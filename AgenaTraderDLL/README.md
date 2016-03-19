@@ -13,7 +13,7 @@ Ich habe vorhin eine Test-DLL in den AT mit folgendem Setup eingebunden:
 
 ##Erstellen einer DLL in Visual Studio
 Unsere Test-DLL besteht aus folgendem Code:
-```
+```C#
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,12 +60,12 @@ Im Select References Fenster erkennen wir unsere DLL im GAC (gelber Pfeil).
 Über den Karteireiter Browse (blauer Pfeil) laden wir unsere DLL seperat in den AT und werden anschließend im unteren Fenster den Pfad zur lokalen DLL wiederfinden (grüner Pfeil).
 
 Wenn wir das korrekte 'using' Statement in Indikatoren oder Conditions hinzufügen, können wir auf die Funktionen unserer DLL zugreifen.
-```
+```C#
 using AgenaTraderDLL;
 ```
 
 Im OnBarUpdate Event greifen wir auf den statischen Helper zu und schreiben den Wert aus unserer DLL in die Ausgabe des AT.
-```
+```C#
 protected override void OnBarUpdate() {
      String helloDLLworld = ExternalHelper.Test();
      Print(helloDLLworld);
