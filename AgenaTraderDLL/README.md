@@ -29,13 +29,13 @@ namespace AgenaTraderDLL
 }
 ```
 
-In den Projekteinstellungen muss das Projekt bevor wir kompilieren zuerst signiert werden! (siehe Attachment gelber Pfeil).
+In den Projekteinstellungen muss das Projekt bevor wir kompilieren zuerst signiert werden! (gelber Pfeil).
+![gacutil](https://github.com/simonpucher/AgenaTrader/blob/master/AgenaTraderDLL/images/gacutil.png)
 
-Wie in Postings vorhin schon angesprochen müssen wir die von uns erstellte DLL über gacutil.exe in den GAC (Global Assembly Cache) kopieren. Eine Alternative ist das Erstellen eines MSI Packages. Die gacutil Variante ist während der Entwicklung die schnellere Variante.
-Da wir .Net 3.5 einsetzen, verwenden wir gacutil aus folgendem Ordner: `C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe'
+Wie in Postings vorhin schon angesprochen müssen wir die von uns erstellte DLL über gacutil.exe in den GAC (Global Assembly Cache) kopieren. Eine Alternative ist das Erstellen eines MSI Packages. Die gacutil Variante ist während der Entwicklung die schnellere Variante. Da wir .Net 3.5 einsetzen, verwenden wir gacutil aus folgendem Ordner: `C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe'
 
 Um sich etwas Arbeit beim kopieren in den GAC zu ersparen kann der Visual Studio Post Build Prozess verwendet werden, so kopiert Visual Studio nach jedem Build die DLL in den GAC.
-(siehe Attachment oranger Pfeil).
+(oranger Pfeil im Bild oben).
 
 ```
 "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe"  /i "$(TargetPath)"
