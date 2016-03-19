@@ -56,6 +56,7 @@ Falls man händisch die DLL wieder aus dem GAC entfernen möchte, kann folgender
 ##Verwendung unserer DLL im AT
 
 Wir starten AT und klicken auf: Tools => Programmierung => Programmier Referenzen.
+![references](https://github.com/simonpucher/AgenaTrader/blob/master/AgenaTraderDLL/images/screenshot.png)
 Im Select References Fenster erkennen wir unsere DLL im GAC (gelber Pfeil).
 Über den Karteireiter Browse (blauer Pfeil) laden wir unsere DLL seperat in den AT und werden anschließend im unteren Fenster den Pfad zur lokalen DLL wiederfinden (grüner Pfeil).
 
@@ -73,5 +74,4 @@ protected override void OnBarUpdate() {
 ```
 
 Zu guter Schluß einmal alles im AT kompilieren und fertig.
-
 Viel Spaß!
