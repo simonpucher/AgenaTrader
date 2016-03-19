@@ -29,7 +29,7 @@ namespace AgenaTraderDLL
 }
 ```
 
-In den Projekteinstellungen muss das Projekt bevor wir kompilieren zuerst SIGNIERT werden! (siehe Attachment gelber Pfeil).
+In den Projekteinstellungen muss das Projekt bevor wir kompilieren zuerst signiert werden! (siehe Attachment gelber Pfeil).
 
 Wie in Postings vorhin schon angesprochen müssen wir die von uns erstellte DLL über gacutil.exe in den GAC (Global Assembly Cache) kopieren. Eine Alternative ist das Erstellen eines MSI Packages. Die gacutil Variante ist während der Entwicklung die schnellere Variante.
 Da wir .Net 3.5 einsetzen, verwenden wir gacutil aus folgendem Ordner: C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe
