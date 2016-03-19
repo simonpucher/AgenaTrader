@@ -13,7 +13,6 @@ Ich habe vorhin eine Test-DLL in den AT mit folgendem Setup eingebunden:
 
 Unsere Test-DLL besteht aus folgendem Code:
 ```
-SELECT ALL
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -38,7 +37,6 @@ Um sich etwas Arbeit beim kopieren in den GAC zu ersparen kann der Visual Studio
 (siehe Attachment oranger Pfeil).
 
 ```
-SELECT ALL
 "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe"  /i "$(TargetPath)"
 ```
 
@@ -46,13 +44,11 @@ Nun kann die Test-DLL kompiliert werden und wird automatisch in den GAC kopiert.
 
 Um zu kontrollieren ob die DLL auch wirklich im GAC ist kann folgender Befehl verwendet werden:
 ```
-SELECT ALL
 "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe"  /l "AgenaTraderDLL"
 ```
 
 Falls man händisch die DLL wieder aus dem GAC entfernen möchte, kann folgender Befehl verwendet werden:
 ```
-SELECT ALL
 "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe"  /u "AgenaTraderDLL"
 ```
 
@@ -64,14 +60,12 @@ Im Select References Fenster erkennen wir unsere DLL im GAC (gelber Pfeil).
 
 Wenn wir das korrekte Using Statement in Indikatoren oder Conditions hinzufügen, können wir auf die Funktionen unserer DLL zugreifen. 
 ```
-SELECT ALL
 using AgenaTraderDLL;
 ```
 
 Im OnBarUpdate Event greifen wir auf den statischen Helper zu und schreiben den Wert aus unserer DLL in die Ausgabe des AT.
 
 ```
-SELECT ALL
 protected override void OnBarUpdate() {
      String helloDLLworld = ExternalHelper.Test();
      Print(helloDLLworld);
