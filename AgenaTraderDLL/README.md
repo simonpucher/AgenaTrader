@@ -1,5 +1,5 @@
 #Einbinden einer DLL in den Agena Trader
-Ursprüngliches Posting im [Agena Trader Forum](http://www.tradeescort.com/phpbb_de/viewtopic.php?f=18&t=1342)
+ [Ursprüngliches Posting im Agena Trader Forum](http://www.tradeescort.com/phpbb_de/viewtopic.php?f=18&t=1342)
 
 Ich greife das Thema nochmal auf, da das Einbinden von DLLs sicherlich eine extrem nützliche Funktion ist. 
 So kann man sich Klassen, Extensions oder Helper einmal zentral zurechtlegen und muss den Source Code nicht jeweils in die Indikatoren oder Conditions kopieren (Redundanz = Fehleranfälligkeit!).
