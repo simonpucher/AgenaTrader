@@ -12,7 +12,8 @@ Ich habe vorhin eine Test-DLL in den AT mit folgendem Setup eingebunden:
 + Visual Studio wurde als Administrator ausgeführt, da sonst Probleme beim Kopieren in den GAC auftreten.
 
 Unsere Test-DLL besteht aus folgendem Code:
-CODE: SELECT ALL
+```
+SELECT ALL
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,7 @@ namespace AgenaTraderDLL
         }
     }
 }
+```
 
 In den Projekteinstellungen muss das Projekt bevor wir kompilieren zuerst SIGNIERT werden! (siehe Attachment gelber Pfeil).
 
@@ -35,19 +37,24 @@ Da wir .Net 3.5 einsetzen, verwenden wir gacutil aus folgendem Ordner: C:\Progra
 Um sich etwas Arbeit beim kopieren in den GAC zu ersparen kann der Visual Studio Post Build Prozess verwendet werden, so kopiert Visual Studio nach jedem Build die DLL in den GAC.
 (siehe Attachment oranger Pfeil).
 
-CODE: SELECT ALL
+```
+SELECT ALL
 "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe"  /i "$(TargetPath)"
+```
 
 Nun kann die Test-DLL kompiliert werden und wird automatisch in den GAC kopiert.
 
 Um zu kontrollieren ob die DLL auch wirklich im GAC ist kann folgender Befehl verwendet werden:
-CODE: SELECT ALL
+```
+SELECT ALL
 "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe"  /l "AgenaTraderDLL"
-
+```
 
 Falls man händisch die DLL wieder aus dem GAC entfernen möchte, kann folgender Befehl verwendet werden:
-CODE: SELECT ALL
+```
+SELECT ALL
 "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe"  /u "AgenaTraderDLL"
+```
 
 #Verwendung unserer DLL im AT
 
@@ -56,17 +63,20 @@ Im Select References Fenster erkennen wir unsere DLL im GAC (gelber Pfeil).
 Über den Karteireiter Browse (blauer Pfeil) laden wir unsere DLL seperat in den AT und werden anschließend im unteren Fenster den Pfad zur lokalen DLL wiederfinden (grüner Pfeil).
 
 Wenn wir das korrekte Using Statement in Indikatoren oder Conditions hinzufügen, können wir auf die Funktionen unserer DLL zugreifen. 
-CODE: SELECT ALL
+```
+SELECT ALL
 using AgenaTraderDLL;
-
+```
 
 Im OnBarUpdate Event greifen wir auf den statischen Helper zu und schreiben den Wert aus unserer DLL in die Ausgabe des AT.
 
-CODE: SELECT ALL
+```
+SELECT ALL
 protected override void OnBarUpdate() {
      String helloDLLworld = ExternalHelper.Test();
      Print(helloDLLworld);
 }
+```
 
 Zu guter Schluß einmal alles im AT kompilieren und fertig.
 Viel Spaß!
