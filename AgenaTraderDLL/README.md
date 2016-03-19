@@ -11,6 +11,7 @@ Ich habe vorhin eine Test-DLL in den AT mit folgendem Setup eingebunden:
 + Für alle Aktivitäten verwenden wir .NET 3.5 Framework 
 + Visual Studio wurde als Administrator ausgeführt, da sonst Probleme beim Kopieren in den GAC auftreten.
 
+##Erstellen einer DLL in Visual Studio
 Unsere Test-DLL besteht aus folgendem Code:
 ```
 using System;
@@ -52,7 +53,7 @@ Falls man händisch die DLL wieder aus dem GAC entfernen möchte, kann folgender
 "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe"  /u "AgenaTraderDLL"
 ```
 
-#Verwendung unserer DLL im AT
+##Verwendung unserer DLL im AT
 
 Wir starten AT und klicken wie schon im obigen Postings beschrieben auf: Tools => Programmierung => Programmier Referenzen.
 Im Select References Fenster erkennen wir unsere DLL im GAC (gelber Pfeil).
