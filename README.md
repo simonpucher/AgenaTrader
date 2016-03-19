@@ -4,4 +4,4 @@
 
 ##Links
 [Agena Trader Software](http://www.tradeescort.com)
-[Agena Trader Support Forum]{http://www.tradeescort.com/phpbb_de/)
+[Agena Trader Support Forum](http://www.tradeescort.com/phpbb_de/)
