@@ -47,11 +47,11 @@ Um zu kontrollieren ob die DLL auch wirklich im GAC ist kann folgender Befehl ve
 ```
 "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe"  /l "AgenaTraderDLL"
 ```
-
 Falls man händisch die DLL wieder aus dem GAC entfernen möchte, kann folgender Befehl verwendet werden:
 ```
 "C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe"  /u "AgenaTraderDLL"
 ```
+gacutil wurde in der Kommandozeile als Administrator ausgeführt.
 
 ##Verwendung unserer DLL im AT
 
