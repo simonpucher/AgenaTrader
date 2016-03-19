@@ -1,5 +1,5 @@
 #Einbinden einer DLL in den Agena Trader
-Ursprüngliches Posting im Forum: http://www.tradeescort.com/phpbb_de/viewtopic.php?f=18&t=1342
+Ursprüngliches Posting im [Agena Trader Forum](http://www.tradeescort.com/phpbb_de/viewtopic.php?f=18&t=1342)
 
 Ich greife das Thema nochmal auf, da das Einbinden von DLLs sicherlich eine extrem nützliche Funktion ist. 
 So kann man sich Klassen, Extensions oder Helper einmal zentral zurechtlegen und muss den Source Code nicht jeweils in die Indikatoren oder Conditions kopieren (Redundanz = Fehleranfälligkeit!).
@@ -32,7 +32,7 @@ namespace AgenaTraderDLL
 In den Projekteinstellungen muss das Projekt bevor wir kompilieren zuerst signiert werden! (siehe Attachment gelber Pfeil).
 
 Wie in Postings vorhin schon angesprochen müssen wir die von uns erstellte DLL über gacutil.exe in den GAC (Global Assembly Cache) kopieren. Eine Alternative ist das Erstellen eines MSI Packages. Die gacutil Variante ist während der Entwicklung die schnellere Variante.
-Da wir .Net 3.5 einsetzen, verwenden wir gacutil aus folgendem Ordner: C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe
+Da wir .Net 3.5 einsetzen, verwenden wir gacutil aus folgendem Ordner: `C:\Program Files (x86)\Microsoft SDKs\Windows\v7.0A\Bin\gacutil.exe'
 
 Um sich etwas Arbeit beim kopieren in den GAC zu ersparen kann der Visual Studio Post Build Prozess verwendet werden, so kopiert Visual Studio nach jedem Build die DLL in den GAC.
 (siehe Attachment oranger Pfeil).
@@ -55,17 +55,16 @@ Falls man händisch die DLL wieder aus dem GAC entfernen möchte, kann folgender
 
 ##Verwendung unserer DLL im AT
 
-Wir starten AT und klicken wie schon im obigen Postings beschrieben auf: Tools => Programmierung => Programmier Referenzen.
+Wir starten AT und klicken auf: Tools => Programmierung => Programmier Referenzen.
 Im Select References Fenster erkennen wir unsere DLL im GAC (gelber Pfeil).
 Über den Karteireiter Browse (blauer Pfeil) laden wir unsere DLL seperat in den AT und werden anschließend im unteren Fenster den Pfad zur lokalen DLL wiederfinden (grüner Pfeil).
 
-Wenn wir das korrekte Using Statement in Indikatoren oder Conditions hinzufügen, können wir auf die Funktionen unserer DLL zugreifen. 
+Wenn wir das korrekte 'using' Statement in Indikatoren oder Conditions hinzufügen, können wir auf die Funktionen unserer DLL zugreifen.
 ```
 using AgenaTraderDLL;
 ```
 
 Im OnBarUpdate Event greifen wir auf den statischen Helper zu und schreiben den Wert aus unserer DLL in die Ausgabe des AT.
-
 ```
 protected override void OnBarUpdate() {
      String helloDLLworld = ExternalHelper.Test();
