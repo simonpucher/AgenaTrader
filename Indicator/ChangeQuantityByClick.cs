@@ -19,7 +19,6 @@ namespace AgenaTrader.UserCode
 	{
 		#region Variables
 
-		//private string _positionsizes = "1;2;3;4;5";
         private OrdersLogFilter olf = new OrdersLogFilter();
 
 		#endregion
@@ -39,39 +38,12 @@ namespace AgenaTrader.UserCode
             if (ChartControl != null)
                 ChartControl.ChartPanelMouseDown += OnChartPanelMouseDown;
 
-            //if (this.Instrument != null && this.Instrument.Core.TradingManager != null)
-            //{
-            //    this.Instrument.Core.TradingManager.NewOrder += TradingManager_NewOrder;
-            //    this.Instrument.Core.TradingManager.NewTrade += TradingManager_NewTrade;
-            //    this.Instrument.Core.TradingManager.NewPosition += TradingManager_NewPosition;
-            //    this.Instrument.Core.TradingManager.NewExecution += TradingManager_NewExecution;
-            //}
-
             //Init Filter
             olf.Instruments = new List<IInstrument>();
             olf.Instruments.Add(this.Instrument);
 
         }
 
-        //void TradingManager_NewPosition(object sender, PositionEventArgs e)
-        //{
-      
-        //}
-
-        //void TradingManager_NewExecution(object sender, ExecutionEventArgs e)
-        //{
-          
-        //}
-
-        //void TradingManager_NewTrade(object sender, TradeEventArgs e)
-        //{
-       
-        //}
-
-        //void TradingManager_NewOrder(object sender, OrderEventArgs e)
-        //{
-        
-        //}
 
 
 		protected override void OnBarUpdate()
@@ -90,15 +62,6 @@ namespace AgenaTrader.UserCode
 
         private void OnChartPanelMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            //this.Instrument.Core.TradingManager.GetOpenOrders();
-            //IList<ITradingOrder> tol = this.Instrument.Core.TradingManager.OpenedOrders.ToList();
-            //IList<ITradingPosition> tpl = this.Instrument.Core.TradingManager.OpenedPositions.ToList();
-            //IList<ITradingTrade> ttl = this.Instrument.Core.TradingManager.OpenedTrades.ToList();
-            
-            //if (e.Button == System.Windows.Forms.MouseButtons.Right) { MessageBox.Show("Right click"); }
-            //if (e.Button == System.Windows.Forms.MouseButtons.Left) { MessageBox.Show("Left click"); }
-
-
 
             if (e.Button == System.Windows.Forms.MouseButtons.Left)
             {
@@ -129,15 +92,10 @@ namespace AgenaTrader.UserCode
                                     this.TradingManager.EditOrder(ord);
                                 }
                             }
-
-                         
                         }
                     }
                 }  
             }
-            
-            //Print("X = {0}, Y = {1}", ChartControl.GetDateTimeByX(e.X), ChartControl.GetPriceByY(e.Y));
-
         }
 
 
@@ -149,14 +107,6 @@ namespace AgenaTrader.UserCode
 		{
 			get { return Values[0]; }
 		}
-
-        //[Description("")]
-        //[Category("Parameters")]
-        //public string Positionsizes
-        //{
-        //    get { return _positionsizes; }
-        //    set { _positionsizes = value; }
-        //}
 
 		#endregion
 	}
