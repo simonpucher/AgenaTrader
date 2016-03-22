@@ -1,7 +1,6 @@
 #AgenaTrader Scripts 
 ##Einbinden einer DLL
-[Einbinden einer DLL in den Agena Trader](https://github.com/simonpucher/AgenaTrader/tree/master/AgenaTraderDLL)
-
+Einfache DLL und Ablauf zur Einbindung der DLL in den Agena Trader.
 
 ##Indikatoren
 **ChangeQuantityByClick**
