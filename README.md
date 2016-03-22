@@ -4,9 +4,11 @@
 
 ##Indikatoren
 **ChangeQuantityByClick**
+
 Ermöglicht Änderungen an Positionsgrößen ohne Tastatureingabe durch Klick auf den Charthintergrund.
 
 **Traders Dynamic Index**
+
 [Funktionsweise TDI](http://www.earnforex.com/metatrader-indicators/Traders-Dynamic-Index/)
 
 
