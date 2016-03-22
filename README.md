@@ -2,11 +2,11 @@
 ##Einbinden einer DLL
 [Einbinden einer DLL in den Agena Trader](https://github.com/simonpucher/AgenaTrader/tree/master/AgenaTraderDLL)
 
-##Indikatoren
+**Indikatoren**
 ###ChangeQuantityByClick
 Ermöglicht Änderungen an Positionsgrößen ohne Tastatureingabe durch Klick auf den Charthintergrund.
 
-###Traders Dynamic Index
+**Traders Dynamic Index**
 [Funktionsweise TDI](http://www.earnforex.com/metatrader-indicators/Traders-Dynamic-Index/)
 
 
