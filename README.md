@@ -1,10 +1,9 @@
 #AgenaTrader Scripts 
 ##Einbinden einer DLL
-Einfache DLL und Ablauf zur Einbindung der DLL in den Agena Trader.
+Einfache DLL mit einem statischen Helper inklusive dem Ablauf zur Einbindung in den Agena Trader (v. 1.8).
 
 ##Indikatoren
-**ChangeQuantityByClick**
-
+###ChangeQuantityByClick
 Ermöglicht Änderungen an Positionsgrößen ohne Tastatureingabe durch Klick auf den Charthintergrund.
 
 **Traders Dynamic Index**
