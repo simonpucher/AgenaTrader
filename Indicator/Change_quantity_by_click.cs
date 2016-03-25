@@ -12,9 +12,11 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 using AgenaTrader.Helper.TradingManager;
 
+/// Version: 1.0
 namespace AgenaTrader.UserCode
 {
-	[Description("Changes the quantity of an order by clicking on the chart.")]
+
+    [Description("Changes the quantity of an order by clicking on the chart.")]
 	public class ChangeQuantity : UserIndicator
 	{
 		#region Variables

@@ -12,9 +12,11 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 using System.Globalization;
 
+/// Version: 1.0
 namespace AgenaTrader.UserCode
 {
-	[Description("ORB Indicator")]
+   
+    [Description("ORB Indicator")]
 	public class ORB : UserIndicator
 	{
 
