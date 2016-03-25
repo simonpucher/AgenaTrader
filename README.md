@@ -6,6 +6,9 @@ Einfache DLL mit einem statischen Helper inklusive dem Ablauf zur Einbindung in 
 ###ChangeQuantityByClick
 Ermöglicht Änderungen an Positionsgrößen ohne Tastatureingabe durch Klick auf den Charthintergrund.
 
+###Open Range Breakout
+[Funktionsweise](https://www.whselfinvest.at/de/Store_Birger_Schaefermeier_Trading_Strategie_Open_Range_Break_Out.php)
+
 ###Traders Dynamic Index
 [Funktionsweise](http://www.earnforex.com/metatrader-indicators/Traders-Dynamic-Index/)
 
