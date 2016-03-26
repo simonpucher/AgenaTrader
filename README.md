@@ -10,7 +10,7 @@ Ermöglicht Änderungen an Positionsgrößen ohne Tastatureingabe durch Klick au
 [Funktionsweise](https://www.whselfinvest.at/de/Store_Birger_Schaefermeier_Trading_Strategie_Open_Range_Break_Out.php)
 
 ###Traders Dynamic Index
-Über die Eigenschaft XXX kann die Dauer der Open Range in Minuten eingestellt werden.
+Über die Eigenschaft ORBMinutes kann die Dauer der Open Range in Minuten eingestellt werden.
 [Funktionsweise](http://www.earnforex.com/metatrader-indicators/Traders-Dynamic-Index/)
 
 ###Coppock Curve
