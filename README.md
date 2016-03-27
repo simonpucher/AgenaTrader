@@ -16,7 +16,7 @@ Ermöglicht Änderungen an Positionsgrößen ohne Tastatureingabe durch Klick au
 ###Coppock Curve
 [Funktionsweise](https://en.wikipedia.org/wiki/Coppock_curve)
 
-###Quantitative Qualitative Estimation
+###Quantitative Qualitative Estimation (QQE)
 [Funktionsweise](https://en.wikipedia.org/wiki/Zero_lag_exponential_moving_average)
 
 ##Links
