@@ -33,6 +33,12 @@ namespace AgenaTrader.UserCode
         #region Variables
         // Wizard generated variables
             private int rSI_Period = 14; // Default setting for RSI_Period
+
+            private Color _line01 = Color.DodgerBlue;
+            private Color _line02 = Color.Gold;
+            private Color _line_upper = Color.Gray;
+            private Color _line_mid = Color.Gray;
+            private Color _line_lower = Color.Gray;
 		
 			private int Wilders_Period;
 			private int StartBar, LastAlertBar;
@@ -50,16 +56,17 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// This method is used to configure the indicator and is called once before any bar data is loaded.
         /// </summary>
-        protected override void Initialize()
+        protected override void OnStartUp()
         {
-            
-			Add(new Plot (new Pen(Color.FromKnownColor(KnownColor.DodgerBlue),2), PlotStyle.Line, "Value1"));
-            Add(new Plot(new Pen(Color.FromKnownColor(KnownColor.Gold),2), PlotStyle.Line, "Value2"));
+
+            Add(new Plot(new Pen(this.Line_01, 2), PlotStyle.Line, "Value1"));
+            Add(new Plot(new Pen(this.Line_02, 2), PlotStyle.Line, "Value2"));
             Plots[1].Pen.DashStyle = DashStyle.Dash;
-			
-			Add(new Line(Color.Gray, 30, "Lower Line"));
-			Add(new Line(Color.Gray, 70, "Upper Line"));
-			Add(new Line(Color.Gray, 50, "Mid Line"));
+
+            Add(new Line(_line_lower, 70, "Upper Line"));
+            Add(new Line(_line_mid, 50, "Mid Line"));
+            Add(new Line(_line_upper, 30, "Lower Line"));
+
 			Lines[0].Pen.DashStyle = DashStyle.Dash;
 			Lines[1].Pen.DashStyle = DashStyle.Dash;
 			
@@ -77,6 +84,8 @@ namespace AgenaTrader.UserCode
 				StartBar=SF;
 			else
 				StartBar=Wilders_Period;
+
+
 				}
 
         /// <summary>
@@ -120,6 +129,12 @@ namespace AgenaTrader.UserCode
 						tr = dv;
 			}
 			Value2.Set(tr);
+
+
+            //Change Colors
+            PlotColors[0][0] = Line_01;
+            PlotColors[1][0] = Line_02;
+           
 		}
 		
         #region Properties
@@ -151,7 +166,67 @@ namespace AgenaTrader.UserCode
             get { return sF; }
             set { sF = Math.Max(1, value); }
         }
-		
+
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color")]
+        [Category("Colors")]
+        [DisplayName("Line 01")]
+        public Color Line_01
+        {
+            get { return _line01; }
+            set { _line01 = value; }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color")]
+        [Category("Colors")]
+        [DisplayName("Line 02")]
+        public Color Line_02
+        {
+            get { return _line02; }
+            set { _line02 = value; }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color")]
+        [Category("Colors")]
+        [DisplayName("Line Upper")]
+        public Color Line_Upper
+        {
+            get { return _line_upper; }
+            set { _line_upper = value; }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color")]
+        [Category("Colors")]
+        [DisplayName("Line Middle")]
+        public Color Line_Mid
+        {
+            get { return _line_mid; }
+            set { _line_mid = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color")]
+        [Category("Colors")]
+        [DisplayName("Line Lower")]
+        public Color Line_Lower
+        {
+            get { return _line_lower; }
+            set { _line_lower = value; }
+        }
+
+
 		
         #endregion
     }
