@@ -56,7 +56,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// This method is used to configure the indicator and is called once before any bar data is loaded.
         /// </summary>
-        protected override void OnStartUp()
+            protected override void Initialize()
         {
 
             Add(new Plot(new Pen(this.Line_01, 2), PlotStyle.Line, "Value1"));
