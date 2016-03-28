@@ -57,10 +57,13 @@ namespace AgenaTrader.UserCode
                     double minvalue = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
                     double maxvalue = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
 
-                    DrawRectangle("MyRect", true, start_date, minvalue, end, maxvalue, Color.Brown, Color.Brown, 70);
-                    DrawHorizontalLine("LowLine", true, minvalue, Color.Brown, DashStyle.Solid, 3);
-                    DrawHorizontalLine("HighLine", true, maxvalue, Color.Brown, DashStyle.Solid, 3);
-                    DrawVerticalLine("BeginnSession", start_date, Color.Brown, DashStyle.Solid, 3);
+                    //DrawFibonacciRetracements("Fibonacci_Session", true, start_date, minvalue, end, maxvalue);
+                    DrawFibonacciProjections("Fibonacci_Session", true, start_date, minvalue, end, maxvalue, start_date, minvalue);
+
+                    //DrawRectangle("MyRect", true, start_date, minvalue, end, maxvalue, Color.Brown, Color.Brown, 70);
+                    DrawHorizontalLine("LowLine", true, minvalue, Color.Red, DashStyle.Solid, 3);
+                    DrawHorizontalLine("HighLine", true, maxvalue, Color.Green, DashStyle.Solid, 3);
+                    //DrawVerticalLine("BeginnSession", start_date, Color.Brown, DashStyle.Solid, 3);
 
                     //Print("min: " + minvalue);
                     //Print("max: " + maxvalue);
@@ -205,3 +208,4 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
