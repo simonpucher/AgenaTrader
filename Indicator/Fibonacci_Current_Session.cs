@@ -39,26 +39,32 @@ namespace AgenaTrader.UserCode
 		{
 			//MyPlot1.Set(Input[0]);
 
-
-            if (Bars != null && Bars.Count > 0 && IsCurrentBarLast)
+            if (this.Bars.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Hour ||  
+                this.Bars.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Minute  ||
+                    this.Bars.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Second ||
+                this.Bars.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Tick)
             {
-                DateTime start = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
-                DateTime start_date = start.Date;
-                DateTime end = start.AddHours(23).AddMinutes(59).AddSeconds(59);
-
-                //Selektiere alle gültigen Kurse und finde low und high.
-                IEnumerable<IBar> list = Bars.Where(x => x.Time >= start).Where(x => x.Time <= end);
-                if (list != null && !list.IsEmpty())
+                
+                if (Bars != null && Bars.Count > 0 && IsCurrentBarLast)
                 {
-                    double minvalue = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
-                    double maxvalue = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
+                    DateTime start = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
+                    DateTime start_date = start.Date;
+                    DateTime end = start.AddHours(23).AddMinutes(59).AddSeconds(59);
 
-                    //DrawFibonacciRetracements("Fibonacci_Session", true, start_date, minvalue, end, maxvalue);
-                    DrawFibonacciProjections("Fibonacci_Session", true, start_date, minvalue, Time[0], maxvalue  , start_date, minvalue);
+                    //Selektiere alle gültigen Kurse und finde low und high.
+                    IEnumerable<IBar> list = Bars.Where(x => x.Time >= start).Where(x => x.Time <= end);
+                    if (list != null && !list.IsEmpty())
+                    {
+                        double minvalue = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
+                        double maxvalue = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
 
-                    DrawHorizontalLine("LowLine", true, minvalue, Color.Red, DashStyle.Solid, 3);
-                    DrawHorizontalLine("HighLine", true, maxvalue, Color.Green, DashStyle.Solid, 3);
+                        //DrawFibonacciRetracements("Fibonacci_Session", true, start_date, minvalue, end, maxvalue);
+                        DrawFibonacciProjections("Fibonacci_Session", true, start_date, minvalue, Time[0], maxvalue  , start_date, minvalue);
 
+                        DrawHorizontalLine("LowLine", true, minvalue, Color.Red, DashStyle.Solid, 3);
+                        DrawHorizontalLine("HighLine", true, maxvalue, Color.Green, DashStyle.Solid, 3);
+
+                    }
                 }
             }
 		}
