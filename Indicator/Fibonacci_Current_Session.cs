@@ -42,10 +42,6 @@ namespace AgenaTrader.UserCode
 
             if (Bars != null && Bars.Count > 0 && IsCurrentBarLast)
             {
-
-                //DateTime start =  DateTime.ParseExact("24.03.2016 09:00", "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
-                //DateTime end = DateTime.ParseExact("24.03.2016 10:15", "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
-
                 DateTime start = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
                 DateTime start_date = start.Date;
                 DateTime end = start.AddHours(23).AddMinutes(59).AddSeconds(59);
@@ -58,15 +54,10 @@ namespace AgenaTrader.UserCode
                     double maxvalue = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
 
                     //DrawFibonacciRetracements("Fibonacci_Session", true, start_date, minvalue, end, maxvalue);
-                    DrawFibonacciProjections("Fibonacci_Session", true, start_date, minvalue, end, maxvalue, start_date, minvalue);
+                    DrawFibonacciProjections("Fibonacci_Session", true, start_date, minvalue, Time[0], maxvalue  , start_date, minvalue);
 
-                    //DrawRectangle("MyRect", true, start_date, minvalue, end, maxvalue, Color.Brown, Color.Brown, 70);
                     DrawHorizontalLine("LowLine", true, minvalue, Color.Red, DashStyle.Solid, 3);
                     DrawHorizontalLine("HighLine", true, maxvalue, Color.Green, DashStyle.Solid, 3);
-                    //DrawVerticalLine("BeginnSession", start_date, Color.Brown, DashStyle.Solid, 3);
-
-                    //Print("min: " + minvalue);
-                    //Print("max: " + maxvalue);
 
                 }
             }
@@ -208,4 +199,5 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
 
