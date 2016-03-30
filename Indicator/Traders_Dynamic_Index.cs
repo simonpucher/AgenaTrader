@@ -27,7 +27,7 @@ namespace AgenaTrader.UserCode
 	/// Optimized execution by predefining instances of external indicators (Zondor August 10 2010)
 	/// </summary>
 	[Description("The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.")]
-	public class TDI : UserIndicator
+	public class TDI_Indicator : UserIndicator
 	{
 		#region Variables
 		
@@ -512,22 +512,22 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public TDI TDI(System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
+		public TDI_Indicator TDI_Indicator(System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
         {
-			return TDI(Input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
+			return TDI_Indicator(Input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
 		}
 
 		/// <summary>
 		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public TDI TDI(IDataSeries input, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
+		public TDI_Indicator TDI_Indicator(IDataSeries input, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<TDI>(input, i => i.RSIPeriod == rSIPeriod && i.PricePeriod == pricePeriod && i.SignalPeriod == signalPeriod && i.BandPeriod == bandPeriod && Math.Abs(i.StdDevNumber - stdDevNumber) <= Double.Epsilon);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<TDI_Indicator>(input, i => i.RSIPeriod == rSIPeriod && i.PricePeriod == pricePeriod && i.SignalPeriod == signalPeriod && i.BandPeriod == bandPeriod && Math.Abs(i.StdDevNumber - stdDevNumber) <= Double.Epsilon);
 
 			if (indicator != null)
 				return indicator;
 
-			indicator = new TDI
+			indicator = new TDI_Indicator
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
@@ -555,20 +555,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public TDI TDI(System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
+		public TDI_Indicator TDI_Indicator(System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
 		{
-			return LeadIndicator.TDI(Input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
+			return LeadIndicator.TDI_Indicator(Input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
 		}
 
 		/// <summary>
 		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public TDI TDI(IDataSeries input, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
+		public TDI_Indicator TDI_Indicator(IDataSeries input, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.TDI(input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
+			return LeadIndicator.TDI_Indicator(input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
 		}
 	}
 
@@ -581,17 +581,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public TDI TDI(System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
+		public TDI_Indicator TDI_Indicator(System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
 		{
-			return LeadIndicator.TDI(Input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
+			return LeadIndicator.TDI_Indicator(Input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
 		}
 
 		/// <summary>
 		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public TDI TDI(IDataSeries input, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
+		public TDI_Indicator TDI_Indicator(IDataSeries input, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
 		{
-			return LeadIndicator.TDI(input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
+			return LeadIndicator.TDI_Indicator(input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
 		}
 	}
 
@@ -604,17 +604,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public TDI TDI(System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
+		public TDI_Indicator TDI_Indicator(System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
 		{
-			return LeadIndicator.TDI(Input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
+			return LeadIndicator.TDI_Indicator(Input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
 		}
 
 		/// <summary>
 		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public TDI TDI(IDataSeries input, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
+		public TDI_Indicator TDI_Indicator(IDataSeries input, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber)
 		{
-			return LeadIndicator.TDI(input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
+			return LeadIndicator.TDI_Indicator(input, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber);
 		}
 	}
 
