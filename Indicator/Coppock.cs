@@ -193,7 +193,13 @@ namespace AgenaTrader.UserCode
         }
 
 
-		#region Properties
+        public override string ToString()
+        {
+            return "Coppock";
+        }
+
+
+        #region Properties
         ///// <summary>
         ///// </summary>
         //[Browsable(false)]
@@ -204,8 +210,8 @@ namespace AgenaTrader.UserCode
         //}
 
         /// <summary>
-		/// </summary>
-		[Browsable(false)]
+        /// </summary>
+        [Browsable(false)]
 		[XmlIgnore()]
 		public DataSeries SignalLine
 		{

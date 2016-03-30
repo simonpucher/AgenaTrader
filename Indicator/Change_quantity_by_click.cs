@@ -101,9 +101,15 @@ namespace AgenaTrader.UserCode
         }
 
 
-		#region Properties
+        public override string ToString()
+        {
+            return "Change Quantity";
+        }
 
-		[Browsable(false)]
+
+        #region Properties
+
+        [Browsable(false)]
 		[XmlIgnore()]
 		public DataSeries MyPlot1
 		{

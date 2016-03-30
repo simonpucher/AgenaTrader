@@ -136,7 +136,13 @@ namespace AgenaTrader.UserCode
             PlotColors[1][0] = Line_02;
            
 		}
-		
+
+
+        public override string ToString()
+        {
+            return "QQE";
+        }
+
         #region Properties
         [Browsable(false)]	// this line prevents the data series from being displayed in the indicator properties dialog, do not remove
         [XmlIgnore()]		// this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove

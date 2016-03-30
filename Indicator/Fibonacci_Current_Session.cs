@@ -76,9 +76,15 @@ namespace AgenaTrader.UserCode
 
         }
 
-		#region Properties
 
-		[Browsable(false)]
+        public override string ToString()
+        {
+            return "Fibonacci Current Session";
+        }
+
+        #region Properties
+
+        [Browsable(false)]
 		[XmlIgnore()]
 		public DataSeries MyPlot1
 		{

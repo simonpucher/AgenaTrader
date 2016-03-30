@@ -122,6 +122,13 @@ namespace AgenaTrader.UserCode
                 PlotColors[5][0] = MidNegative;
 		}
 
+
+
+        public override string ToString()
+        {
+            return "TDI";
+        }
+
 		#region Properties
 		/// <summary>
 		/// </summary>
