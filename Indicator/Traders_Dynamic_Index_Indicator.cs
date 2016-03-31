@@ -62,6 +62,9 @@ namespace AgenaTrader.UserCode
 		private SMA DYNSignal; 
 		private SMA	DYNAverage; 
 		private StdDev SDBB;
+
+        private DataSeries RSILine;
+
 		#endregion
 
 		/// <summary>
@@ -84,39 +87,83 @@ namespace AgenaTrader.UserCode
 		/// Calculates the indicator value(s) at the current index.
 		/// </summary>
 		protected override void OnStartUp()
-		{
- 
-			DYNRSI = RSI(Input,RSIPeriod,1);
-			DYNPrice = SMA(DYNRSI,PricePeriod);
-			DYNSignal = SMA(DYNRSI,SignalPeriod);
-			DYNAverage = SMA(DYNRSI, BandPeriod);
-			SDBB = StdDev(DYNRSI,BandPeriod);
+        {
+            DYNRSI = RSI(Input, RSIPeriod, 1);
+            DYNPrice = SMA(DYNRSI, PricePeriod);
+            DYNSignal = SMA(DYNRSI, SignalPeriod);
+            DYNAverage = SMA(DYNRSI, BandPeriod);
+            SDBB = StdDev(DYNRSI, BandPeriod);
+
+            this.RSILine = new DataSeries(this);
+    
 		}
 		
 		protected override void OnBarUpdate()
 		{
 
+            //if (this.IsCurrentBarLast)
+            //{
+            //     int count_input = Input.Count;
+            //    int count_RSI = RSI(Input, 10, 1).Count;
+            //    int count_SMA = SMA(Input, 10).Count;
+
+            //    Print("Input: " + count_input);
+            //    Print("RSI: " + count_RSI);
+            //    Print("SMA: " + count_SMA);
+            //}
+
+
             int countbar = Bars.Count - 1 - CurrentBar;
 
-            double priceValue = DYNPrice[countbar];
-            PriceLine.Set(priceValue);
-            SignalLine.Set(DYNSignal[countbar]);
+            //DYNRSI = RSI(Input, RSIPeriod, 1);
 
-            double avg = DYNAverage[countbar];
-            Average.Set(avg);
+            double RSI_value = RSI(RSIPeriod, 1)[0];
+            RSILine.Set(RSI_value);
+
+            double PRICE_value = SMA(DYNRSI, PricePeriod)[0];
+            PriceLine.Set(PRICE_value);
+
+            double SIGNAL_value = SMA(DYNRSI, SignalPeriod)[0];
+            SignalLine.Set(SIGNAL_value);
+
+            double AVG_value = SMA(DYNRSI, BandPeriod)[0];
+            Average.Set(AVG_value);
             MidLine.Set(50);
 
-            double stdDevValue = SDBB[countbar];
-            Upper.Set(avg + StdDevNumber * stdDevValue);
-            Lower.Set(avg - StdDevNumber * stdDevValue);
+            double stdDevValue = StdDev(DYNRSI, BandPeriod)[0];
 
-			PlotColors[0][0] = Main;
-			PlotColors[1][0] = Signal;
-			PlotColors[2][0] = BBAverage;
-			PlotColors[3][0] = BBUpper;
-			PlotColors[4][0] = BBLower;
+            Upper.Set(AVG_value + StdDevNumber * stdDevValue);
+            Lower.Set(AVG_value - StdDevNumber * stdDevValue);
 
-            if (avg > 50)
+            
+
+            //DYNRSI = RSI(Input, RSIPeriod, 1);
+            //DYNPrice = SMA(DYNRSI, PricePeriod);
+            //DYNSignal = SMA(DYNRSI, SignalPeriod);
+            //DYNAverage = SMA(DYNRSI, BandPeriod);
+            //SDBB = StdDev(DYNRSI, BandPeriod);
+
+
+            //double priceValue = DYNPrice[countbar];
+            //PriceLine.Set(DYNRSI[countbar]);
+            ////PriceLine.Set(priceValue);
+            //SignalLine.Set(DYNSignal[countbar]);
+
+            //double AVG_value = DYNAverage[countbar];
+            //Average.Set(AVG_value);
+            //MidLine.Set(50);
+
+            //double stdDevValue = SDBB[countbar];
+            //Upper.Set(AVG_value + StdDevNumber * stdDevValue);
+            //Lower.Set(AVG_value - StdDevNumber * stdDevValue);
+
+            PlotColors[0][0] = Main;
+            PlotColors[1][0] = Signal;
+            PlotColors[2][0] = BBAverage;
+            PlotColors[3][0] = BBUpper;
+            PlotColors[4][0] = BBLower;
+
+            if (AVG_value > 50)
                 PlotColors[5][0] = MidPositive;
             else
                 PlotColors[5][0] = MidNegative;
@@ -130,6 +177,9 @@ namespace AgenaTrader.UserCode
         }
 
 		#region Properties
+
+
+
 		/// <summary>
 		/// </summary>
 		[Browsable(false)]
@@ -183,6 +233,8 @@ namespace AgenaTrader.UserCode
 		{
 			get { return Values[5]; }
 		}
+
+
 
 		/// <summary>
 		/// </summary>
