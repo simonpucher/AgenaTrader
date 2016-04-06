@@ -128,7 +128,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator : Indicator
 	{
 		/// <summary>
-		/// Changes the position size by clicking on the chart.
+		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
 		public ChangeQuantity ChangeQuantity()
         {
@@ -136,7 +136,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Changes the position size by clicking on the chart.
+		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
 		public ChangeQuantity ChangeQuantity(IDataSeries input)
 		{
@@ -166,7 +166,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Changes the position size by clicking on the chart.
+		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
 		public ChangeQuantity ChangeQuantity()
 		{
@@ -174,7 +174,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Changes the position size by clicking on the chart.
+		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
 		public ChangeQuantity ChangeQuantity(IDataSeries input)
 		{
@@ -192,7 +192,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Changes the position size by clicking on the chart.
+		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
 		public ChangeQuantity ChangeQuantity()
 		{
@@ -200,7 +200,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Changes the position size by clicking on the chart.
+		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
 		public ChangeQuantity ChangeQuantity(IDataSeries input)
 		{
@@ -215,7 +215,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Changes the position size by clicking on the chart.
+		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
 		public ChangeQuantity ChangeQuantity()
 		{
@@ -223,7 +223,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Changes the position size by clicking on the chart.
+		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
 		public ChangeQuantity ChangeQuantity(IDataSeries input)
 		{
