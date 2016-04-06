@@ -56,14 +56,14 @@ namespace AgenaTrader.UserCode
 		private PlotStyle plot3Style 	= PlotStyle.Line;
 		private DashStyle dash3Style 	= DashStyle.Solid;
 		private bool 	init 			= false;
-			
-		private RSI DYNRSI;
-		private SMA DYNPrice;
-		private SMA DYNSignal; 
-		private SMA	DYNAverage; 
-		private StdDev SDBB;
 
-        private DataSeries RSILine;
+        //private RSI DYNRSI;
+        //private SMA DYNPrice;
+        //private SMA DYNSignal;
+        //private SMA DYNAverage;
+        //private StdDev SDBB;
+
+        private DataSeries DYNRSI;
 
 		#endregion
 
@@ -88,37 +88,14 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		protected override void OnStartUp()
         {
-            DYNRSI = RSI(Input, RSIPeriod, 1);
-            DYNPrice = SMA(DYNRSI, PricePeriod);
-            DYNSignal = SMA(DYNRSI, SignalPeriod);
-            DYNAverage = SMA(DYNRSI, BandPeriod);
-            SDBB = StdDev(DYNRSI, BandPeriod);
-
-            this.RSILine = new DataSeries(this);
-    
+            this.DYNRSI = new DataSeries(this);
 		}
 		
 		protected override void OnBarUpdate()
 		{
 
-            //if (this.IsCurrentBarLast)
-            //{
-            //     int count_input = Input.Count;
-            //    int count_RSI = RSI(Input, 10, 1).Count;
-            //    int count_SMA = SMA(Input, 10).Count;
-
-            //    Print("Input: " + count_input);
-            //    Print("RSI: " + count_RSI);
-            //    Print("SMA: " + count_SMA);
-            //}
-
-
-            int countbar = Bars.Count - 1 - CurrentBar;
-
-            //DYNRSI = RSI(Input, RSIPeriod, 1);
-
             double RSI_value = RSI(RSIPeriod, 1)[0];
-            RSILine.Set(RSI_value);
+            DYNRSI.Set(RSI_value);
 
             double PRICE_value = SMA(DYNRSI, PricePeriod)[0];
             PriceLine.Set(PRICE_value);
@@ -134,28 +111,6 @@ namespace AgenaTrader.UserCode
 
             Upper.Set(AVG_value + StdDevNumber * stdDevValue);
             Lower.Set(AVG_value - StdDevNumber * stdDevValue);
-
-            
-
-            //DYNRSI = RSI(Input, RSIPeriod, 1);
-            //DYNPrice = SMA(DYNRSI, PricePeriod);
-            //DYNSignal = SMA(DYNRSI, SignalPeriod);
-            //DYNAverage = SMA(DYNRSI, BandPeriod);
-            //SDBB = StdDev(DYNRSI, BandPeriod);
-
-
-            //double priceValue = DYNPrice[countbar];
-            //PriceLine.Set(DYNRSI[countbar]);
-            ////PriceLine.Set(priceValue);
-            //SignalLine.Set(DYNSignal[countbar]);
-
-            //double AVG_value = DYNAverage[countbar];
-            //Average.Set(AVG_value);
-            //MidLine.Set(50);
-
-            //double stdDevValue = SDBB[countbar];
-            //Upper.Set(AVG_value + StdDevNumber * stdDevValue);
-            //Lower.Set(AVG_value - StdDevNumber * stdDevValue);
 
             PlotColors[0][0] = Main;
             PlotColors[1][0] = Signal;
@@ -233,6 +188,7 @@ namespace AgenaTrader.UserCode
 		{
 			get { return Values[5]; }
 		}
+
 
 
 
