@@ -12,7 +12,14 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 using AgenaTrader.Helper.TradingManager;
 
+
+/// <summary>
 /// Version: 1.0
+/// -------------------------------------------------------------------------
+/// Simon Pucher 2016
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
 

@@ -53,9 +53,18 @@ namespace AgenaTrader.UserCode
 		{
             // Print("OnBarUpdate");
 
+            //if (IsCurrentBarLast)
+            //{
+            //    Print("*******");
+            //    Print(this.Instrument.GetTradingHours());
+            //    Print(this.Instrument.GetTradingHoursOriginal());
+            //    Print(this.Instrument.GetExtentedTradingHours());
+            //    Print(this.Instrument.GetExtentedTradingHoursOriginal());
+            //}
+
 			MyPlot1.Set(Input[0]);
 
-            if (Bars != null && Bars.Count > 0 && IsCurrentBarLast)
+            if (this.Instrument != null && Bars != null && Bars.Count > 0 && IsCurrentBarLast)
             {
 
          //DateTime start =  DateTime.ParseExact("24.03.2016 09:00", "dd.MM.yyyy HH:mm", CultureInfo.InvariantCulture);
