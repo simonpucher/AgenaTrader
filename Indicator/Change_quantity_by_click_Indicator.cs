@@ -113,6 +113,14 @@ namespace AgenaTrader.UserCode
             return "Change Quantity";
         }
 
+        public override string DisplayName
+        {
+            get
+            {
+                return "Change Quantity";
+            }
+        }
+
 
         #region Properties
 
