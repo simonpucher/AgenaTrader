@@ -25,7 +25,8 @@ namespace AgenaTrader.UserCode
 	{
 		#region Variables
 
-		private string _name_of_list = "";
+		    private string _name_of_list = String.Empty;
+
 
 		#endregion
 
@@ -33,7 +34,6 @@ namespace AgenaTrader.UserCode
         {
             Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
             Overlay = true;
-
         }
 
 
@@ -41,45 +41,51 @@ namespace AgenaTrader.UserCode
         {
             base.OnStartUp();
 
-            if (!String.IsNullOrEmpty(Name_of_list))
+            if (this.Instrument != null)
             {
-
-                this.Root.Core.InstrumentManager.GetInstrumentLists();
-                IInstrumentsList liste = this.Root.Core.InstrumentManager.GetInstrumentsListStatic(this.Name_of_list);
-                if (liste == null)
+                 if (!String.IsNullOrEmpty(Name_of_list))
                 {
-                    liste = this.Root.Core.InstrumentManager.GetInstrumentsListDynamic(this.Name_of_list);
-                }
-                if (liste != null)
-                {
-                    //Get instrument
-                    Instrument instrument = this.Root.Core.InstrumentManager.GetInstrument("SKB.DE");
 
-                   // System.Configuration.SettingsProvider;
-
-                    // liste.Add(instrument);
-
-                    //If you want to clear instruments from the list
-                    //liste.Clear();
-
-                    if (!this.Root.Core.InstrumentManager.IsInstrumentExists(instrument.Symbol))
+                    this.Root.Core.InstrumentManager.GetInstrumentLists();
+                    IInstrumentsList liste = this.Root.Core.InstrumentManager.GetInstrumentsListStatic(this.Name_of_list);
+                    if (liste == null)
                     {
-                        this.Root.Core.InstrumentManager.AddInstrument2List(instrument, this.Name_of_list); 
+                        liste = this.Root.Core.InstrumentManager.GetInstrumentsListDynamic(this.Name_of_list);
+                    }
+                    if (liste != null)
+                    {
+                        //Get instrument
+                        // Instrument instrument = this.Root.Core.InstrumentManager.GetInstrument("SKB.DE");
+
+                        // liste.Add(instrument);
+
+                        //If you want to clear instruments from the list
+                        //liste.Clear();
+
+                        if (!this.Root.Core.InstrumentManager.IsInstrumentExists(this.Instrument.Symbol))
+                        {
+                            this.Root.Core.InstrumentManager.AddInstrument2List(this.Instrument, this.Name_of_list);
+                        }
+
+                    }
+                    else
+                    {
+                        Log("The list " + this.Name_of_list + " does not exist.", InfoLogLevel.Warning);
                     }
 
                 }
                 else
                 {
-                    ////todo: log it!
-                    //Log("Das ist eine Nachricht.", InfoLogLevel.Message);
+                    Log("You need to specify a name for the list.", InfoLogLevel.Warning);
                 }
-
             }
-
-          
 
 
         }
+
+
+
+
 
 
 
@@ -90,33 +96,60 @@ namespace AgenaTrader.UserCode
 
 		}
 
-		#region Properties
+        protected override void OnTermination()
+        {
+        
+        }
 
-		[Browsable(false)]
-		[XmlIgnore()]
-		public DataSeries MyPlot1
-		{
-			get { return Values[0]; }
-		}
-
-		[Description("The name of the list you would like to add instruments.")]
-		[Category("Parameters")]
-		public string Name_of_list
-		{
-			get { return _name_of_list; }
-			set { _name_of_list = value; }
-		}
 
         public override string DisplayName
         {
             get
             {
-                return "QA";//base.DisplayName;
+                return "QA";
             }
         }
 
+
+        public override string ToString()
+        {
+            return "QA";
+        }
+
+
+
+		#region Properties
+
+            #region Output
+
+            [Browsable(false)]
+            [XmlIgnore()]
+            public DataSeries MyPlot1
+            {
+                get { return Values[0]; }
+            }
+
+            #endregion
+
+            #region Input
+
+
+            [Description("The name of the list to which you would like to add instruments.")]
+            //[Category("Values")]
+            [DisplayName("Name of the list")]
+            public string Name_of_list
+            {
+                get { return _name_of_list; }
+                set { _name_of_list = value; }
+            }
+            #endregion
+
+  
+
 		#endregion
-	}
+
+        
+    }
 }
 
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
@@ -130,17 +163,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Adds the instrument to a static list.
 		/// </summary>
-		public QuickAdd QuickAdd(System.String name_of_list)
+		public QuickAdd QuickAdd()
         {
-			return QuickAdd(Input, name_of_list);
+			return QuickAdd(Input);
 		}
 
 		/// <summary>
 		/// Adds the instrument to a static list.
 		/// </summary>
-		public QuickAdd QuickAdd(IDataSeries input, System.String name_of_list)
+		public QuickAdd QuickAdd(IDataSeries input)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<QuickAdd>(input, i => i.Name_of_list == name_of_list);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<QuickAdd>(input);
 
 			if (indicator != null)
 				return indicator;
@@ -149,8 +182,7 @@ namespace AgenaTrader.UserCode
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
-							Name_of_list = name_of_list
+							Input = input
 						};
 			indicator.SetUp();
 
@@ -169,20 +201,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Adds the instrument to a static list.
 		/// </summary>
-		public QuickAdd QuickAdd(System.String name_of_list)
+		public QuickAdd QuickAdd()
 		{
-			return LeadIndicator.QuickAdd(Input, name_of_list);
+			return LeadIndicator.QuickAdd(Input);
 		}
 
 		/// <summary>
 		/// Adds the instrument to a static list.
 		/// </summary>
-		public QuickAdd QuickAdd(IDataSeries input, System.String name_of_list)
+		public QuickAdd QuickAdd(IDataSeries input)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.QuickAdd(input, name_of_list);
+			return LeadIndicator.QuickAdd(input);
 		}
 	}
 
@@ -195,17 +227,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Adds the instrument to a static list.
 		/// </summary>
-		public QuickAdd QuickAdd(System.String name_of_list)
+		public QuickAdd QuickAdd()
 		{
-			return LeadIndicator.QuickAdd(Input, name_of_list);
+			return LeadIndicator.QuickAdd(Input);
 		}
 
 		/// <summary>
 		/// Adds the instrument to a static list.
 		/// </summary>
-		public QuickAdd QuickAdd(IDataSeries input, System.String name_of_list)
+		public QuickAdd QuickAdd(IDataSeries input)
 		{
-			return LeadIndicator.QuickAdd(input, name_of_list);
+			return LeadIndicator.QuickAdd(input);
 		}
 	}
 
@@ -218,17 +250,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Adds the instrument to a static list.
 		/// </summary>
-		public QuickAdd QuickAdd(System.String name_of_list)
+		public QuickAdd QuickAdd()
 		{
-			return LeadIndicator.QuickAdd(Input, name_of_list);
+			return LeadIndicator.QuickAdd(Input);
 		}
 
 		/// <summary>
 		/// Adds the instrument to a static list.
 		/// </summary>
-		public QuickAdd QuickAdd(IDataSeries input, System.String name_of_list)
+		public QuickAdd QuickAdd(IDataSeries input)
 		{
-			return LeadIndicator.QuickAdd(input, name_of_list);
+			return LeadIndicator.QuickAdd(input);
 		}
 	}
 
