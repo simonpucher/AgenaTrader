@@ -136,6 +136,14 @@ namespace AgenaTrader.UserCode
             return "TDI";
         }
 
+        public override string DisplayName
+        {
+            get
+            {
+                return "TDI";
+            }
+        }
+
         #region Properties
 
 
