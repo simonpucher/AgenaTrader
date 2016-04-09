@@ -41,9 +41,7 @@ namespace AgenaTrader.UserCode
 
         protected override void OnStartUp()
         {
-            //base.OnStartUp();
-
-
+           
             // Add event listener
             if (ChartControl != null)
                 ChartControl.ChartPanelMouseDown += OnChartPanelMouseDown;
@@ -55,18 +53,18 @@ namespace AgenaTrader.UserCode
 
                     this.Root.Core.InstrumentManager.GetInstrumentLists();
                     _list = this.Root.Core.InstrumentManager.GetInstrumentsListStatic(this.Name_of_list);
-                    if (_list == null)
+                    //if (_list == null)
+                    //{
+                    //    _list = this.Root.Core.InstrumentManager.GetInstrumentsListDynamic(this.Name_of_list);
+                    //}
+                    if (_list == null || _list.Count == 0)
                     {
-                        _list = this.Root.Core.InstrumentManager.GetInstrumentsListDynamic(this.Name_of_list);
-                    }
-                    if (_list == null)
-                    {
-                        Log("The list " + this.Name_of_list + " does not exist.", InfoLogLevel.Warning);
+                        Log(this.DisplayName + ": The list " + this.Name_of_list + " does not exist.", InfoLogLevel.Warning);
                     }
                 }
                 else
                 {
-                    Log("You need to specify a name for the list.", InfoLogLevel.Warning);
+                    Log(this.DisplayName + ": You need to specify a name for the list.", InfoLogLevel.Warning);
                 }
             }
 
