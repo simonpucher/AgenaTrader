@@ -27,14 +27,15 @@ namespace AgenaTrader.UserCode
 
 		    private string _name_of_list = String.Empty;
             private IInstrumentsList _list = null;
-            private Rectangle rect;
-            private Pen pen;
+            private RectangleF rect;
+            private Pen pen = Pens.Black;
+            private Brush brush = Brushes.Black;
 
 		#endregion
 
         protected override void Initialize()
         {
-            Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
+            //Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
             Overlay = true;
         }
 
@@ -120,24 +121,22 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnBarUpdate()
 		{
-			MyPlot1.Set(Input[0]);
+			//MyPlot1.Set(Input[0]);
 
-            if (this.IsCurrentBarLast && _list != null)
+            if (this.IsCurrentBarLast && _list != null && _list.Count > 0)
             {
                 if (_list.Contains((Instrument)this.Instrument))
                 {
-                    //DrawTextFixed("MyText", "is in list", TextPosition.TopRight);
-                    //DrawText("MyText2", "Das ist ein Beispieltext.", 10, 60, Color.Black);
+                    pen = Pens.Red;
+                    brush = Brushes.Red;
                 }
-                else
-                {
-                    //DrawTextFixed("MyText", "is not list", TextPosition.TopRight);
-                    //DrawText("MyText2", "Das ist ein Beispieltext.", 10, 60, Color.Black);
+                else {
+                    pen = Pens.Black;
+                    brush = Brushes.Black;
                 }
 
-                DrawTextFixed("MyText", "Currentbar: " + CurrentBar + " - " + DateTime.Now.ToString(), TextPosition.TopRight);
-
-            }
+                //DrawTextFixed("MyText", "Currentbar: " + CurrentBar + " - " + DateTime.Now.ToString(), TextPosition.TopRight);
+             }
 
 		}
 
@@ -153,29 +152,38 @@ namespace AgenaTrader.UserCode
         {
             get
             {
-                return "QA";
+                return "QuickAdd";
             }
         }
 
 
         public override string ToString()
         {
-            return "QA";
+            return "QuickAdd";
         }
 
 
         #region Events
 
-
+        int counti = 0;
 
         public override void Plot(Graphics g, Rectangle r, double min, double max)
         {
             if (Bars == null || ChartControl == null) return;
+            counti = counti + 1;
+            Print(counti);
 
+
+            using (Font font1 = new Font("Arial", 10, FontStyle.Bold, GraphicsUnit.Point))
+            {
+                rect = new RectangleF(r.Width - 150, 10, 100, 30);
+                g.DrawString(_name_of_list, font1, brush, rect);
+                g.DrawRectangle(pen, Rectangle.Round(rect));
+            }
           
-            pen = Pens.Black;
-           rect = new Rectangle(r.Width - 100, 20 , 80, 60);
-            g.DrawRectangle(pen, rect);
+           // pen = Pens.Black;
+           //rect = new Rectangle(r.Width - 100, 20 , 80, 60);
+           // g.DrawRectangle(pen, rect);
 
             //// Eigenschaften von ChartControl
             //string s;
@@ -204,63 +212,35 @@ namespace AgenaTrader.UserCode
 
             private void OnChartPanelMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
             {
-                Print("X = {0}, Y = {1}", e.X, e.Y);
-                Print("X = {0}, Y = {1}", ChartControl.GetDateTimeByX(e.X), ChartControl.GetPriceByY(e.Y));
+                //Print("X = {0}, Y = {1}", e.X, e.Y);
+                //Print("X = {0}, Y = {1}", ChartControl.GetDateTimeByX(e.X), ChartControl.GetPriceByY(e.Y));
 
                 //ITextFixed txt = (ITextFixed)DrawObjects["MyText"];
                 //IText bubu;
                 
 
-                //Point cursorPos = new Point(e.X, e.Y);
-                //if (rect.Contains(cursorPos))
-                //{
-                //    DrawText("MyText", "Das ist ein Beispieltext.", 10, 3, Color.Black);
-                //    pen = Pens.Red;
-                //}
-                //else
-                //{
-                //    DrawText("MyText", "Das ist ein Beispieltext.", 10, 3, Color.Black);
-                //    pen = Pens.Black;
-                //}
+                Point cursorPos = new Point(e.X, e.Y);
+                if (rect.Contains(cursorPos))
+                {
+                    if (!_list.Contains((Instrument)this.Instrument))
+                    {
+                        this.Root.Core.InstrumentManager.AddInstrument2List(this.Instrument, this.Name_of_list);
+                    }
+                    else
+                    {
+                        this.Root.Core.InstrumentManager.RemoveInstrumentFromList(this.Name_of_list, this.Instrument);
+                    }
+                
+                }
+                else
+                {
+                  //nothing to do.
+                }
 
 
                 this.OnBarUpdate();
                 
-              
-
-                //if (e.Button == System.Windows.Forms.MouseButtons.Left)
-                //{
-                //    //Get the last order where IsProposal is true.
-                //    if (this.TradingManager != null && olf != null && this.Instrument != null)
-                //    {
-                //        IEnumerable<OrdersLogRecord> olren = this.TradingManager.GetOrdersLog(olf).Where(x => x.Instrument.Id == this.Instrument.Id).Where(x => x.IsProposal == true).Where(x => x.State == OrderState.PendingSubmit);
-                //        List<OrdersLogRecord> hhh = olren.ToList();
-                //        OrdersLogRecord olr = olren.LastOrDefault();
-                //        if (olr != null)
-                //        {
-                //            //Cast the order
-                //            Order ord = (Order)this.TradingManager.GetOrder(olr.OrderId);
-                //            if (ord != null && ord.State == OrderState.PendingSubmit)
-                //            {
-                //                //Change quantity
-                //                double clickprice = ChartControl.GetPriceByY(e.Y);
-                //                if (clickprice >= ord.Price + (ord.Price / 100 * 1))
-                //                {
-                //                    ord.Quantity = ord.Quantity + 1;
-                //                    this.TradingManager.EditOrder(ord);
-                //                }
-                //                else if (clickprice <= ord.Price - (ord.Price / 100 * 1))
-                //                {
-                //                    if (ord.Quantity > 1)
-                //                    {
-                //                        ord.Quantity = ord.Quantity - 1;
-                //                        this.TradingManager.EditOrder(ord);
-                //                    }
-                //                }
-                //            }
-                //        }
-                //    }
-                //}
+           
             }
 
         #endregion
@@ -271,12 +251,12 @@ namespace AgenaTrader.UserCode
 
         #region Output
 
-        [Browsable(false)]
-            [XmlIgnore()]
-            public DataSeries MyPlot1
-            {
-                get { return Values[0]; }
-            }
+        //[Browsable(false)]
+        //    [XmlIgnore()]
+        //    public DataSeries MyPlot1
+        //    {
+        //        get { return Values[0]; }
+        //    }
 
             #endregion
 
