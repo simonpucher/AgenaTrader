@@ -142,6 +142,8 @@ namespace AgenaTrader.UserCode
 
         private void CalcOpenRange(out DateTime OpenRangeStart, out DateTime OpenRangeEnd)
         {
+            //Print("CalcOpenRange");
+
             OpenRangeStart = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;    //liefert erste tageskerze
             OpenRangeStart = GetStartTime(OpenRangeStart);
             OpenRangeEnd = GetEndTime(OpenRangeStart);
