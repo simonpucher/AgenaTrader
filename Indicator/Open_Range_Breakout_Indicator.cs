@@ -75,6 +75,10 @@ namespace AgenaTrader.UserCode
         protected override void OnStartUp()
         {
             //Print("OnStartUp");
+
+            //Calling a value from our main class!
+            ORB_Condition sc = GetScriptedCondition("ORB_Condition") as ORB_Condition;
+            Print(sc.HelloWorld());
         }
 
         protected override void OnBarUpdate()
@@ -472,3 +476,4 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+

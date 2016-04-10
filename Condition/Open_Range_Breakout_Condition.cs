@@ -55,6 +55,11 @@ namespace AgenaTrader.UserCode
 			//TODO: Write your owner OnBarUpdate handling
 		}
 
+
+        public string HelloWorld() {
+            return "Hello World!";
+        }
+
 		#region Properties
 
 		[Browsable(false)]
