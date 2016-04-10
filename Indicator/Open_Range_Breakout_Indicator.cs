@@ -104,29 +104,27 @@ namespace AgenaTrader.UserCode
             {
 
                 if (Bars.GetLow(CurrentBar) <= target_short && Bars.GetTime(Count-1) > OpenRangeEnd )
-              {
-                    SessionSuccessful = true;
-                    CounterShort += 1;
-                    BarColor = Color.Purple;
-                    string strArrowDown = "ArrowDown" + OpenRangeStart;
-                    DrawArrowUp(strArrowDown, true, Bars.GetTime(Count - 1), Bars.GetLow(CurrentBar) - 300 * TickSize, Color.Red);
-                    Print("Treffer Short" + DayStart.ToShortDateString());
+                  {
+                        SessionSuccessful = true;
+                        CounterShort += 1;
+                        BarColor = Color.Purple;
+                        string strArrowDown = "ArrowDown" + OpenRangeStart;
+                        DrawArrowUp(strArrowDown, true, Bars.GetTime(Count - 1), Bars.GetLow(CurrentBar) - 300 * TickSize, Color.Red);
+                        Print("Treffer Short" + DayStart.ToShortDateString());
 
-             }else if( Bars.GetHigh(CurrentBar) >= target_long && Bars.GetTime(Count-1) > OpenRangeEnd )
-                {
-                    SessionSuccessful = true;
-                    CounterLong += 1;
-                    BarColor = Color.Turquoise;
-                    string strArrowUp = "ArrowUp" + OpenRangeStart;
-                    DrawArrowDown(strArrowUp, true, Bars.GetTime(Count - 1), Bars.GetHigh(CurrentBar) + 300 * TickSize, Color.Green);    
-                    Print("Treffer Long" + DayStart.ToShortDateString());
-             }
+                 } else if( Bars.GetHigh(CurrentBar) >= target_long && Bars.GetTime(Count-1) > OpenRangeEnd ) {
+                        SessionSuccessful = true;
+                        CounterLong += 1;
+                        BarColor = Color.Turquoise;
+                        string strArrowUp = "ArrowUp" + OpenRangeStart;
+                        DrawArrowDown(strArrowUp, true, Bars.GetTime(Count - 1), Bars.GetHigh(CurrentBar) + 300 * TickSize, Color.Green);    
+                        Print("Treffer Long" + DayStart.ToShortDateString());
+                 }
             }
 
-//Beim letzten Bar den Status schreiben
+            //Beim letzten Bar den Status schreiben
             if (Count == Bars.Count)
             {
-             
                     Print("Counter Erfolg Long: " + CounterLong);
                     Print("Counter Erfolg Short: " + CounterShort);
                     Print("Counter Erfolg Gesamt: " + (CounterShort + CounterLong));
@@ -174,9 +172,9 @@ namespace AgenaTrader.UserCode
 
         private DateTime GetStartTime(DateTime start)
         {
-                TimeSpan tim_OpenRangeStart = getOpenRangeStart();
-                start = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);  //Uhrzeit auf 00:00:00 zurücksetzen, ist vorbefüllt aus SessionStart
-                return start.Add(tim_OpenRangeStart);
+            TimeSpan tim_OpenRangeStart = getOpenRangeStart();
+            start = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);  //Uhrzeit auf 00:00:00 zurücksetzen, ist vorbefüllt aus SessionStart
+            return start.Add(tim_OpenRangeStart);
         }
 
         private DateTime GetEndTime(DateTime start)
@@ -275,7 +273,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         [Description("Select Color")]
         [Category("Colors")]
-        [DisplayName("ORB")]
+        [DisplayName("Open Range")]
         public Color Color_ORB
         {
             get { return _col_orb; }
@@ -286,7 +284,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         [Description("Select Color TargetAreaShort")]
         [Category("Colors")]
-        [DisplayName("TargetAreaShort")]
+        [DisplayName("Target Area Short")]
         public Color Color_TargetAreaShort
         {
             get { return _col_target_short; }
@@ -297,7 +295,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         [Description("Select Color TargetAreaLong")]
         [Category("Colors")]
-        [DisplayName("TargetAreaLong")]
+        [DisplayName("Target Area Long")]
         public Color Color_TargetAreaLong
         {
             get { return _col_target_long; }
