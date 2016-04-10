@@ -32,11 +32,11 @@ namespace AgenaTrader.UserCode
 {
    
     [Description("ORB Indicator")]
-	public class ORB : UserIndicator
+	public class ORB_Indicator : UserIndicator
 	{
         
         private int _orbminutes = 75;
-        private Color _col_orb          = Color.Brown;
+        private Color _col_orb = Color.Brown;
         private Color _col_target_short = Color.PaleVioletRed;                      
         private Color _col_target_long  = Color.PaleGreen;
 
@@ -60,7 +60,7 @@ namespace AgenaTrader.UserCode
 
 		protected override void Initialize()
 		{
-			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
+			//Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
 			Overlay = true;
 			CalculateOnBarClose = true;
             ClearOutputWindow();
@@ -75,12 +75,17 @@ namespace AgenaTrader.UserCode
         protected override void OnStartUp()
         {
             //Print("OnStartUp");
+
+            //Calling a value from our main class!
+            ORB_Condition sc = GetScriptedCondition("ORB_Condition") as ORB_Condition;
+            Print(sc.HelloWorld());
         }
 
         protected override void OnBarUpdate()
 		{
-            MyPlot1.Set(Input[0]);
-           // if (Bars != null && Bars.Count > 0 && IsCurrentBarLast)
+           // MyPlot1.Set(Input[0]);
+           
+            // if (Bars != null && Bars.Count > 0 && IsCurrentBarLast)
             if (Bars != null && Bars.Count > 0 && Bars.BarsSinceSession == 0)
             {
                 SessionSuccessful = false; //zurücksetzen
@@ -103,34 +108,33 @@ namespace AgenaTrader.UserCode
             {
 
                 if (Bars.GetLow(CurrentBar) <= target_short && Bars.GetTime(Count-1) > OpenRangeEnd )
-              {
-                    SessionSuccessful = true;
-                    CounterShort += 1;
-                    BarColor = Color.Purple;
-                    string strArrowDown = "ArrowDown" + OpenRangeStart;
-                    DrawArrowUp(strArrowDown, true, Bars.GetTime(Count - 1), Bars.GetLow(CurrentBar) - 300 * TickSize, Color.Red);
-                    Print("Treffer Short" + DayStart.ToShortDateString());
+                  {
+                        SessionSuccessful = true;
+                        CounterShort += 1;
+                        BarColor = Color.Purple;
+                        string strArrowDown = "ArrowDown" + OpenRangeStart;
+                        DrawArrowUp(strArrowDown, true, Bars.GetTime(Count - 1), Bars.GetLow(CurrentBar) - 300 * TickSize, Color.Red);
+                        Print("Treffer Short" + DayStart.ToShortDateString());
 
-             }else if( Bars.GetHigh(CurrentBar) >= target_long && Bars.GetTime(Count-1) > OpenRangeEnd )
-                {
-                    SessionSuccessful = true;
-                    CounterLong += 1;
-                    BarColor = Color.Turquoise;
-                    string strArrowUp = "ArrowUp" + OpenRangeStart;
-                    DrawArrowDown(strArrowUp, true, Bars.GetTime(Count - 1), Bars.GetHigh(CurrentBar) + 300 * TickSize, Color.Green);    
-                    Print("Treffer Long" + DayStart.ToShortDateString());
-             }
+                 } else if( Bars.GetHigh(CurrentBar) >= target_long && Bars.GetTime(Count-1) > OpenRangeEnd ) {
+                        SessionSuccessful = true;
+                        CounterLong += 1;
+                        BarColor = Color.Turquoise;
+                        string strArrowUp = "ArrowUp" + OpenRangeStart;
+                        DrawArrowDown(strArrowUp, true, Bars.GetTime(Count - 1), Bars.GetHigh(CurrentBar) + 300 * TickSize, Color.Green);    
+                        Print("Treffer Long" + DayStart.ToShortDateString());
+                 }
             }
 
-//Beim letzten Bar den Status schreiben
+            //Beim letzten Bar den Status schreiben
             if (Count == Bars.Count)
-                {
-            Print("Counter Erfolg Long: " + CounterLong);
-            Print("Counter Erfolg Short: " + CounterShort);
-            Print("Counter Erfolg Gesamt: " + (CounterShort + CounterLong));
-            Print("Erfolg %: " + (((CounterShort + CounterLong) / CounterSessions) * 100));
-            Print("CounterSessions: " + CounterSessions);
-                    }
+            {
+                    Print("Counter Erfolg Long: " + CounterLong);
+                    Print("Counter Erfolg Short: " + CounterShort);
+                    Print("Counter Erfolg Gesamt: " + (CounterShort + CounterLong));
+                    Print("Erfolg %: " + (((CounterShort + CounterLong) / CounterSessions) * 100));
+                    Print("CounterSessions: " + CounterSessions);
+               }
 		}
 
 
@@ -172,9 +176,9 @@ namespace AgenaTrader.UserCode
 
         private DateTime GetStartTime(DateTime start)
         {
-                TimeSpan tim_OpenRangeStart = getOpenRangeStart();
-                start = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);  //Uhrzeit auf 00:00:00 zurücksetzen, ist vorbefüllt aus SessionStart
-                return start.Add(tim_OpenRangeStart);
+            TimeSpan tim_OpenRangeStart = getOpenRangeStart();
+            start = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);  //Uhrzeit auf 00:00:00 zurücksetzen, ist vorbefüllt aus SessionStart
+            return start.Add(tim_OpenRangeStart);
         }
 
         private DateTime GetEndTime(DateTime start)
@@ -223,21 +227,45 @@ namespace AgenaTrader.UserCode
         }
 
 
+        public override string ToString()
+        {
+            return "ORB";
+                //return base.ToString();
+        }
 
-		#region Properties
+        public override string DisplayName
+        {
+            get
+            {
+                return "ORB";
+                //return base.DisplayName;
+            }
+        }
 
-		[Browsable(false)]
-		[XmlIgnore()]
-		public DataSeries MyPlot1
-		{
-			get { return Values[0]; }
-		}
+
+
+        #region Properties
+
+        #region Output
+
+        //[Browsable(false)]
+        //[XmlIgnore()]
+        //public DataSeries MyPlot1
+        //{
+        //    get { return Values[0]; }
+        //}
+
+        #endregion
+
+
+        #region Input
+
 
 
         /// <summary>
         /// </summary>
         [Description("Period in minutes for ORB")]
-        [Category("Parameters")]
+        [Category("Values")]
         [DisplayName("Minutes ORB")]
         public int ORBMinutes
         {
@@ -249,7 +277,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         [Description("Select Color")]
         [Category("Colors")]
-        [DisplayName("ORB")]
+        [DisplayName("Open Range")]
         public Color Color_ORB
         {
             get { return _col_orb; }
@@ -260,7 +288,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         [Description("Select Color TargetAreaShort")]
         [Category("Colors")]
-        [DisplayName("TargetAreaShort")]
+        [DisplayName("Target Area Short")]
         public Color Color_TargetAreaShort
         {
             get { return _col_target_short; }
@@ -271,7 +299,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         [Description("Select Color TargetAreaLong")]
         [Category("Colors")]
-        [DisplayName("TargetAreaLong")]
+        [DisplayName("Target Area Long")]
         public Color Color_TargetAreaLong
         {
             get { return _col_target_long; }
@@ -324,9 +352,11 @@ namespace AgenaTrader.UserCode
 
         //ADD KOVAC 20160403 end
 
-       
-		#endregion
-	}
+        #endregion
+
+
+        #endregion
+    }
 }
 
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
@@ -340,27 +370,26 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator()
         {
-			return ORB(Input, oRBMinutes);
+			return ORB_Indicator(Input);
 		}
 
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(IDataSeries input, System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator(IDataSeries input)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<ORB>(input, i => i.ORBMinutes == oRBMinutes);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<ORB_Indicator>(input);
 
 			if (indicator != null)
 				return indicator;
 
-			indicator = new ORB
+			indicator = new ORB_Indicator
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
-							ORBMinutes = oRBMinutes
+							Input = input
 						};
 			indicator.SetUp();
 
@@ -379,20 +408,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator()
 		{
-			return LeadIndicator.ORB(Input, oRBMinutes);
+			return LeadIndicator.ORB_Indicator(Input);
 		}
 
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(IDataSeries input, System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator(IDataSeries input)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.ORB(input, oRBMinutes);
+			return LeadIndicator.ORB_Indicator(input);
 		}
 	}
 
@@ -405,17 +434,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator()
 		{
-			return LeadIndicator.ORB(Input, oRBMinutes);
+			return LeadIndicator.ORB_Indicator(Input);
 		}
 
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(IDataSeries input, System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator(IDataSeries input)
 		{
-			return LeadIndicator.ORB(input, oRBMinutes);
+			return LeadIndicator.ORB_Indicator(input);
 		}
 	}
 
@@ -428,17 +457,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator()
 		{
-			return LeadIndicator.ORB(Input, oRBMinutes);
+			return LeadIndicator.ORB_Indicator(Input);
 		}
 
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(IDataSeries input, System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator(IDataSeries input)
 		{
-			return LeadIndicator.ORB(input, oRBMinutes);
+			return LeadIndicator.ORB_Indicator(input);
 		}
 	}
 
