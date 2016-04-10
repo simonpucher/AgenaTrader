@@ -136,7 +136,7 @@ namespace AgenaTrader.UserCode
 
         protected override void OnTermination()
         {
-
+            //Print("OnTermination");
         }
 
 
