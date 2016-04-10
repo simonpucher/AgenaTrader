@@ -69,13 +69,15 @@ namespace AgenaTrader.UserCode
 
         protected override void InitRequirements()
         {
+            //Print("InitRequirements");
         }
 
         protected override void OnStartUp()
         {
+            //Print("OnStartUp");
         }
 
-    		protected override void OnBarUpdate()
+        protected override void OnBarUpdate()
 		{
             MyPlot1.Set(Input[0]);
            // if (Bars != null && Bars.Count > 0 && IsCurrentBarLast)
