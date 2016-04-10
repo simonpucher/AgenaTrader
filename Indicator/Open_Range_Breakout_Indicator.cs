@@ -32,7 +32,7 @@ namespace AgenaTrader.UserCode
 {
    
     [Description("ORB Indicator")]
-	public class ORB : UserIndicator
+	public class ORB_Indicator : UserIndicator
 	{
         
         private int _orbminutes = 75;
@@ -366,22 +366,22 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB()
+		public ORB_Indicator ORB_Indicator()
         {
-			return ORB(Input);
+			return ORB_Indicator(Input);
 		}
 
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(IDataSeries input)
+		public ORB_Indicator ORB_Indicator(IDataSeries input)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<ORB>(input);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<ORB_Indicator>(input);
 
 			if (indicator != null)
 				return indicator;
 
-			indicator = new ORB
+			indicator = new ORB_Indicator
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
@@ -404,20 +404,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB()
+		public ORB_Indicator ORB_Indicator()
 		{
-			return LeadIndicator.ORB(Input);
+			return LeadIndicator.ORB_Indicator(Input);
 		}
 
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(IDataSeries input)
+		public ORB_Indicator ORB_Indicator(IDataSeries input)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.ORB(input);
+			return LeadIndicator.ORB_Indicator(input);
 		}
 	}
 
@@ -430,17 +430,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB()
+		public ORB_Indicator ORB_Indicator()
 		{
-			return LeadIndicator.ORB(Input);
+			return LeadIndicator.ORB_Indicator(Input);
 		}
 
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(IDataSeries input)
+		public ORB_Indicator ORB_Indicator(IDataSeries input)
 		{
-			return LeadIndicator.ORB(input);
+			return LeadIndicator.ORB_Indicator(input);
 		}
 	}
 
@@ -453,17 +453,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB()
+		public ORB_Indicator ORB_Indicator()
 		{
-			return LeadIndicator.ORB(Input);
+			return LeadIndicator.ORB_Indicator(Input);
 		}
 
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(IDataSeries input)
+		public ORB_Indicator ORB_Indicator(IDataSeries input)
 		{
-			return LeadIndicator.ORB(input);
+			return LeadIndicator.ORB_Indicator(input);
 		}
 	}
 
@@ -472,4 +472,3 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
-
