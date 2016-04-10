@@ -12,13 +12,22 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 using System.Globalization;
 
+
+
+/// <summary>
 /// Version: 1.0
+/// -------------------------------------------------------------------------
+/// Simon Pucher 2016
+/// Christian Kovar 2016
+/// -------------------------------------------------------------------------
 /// ToDo
 /// 1)  Customzing für Börsenstart 09.00 oder 15.30
 /// 2)  Drawings in Background bringen, aktuell verdecken sie andere Indikatoren wie zB SMA200 -> erledigt mit Opacity
 /// 3)  automatische Ordererstellung (http://www.tradeescort.com/phpbb_de/viewtopic.php?f=19&t=2401)
 /// 4)  Im 1-Stundenchart wird automatisch das High/Low von dem kompletten Bar genommen. Es wird also die OpenRange von 2 Stunden genommen (120 Mins statt 75) Noch testen!
-
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
    
@@ -60,13 +69,15 @@ namespace AgenaTrader.UserCode
 
         protected override void InitRequirements()
         {
+            //Print("InitRequirements");
         }
 
         protected override void OnStartUp()
         {
+            //Print("OnStartUp");
         }
 
-    		protected override void OnBarUpdate()
+        protected override void OnBarUpdate()
 		{
             MyPlot1.Set(Input[0]);
            // if (Bars != null && Bars.Count > 0 && IsCurrentBarLast)
