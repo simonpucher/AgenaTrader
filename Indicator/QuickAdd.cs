@@ -16,6 +16,8 @@ using AgenaTrader.Helper;
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
+/// 
+/// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode
@@ -116,7 +118,7 @@ namespace AgenaTrader.UserCode
 
 
 
-
+        
 
 
 		protected override void OnBarUpdate()
@@ -165,22 +167,26 @@ namespace AgenaTrader.UserCode
 
         #region Events
 
-        int counti = 0;
+      //  int counti = 0;
 
         public override void Plot(Graphics g, Rectangle r, double min, double max)
         {
             if (Bars == null || ChartControl == null) return;
-            counti = counti + 1;
-            Print(counti);
+            //counti = counti + 1;
+            //Print(counti);
 
-
-            using (Font font1 = new Font("Arial", 10, FontStyle.Bold, GraphicsUnit.Point))
+            //Only draw button if parameters are available.
+            if (this.Instrument != null && _list != null && _list.Count > 0)
             {
-                rect = new RectangleF(r.Width - 150, 10, 100, 30);
-                g.DrawString(_name_of_list, font1, brush, rect);
-                g.DrawRectangle(pen, Rectangle.Round(rect));
+                    using (Font font1 = new Font("Arial", 10, FontStyle.Bold, GraphicsUnit.Point))
+                    {
+                        rect = new RectangleF(r.Width - 150, 10, 100, 30);
+                        g.DrawString(_name_of_list, font1, brush, rect);
+                        g.DrawRectangle(pen, Rectangle.Round(rect));
+                    }
             }
-          
+
+
            // pen = Pens.Black;
            //rect = new Rectangle(r.Width - 100, 20 , 80, 60);
            // g.DrawRectangle(pen, rect);
@@ -214,10 +220,6 @@ namespace AgenaTrader.UserCode
             {
                 //Print("X = {0}, Y = {1}", e.X, e.Y);
                 //Print("X = {0}, Y = {1}", ChartControl.GetDateTimeByX(e.X), ChartControl.GetPriceByY(e.Y));
-
-                //ITextFixed txt = (ITextFixed)DrawObjects["MyText"];
-                //IText bubu;
-                
 
                 Point cursorPos = new Point(e.X, e.Y);
                 if (rect.Contains(cursorPos))
