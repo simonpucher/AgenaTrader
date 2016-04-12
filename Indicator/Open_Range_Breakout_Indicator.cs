@@ -306,6 +306,19 @@ namespace AgenaTrader.UserCode
             }
 
 
+            public override string ToString()
+            {
+                return "ORB";
+            }
+
+            public override string DisplayName
+            {
+                get
+                {
+                    return "ORB";
+                }
+            }
+
 
 		#region Properties
 

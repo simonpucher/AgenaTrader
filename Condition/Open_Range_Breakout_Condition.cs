@@ -61,6 +61,21 @@ namespace AgenaTrader.UserCode
             return "Hello World!";
         }
 
+
+
+        public override string ToString()
+        {
+            return "ORB";
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "ORB";
+            }
+        }
+
 		#region Properties
 
 		[Browsable(false)]
