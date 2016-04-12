@@ -11,6 +11,7 @@ using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
+
 /// <summary>
 /// Version: 1.0
 /// -------------------------------------------------------------------------
@@ -58,6 +59,21 @@ namespace AgenaTrader.UserCode
 
         public string HelloWorld() {
             return "Hello World!";
+        }
+
+
+
+        public override string ToString()
+        {
+            return "ORB";
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "ORB";
+            }
         }
 
 		#region Properties

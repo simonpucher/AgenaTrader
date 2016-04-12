@@ -16,6 +16,8 @@ using AgenaTrader.Helper;
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
+/// Adds an instrument to a static list (e.g. watchlist) by clicking on a button in the chart.
+/// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode
@@ -26,10 +28,11 @@ namespace AgenaTrader.UserCode
 		#region Variables
 
 		    private string _name_of_list = String.Empty;
+            private string _shortcut_list = String.Empty;
             private IInstrumentsList _list = null;
-            private RectangleF rect;
-            private Pen pen = Pens.Black;
-            private Brush brush = Brushes.Black;
+            private RectangleF _rect;
+            //private Pen _pen = Pens.Black;
+            private Brush _brush = Brushes.Gray;
 
 		#endregion
 
@@ -69,54 +72,7 @@ namespace AgenaTrader.UserCode
                 }
             }
 
-
-
-            //if (this.Instrument != null)
-            //{
-            //     if (!String.IsNullOrEmpty(Name_of_list))
-            //    {
-
-            //        this.Root.Core.InstrumentManager.GetInstrumentLists();
-            //        _list = this.Root.Core.InstrumentManager.GetInstrumentsListStatic(this.Name_of_list);
-            //        if (liste == null)
-            //        {
-            //            liste = this.Root.Core.InstrumentManager.GetInstrumentsListDynamic(this.Name_of_list);
-            //        }
-            //        if (liste != null)
-            //        {
-            //            //Get instrument
-            //            // Instrument instrument = this.Root.Core.InstrumentManager.GetInstrument("SKB.DE");
-
-            //            // liste.Add(instrument);
-
-            //            //If you want to clear instruments from the list
-            //            //liste.Clear();
-
-            //            if (!this.Root.Core.InstrumentManager.IsInstrumentExists(this.Instrument.Symbol))
-            //            {
-            //                this.Root.Core.InstrumentManager.AddInstrument2List(this.Instrument, this.Name_of_list);
-            //            }
-
-            //        }
-            //        else
-            //        {
-            //            Log("The list " + this.Name_of_list + " does not exist.", InfoLogLevel.Warning);
-            //        }
-
-            //    }
-            //    else
-            //    {
-            //        Log("You need to specify a name for the list.", InfoLogLevel.Warning);
-            //    }
-            //}
-
-
         }
-
-
-
-
-
 
 
 		protected override void OnBarUpdate()
@@ -127,15 +83,13 @@ namespace AgenaTrader.UserCode
             {
                 if (_list.Contains((Instrument)this.Instrument))
                 {
-                    pen = Pens.Red;
-                    brush = Brushes.Red;
+                    //_pen = Pens.Red;
+                    _brush = Brushes.Green;
                 }
                 else {
-                    pen = Pens.Black;
-                    brush = Brushes.Black;
+                    //_pen = Pens.Black;
+                    _brush = Brushes.Gray;
                 }
-
-                //DrawTextFixed("MyText", "Currentbar: " + CurrentBar + " - " + DateTime.Now.ToString(), TextPosition.TopRight);
              }
 
 		}
@@ -165,49 +119,42 @@ namespace AgenaTrader.UserCode
 
         #region Events
 
-        int counti = 0;
-
-        public override void Plot(Graphics g, Rectangle r, double min, double max)
-        {
-            if (Bars == null || ChartControl == null) return;
-            counti = counti + 1;
-            Print(counti);
 
 
-            using (Font font1 = new Font("Arial", 10, FontStyle.Bold, GraphicsUnit.Point))
+            public override void Plot(Graphics g, Rectangle r, double min, double max)
             {
-                rect = new RectangleF(r.Width - 150, 10, 100, 30);
-                g.DrawString(_name_of_list, font1, brush, rect);
-                g.DrawRectangle(pen, Rectangle.Round(rect));
+                if (Bars == null || ChartControl == null) return;
+
+                //Only draw button if parameters are available.
+                if (this.Instrument != null && _list != null && _list.Count > 0)
+                {
+                    using (Font font1 = new Font("Arial", 10, FontStyle.Bold, GraphicsUnit.Point))
+                    {
+                        StringFormat stringFormat = new StringFormat();
+                        stringFormat.Alignment = StringAlignment.Center;
+                        stringFormat.LineAlignment = StringAlignment.Center;
+
+                        if (String.IsNullOrEmpty(Shortcut_list))
+                        {
+                            if (this.Name_of_list.Count() >= 5)
+                            {
+                                this.Shortcut_list = this.Name_of_list.Substring(0, 5);
+                            }
+                            else
+                            {
+                                this.Shortcut_list = this.Name_of_list;
+                            }
+                        }
+
+                        Brush tempbrush = new SolidBrush(GlobalUtilities.AdjustOpacity(((SolidBrush)_brush).Color, 0.5F));
+
+                        _rect = new RectangleF(r.Width - 100, 10, 86, 27);
+                        g.FillRectangle(tempbrush, _rect);
+                        g.DrawString(Shortcut_list, font1, Brushes.White, _rect, stringFormat);
+                        //g.DrawRectangle(_pen, Rectangle.Round(_rect));
+                    }
+                }
             }
-          
-           // pen = Pens.Black;
-           //rect = new Rectangle(r.Width - 100, 20 , 80, 60);
-           // g.DrawRectangle(pen, rect);
-
-            //// Eigenschaften von ChartControl
-            //string s;
-            //s = "bounds: " + r.X.ToString() + "   " + r.Y.ToString() + "   " + r.Height.ToString() + "   " + r.Width.ToString();
-            //g.DrawString(s, font, brush, 10, 50, sf);
-
-            //s = "min: " + Instrument.Round2TickSize(min).ToString() + "   max: " + Instrument.Round2TickSize(max).ToString();
-            //g.DrawString(s, font, brush, 10, 70, sf);
-
-            //s = "BarSpace: " + ChartControl.BarSpace.ToString() + "   BarWidth: " + ChartControl.BarWidth.ToString();
-            //g.DrawString(s, font, brush, 10, 90, sf);
-
-            //s = "Bars.Count: " + Bars.Count.ToString();
-            //g.DrawString(s, font, brush, 10, 110, sf);
-
-            //s = "BarsPainted: " + ChartControl.BarsPainted.ToString() + "   FirstBarPainted: " + ChartControl.FirstBarPainted.ToString() + "   LastBarPainted: " + ChartControl.LastBarPainted.ToString();
-            //g.DrawString(s, font, brush, 10, 130, sf);
-
-            //s = "BarsVisible: " + ChartControl.BarsVisible.ToString() + "   FirstBarVisible: " + ChartControl.FirstBarVisible.ToString() + "   LastBarVisible: " + ChartControl.LastBarVisible.ToString();
-            //g.DrawString(s, font, brush, 10, 150, sf);
-
-
-
-        }
 
 
             private void OnChartPanelMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -215,12 +162,8 @@ namespace AgenaTrader.UserCode
                 //Print("X = {0}, Y = {1}", e.X, e.Y);
                 //Print("X = {0}, Y = {1}", ChartControl.GetDateTimeByX(e.X), ChartControl.GetPriceByY(e.Y));
 
-                //ITextFixed txt = (ITextFixed)DrawObjects["MyText"];
-                //IText bubu;
-                
-
                 Point cursorPos = new Point(e.X, e.Y);
-                if (rect.Contains(cursorPos))
+                if (_rect.Contains(cursorPos))
                 {
                     if (!_list.Contains((Instrument)this.Instrument))
                     {
@@ -230,17 +173,14 @@ namespace AgenaTrader.UserCode
                     {
                         this.Root.Core.InstrumentManager.RemoveInstrumentFromList(this.Name_of_list, this.Instrument);
                     }
-                
                 }
                 else
                 {
-                  //nothing to do.
+                  //nothing to do
                 }
 
-
                 this.OnBarUpdate();
-                
-           
+               
             }
 
         #endregion
@@ -263,14 +203,24 @@ namespace AgenaTrader.UserCode
             #region Input
 
 
-            [Description("The name of the list to which you would like to add instruments.")]
+            [Description("The name of the static list to which you would like to add the instruments.")]
             //[Category("Values")]
-            [DisplayName("Name of the list")]
+            [DisplayName("Static list")]
             public string Name_of_list
             {
                 get { return _name_of_list; }
                 set { _name_of_list = value; }
             }
+
+            [Description("Shortcut is used to dsiplay the name of the static list in a button.")]
+            //[Category("Values")]
+            [DisplayName("Shortcut for the list")]
+            public string Shortcut_list
+            {
+                get { return _shortcut_list; }
+                set { _shortcut_list = value; }
+            }
+
             #endregion
 
   
@@ -398,4 +348,5 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
 
