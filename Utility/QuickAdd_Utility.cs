@@ -120,20 +120,6 @@ namespace AgenaTrader.UserCode
         #region Events
 
 
-        private Color AdjustBrightness(Color originalColour, double brightnessFactor)
-        {
-            Color adjustedColour = Color.FromArgb(originalColour.A,
-                (int)(originalColour.R * brightnessFactor),
-                (int)(originalColour.G * brightnessFactor),
-                (int)(originalColour.B * brightnessFactor));
-            return adjustedColour;
-        }
-
-        private Color AdjustOpacity(Color originalColour, double opacityFactor)
-        {
-           return Color.FromArgb((int)(originalColour.A * opacityFactor), originalColour.R, originalColour.G, originalColour.B);
-        }
-
 
             public override void Plot(Graphics g, Rectangle r, double min, double max)
             {
@@ -160,8 +146,7 @@ namespace AgenaTrader.UserCode
                             }
                         }
 
-                        Color color = AdjustOpacity(((SolidBrush)_brush).Color, 0.5F);
-                        Brush tempbrush = new SolidBrush(color);
+                        Brush tempbrush = new SolidBrush(GlobalUtilities.AdjustOpacity(((SolidBrush)_brush).Color, 0.5F));
 
                         _rect = new RectangleF(r.Width - 100, 10, 86, 27);
                         g.FillRectangle(tempbrush, _rect);
