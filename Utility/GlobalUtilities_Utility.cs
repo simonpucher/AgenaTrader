@@ -23,25 +23,40 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-    public static class GlobalUtilities {
+    public static class GlobalUtilities
+    {
 
-        public static Color AdjustBrightness(Color originalColour, double brightnessFactor)
-        {
-            Color adjustedColour = Color.FromArgb(originalColour.A,
-                (int)(originalColour.R * brightnessFactor),
-                (int)(originalColour.G * brightnessFactor),
-                (int)(originalColour.B * brightnessFactor));
-            return adjustedColour;
-        }
+        #region Colors
 
-     public static Color AdjustOpacity(Color originalColour, double opacityFactor)
-        {
-            return Color.FromArgb((int)(originalColour.A * opacityFactor), originalColour.R, originalColour.G, originalColour.B);
-        }
+            /// <summary>
+            /// Adjust the brightness of a color. 
+            /// e.g. use this function to create a similiar color in a button click event or on mouse hover.
+            /// </summary>
+            /// <param name="originalColour"></param>
+            /// <param name="brightnessFactor"></param>
+            /// <returns></returns>
+            public static Color AdjustBrightness(Color originalColour, double brightnessFactor)
+            {
+                return Color.FromArgb(originalColour.A, (int)(originalColour.R * brightnessFactor), (int)(originalColour.G * brightnessFactor), (int)(originalColour.B * brightnessFactor));
+            }
+
+            /// <summary>
+            /// Adjust the opacity of a color. 
+            /// e.g. use this function to change the alpha channel of the Color.
+            /// </summary>
+            /// <param name="originalColour"></param>
+            /// <param name="opacityFactor"></param>
+            /// <returns></returns>
+            public static Color AdjustOpacity(Color originalColour, double opacityFactor)
+            {
+                return Color.FromArgb((int)(originalColour.A * opacityFactor), originalColour.R, originalColour.G, originalColour.B);
+            }
+
+        #endregion
     }
 
 
-	[Description("We use this indicator to transport global code like helper classes into agena trader.")]
+	[Description("We use this indicator to share global code in agena trader (like a global helper class).")]
 	public class GlobalUtility : UserIndicator
 	{
 
@@ -59,7 +74,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator : Indicator
 	{
 		/// <summary>
-		/// We use this indicator to transport global code like helper classes into agena trader.
+		/// We use this indicator to share global code in agena trader (like a global helper class).
 		/// </summary>
 		public GlobalUtility GlobalUtility()
         {
@@ -67,7 +82,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// We use this indicator to transport global code like helper classes into agena trader.
+		/// We use this indicator to share global code in agena trader (like a global helper class).
 		/// </summary>
 		public GlobalUtility GlobalUtility(IDataSeries input)
 		{
@@ -97,7 +112,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// We use this indicator to transport global code like helper classes into agena trader.
+		/// We use this indicator to share global code in agena trader (like a global helper class).
 		/// </summary>
 		public GlobalUtility GlobalUtility()
 		{
@@ -105,7 +120,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// We use this indicator to transport global code like helper classes into agena trader.
+		/// We use this indicator to share global code in agena trader (like a global helper class).
 		/// </summary>
 		public GlobalUtility GlobalUtility(IDataSeries input)
 		{
@@ -123,7 +138,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// We use this indicator to transport global code like helper classes into agena trader.
+		/// We use this indicator to share global code in agena trader (like a global helper class).
 		/// </summary>
 		public GlobalUtility GlobalUtility()
 		{
@@ -131,7 +146,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// We use this indicator to transport global code like helper classes into agena trader.
+		/// We use this indicator to share global code in agena trader (like a global helper class).
 		/// </summary>
 		public GlobalUtility GlobalUtility(IDataSeries input)
 		{
@@ -146,7 +161,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// We use this indicator to transport global code like helper classes into agena trader.
+		/// We use this indicator to share global code in agena trader (like a global helper class).
 		/// </summary>
 		public GlobalUtility GlobalUtility()
 		{
@@ -154,7 +169,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// We use this indicator to transport global code like helper classes into agena trader.
+		/// We use this indicator to share global code in agena trader (like a global helper class).
 		/// </summary>
 		public GlobalUtility GlobalUtility(IDataSeries input)
 		{
