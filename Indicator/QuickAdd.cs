@@ -28,10 +28,11 @@ namespace AgenaTrader.UserCode
 		#region Variables
 
 		    private string _name_of_list = String.Empty;
+            private string _shortcut_list = String.Empty;
             private IInstrumentsList _list = null;
             private RectangleF _rect;
-            private Pen _pen = Pens.Black;
-            private Brush _brush = Brushes.Black;
+            //private Pen _pen = Pens.Black;
+            private Brush _brush = Brushes.Gray;
 
 		#endregion
 
@@ -82,12 +83,12 @@ namespace AgenaTrader.UserCode
             {
                 if (_list.Contains((Instrument)this.Instrument))
                 {
-                    _pen = Pens.Red;
-                    _brush = Brushes.Red;
+                    //_pen = Pens.Red;
+                    _brush = Brushes.Green;
                 }
                 else {
-                    _pen = Pens.Black;
-                    _brush = Brushes.Black;
+                    //_pen = Pens.Black;
+                    _brush = Brushes.Gray;
                 }
              }
 
@@ -118,25 +119,57 @@ namespace AgenaTrader.UserCode
 
         #region Events
 
-      //  int counti = 0;
 
-        public override void Plot(Graphics g, Rectangle r, double min, double max)
+        private Color AdjustBrightness(Color originalColour, double brightnessFactor)
         {
-            if (Bars == null || ChartControl == null) return;
-            //counti = counti + 1;
-            //Print(counti);
+            Color adjustedColour = Color.FromArgb(originalColour.A,
+                (int)(originalColour.R * brightnessFactor),
+                (int)(originalColour.G * brightnessFactor),
+                (int)(originalColour.B * brightnessFactor));
+            return adjustedColour;
+        }
 
-            //Only draw button if parameters are available.
-            if (this.Instrument != null && _list != null && _list.Count > 0)
+        private Color AdjustOpacity(Color originalColour, double opacityFactor)
+        {
+           return Color.FromArgb((int)(originalColour.A * opacityFactor), originalColour.R, originalColour.G, originalColour.B);
+        }
+
+
+            public override void Plot(Graphics g, Rectangle r, double min, double max)
             {
+                if (Bars == null || ChartControl == null) return;
+
+                //Only draw button if parameters are available.
+                if (this.Instrument != null && _list != null && _list.Count > 0)
+                {
                     using (Font font1 = new Font("Arial", 10, FontStyle.Bold, GraphicsUnit.Point))
                     {
-                        _rect = new RectangleF(r.Width - 150, 10, 100, 30);
-                        g.DrawString(_name_of_list, font1, _brush, _rect);
-                        g.DrawRectangle(_pen, Rectangle.Round(_rect));
+                        StringFormat stringFormat = new StringFormat();
+                        stringFormat.Alignment = StringAlignment.Center;
+                        stringFormat.LineAlignment = StringAlignment.Center;
+
+                        if (String.IsNullOrEmpty(Shortcut_list))
+                        {
+                            if (this.Name_of_list.Count() >= 5)
+                            {
+                                this.Shortcut_list = this.Name_of_list.Substring(0, 5);
+                            }
+                            else
+                            {
+                                this.Shortcut_list = this.Name_of_list;
+                            }
+                        }
+
+                        Color color = AdjustOpacity(((SolidBrush)_brush).Color, 0.5F);
+                        Brush tempbrush = new SolidBrush(color);
+
+                        _rect = new RectangleF(r.Width - 100, 10, 86, 27);
+                        g.FillRectangle(tempbrush, _rect);
+                        g.DrawString(Shortcut_list, font1, Brushes.White, _rect, stringFormat);
+                        //g.DrawRectangle(_pen, Rectangle.Round(_rect));
                     }
+                }
             }
-        }
 
 
             private void OnChartPanelMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -155,7 +188,6 @@ namespace AgenaTrader.UserCode
                     {
                         this.Root.Core.InstrumentManager.RemoveInstrumentFromList(this.Name_of_list, this.Instrument);
                     }
-                
                 }
                 else
                 {
@@ -186,14 +218,24 @@ namespace AgenaTrader.UserCode
             #region Input
 
 
-            [Description("The name of the list to which you would like to add instruments.")]
+            [Description("The name of the static list to which you would like to add the instruments.")]
             //[Category("Values")]
-            [DisplayName("Name of the list")]
+            [DisplayName("Static list")]
             public string Name_of_list
             {
                 get { return _name_of_list; }
                 set { _name_of_list = value; }
             }
+
+            [Description("Shortcut is used to dsiplay the name of the static list in a button.")]
+            //[Category("Values")]
+            [DisplayName("Shortcut for the list")]
+            public string Shortcut_list
+            {
+                get { return _shortcut_list; }
+                set { _shortcut_list = value; }
+            }
+
             #endregion
 
   
@@ -321,4 +363,5 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
 
