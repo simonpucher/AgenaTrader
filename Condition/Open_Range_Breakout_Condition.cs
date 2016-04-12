@@ -11,6 +11,7 @@ using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
+
 /// <summary>
 /// Version: 1.0
 /// -------------------------------------------------------------------------

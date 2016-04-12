@@ -13,7 +13,6 @@ using AgenaTrader.Helper;
 using System.Globalization;
 
 
-
 /// <summary>
 /// Version: 1.0
 /// -------------------------------------------------------------------------
@@ -32,7 +31,7 @@ namespace AgenaTrader.UserCode
 {
    
     [Description("ORB Indicator")]
-	public class ORB : UserIndicator
+	public class ORB_Indicator : UserIndicator
 	{
         
         private int _orbminutes = 75;
@@ -446,22 +445,22 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator(System.Int32 oRBMinutes)
         {
-			return ORB(Input, oRBMinutes);
+			return ORB_Indicator(Input, oRBMinutes);
 		}
 
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(IDataSeries input, System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator(IDataSeries input, System.Int32 oRBMinutes)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<ORB>(input, i => i.ORBMinutes == oRBMinutes);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<ORB_Indicator>(input, i => i.ORBMinutes == oRBMinutes);
 
 			if (indicator != null)
 				return indicator;
 
-			indicator = new ORB
+			indicator = new ORB_Indicator
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
@@ -485,20 +484,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator(System.Int32 oRBMinutes)
 		{
-			return LeadIndicator.ORB(Input, oRBMinutes);
+			return LeadIndicator.ORB_Indicator(Input, oRBMinutes);
 		}
 
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(IDataSeries input, System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator(IDataSeries input, System.Int32 oRBMinutes)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.ORB(input, oRBMinutes);
+			return LeadIndicator.ORB_Indicator(input, oRBMinutes);
 		}
 	}
 
@@ -511,17 +510,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator(System.Int32 oRBMinutes)
 		{
-			return LeadIndicator.ORB(Input, oRBMinutes);
+			return LeadIndicator.ORB_Indicator(Input, oRBMinutes);
 		}
 
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(IDataSeries input, System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator(IDataSeries input, System.Int32 oRBMinutes)
 		{
-			return LeadIndicator.ORB(input, oRBMinutes);
+			return LeadIndicator.ORB_Indicator(input, oRBMinutes);
 		}
 	}
 
@@ -534,17 +533,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator(System.Int32 oRBMinutes)
 		{
-			return LeadIndicator.ORB(Input, oRBMinutes);
+			return LeadIndicator.ORB_Indicator(Input, oRBMinutes);
 		}
 
 		/// <summary>
 		/// ORB Indicator
 		/// </summary>
-		public ORB ORB(IDataSeries input, System.Int32 oRBMinutes)
+		public ORB_Indicator ORB_Indicator(IDataSeries input, System.Int32 oRBMinutes)
 		{
-			return LeadIndicator.ORB(input, oRBMinutes);
+			return LeadIndicator.ORB_Indicator(input, oRBMinutes);
 		}
 	}
 
@@ -553,4 +552,3 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
-
