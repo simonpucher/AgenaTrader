@@ -61,7 +61,7 @@ namespace AgenaTrader.UserCode
         private bool SessionSuccessful;
         private bool SessionOrderTriggered_Short;
         private bool SessionOrderTriggered_Long;
-        private bool EOD_Done;  //hässlich
+        private bool EOD_Done;  //TODO: hässlich
         private decimal CounterShort;
         private decimal CounterLong;
         private decimal CounterSessions;
