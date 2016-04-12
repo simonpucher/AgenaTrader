@@ -41,7 +41,7 @@ namespace AgenaTrader.UserCode
     }
 
 
-	[Description("Adds the instrument to a static list.")]
+	[Description("We use this indicator to transport global code like helper classes into agena trader.")]
 	public class GlobalUtility : UserIndicator
 	{
 
@@ -59,7 +59,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator : Indicator
 	{
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// We use this indicator to transport global code like helper classes into agena trader.
 		/// </summary>
 		public GlobalUtility GlobalUtility()
         {
@@ -67,7 +67,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// We use this indicator to transport global code like helper classes into agena trader.
 		/// </summary>
 		public GlobalUtility GlobalUtility(IDataSeries input)
 		{
@@ -97,7 +97,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// We use this indicator to transport global code like helper classes into agena trader.
 		/// </summary>
 		public GlobalUtility GlobalUtility()
 		{
@@ -105,7 +105,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// We use this indicator to transport global code like helper classes into agena trader.
 		/// </summary>
 		public GlobalUtility GlobalUtility(IDataSeries input)
 		{
@@ -123,7 +123,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// We use this indicator to transport global code like helper classes into agena trader.
 		/// </summary>
 		public GlobalUtility GlobalUtility()
 		{
@@ -131,7 +131,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// We use this indicator to transport global code like helper classes into agena trader.
 		/// </summary>
 		public GlobalUtility GlobalUtility(IDataSeries input)
 		{
@@ -146,7 +146,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// We use this indicator to transport global code like helper classes into agena trader.
 		/// </summary>
 		public GlobalUtility GlobalUtility()
 		{
@@ -154,7 +154,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// We use this indicator to transport global code like helper classes into agena trader.
 		/// </summary>
 		public GlobalUtility GlobalUtility(IDataSeries input)
 		{
