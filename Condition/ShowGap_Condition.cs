@@ -69,19 +69,6 @@ namespace AgenaTrader.UserCode
 			CalculateOnBarClose = true;
 		}
 
-        //protected override void OnBarUpdate()
-        //{
-        //    //TODO: Write your owner OnBarUpdate handling
-
-
-        //    //DrawArrowUp("Arrowup" + CurrentBar, true, Bars.GetTime(Count - 1), Bars.GetLow(CurrentBar) - 300 * TickSize, Color.Red);
-        //    //DrawArrowDown("Arrowdown" + CurrentBar, true, Bars.GetTime(Count - 1), Bars.GetHigh(CurrentBar) + 300 * TickSize, Color.Green);
-
-        //    //Occurred.Set(-1);
-        //    //Entry.Set(Close[0]);
-
-        //}
-
         protected override void OnBarUpdate()
         {
             //MyGap.Set(Input[0]);
@@ -100,18 +87,26 @@ namespace AgenaTrader.UserCode
                 sessionprocessed = false;
             }
 
-            //08.00, 08.15, 08.30, 08.45, 09.00 sind abgeschlossen -> es ist 09.15)
-            //                if(Bars.BarsSinceSession == 5)
-            if (ToTime(Bars.GetTime(CurrentBar)) > 90000 //größer 09.00 geht für 15M und 1Std (und 1Tag?)
+            TimeSpan openingtime = GlobalUtilities.GetOfficialMarketOpeningTime(Instrument.Symbol);
+            
+            if (Bars.GetTime(CurrentBar).TimeOfDay > openingtime //größer 09.00 geht für 15M und 1Std (und 1Tag?)
             && sessionprocessed == false)        //Tag noch nicht verarbeitet
             {
                 sessionprocessed = true;
                 GapTradeLong = GapTradeShort = false;
-
-                IBar GapOpenBar = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault(); //liefert erster kerze des tages
+                  
+//                IBar GapOpenBar = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault(); //liefert erster kerze des tages
+                IBar GapOpenBar = GlobalUtilities.GetFirstBarOfCurrentSession(Bars);
                 double GapOpen = GapOpenBar.Open;
 
                 double LastDayClose = PriorDayOHLC().PriorClose[0];
+
+//Wenn es keinen LastDayClose Wert gibt -> raus (immer am Anfang des Charts)
+                if (LastDayClose == 0) {
+                    return;
+                }
+
+
                 double GapSize = GapOpen - LastDayClose;
                 DateTime LastDayCloseDate = Bars.GetTime(Count - 7);
                 DateTime LastPeriod = Time[1];
