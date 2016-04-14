@@ -52,133 +52,70 @@ namespace AgenaTrader.UserCode
                 return Color.FromArgb((int)(originalColour.A * opacityFactor), originalColour.R, originalColour.G, originalColour.B);
             }
 
+
+            public static TimeSpan GetOfficialMarketOpeningTime(string Symbol)
+            {
+                //Gets official Stock Market Opening Time
+                //Dirty hack to handle different pre-market times
+                //technically we can not distinguish between pre-market and market data
+                //e.g. use this function to determine opening time for Dax-Index (09.00) or Nasdaq-Index(15.30)
+                if (Symbol.Contains("DE.30") || Symbol.Contains("DE-XTB"))
+                {
+                    return new TimeSpan(9, 00, 00);
+                }
+                else if (Symbol.Contains("US.30") || Symbol.Contains("US-XTB"))
+                {
+                    return new TimeSpan(15, 30, 00);
+                }
+                else
+                {
+                    return new TimeSpan(9, 00, 00);
+                }
+            }
+
+            public static TimeSpan GetOfficialMarketClosingTime(string Symbol)
+            {
+                //Gets official Stock Market Closing Time
+                //e.g. use this function to determine closing time for Dax-Index (17.30) or Nasdaq-Index(22.00)
+                if (Symbol.Contains("DE.30") || Symbol.Contains("DE-XTB"))
+                {
+                    return new TimeSpan(17, 30, 00);
+
+                }
+                else if (Symbol.Contains("US.30") || Symbol.Contains("US-XTB"))
+                {
+                    return new TimeSpan(22, 00, 00);
+                }
+                else
+                {
+                    return new TimeSpan(17, 30, 00);
+                }
+            }
+
+
+
+            public static IBar GetFirstBarOfCurrentSession(IBars Bars) {
+                //returns the first Bar of the latest(=current) Session
+                return Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault();
+            }
+
+
+    }
         #endregion
     }
 
 
 	[Description("We use this indicator to share global code in agena trader (like a global helper class).")]
-	public class GlobalUtility : UserIndicator
+	public class GlobalUtility : AgenaTrader.UserCode.UserIndicator
 	{
 
-
-
         
-    }
+
 }
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 
 namespace AgenaTrader.UserCode
 {
-	#region Indicator
-
-	public partial class UserIndicator : Indicator
-	{
-		/// <summary>
-		/// We use this indicator to share global code in agena trader (like a global helper class).
-		/// </summary>
-		public GlobalUtility GlobalUtility()
-        {
-			return GlobalUtility(Input);
-		}
-
-		/// <summary>
-		/// We use this indicator to share global code in agena trader (like a global helper class).
-		/// </summary>
-		public GlobalUtility GlobalUtility(IDataSeries input)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<GlobalUtility>(input);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new GlobalUtility
-						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// We use this indicator to share global code in agena trader (like a global helper class).
-		/// </summary>
-		public GlobalUtility GlobalUtility()
-		{
-			return LeadIndicator.GlobalUtility(Input);
-		}
-
-		/// <summary>
-		/// We use this indicator to share global code in agena trader (like a global helper class).
-		/// </summary>
-		public GlobalUtility GlobalUtility(IDataSeries input)
-		{
-			if (InInitialize && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
-
-			return LeadIndicator.GlobalUtility(input);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// We use this indicator to share global code in agena trader (like a global helper class).
-		/// </summary>
-		public GlobalUtility GlobalUtility()
-		{
-			return LeadIndicator.GlobalUtility(Input);
-		}
-
-		/// <summary>
-		/// We use this indicator to share global code in agena trader (like a global helper class).
-		/// </summary>
-		public GlobalUtility GlobalUtility(IDataSeries input)
-		{
-			return LeadIndicator.GlobalUtility(input);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// We use this indicator to share global code in agena trader (like a global helper class).
-		/// </summary>
-		public GlobalUtility GlobalUtility()
-		{
-			return LeadIndicator.GlobalUtility(Input);
-		}
-
-		/// <summary>
-		/// We use this indicator to share global code in agena trader (like a global helper class).
-		/// </summary>
-		public GlobalUtility GlobalUtility(IDataSeries input)
-		{
-			return LeadIndicator.GlobalUtility(input);
-		}
-	}
-
-	#endregion
-
 }
 
 #endregion

@@ -69,19 +69,6 @@ namespace AgenaTrader.UserCode
 			CalculateOnBarClose = true;
 		}
 
-        //protected override void OnBarUpdate()
-        //{
-        //    //TODO: Write your owner OnBarUpdate handling
-
-
-        //    //DrawArrowUp("Arrowup" + CurrentBar, true, Bars.GetTime(Count - 1), Bars.GetLow(CurrentBar) - 300 * TickSize, Color.Red);
-        //    //DrawArrowDown("Arrowdown" + CurrentBar, true, Bars.GetTime(Count - 1), Bars.GetHigh(CurrentBar) + 300 * TickSize, Color.Green);
-
-        //    //Occurred.Set(-1);
-        //    //Entry.Set(Close[0]);
-
-        //}
-
         protected override void OnBarUpdate()
         {
             //MyGap.Set(Input[0]);
