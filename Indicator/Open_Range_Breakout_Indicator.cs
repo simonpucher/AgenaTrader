@@ -14,7 +14,7 @@ using System.Globalization;
 
 
 /// <summary>
-/// Version: 1.0
+/// Version: in progress
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -266,7 +266,7 @@ namespace AgenaTrader.UserCode
 
             private void ProcessOpenRange() {
             
-                            CounterSessions += 1;
+                CounterSessions += 1;
 
                 //Liefert RangeStart und RangeEnde
                 CalcOpenRange(out OpenRangeStart, out OpenRangeEnd);
