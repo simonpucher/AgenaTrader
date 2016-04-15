@@ -28,79 +28,107 @@ namespace AgenaTrader.UserCode
 
         #region Colors
 
-            /// <summary>
-            /// Adjust the brightness of a color. 
-            /// e.g. use this function to create a similiar color in a button click event or on mouse hover.
-            /// </summary>
-            /// <param name="originalColour"></param>
-            /// <param name="brightnessFactor"></param>
-            /// <returns></returns>
-            public static Color AdjustBrightness(Color originalColour, double brightnessFactor)
+        /// <summary>
+        /// Adjust the brightness of a color. 
+        /// e.g. use this function to create a similiar color in a button click event or on mouse hover.
+        /// </summary>
+        /// <param name="originalColour"></param>
+        /// <param name="brightnessFactor"></param>
+        /// <returns></returns>
+        public static Color AdjustBrightness(Color originalColour, double brightnessFactor)
+        {
+            return Color.FromArgb(originalColour.A, (int)(originalColour.R * brightnessFactor), (int)(originalColour.G * brightnessFactor), (int)(originalColour.B * brightnessFactor));
+        }
+
+        /// <summary>
+        /// Adjust the opacity of a color. 
+        /// e.g. use this function to change the alpha channel of the Color.
+        /// </summary>
+        /// <param name="originalColour"></param>
+        /// <param name="opacityFactor"></param>
+        /// <returns></returns>
+        public static Color AdjustOpacity(Color originalColour, double opacityFactor)
+        {
+            return Color.FromArgb((int)(originalColour.A * opacityFactor), originalColour.R, originalColour.G, originalColour.B);
+        }
+
+
+        public static TimeSpan GetOfficialMarketOpeningTime(string Symbol)
+        {
+            //Gets official Stock Market Opening Time
+            //Dirty hack to handle different pre-market times
+            //technically we can not distinguish between pre-market and market data
+            //e.g. use this function to determine opening time for Dax-Index (09.00) or Nasdaq-Index(15.30)
+            if (Symbol.Contains("DE.30") || Symbol.Contains("DE-XTB"))
             {
-                return Color.FromArgb(originalColour.A, (int)(originalColour.R * brightnessFactor), (int)(originalColour.G * brightnessFactor), (int)(originalColour.B * brightnessFactor));
+                return new TimeSpan(9, 00, 00);
             }
-
-            /// <summary>
-            /// Adjust the opacity of a color. 
-            /// e.g. use this function to change the alpha channel of the Color.
-            /// </summary>
-            /// <param name="originalColour"></param>
-            /// <param name="opacityFactor"></param>
-            /// <returns></returns>
-            public static Color AdjustOpacity(Color originalColour, double opacityFactor)
+            else if (Symbol.Contains("US.30") || Symbol.Contains("US-XTB"))
             {
-                return Color.FromArgb((int)(originalColour.A * opacityFactor), originalColour.R, originalColour.G, originalColour.B);
+                return new TimeSpan(15, 30, 00);
             }
-
-
-            public static TimeSpan GetOfficialMarketOpeningTime(string Symbol)
+            else
             {
-                //Gets official Stock Market Opening Time
-                //Dirty hack to handle different pre-market times
-                //technically we can not distinguish between pre-market and market data
-                //e.g. use this function to determine opening time for Dax-Index (09.00) or Nasdaq-Index(15.30)
-                if (Symbol.Contains("DE.30") || Symbol.Contains("DE-XTB"))
-                {
-                    return new TimeSpan(9, 00, 00);
-                }
-                else if (Symbol.Contains("US.30") || Symbol.Contains("US-XTB"))
-                {
-                    return new TimeSpan(15, 30, 00);
-                }
-                else
-                {
-                    return new TimeSpan(9, 00, 00);
-                }
+                return new TimeSpan(9, 00, 00);
             }
+        }
 
-            public static TimeSpan GetOfficialMarketClosingTime(string Symbol)
+        public static TimeSpan GetOfficialMarketClosingTime(string Symbol)
+        {
+            //Gets official Stock Market Closing Time
+            //e.g. use this function to determine closing time for Dax-Index (17.30) or Nasdaq-Index(22.00)
+            if (Symbol.Contains("DE.30") || Symbol.Contains("DE-XTB"))
             {
-                //Gets official Stock Market Closing Time
-                //e.g. use this function to determine closing time for Dax-Index (17.30) or Nasdaq-Index(22.00)
-                if (Symbol.Contains("DE.30") || Symbol.Contains("DE-XTB"))
-                {
-                    return new TimeSpan(17, 30, 00);
+                return new TimeSpan(17, 30, 00);
 
-                }
-                else if (Symbol.Contains("US.30") || Symbol.Contains("US-XTB"))
-                {
-                    return new TimeSpan(22, 00, 00);
-                }
-                else
-                {
-                    return new TimeSpan(17, 30, 00);
-                }
+            }
+            else if (Symbol.Contains("US.30") || Symbol.Contains("US-XTB"))
+            {
+                return new TimeSpan(22, 00, 00);
+            }
+            else
+            {
+                return new TimeSpan(17, 30, 00);
+            }
+        }
+
+
+
+        public static IBar GetFirstBarOfCurrentSession(IBars Bars)
+        {
+            //returns the first Bar of the latest(=current) Session
+            return Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault();
+        }
+
+        public static double GetHighestHigh(IBars Bars, int BarsAgo) {
+//HighestHigh Method is not available in Conditions, therefore this alternative can be used
+                double HighestHigh = 0;
+                for (int i = 0; i < BarsAgo; i++)
+
+                    if (HighestHigh < Bars[i].High)
+                    { 
+                    HighestHigh = Bars[i].High;
+                    }
+                    ;
+                    return HighestHigh;   
             }
 
+        public static double GetLowestLow(IBars Bars, int BarsAgo)
+        {
+            //LowestLow Method is not available in Conditions, therefore this alternative can be used
+            double LowestLow = 9999999999;
+            for (int i = 0; i < BarsAgo; i++)
 
-
-            public static IBar GetFirstBarOfCurrentSession(IBars Bars) {
-                //returns the first Bar of the latest(=current) Session
-                return Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault();
-            }
-
-
+                if (LowestLow > Bars[i].High)
+                {
+                    LowestLow = Bars[i].High;
+                }
+            ;
+            return LowestLow;
+        }
     }
+
+
         #endregion
     }
 
