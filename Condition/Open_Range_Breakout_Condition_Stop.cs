@@ -32,7 +32,7 @@ namespace AgenaTrader.UserCode
 	[IsStopAttribute(true)]
 	[IsTargetAttribute(false)]
 	[OverrulePreviousStopPrice(false)]
-	public class ShowGap_Condition_Stop : UserScriptedCondition
+	public class ORB_Condition_Stop : UserScriptedCondition
 	{
 		#region Variables
 
