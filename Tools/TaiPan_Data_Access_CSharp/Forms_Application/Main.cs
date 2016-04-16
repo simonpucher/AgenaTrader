@@ -33,19 +33,80 @@ namespace WindowsFormsApplication1
             InitializeComponent();
         }
 
- 
 
-        private void Kurssuche(DataBase tprdata, string suchbegriff)
+        /// <summary>
+        /// Load Event of the main form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Main_Load(object sender, EventArgs e)
+        {
+            SetWatermark(this.txt_input_search, "Search instrument");
+            this.txt_input_search.Focus();
+
+            this.ResetInstrumentsListView();
+        }
+
+        private void ResetInstrumentsListView() {
+            this.lstvw_instruments.Clear();
+
+            this.lstvw_instruments.View = View.Details;
+            this.lstvw_instruments.GridLines = true;
+            this.lstvw_instruments.FullRowSelect = true;
+
+            //Add column header
+            this.lstvw_instruments.Columns.Add("Name", 200);
+            this.lstvw_instruments.Columns.Add("Symbol", 70);
+            this.lstvw_instruments.Columns.Add("Symbol Nr.", 70);
+        }
+
+
+        private void Kurssuche(DataBase tprdata, string searchtext)
         {
 
             // Objekt zu den Suchkriterien
-            TPRSuchKriterien TPRTSuchkriterium = new TPRSuchKriterien();
-            TPRTSuchkriterium = TPRSuchKriterien.TPRSucheWertpapiername;
+            TPRSuchKriterien criteria = new TPRSuchKriterien();
+            if (this.rbtn_agena.Checked)
+            {
+                criteria = TPRSuchKriterien.TPRSucheAgenaInstument;
+            }
+            else if (this.rbtn_Isin.Checked)
+            {
+                criteria = TPRSuchKriterien.TPRSucheISIN;
+            }
+            else if (this.rbtn_Name.Checked)
+            {
+                criteria = TPRSuchKriterien.TPRSucheWertpapiername;
+            }
+            else
+            {
+                MessageBox.Show("Please define which type of search you would like to use!", "Error");
+                return;
+            }
 
             /*
-             9 = Xetra
+             * 9 = XETRA
+             * 17 = NYSE
+             * 18 = NASDAQ
              */
-            ushort usBoerse = 9;
+            ushort exchange = 0;
+            if (this.rbtn_xetra.Checked)
+            {
+                exchange = 9;
+            }
+            else if (this.rbtn_NYSE.Checked)
+            {
+                exchange = 17;
+            }
+            else if (this.rbtn_nasdaq.Checked)
+            {
+                exchange = 18;
+            }
+            else
+            {
+                MessageBox.Show("Please define which exchange you want to use!", "Error");
+                return;
+            }
 
             /*
              * 1 = Aktien
@@ -57,19 +118,44 @@ namespace WindowsFormsApplication1
              * 9 = Fonds
              * 10 = Devisen
              */
-            ushort usWertpapierart = 6;
+            ushort stocktype;
+            if (this.rbtn_Stocks.Checked)
+            {
+                stocktype = 1;
+            }
+            else if (this.rbtn_indices.Checked)
+            {
+                stocktype = 6;
+            }
+            else
+            {
+                MessageBox.Show("Please define which type of instrument you want to search!", "Error");
+                return;
+            }
 
-            IKursSuchListe TPRTKursSuchListe = (IKursSuchListe)tprdata.KursSuche(TPRSuchKriterien.TPRSucheWertpapiername, suchbegriff, usBoerse, usWertpapierart);
 
-            Console.WriteLine("Gesucht wurde nach: string: " + suchbegriff + ", Boerse: " + usBoerse.ToString() + " , WertPapierArt: " + usWertpapierart.ToString());
+            IKursSuchListe TPRTKursSuchListe = (IKursSuchListe)tprdata.KursSuche(criteria, searchtext, exchange, stocktype);
+
+            //Console.WriteLine("searchstring: " + searchtext + ", Boerse: " + exchange.ToString() + " , WertPapierArt: " + stocktype.ToString());
+
+            this.ResetInstrumentsListView();
 
             IKursSymbol TPRTKursSymbol;
             for (int i = 1; i <= TPRTKursSuchListe.Count; i++)
             {
                 TPRTKursSymbol = (IKursSymbol)TPRTKursSuchListe[i];
 
-                Console.WriteLine("Name: " + TPRTKursSymbol.Name + " Börse: " + TPRTKursSymbol.Boerse + " Symbol: " + TPRTKursSymbol.Symbol + " SymbolNr.: " + TPRTKursSymbol.SymbolNr);
+                //Console.WriteLine("Name: " + TPRTKursSymbol.Name + " Exchange: " + TPRTKursSymbol.Boerse + " Symbol: " + TPRTKursSymbol.Symbol + " SymbolNr.: " + TPRTKursSymbol.SymbolNr);
 
+                //Add first item
+                string[] arr = new string[3];
+                arr[0] = TPRTKursSymbol.Name;
+                arr[1] = TPRTKursSymbol.Symbol;
+                arr[2] = TPRTKursSymbol.SymbolNr.ToString();
+                this.lstvw_instruments.Items.Add(new ListViewItem(arr));
+
+                //lstvw_.Items.Insert(nIndex - 1, TPRTBoerse.Name);
+                //lcAusgabe_Boersen.Items[nIndex - 1].SubItems.Add(TPRTBoerse.Nr.ToString());
 
                 //lcAusgabeSuchergebnis.Items.Insert(i - 1, TPRTKursSymbol.Aktuell.ToString());
                 //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.AktuellZeit.ToString());
@@ -138,16 +224,7 @@ namespace WindowsFormsApplication1
 
         }
 
-        /// <summary>
-        /// Load Event of the main form.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void Main_Load(object sender, EventArgs e)
-        {
-           SetWatermark(this.txt_input_search, "Search instrument");
-           this.txt_input_search.Focus();
-        }
+   
 
         /// <summary>
         /// Start the search on instruments.
@@ -156,7 +233,7 @@ namespace WindowsFormsApplication1
         /// <param name="e"></param>
         private void btn_start_Click(object sender, EventArgs e)
         {
-            this.StartSearch();
+        this.StartSearch();
         }
 
         private void txt_input_search_KeyDown(object sender, KeyEventArgs e)
