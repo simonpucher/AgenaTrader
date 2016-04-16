@@ -1,0 +1,180 @@
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using TaiPanRTLib;
+
+namespace WindowsFormsApplication1
+{
+    public partial class Main : Form
+    {
+
+        //Dll Import to use watermarks in textboxes
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern Int32 SendMessage(IntPtr hWnd, int msg, int wParam, [MarshalAs(UnmanagedType.LPWStr)]string lParam);
+
+        private static void SetWatermark(TextBox textbox, string text) {
+        
+            SendMessage(textbox.Handle, 0x1501, 1, text);
+        }
+
+
+        /// <summary>
+        /// Main Method
+        /// </summary>
+        public Main()
+        {
+            InitializeComponent();
+        }
+
+ 
+
+        private void Kurssuche(DataBase tprdata, string suchbegriff)
+        {
+
+            // Objekt zu den Suchkriterien
+            TPRSuchKriterien TPRTSuchkriterium = new TPRSuchKriterien();
+            TPRTSuchkriterium = TPRSuchKriterien.TPRSucheWertpapiername;
+
+            /*
+             9 = Xetra
+             */
+            ushort usBoerse = 9;
+
+            /*
+             * 1 = Aktien
+             * 2 = Optionen
+             * 3 = Futures
+             * 5 = Anleihen
+             * 6 = Inizies 
+             * 8 = Optionsscheine
+             * 9 = Fonds
+             * 10 = Devisen
+             */
+            ushort usWertpapierart = 6;
+
+            IKursSuchListe TPRTKursSuchListe = (IKursSuchListe)tprdata.KursSuche(TPRSuchKriterien.TPRSucheWertpapiername, suchbegriff, usBoerse, usWertpapierart);
+
+            Console.WriteLine("Gesucht wurde nach: string: " + suchbegriff + ", Boerse: " + usBoerse.ToString() + " , WertPapierArt: " + usWertpapierart.ToString());
+
+            IKursSymbol TPRTKursSymbol;
+            for (int i = 1; i <= TPRTKursSuchListe.Count; i++)
+            {
+                TPRTKursSymbol = (IKursSymbol)TPRTKursSuchListe[i];
+
+                Console.WriteLine("Name: " + TPRTKursSymbol.Name + " Börse: " + TPRTKursSymbol.Boerse + " Symbol: " + TPRTKursSymbol.Symbol + " SymbolNr.: " + TPRTKursSymbol.SymbolNr);
+
+
+                //lcAusgabeSuchergebnis.Items.Insert(i - 1, TPRTKursSymbol.Aktuell.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.AktuellZeit.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.BezahltVolume.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.Boerse);
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.Brief.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.BriefVolume.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.BriefZeit.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.Geld.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.GeldVolume.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.GeldZeit.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.Handel.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.High.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.Low.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.Name);
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.Open.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.PrevClose.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.Symbol);
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.SymbolNr.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.Volume.ToString());
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.Waehrung);
+                //lcAusgabeSuchergebnis.Items[i - 1].SubItems.Add(TPRTKursSymbol.WPArt);
+            }
+
+        }
+
+        private void GetDate(DataBase tprdata)
+        {
+
+            //IIntradayChartPeriodeEintrag TPRTIntrChartPeriodeEintrag = (IIntradayChartPeriodeEintrag)tprdata.IntradayChart(486941, 9, DateTime.Now.Date);
+
+            int iAnzahlIntradayChart = 0;
+            DateTime ChartDatum;
+            int iBidAsk = 1;
+
+            /*
+                TPRKursartBezahlt = 0 
+                TPRKursartBrief = 1 
+                TPRKursartGeld = 2 
+             */
+
+            IIntradayChartEintrag TPRTIntradayChartEintrag;
+
+            ChartDatum = DateTime.Now.Date.AddDays(-1).Date;
+
+            IIntradayChart TPRTIntradayChart = (IIntradayChart)tprdata.IntradayChart(79514, iBidAsk, ChartDatum);
+
+            TPRTIntradayChart.KursArt = TPRKursart.TPRKursartBezahlt;
+            iAnzahlIntradayChart = TPRTIntradayChart.Count;
+
+            if (iAnzahlIntradayChart != 0)
+            {
+                for (int i = 1; i <= TPRTIntradayChart.Count; i++)
+                {
+                    TPRTIntradayChartEintrag = (IIntradayChartEintrag)TPRTIntradayChart[i];
+                    Console.WriteLine(TPRTIntradayChartEintrag.Kurs.ToString());
+                    //Console.WriteLine(TPRTIntradayChartEintrag.Volume.ToString());
+                    Console.WriteLine(TPRTIntradayChartEintrag.Zeit.ToString());
+                }
+            }
+            else
+                MessageBox.Show("Die Anzahl des Intraday Charts ist 0");
+
+            //IStamminformationen StammInfo = new StamminformationenClass();
+            //StammInfo.SymbolNr = 78298;
+
+        }
+
+        /// <summary>
+        /// Load Event of the main form.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Main_Load(object sender, EventArgs e)
+        {
+           SetWatermark(this.txt_input_search, "Search instrument");
+           this.txt_input_search.Focus();
+        }
+
+        /// <summary>
+        /// Start the search on instruments.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btn_start_Click(object sender, EventArgs e)
+        {
+            this.StartSearch();
+        }
+
+        private void txt_input_search_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Enter)
+            {
+                this.StartSearch();
+            }
+        }
+
+        private void StartSearch() {
+            TaiPanRealtime tpr = new TaiPanRealtime();
+            DataBase tprdata = (DataBase)tpr.DataBase;
+
+            if (!String.IsNullOrWhiteSpace(this.txt_input_search.Text))
+            {
+                this.Kurssuche(tprdata, this.txt_input_search.Text);
+            }
+        }
+    }
+}
