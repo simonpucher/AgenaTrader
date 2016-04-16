@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -15,6 +16,7 @@ namespace WindowsFormsApplication1
     public partial class Main : Form
     {
 
+
         //Dll Import to use watermarks in textboxes
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         private static extern Int32 SendMessage(IntPtr hWnd, int msg, int wParam, [MarshalAs(UnmanagedType.LPWStr)]string lParam);
@@ -23,6 +25,10 @@ namespace WindowsFormsApplication1
         
             SendMessage(textbox.Handle, 0x1501, 1, text);
         }
+
+
+        private IList<string[]> _exportdata;
+
 
 
         /// <summary>
@@ -61,7 +67,7 @@ namespace WindowsFormsApplication1
         }
 
 
-        private void Kurssuche(DataBase tprdata, string searchtext)
+        private void SearchInstrument(DataBase tprdata, string searchtext)
         {
 
             // Objekt zu den Suchkriterien
@@ -182,13 +188,12 @@ namespace WindowsFormsApplication1
 
         }
 
-        private void GetDate(DataBase tprdata)
+        private void GetData(DataBase tprdata, DateTime date, ListView.SelectedListViewItemCollection selecteditem)
         {
 
             //IIntradayChartPeriodeEintrag TPRTIntrChartPeriodeEintrag = (IIntradayChartPeriodeEintrag)tprdata.IntradayChart(486941, 9, DateTime.Now.Date);
 
             int iAnzahlIntradayChart = 0;
-            DateTime ChartDatum;
             int iBidAsk = 1;
 
             /*
@@ -199,25 +204,34 @@ namespace WindowsFormsApplication1
 
             IIntradayChartEintrag TPRTIntradayChartEintrag;
 
-            ChartDatum = DateTime.Now.Date.AddDays(-1).Date;
-
-            IIntradayChart TPRTIntradayChart = (IIntradayChart)tprdata.IntradayChart(79514, iBidAsk, ChartDatum);
+            IIntradayChart TPRTIntradayChart = (IIntradayChart)tprdata.IntradayChart(Int32.Parse(selecteditem[0].SubItems[2].Text), iBidAsk, date);
 
             TPRTIntradayChart.KursArt = TPRKursart.TPRKursartBezahlt;
             iAnzahlIntradayChart = TPRTIntradayChart.Count;
 
             if (iAnzahlIntradayChart != 0)
             {
+                _exportdata = new List<string[]>();
                 for (int i = 1; i <= TPRTIntradayChart.Count; i++)
                 {
                     TPRTIntradayChartEintrag = (IIntradayChartEintrag)TPRTIntradayChart[i];
-                    Console.WriteLine(TPRTIntradayChartEintrag.Kurs.ToString());
+                    string[] tempdata = new string[3];
+                    tempdata[0] = date.ToString("yyyyMMdd") + " " + TPRTIntradayChartEintrag.Zeit.ToString("hhmmss");
+                    tempdata[1] = TPRTIntradayChartEintrag.Kurs.ToString();
+                    tempdata[2] = TPRTIntradayChartEintrag.Volume.ToString();
+
+                    _exportdata.Add(tempdata);
+                    //Console.WriteLine("Time: " + TPRTIntradayChartEintrag.Zeit.ToString() + " Value: " + TPRTIntradayChartEintrag.Kurs.ToString());
                     //Console.WriteLine(TPRTIntradayChartEintrag.Volume.ToString());
-                    Console.WriteLine(TPRTIntradayChartEintrag.Zeit.ToString());
+
                 }
+                this.lbl_data_loaded.Text = TPRTIntradayChart.Count + " rows of data loaded.";
             }
             else
-                MessageBox.Show("Die Anzahl des Intraday Charts ist 0");
+            {
+                this.lbl_data_loaded.Text = "There is no data available.";
+                return;
+            }
 
             //IStamminformationen StammInfo = new StamminformationenClass();
             //StammInfo.SymbolNr = 78298;
@@ -250,8 +264,61 @@ namespace WindowsFormsApplication1
 
             if (!String.IsNullOrWhiteSpace(this.txt_input_search.Text))
             {
-                this.Kurssuche(tprdata, this.txt_input_search.Text);
+                this.SearchInstrument(tprdata, this.txt_input_search.Text);
             }
         }
+
+ 
+
+        private void btn_export_Click(object sender, EventArgs e)
+        {
+
+            if (_exportdata != null && _exportdata.Count > 0)
+            {
+                var csv = new StringBuilder();
+                foreach (string[] item in _exportdata)
+                {
+                    csv.AppendLine(string.Format("{0};{1};{2}", item[0], item[1], item[2]));
+                }
+                File.WriteAllText(System.IO.Directory.GetCurrentDirectory() + "\\exportdata.csv", csv.ToString());
+            }
+            else
+            {
+                MessageBox.Show("Please load data first!", "Warning");
+                return;
+            }
+        }
+
+        private void btn_loaddata_Click(object sender, EventArgs e)
+        {
+            if (this.lstvw_instruments.SelectedItems.Count > 0)
+            {
+                 TaiPanRealtime tpr = new TaiPanRealtime();
+                DataBase tprdata = (DataBase)tpr.DataBase;
+                this.GetData(tprdata, this.dtp_to.Value, this.lstvw_instruments.SelectedItems);
+            }
+            else
+            {
+                MessageBox.Show("Please select an instrument!", "Warning");
+                return;
+            }
+        }
+
+        private void lstvw_instruments_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            if (this.lstvw_instruments.SelectedItems.Count > 0)
+            {
+                this.lbl_selected_instrument.Text = this.lstvw_instruments.SelectedItems[0].Text + " - " + this.lstvw_instruments.SelectedItems[0].SubItems[2].Text;   
+            }
+        }
+
+
+
+
+     
+
+
+
+    
     }
 }
