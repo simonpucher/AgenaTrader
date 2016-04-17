@@ -30,6 +30,8 @@
         {
             this.tabs = new System.Windows.Forms.TabControl();
             this.tabpg_search = new System.Windows.Forms.TabPage();
+            this.lbl_data_loaded = new System.Windows.Forms.Label();
+            this.lbl_selected_instrument = new System.Windows.Forms.Label();
             this.dtp_to = new System.Windows.Forms.DateTimePicker();
             this.btn_loaddata = new System.Windows.Forms.Button();
             this.btn_export = new System.Windows.Forms.Button();
@@ -47,8 +49,8 @@
             this.rbtn_Name = new System.Windows.Forms.RadioButton();
             this.txt_input_search = new System.Windows.Forms.TextBox();
             this.btn_start = new System.Windows.Forms.Button();
-            this.lbl_selected_instrument = new System.Windows.Forms.Label();
-            this.lbl_data_loaded = new System.Windows.Forms.Label();
+            this.rtb_exchange_dontcare = new System.Windows.Forms.RadioButton();
+            this.rtb_stocktype_dontcare = new System.Windows.Forms.RadioButton();
             this.tabs.SuspendLayout();
             this.tabpg_search.SuspendLayout();
             this.groupBox1.SuspendLayout();
@@ -88,6 +90,24 @@
             this.tabpg_search.TabIndex = 0;
             this.tabpg_search.Text = "Search";
             this.tabpg_search.UseVisualStyleBackColor = true;
+            // 
+            // lbl_data_loaded
+            // 
+            this.lbl_data_loaded.AutoSize = true;
+            this.lbl_data_loaded.Location = new System.Drawing.Point(571, 194);
+            this.lbl_data_loaded.Name = "lbl_data_loaded";
+            this.lbl_data_loaded.Size = new System.Drawing.Size(78, 13);
+            this.lbl_data_loaded.TabIndex = 16;
+            this.lbl_data_loaded.Text = "no data loaded";
+            // 
+            // lbl_selected_instrument
+            // 
+            this.lbl_selected_instrument.AutoSize = true;
+            this.lbl_selected_instrument.Location = new System.Drawing.Point(567, 25);
+            this.lbl_selected_instrument.Name = "lbl_selected_instrument";
+            this.lbl_selected_instrument.Size = new System.Drawing.Size(113, 13);
+            this.lbl_selected_instrument.TabIndex = 15;
+            this.lbl_selected_instrument.Text = "no instrument selected";
             // 
             // dtp_to
             // 
@@ -132,6 +152,7 @@
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.rtb_stocktype_dontcare);
             this.groupBox1.Controls.Add(this.rbtn_Stocks);
             this.groupBox1.Controls.Add(this.rbtn_indices);
             this.groupBox1.Location = new System.Drawing.Point(3, 110);
@@ -145,19 +166,17 @@
             // rbtn_Stocks
             // 
             this.rbtn_Stocks.AutoSize = true;
-            this.rbtn_Stocks.Checked = true;
-            this.rbtn_Stocks.Location = new System.Drawing.Point(6, 19);
+            this.rbtn_Stocks.Location = new System.Drawing.Point(91, 17);
             this.rbtn_Stocks.Name = "rbtn_Stocks";
             this.rbtn_Stocks.Size = new System.Drawing.Size(58, 17);
             this.rbtn_Stocks.TabIndex = 2;
-            this.rbtn_Stocks.TabStop = true;
             this.rbtn_Stocks.Text = "Stocks";
             this.rbtn_Stocks.UseVisualStyleBackColor = true;
             // 
             // rbtn_indices
             // 
             this.rbtn_indices.AutoSize = true;
-            this.rbtn_indices.Location = new System.Drawing.Point(65, 19);
+            this.rbtn_indices.Location = new System.Drawing.Point(150, 17);
             this.rbtn_indices.Name = "rbtn_indices";
             this.rbtn_indices.Size = new System.Drawing.Size(59, 17);
             this.rbtn_indices.TabIndex = 0;
@@ -166,6 +185,7 @@
             // 
             // grpbox_exchange
             // 
+            this.grpbox_exchange.Controls.Add(this.rtb_exchange_dontcare);
             this.grpbox_exchange.Controls.Add(this.rbtn_xetra);
             this.grpbox_exchange.Controls.Add(this.rbtn_nasdaq);
             this.grpbox_exchange.Controls.Add(this.rbtn_NYSE);
@@ -180,19 +200,17 @@
             // rbtn_xetra
             // 
             this.rbtn_xetra.AutoSize = true;
-            this.rbtn_xetra.Checked = true;
-            this.rbtn_xetra.Location = new System.Drawing.Point(6, 19);
+            this.rbtn_xetra.Location = new System.Drawing.Point(90, 19);
             this.rbtn_xetra.Name = "rbtn_xetra";
             this.rbtn_xetra.Size = new System.Drawing.Size(50, 17);
             this.rbtn_xetra.TabIndex = 2;
-            this.rbtn_xetra.TabStop = true;
             this.rbtn_xetra.Text = "Xetra";
             this.rbtn_xetra.UseVisualStyleBackColor = true;
             // 
             // rbtn_nasdaq
             // 
             this.rbtn_nasdaq.AutoSize = true;
-            this.rbtn_nasdaq.Location = new System.Drawing.Point(124, 19);
+            this.rbtn_nasdaq.Location = new System.Drawing.Point(208, 19);
             this.rbtn_nasdaq.Name = "rbtn_nasdaq";
             this.rbtn_nasdaq.Size = new System.Drawing.Size(62, 17);
             this.rbtn_nasdaq.TabIndex = 1;
@@ -202,7 +220,7 @@
             // rbtn_NYSE
             // 
             this.rbtn_NYSE.AutoSize = true;
-            this.rbtn_NYSE.Location = new System.Drawing.Point(65, 19);
+            this.rbtn_NYSE.Location = new System.Drawing.Point(149, 19);
             this.rbtn_NYSE.Name = "rbtn_NYSE";
             this.rbtn_NYSE.Size = new System.Drawing.Size(54, 17);
             this.rbtn_NYSE.TabIndex = 0;
@@ -272,23 +290,27 @@
             this.btn_start.UseVisualStyleBackColor = true;
             this.btn_start.Click += new System.EventHandler(this.btn_start_Click);
             // 
-            // lbl_selected_instrument
+            // rtb_exchange_dontcare
             // 
-            this.lbl_selected_instrument.AutoSize = true;
-            this.lbl_selected_instrument.Location = new System.Drawing.Point(567, 25);
-            this.lbl_selected_instrument.Name = "lbl_selected_instrument";
-            this.lbl_selected_instrument.Size = new System.Drawing.Size(113, 13);
-            this.lbl_selected_instrument.TabIndex = 15;
-            this.lbl_selected_instrument.Text = "no instrument selected";
+            this.rtb_exchange_dontcare.AutoSize = true;
+            this.rtb_exchange_dontcare.Checked = true;
+            this.rtb_exchange_dontcare.Location = new System.Drawing.Point(7, 19);
+            this.rtb_exchange_dontcare.Name = "rtb_exchange_dontcare";
+            this.rtb_exchange_dontcare.Size = new System.Drawing.Size(76, 17);
+            this.rtb_exchange_dontcare.TabIndex = 3;
+            this.rtb_exchange_dontcare.Text = "I dont care";
+            this.rtb_exchange_dontcare.UseVisualStyleBackColor = true;
             // 
-            // lbl_data_loaded
+            // rtb_stocktype_dontcare
             // 
-            this.lbl_data_loaded.AutoSize = true;
-            this.lbl_data_loaded.Location = new System.Drawing.Point(571, 194);
-            this.lbl_data_loaded.Name = "lbl_data_loaded";
-            this.lbl_data_loaded.Size = new System.Drawing.Size(78, 13);
-            this.lbl_data_loaded.TabIndex = 16;
-            this.lbl_data_loaded.Text = "no data loaded";
+            this.rtb_stocktype_dontcare.AutoSize = true;
+            this.rtb_stocktype_dontcare.Checked = true;
+            this.rtb_stocktype_dontcare.Location = new System.Drawing.Point(7, 19);
+            this.rtb_stocktype_dontcare.Name = "rtb_stocktype_dontcare";
+            this.rtb_stocktype_dontcare.Size = new System.Drawing.Size(76, 17);
+            this.rtb_stocktype_dontcare.TabIndex = 3;
+            this.rtb_stocktype_dontcare.Text = "I dont care";
+            this.rtb_stocktype_dontcare.UseVisualStyleBackColor = true;
             // 
             // Main
             // 
@@ -335,6 +357,8 @@
         private System.Windows.Forms.Button btn_export;
         private System.Windows.Forms.Label lbl_selected_instrument;
         private System.Windows.Forms.Label lbl_data_loaded;
+        private System.Windows.Forms.RadioButton rtb_stocktype_dontcare;
+        private System.Windows.Forms.RadioButton rtb_exchange_dontcare;
 
     }
 }

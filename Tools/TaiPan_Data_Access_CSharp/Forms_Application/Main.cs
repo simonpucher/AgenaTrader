@@ -64,6 +64,7 @@ namespace WindowsFormsApplication1
             this.lstvw_instruments.Columns.Add("Name", 200);
             this.lstvw_instruments.Columns.Add("Symbol", 70);
             this.lstvw_instruments.Columns.Add("Symbol Nr.", 70);
+            this.lstvw_instruments.Columns.Add("Börse", 100);
         }
 
 
@@ -108,6 +109,10 @@ namespace WindowsFormsApplication1
             {
                 exchange = 18;
             }
+            else if (this.rtb_exchange_dontcare.Checked)
+            {
+                exchange = 0;
+            }
             else
             {
                 MessageBox.Show("Please define which exchange you want to use!", "Error");
@@ -133,6 +138,10 @@ namespace WindowsFormsApplication1
             {
                 stocktype = 6;
             }
+            else if (this.rtb_stocktype_dontcare.Checked)
+            {
+                stocktype = 0;
+            }
             else
             {
                 MessageBox.Show("Please define which type of instrument you want to search!", "Error");
@@ -154,10 +163,11 @@ namespace WindowsFormsApplication1
                 //Console.WriteLine("Name: " + TPRTKursSymbol.Name + " Exchange: " + TPRTKursSymbol.Boerse + " Symbol: " + TPRTKursSymbol.Symbol + " SymbolNr.: " + TPRTKursSymbol.SymbolNr);
 
                 //Add first item
-                string[] arr = new string[3];
+                string[] arr = new string[4];
                 arr[0] = TPRTKursSymbol.Name;
                 arr[1] = TPRTKursSymbol.Symbol;
                 arr[2] = TPRTKursSymbol.SymbolNr.ToString();
+                arr[3] = TPRTKursSymbol.Boerse;
                 this.lstvw_instruments.Items.Add(new ListViewItem(arr));
 
                 //lstvw_.Items.Insert(nIndex - 1, TPRTBoerse.Name);
@@ -280,7 +290,10 @@ namespace WindowsFormsApplication1
                 {
                     csv.AppendLine(string.Format("{0};{1};{2}", item[0], item[1], item[2]));
                 }
-                File.WriteAllText(System.IO.Directory.GetCurrentDirectory() + "\\exportdata.csv", csv.ToString());
+                string filename = this.lstvw_instruments.SelectedItems[0].Text + "_" + this.lstvw_instruments.SelectedItems[0].SubItems[2].Text + "_" + this.dtp_to.Value.ToString("yyyyMMdd") + "_" + this.dtp_to.Value.ToString("yyyyMMdd") + ".csv";
+                var invalids = System.IO.Path.GetInvalidFileNameChars();
+                filename = String.Join("_", filename.Split(invalids, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
+                File.WriteAllText(System.IO.Directory.GetCurrentDirectory() + "\\" + filename, csv.ToString());
             }
             else
             {
