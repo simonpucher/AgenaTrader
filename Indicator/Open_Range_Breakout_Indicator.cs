@@ -32,12 +32,14 @@ namespace AgenaTrader.UserCode
    
     [Description("ORB Indicator")]
 	public class ORB_Indicator : UserIndicator
-	{
-        
+    {
+        #region Variables
+
+        //Input
         private int _orbminutes = 75;
-        private Color _col_orb          = Color.Brown;
-        private Color _col_target_short = Color.PaleVioletRed;                      
-        private Color _col_target_long  = Color.PaleGreen;
+        private Color _col_orb = Color.Brown;
+        private Color _col_target_short = Color.PaleVioletRed;
+        private Color _col_target_long = Color.PaleGreen;
 
         private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);    //09:00:00   
         private TimeSpan _tim_OpenRangeEndDE = new TimeSpan(10, 15, 0);    //09:00:00   
@@ -47,6 +49,13 @@ namespace AgenaTrader.UserCode
 
         private TimeSpan _tim_EndOfDay_DE = new TimeSpan(16, 30, 0);  //16:30:00   
         private TimeSpan _tim_EndOfDay_US = new TimeSpan(21, 30, 0);  //21:30:00
+
+        //Output
+
+        //Internal
+
+        #endregion
+
 
         private DateTime DayStart;                                                                                          
         private DateTime DayEnd;
@@ -322,125 +331,131 @@ namespace AgenaTrader.UserCode
 
 		#region Properties
 
-		[Browsable(false)]
-		[XmlIgnore()]
-		public DataSeries MyPlot1
-		{
-			get { return Values[0]; }
-		}
+            #region Input
+
+            /// <summary>
+            /// </summary>
+            [Description("Period in minutes for ORB")]
+            [Category("Parameters")]
+            [DisplayName("Minutes ORB")]
+            public int ORBMinutes
+            {
+                get { return _orbminutes; }
+                set { _orbminutes = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("Select Color")]
+            [Category("Colors")]
+            [DisplayName("ORB")]
+            public Color Color_ORB
+            {
+                get { return _col_orb; }
+                set { _col_orb = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("Select Color TargetAreaShort")]
+            [Category("Colors")]
+            [DisplayName("TargetAreaShort")]
+            public Color Color_TargetAreaShort
+            {
+                get { return _col_target_short; }
+                set { _col_target_short = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("Select Color TargetAreaLong")]
+            [Category("Colors")]
+            [DisplayName("TargetAreaLong")]
+            public Color Color_TargetAreaLong
+            {
+                get { return _col_target_long; }
+                set { _col_target_long = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
+            [Category("TimeSpan")]
+            [DisplayName("1. OpenRange Start DE")]
+            public TimeSpan Time_OpenRangeStartDE
+            {
+                get { return _tim_OpenRangeStartDE; }
+                set { _tim_OpenRangeStartDE = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("OpenRange DE End: Uhrzeit wann Range geschlossen wird")]
+            [Category("TimeSpan")]
+            [DisplayName("2. OpenRange End DE")]
+            public TimeSpan Time_OpenRangeEndDE
+            {
+                get { return _tim_OpenRangeEndDE; }
+                set { _tim_OpenRangeEndDE = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
+            [Category("TimeSpan")]
+            [DisplayName("3. OpenRange Start US")]
+            public TimeSpan Time_OpenRangeStartUS
+            {
+                get { return _tim_OpenRangeStartUS; }
+                set { _tim_OpenRangeStartUS = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("OpenRange US End: Uhrzeit wann Range geschlossen wird")]
+            [Category("TimeSpan")]
+            [DisplayName("4. OpenRange End US")]
+            public TimeSpan Time_OpenRangeEndUS
+            {
+                get { return _tim_OpenRangeEndUS; }
+                set { _tim_OpenRangeEndUS = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("EndOfDay DE: Uhrzeit spätestens verkauft wird")]
+            [Category("TimeSpan")]
+            [DisplayName("5. EndOfDay DE")]
+            public TimeSpan Time_EndOfDay_DE
+            {
+                get { return _tim_EndOfDay_DE; }
+                set { _tim_EndOfDay_DE = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("EndOfDay US: Uhrzeit spätestens verkauft wird")]
+            [Category("TimeSpan")]
+            [DisplayName("5. EndOfDay US")]
+            public TimeSpan Time_EndOfDay_US
+            {
+                get { return _tim_EndOfDay_US; }
+                set { _tim_EndOfDay_US = value; }
+            }
+            #endregion
 
 
-        /// <summary>
-        /// </summary>
-        [Description("Period in minutes for ORB")]
-        [Category("Parameters")]
-        [DisplayName("Minutes ORB")]
-        public int ORBMinutes
-        {
-            get { return _orbminutes; }
-            set { _orbminutes = value; }
-        }
+            #region Output
+                [Browsable(false)]
+                [XmlIgnore()]
+                public DataSeries MyPlot1
+                {
+                    get { return Values[0]; }
+                }
+            #endregion
 
-        /// <summary>
-        /// </summary>
-        [Description("Select Color")]
-        [Category("Colors")]
-        [DisplayName("ORB")]
-        public Color Color_ORB
-        {
-            get { return _col_orb; }
-            set { _col_orb = value; }
-        }
-        //ADD KOVAC 20160403 begin
-        /// <summary>
-        /// </summary>
-        [Description("Select Color TargetAreaShort")]
-        [Category("Colors")]
-        [DisplayName("TargetAreaShort")]
-        public Color Color_TargetAreaShort
-        {
-            get { return _col_target_short; }
-            set { _col_target_short = value; }
-        }
 
-        /// <summary>
-        /// </summary>
-        [Description("Select Color TargetAreaLong")]
-        [Category("Colors")]
-        [DisplayName("TargetAreaLong")]
-        public Color Color_TargetAreaLong
-        {
-            get { return _col_target_long; }
-            set { _col_target_long = value; }
-        }
 
-        /// <summary>
-        /// </summary>
-        [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
-        [Category("TimeSpan")]
-        [DisplayName("1. OpenRange Start DE")]
-        public TimeSpan Time_OpenRangeStartDE
-        {
-            get { return _tim_OpenRangeStartDE; }
-            set { _tim_OpenRangeStartDE = value; }
-        }
-
-        /// <summary>
-        /// </summary>
-        [Description("OpenRange DE End: Uhrzeit wann Range geschlossen wird")]
-        [Category("TimeSpan")]
-        [DisplayName("2. OpenRange End DE")]
-        public TimeSpan Time_OpenRangeEndDE
-        {
-            get { return _tim_OpenRangeEndDE; }
-            set { _tim_OpenRangeEndDE = value; }
-        }
-
-        /// <summary>
-        /// </summary>
-        [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
-        [Category("TimeSpan")]
-        [DisplayName("3. OpenRange Start US")]
-        public TimeSpan Time_OpenRangeStartUS
-        {
-            get { return _tim_OpenRangeStartUS; }
-            set { _tim_OpenRangeStartUS = value; }
-        }
-
-        /// <summary>
-        /// </summary>
-        [Description("OpenRange US End: Uhrzeit wann Range geschlossen wird")]
-        [Category("TimeSpan")]
-        [DisplayName("4. OpenRange End US")]
-        public TimeSpan Time_OpenRangeEndUS
-        {
-            get { return _tim_OpenRangeEndUS; }
-            set { _tim_OpenRangeEndUS = value; }
-        }
-
-        /// <summary>
-        /// </summary>
-        [Description("EndOfDay DE: Uhrzeit spätestens verkauft wird")]
-        [Category("TimeSpan")]
-        [DisplayName("5. EndOfDay DE")]
-        public TimeSpan Time_EndOfDay_DE
-        {
-            get { return _tim_EndOfDay_DE; }
-            set { _tim_EndOfDay_DE = value; }
-        }
-
-        /// <summary>
-        /// </summary>
-        [Description("EndOfDay US: Uhrzeit spätestens verkauft wird")]
-        [Category("TimeSpan")]
-        [DisplayName("5. EndOfDay US")]
-        public TimeSpan Time_EndOfDay_US
-        {
-            get { return _tim_EndOfDay_US; }
-            set { _tim_EndOfDay_US = value; }
-        }
-
-        //ADD KOVAC 20160403 end
 
        
 		#endregion
