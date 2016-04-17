@@ -139,6 +139,47 @@ namespace AgenaTrader.UserCode
                 }
             }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <returns></returns>
+            public DateTime GetStartTime(DateTime start)
+            {
+                TimeSpan temp_time_OpenRangeStart = this.getOpenRangeStart(this.Time_OpenRangeStartDE, this.Time_OpenRangeStartUS);
+                start = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);  //Uhrzeit auf 00:00:00 zurücksetzen, ist vorbefüllt aus SessionStart
+                return start.Add(temp_time_OpenRangeStart);
+            }
+
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="OpenRangeStart"></param>
+            /// <param name="OpenRangeEnd"></param>
+            public void CalcOpenRange(out DateTime openrangestart, out DateTime openrangeend)
+            {
+                //Print("CalcOpenRange");
+
+                //get the first candle of the day
+                openrangestart = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
+                //Set open range start
+                openrangestart = GetStartTime(openrangestart);
+                //Set open range end
+                openrangeend = GetEndTime(openrangestart, this.ORBMinutes);
+            }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="minutes"></param>
+        /// <returns></returns>
+            public DateTime GetEndTime(DateTime start, int minutes)
+            {
+                return start.AddMinutes(minutes);
+            }
 
         #endregion
 
@@ -151,7 +192,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
             /// </summary>
             [Description("Period in minutes for ORB")]
-            [Category("Parameters")]
+            [Category("TimeSpan")]
             [DisplayName("Minutes ORB")]
             public int ORBMinutes
             {

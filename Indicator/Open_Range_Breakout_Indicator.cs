@@ -322,176 +322,215 @@ namespace AgenaTrader.UserCode
 
 		#region Properties
 
-        //[Browsable(false)]
-        //[XmlIgnore()]
-        //public DataSeries MyPlot1
-        //{
-        //    get { return Values[0]; }
-        //}
 
 
-        /// <summary>
-        /// </summary>
-        [Description("Period in minutes for ORB")]
-        [Category("Minutes")]
-        [DisplayName("Minutes ORB")]
-        public int ORBMinutes
-        {
-            get { return _orbminutes; }
-            set { _orbminutes = value; }
-        }
+            #region Input
 
-        /// <summary>
-        /// </summary>
-        [Description("Select Color")]
-        [Category("Colors")]
-        [DisplayName("ORB")]
-        public Color Color_ORB
-        {
-            get { return _col_orb; }
-            set { _col_orb = value; }
-        }
+                /// <summary>
+                /// </summary>
+                [Description("Period in minutes for ORB")]
+                [Category("Minutes")]
+                [DisplayName("Minutes ORB")]
+                public int ORBMinutes
+                {
+                    get { return _orbminutes; }
+                    set { _orbminutes = value; }
+                }
 
-        [Browsable(false)]
-        public string Color_ORBSerialize
-        {
-            get { return SerializableColor.ToString(_col_orb); }
-            set { _col_orb = SerializableColor.FromString(value); }
-        }
+                /// <summary>
+                /// </summary>
+                [Description("Select Color")]
+                [Category("Colors")]
+                [DisplayName("ORB")]
+                public Color Color_ORB
+                {
+                    get { return _col_orb; }
+                    set { _col_orb = value; }
+                }
 
-        /// <summary>
-        /// </summary>
-        [Description("Select Color TargetAreaShort")]
-        [Category("Colors")]
-        [DisplayName("TargetAreaShort")]
-        public Color Color_TargetAreaShort
-        {
-            get { return _col_target_short; }
-            set { _col_target_short = value; }
-        }
-        [Browsable(false)]
-        public string Color_TargetAreaShortSerialize
-        {
-            get { return SerializableColor.ToString(_col_target_short); }
-            set { _col_target_short = SerializableColor.FromString(value); }
-        }
+                [Browsable(false)]
+                public string Color_ORBSerialize
+                {
+                    get { return SerializableColor.ToString(_col_orb); }
+                    set { _col_orb = SerializableColor.FromString(value); }
+                }
 
-        /// <summary>
-        /// </summary>
-        [Description("Select Color TargetAreaLong")]
-        [Category("Colors")]
-        [DisplayName("TargetAreaLong")]
-        public Color Color_TargetAreaLong
-        {
-            get { return _col_target_long; }
-            set { _col_target_long = value; }
-        }
-        [Browsable(false)]
-        public string Color_TargetAreaLongSerialize
-        {
-            get { return SerializableColor.ToString(_col_target_long); }
-            set { _col_target_long = SerializableColor.FromString(value); }
-        }
+                /// <summary>
+                /// </summary>
+                [Description("Select Color TargetAreaShort")]
+                [Category("Colors")]
+                [DisplayName("TargetAreaShort")]
+                public Color Color_TargetAreaShort
+                {
+                    get { return _col_target_short; }
+                    set { _col_target_short = value; }
+                }
+                [Browsable(false)]
+                public string Color_TargetAreaShortSerialize
+                {
+                    get { return SerializableColor.ToString(_col_target_short); }
+                    set { _col_target_short = SerializableColor.FromString(value); }
+                }
 
-        /// <summary>
-        /// </summary>
-        [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
-        [Category("TimeSpan")]
-        [DisplayName("1. OpenRange Start DE")]
-        public TimeSpan Time_OpenRangeStartDE
-        {
-            get { return _tim_OpenRangeStartDE; }
-            set { _tim_OpenRangeStartDE = value; }
-        }
-        [Browsable(false)]
-        public long Time_OpenRangeStartDESerialize
-        {
-            get { return _tim_OpenRangeStartDE.Ticks; }
-            set { _tim_OpenRangeStartDE = new TimeSpan(value); }
-        }
+                /// <summary>
+                /// </summary>
+                [Description("Select Color TargetAreaLong")]
+                [Category("Colors")]
+                [DisplayName("TargetAreaLong")]
+                public Color Color_TargetAreaLong
+                {
+                    get { return _col_target_long; }
+                    set { _col_target_long = value; }
+                }
+                [Browsable(false)]
+                public string Color_TargetAreaLongSerialize
+                {
+                    get { return SerializableColor.ToString(_col_target_long); }
+                    set { _col_target_long = SerializableColor.FromString(value); }
+                }
 
-        /// <summary>
-        /// </summary>
-        [Description("OpenRange DE End: Uhrzeit wann Range geschlossen wird")]
-        [Category("TimeSpan")]
-        [DisplayName("2. OpenRange End DE")]
-        public TimeSpan Time_OpenRangeEndDE
-        {
-            get { return _tim_OpenRangeEndDE; }
-            set { _tim_OpenRangeEndDE = value; }
-        }
-        [Browsable(false)]
-        public long Time_OpenRangeEndDESerialize
-        {
-            get { return _tim_OpenRangeEndDE.Ticks; }
-            set { _tim_OpenRangeEndDE = new TimeSpan(value); }
-        }
+                /// <summary>
+                /// </summary>
+                [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
+                [Category("TimeSpan")]
+                [DisplayName("1. OpenRange Start DE")]
+                public TimeSpan Time_OpenRangeStartDE
+                {
+                    get { return _tim_OpenRangeStartDE; }
+                    set { _tim_OpenRangeStartDE = value; }
+                }
+                [Browsable(false)]
+                public long Time_OpenRangeStartDESerialize
+                {
+                    get { return _tim_OpenRangeStartDE.Ticks; }
+                    set { _tim_OpenRangeStartDE = new TimeSpan(value); }
+                }
 
-        /// <summary>
-        /// </summary>
-        [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
-        [Category("TimeSpan")]
-        [DisplayName("3. OpenRange Start US")]
-        public TimeSpan Time_OpenRangeStartUS
-        {
-            get { return _tim_OpenRangeStartUS; }
-            set { _tim_OpenRangeStartUS = value; }
-        }
-        public long Time_OpenRangeStartUSSerialize
-        {
-            get { return _tim_OpenRangeStartUS.Ticks; }
-            set { _tim_OpenRangeStartUS = new TimeSpan(value); }
-        }
+                /// <summary>
+                /// </summary>
+                [Description("OpenRange DE End: Uhrzeit wann Range geschlossen wird")]
+                [Category("TimeSpan")]
+                [DisplayName("2. OpenRange End DE")]
+                public TimeSpan Time_OpenRangeEndDE
+                {
+                    get { return _tim_OpenRangeEndDE; }
+                    set { _tim_OpenRangeEndDE = value; }
+                }
+                [Browsable(false)]
+                public long Time_OpenRangeEndDESerialize
+                {
+                    get { return _tim_OpenRangeEndDE.Ticks; }
+                    set { _tim_OpenRangeEndDE = new TimeSpan(value); }
+                }
 
-        /// <summary>
-        /// </summary>
-        [Description("OpenRange US End: Uhrzeit wann Range geschlossen wird")]
-        [Category("TimeSpan")]
-        [DisplayName("4. OpenRange End US")]
-        public TimeSpan Time_OpenRangeEndUS
-        {
-            get { return _tim_OpenRangeEndUS; }
-            set { _tim_OpenRangeEndUS = value; }
-        }
-        public long Time_OpenRangeEndUSSerialize
-        {
-            get { return _tim_OpenRangeEndUS.Ticks; }
-            set { _tim_OpenRangeEndUS = new TimeSpan(value); }
-        }
+                /// <summary>
+                /// </summary>
+                [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
+                [Category("TimeSpan")]
+                [DisplayName("3. OpenRange Start US")]
+                public TimeSpan Time_OpenRangeStartUS
+                {
+                    get { return _tim_OpenRangeStartUS; }
+                    set { _tim_OpenRangeStartUS = value; }
+                }
+             [Browsable(false)]
+                public long Time_OpenRangeStartUSSerialize
+                {
+                    get { return _tim_OpenRangeStartUS.Ticks; }
+                    set { _tim_OpenRangeStartUS = new TimeSpan(value); }
+                }
 
-        /// <summary>
-        /// </summary>
-        [Description("EndOfDay DE: Uhrzeit spätestens verkauft wird")]
-        [Category("TimeSpan")]
-        [DisplayName("5. EndOfDay DE")]
-        public TimeSpan Time_EndOfDay_DE
-        {
-            get { return _tim_EndOfDay_DE; }
-            set { _tim_EndOfDay_DE = value; }
-        }
+                /// <summary>
+                /// </summary>
+                [Description("OpenRange US End: Uhrzeit wann Range geschlossen wird")]
+                [Category("TimeSpan")]
+                [DisplayName("4. OpenRange End US")]
+                public TimeSpan Time_OpenRangeEndUS
+                {
+                    get { return _tim_OpenRangeEndUS; }
+                    set { _tim_OpenRangeEndUS = value; }
+                }
+             [Browsable(false)]
+                public long Time_OpenRangeEndUSSerialize
+                {
+                    get { return _tim_OpenRangeEndUS.Ticks; }
+                    set { _tim_OpenRangeEndUS = new TimeSpan(value); }
+                }
 
-        public long Time_EndOfDay_DESerialize
-        {
-            get { return _tim_EndOfDay_DE.Ticks; }
-            set { _tim_EndOfDay_DE = new TimeSpan(value); }
-        }
+                /// <summary>
+                /// </summary>
+                [Description("EndOfDay DE: Uhrzeit spätestens verkauft wird")]
+                [Category("TimeSpan")]
+                [DisplayName("5. EndOfDay DE")]
+                public TimeSpan Time_EndOfDay_DE
+                {
+                    get { return _tim_EndOfDay_DE; }
+                    set { _tim_EndOfDay_DE = value; }
+                }
+             [Browsable(false)]
+                public long Time_EndOfDay_DESerialize
+                {
+                    get { return _tim_EndOfDay_DE.Ticks; }
+                    set { _tim_EndOfDay_DE = new TimeSpan(value); }
+                }
 
-        /// <summary>
-        /// </summary>
-        [Description("EndOfDay US: Uhrzeit spätestens verkauft wird")]
-        [Category("TimeSpan")]
-        [DisplayName("5. EndOfDay US")]
-        public TimeSpan Time_EndOfDay_US
-        {
-            get { return _tim_EndOfDay_US; }
-            set { _tim_EndOfDay_US = value; }
-        }
+                /// <summary>
+                /// </summary>
+                [Description("EndOfDay US: Uhrzeit spätestens verkauft wird")]
+                [Category("TimeSpan")]
+                [DisplayName("5. EndOfDay US")]
+                public TimeSpan Time_EndOfDay_US
+                {
+                    get { return _tim_EndOfDay_US; }
+                    set { _tim_EndOfDay_US = value; }
+                }
+             [Browsable(false)]
+                public long Time_EndOfDay_USSerialize
+                {
+                    get { return _tim_EndOfDay_US.Ticks; }
+                    set { _tim_EndOfDay_US = new TimeSpan(value); }
+                }
 
-        public long Time_EndOfDay_USSerialize
-        {
-            get { return _tim_EndOfDay_US.Ticks; }
-            set { _tim_EndOfDay_US = new TimeSpan(value); }
-        }
+            #endregion
+
+                #region Output
+
+                //[Browsable(false)]
+                //[XmlIgnore()]
+                //public DataSeries MyPlot1
+                //{
+                //    get { return Values[0]; }
+                //}
+
+                #endregion
+
+                #region Internal
+
+                private ORB_Condition _sc;
+                /// <summary>
+                /// Access to the condition with global code.
+                /// </summary>
+                [Browsable(false)]
+                [XmlIgnore()]
+                public ORB_Condition SC
+                {
+                    get
+                    {
+                        if (_sc == null)
+                        {
+                            //typeof(ORB_Condition).Name.ToString()
+                            _sc = (AgenaTrader.UserCode.ORB_Condition)GetScriptedCondition("ORB_Condition") as AgenaTrader.UserCode.ORB_Condition;
+                            if (_sc == null)
+                            {
+                                Log(this.DisplayName + ": Access to Condition " + typeof(ORB_Condition).ToString() + " is missing.", InfoLogLevel.AlertLog);
+                            }
+                        }
+                        return _sc;
+                    }
+                }
+
+            #endregion
+
 
        
 		#endregion
