@@ -81,11 +81,13 @@ namespace AgenaTrader.UserCode
         protected override void InitRequirements()
         {
             //Print("InitRequirements");
+ 
         }
 
         protected override void OnStartUp()
         {
             //Print("OnStartUp");
+
         }
 
         protected override void OnBarUpdate()

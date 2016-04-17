@@ -67,7 +67,7 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnBarUpdate()
 		{
-	
+    
 
             //Occurred.Set(-1);
             //Entry.Set(Close[0]);
