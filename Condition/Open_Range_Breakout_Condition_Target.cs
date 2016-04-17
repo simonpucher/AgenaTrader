@@ -18,16 +18,11 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// ToDo
-/// 
-/// 
-/// 
-/// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-	[Description("Geben Sie bitte hier die Beschreibung für die neue Condition ein")]
+    [Description("Open Range Breakout Target")]
 	[IsEntryAttribute(false)]
 	[IsStopAttribute(false)]
 	[IsTargetAttribute(true)]
@@ -83,14 +78,14 @@ namespace AgenaTrader.UserCode
 
         public override string ToString()
         {
-            return "ORB";
+            return "ORB Target";
         }
 
         public override string DisplayName
         {
             get
             {
-                return "ORB";
+                return "ORB Target";
             }
         }
 

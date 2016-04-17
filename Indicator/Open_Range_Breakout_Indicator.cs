@@ -29,8 +29,8 @@ using System.Globalization;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-   
-    [Description("ORB Indicator")]
+
+        [Description("Open Range Breakout Indicator")]
 	public class ORB_Indicator : UserIndicator
     {
         #region Variables
@@ -53,6 +53,7 @@ namespace AgenaTrader.UserCode
         //Output
 
         //Internal
+        ORB_Condition _sc = null;
 
         #endregion
 
@@ -80,6 +81,7 @@ namespace AgenaTrader.UserCode
 
 		protected override void Initialize()
 		{
+            //Print("Initialize");
 			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
 			Overlay = true;
 			CalculateOnBarClose = true;
@@ -155,15 +157,15 @@ namespace AgenaTrader.UserCode
 //Beim allerletzten Bar des Charts den Status schreiben
             if (Count == Bars.Count)
                 {
-            Print("Counter Erfolg Long: " + CounterLong);
-            Print("Counter Erfolg Short: " + CounterShort);
-            Print("Counter Erfolg Gesamt: " + (CounterShort + CounterLong));
-            Print("Erfolg %: " + (((CounterShort + CounterLong) / CounterSessions) * 100));
-            Print("CounterSessions: " + CounterSessions);
-            Print("EOD Verkäufe: " + CounterEOD);
-            Print("EOD Long Punkte: " + CounterEODPoints_Long);
-            Print("EOD Short Punkte: " + CounterEODPoints_Short);
-                    }
+                    Print("Counter Erfolg Long: " + CounterLong);
+                    Print("Counter Erfolg Short: " + CounterShort);
+                    Print("Counter Erfolg Gesamt: " + (CounterShort + CounterLong));
+                    Print("Erfolg %: " + (((CounterShort + CounterLong) / CounterSessions) * 100));
+                    Print("CounterSessions: " + CounterSessions);
+                    Print("EOD Verkäufe: " + CounterEOD);
+                    Print("EOD Long Punkte: " + CounterEODPoints_Long);
+                    Print("EOD Short Punkte: " + CounterEODPoints_Short);
+                }
 		}
 
 
@@ -183,48 +185,9 @@ namespace AgenaTrader.UserCode
         }
 
 
-        private TimeSpan getOpenRangeStart( )
-        {
-
-            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
-                {
-                    //return new TimeSpan(9,00,00);
-                       return _tim_OpenRangeStartDE;
-                }
-            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
-                {
-                        //return new TimeSpan(15,30,00);
-                        return _tim_OpenRangeStartUS;
-                }
-                else
-                {
-                    return _tim_OpenRangeStartDE;
-                }
-        }
-
-        private TimeSpan getEODTime()
-        {
-
-            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
-            {
-                //return new TimeSpan(9,00,00);
-                return _tim_EndOfDay_DE;
-            }
-            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
-            {
-                //return new TimeSpan(15,30,00);
-                return _tim_EndOfDay_US;
-            }
-            else
-            {
-                return _tim_EndOfDay_DE;
-            }
-        }
-
-
         private DateTime GetStartTime(DateTime start)
         {
-                TimeSpan tim_OpenRangeStart = getOpenRangeStart();
+            TimeSpan tim_OpenRangeStart = this.SC.getOpenRangeStart(this.Time_OpenRangeStartDE, this.Time_OpenRangeEndUS);
                 start = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);  //Uhrzeit auf 00:00:00 zurücksetzen, ist vorbefüllt aus SessionStart
                 return start.Add(tim_OpenRangeStart);
         }
@@ -286,7 +249,7 @@ namespace AgenaTrader.UserCode
 
 
                 DayEnd = new DateTime(DayEnd.Year, DayEnd.Month, DayEnd.Day, 0, 0, 0);  //Uhrzeit auf 00:00:00 zurücksetzen
-                EOD = getEODTime();
+                EOD = this.SC.getEODTime(this.Time_OpenRangeEndDE, this.Time_OpenRangeEndUS);
                 DayEnd = DayStart.Add(EOD);
 
 
@@ -455,11 +418,34 @@ namespace AgenaTrader.UserCode
             #endregion
 
 
+        #region Internal
+        
 
+        #endregion
 
-       
-		#endregion
-	}
+                /// <summary>
+                /// Access to the condition with global code.
+                /// </summary>
+                [Browsable(false)]
+                [XmlIgnore()]
+                public ORB_Condition SC
+                {
+                    get
+                    {
+                        if (_sc == null)
+                        {
+                            _sc = GetScriptedCondition(typeof(ORB_Condition).Name.ToString()) as ORB_Condition;
+                            if (_sc == null)
+                            {
+                                Log(this.DisplayName + ": Access to Condition " + typeof(ORB_Condition).ToString() + " is missing.", InfoLogLevel.AlertLog);
+                            }
+                        }
+                        return _sc;
+                    }
+                }
+
+        #endregion
+    }
 }
 
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
@@ -471,7 +457,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator : Indicator
 	{
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator(System.Int32 oRBMinutes)
         {
@@ -479,7 +465,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator(IDataSeries input, System.Int32 oRBMinutes)
 		{
@@ -510,7 +496,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator(System.Int32 oRBMinutes)
 		{
@@ -518,7 +504,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator(IDataSeries input, System.Int32 oRBMinutes)
 		{
@@ -536,7 +522,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator(System.Int32 oRBMinutes)
 		{
@@ -544,7 +530,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator(IDataSeries input, System.Int32 oRBMinutes)
 		{
@@ -559,7 +545,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator(System.Int32 oRBMinutes)
 		{
@@ -567,7 +553,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator(IDataSeries input, System.Int32 oRBMinutes)
 		{

@@ -18,16 +18,11 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// ToDo
-/// 
-/// 
-/// 
-/// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-	[Description("Geben Sie bitte hier die Beschreibung für die neue Condition ein")]
+	[Description("Open Range Breakout Condition")]
 	[IsEntryAttribute(true)]
 	[IsStopAttribute(false)]
 	[IsTargetAttribute(false)]
@@ -80,8 +75,6 @@ namespace AgenaTrader.UserCode
 		}
 
 
-
-
         public override string ToString()
         {
             return "ORB";
@@ -95,12 +88,67 @@ namespace AgenaTrader.UserCode
             }
         }
 
-		#region Properties
+        #region Public Functions for usage in other ORB Indicators, Targets, Stops, and so on
+
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="time_openrangestartde"></param>
+      /// <param name="time_openrangestartus"></param>
+      /// <returns></returns>
+        public TimeSpan getOpenRangeStart(TimeSpan time_openrangestartde, TimeSpan time_openrangestartus)
+            {
+                if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
+                {
+                    //return new TimeSpan(9,00,00);
+                    return time_openrangestartde;
+                }
+                else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
+                {
+                    //return new TimeSpan(15,30,00);
+                    return time_openrangestartus;
+                }
+                else
+                {
+                    return time_openrangestartde;
+                }
+            }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time_openrangeendde"></param>
+        /// <param name="time_openrangeendus"></param>
+        /// <returns></returns>
+            public TimeSpan getEODTime(TimeSpan time_openrangeendde, TimeSpan time_openrangeendus)
+            {
+
+                if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
+                {
+                    //return new TimeSpan(9,00,00);
+                    return time_openrangeendde;
+                }
+                else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
+                {
+                    //return new TimeSpan(15,30,00);
+                    return time_openrangeendus;
+                }
+                else
+                {
+                    return time_openrangeendde;
+                }
+            }
 
 
-            #region Input
+        #endregion
 
-            /// <summary>
+
+        #region Properties
+
+
+        #region Input
+
+        /// <summary>
             /// </summary>
             [Description("Period in minutes for ORB")]
             [Category("Parameters")]
