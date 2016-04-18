@@ -103,12 +103,26 @@ namespace AgenaTrader.UserCode
             }
 
 
-    }
+ 
         #endregion
 
+        #region DateTime
+        /// <summary>
+        /// Returns the Start of the current week.
+        /// Code from: http://www.codeproject.com/Articles/9706/C-DateTime-Library
+        /// </summary>
+        /// <returns></returns>
+          public static DateTime GetStartOfCurrentWeek()
+            {
+                int DaysToSubtract = (int)DateTime.Now.DayOfWeek;
+                DateTime dt = DateTime.Now.Subtract(System.TimeSpan.FromDays( DaysToSubtract ) );
+                return new DateTime(dt.Year, dt.Month, dt.Day, 0, 0, 0, 0);
+            }
 
+        #endregion
 
     }
+}
 
 /// <summary>
 /// This class contains all extension methods for strings.
