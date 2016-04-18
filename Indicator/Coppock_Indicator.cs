@@ -198,6 +198,15 @@ namespace AgenaTrader.UserCode
             return "Coppock";
         }
 
+        public override string DisplayName
+        {
+            get
+            {
+                return "Coppock";
+            }
+        }
+
+
 
         #region Properties
         ///// <summary>
