@@ -94,10 +94,10 @@ namespace AgenaTrader.UserCode
 
 
 
-        public static IBar GetFirstBarOfCurrentSession(IBars Bars)
+        public static IBar GetFirstBarOfCurrentSession(IBars Bars, DateTime Date)
         {
             //returns the first Bar of the latest(=current) Session
-            return Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault();
+            return Bars.Where(x => x.Time.Date == Date).FirstOrDefault();
         }
 
         public static double GetHighestHigh(IBars Bars, int BarsAgo) {
