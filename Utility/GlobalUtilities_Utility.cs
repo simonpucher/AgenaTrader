@@ -23,6 +23,9 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+    /// <summary>
+    /// Global static Helper.
+    /// </summary>
     public static class GlobalUtilities
     {
 
@@ -119,6 +122,7 @@ namespace AgenaTrader.UserCode
             double LowestLow = 9999999999;
             for (int i = 0; i < BarsAgo; i++)
 
+<<<<<<< HEAD
                 if (LowestLow > Bars[i].High)
                 {
                     LowestLow = Bars[i].High;
@@ -129,11 +133,58 @@ namespace AgenaTrader.UserCode
     }
 
 
+=======
+ 
+>>>>>>> refs/remotes/simonpucher/master
         #endregion
+
+        #region DateTime
+        /// <summary>
+        /// Returns the Start of the current week.
+        /// Code from: http://www.codeproject.com/Articles/9706/C-DateTime-Library
+        /// </summary>
+        /// <returns></returns>
+          public static DateTime GetStartOfCurrentWeek()
+            {
+                int DaysToSubtract = (int)DateTime.Now.DayOfWeek;
+                DateTime dt = DateTime.Now.Subtract(System.TimeSpan.FromDays( DaysToSubtract ) );
+                return new DateTime(dt.Year, dt.Month, dt.Day, 0, 0, 0, 0);
+            }
+
+        #endregion
+
+    }
+}
+
+/// <summary>
+/// This class contains all extension methods for strings.
+/// </summary>
+public static class StringExtensions {
+
+    /// <summary>
+    /// Checks if the string contains a numeric value.
+    /// </summary>
+    /// <param name="theValue">The string to be tested.</param>
+    /// <returns>True if the string is numeric.</returns>
+    public static bool IsNumeric(this string theValue)
+    {
+        long retNum;
+        return long.TryParse(theValue, System.Globalization.NumberStyles.Integer, System.Globalization.NumberFormatInfo.InvariantInfo, out retNum);
     }
 
+    /// <summary>
+    /// Counts the words in a string.
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    public static int WordCount(this String str)
+    {
+        return str.Split(new char[] { ' ', '.', '?' }, StringSplitOptions.RemoveEmptyEntries).Length;
+    }
+}
 
-	[Description("We use this indicator to share global code in agena trader (like a global helper class).")]
+
+	[Description("We use this indicator to share global code in agena trader.")]
 	public class GlobalUtility : AgenaTrader.UserCode.UserIndicator
 	{
 

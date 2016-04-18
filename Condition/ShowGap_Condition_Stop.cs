@@ -13,15 +13,10 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: 1.0
+/// Version: in progress
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
-/// -------------------------------------------------------------------------
-/// ToDo
-/// 
-/// 
-/// 
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>

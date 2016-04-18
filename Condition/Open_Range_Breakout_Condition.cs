@@ -18,16 +18,11 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// ToDo
-/// 
-/// 
-/// 
-/// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-	[Description("Geben Sie bitte hier die Beschreibung für die neue Condition ein")]
+	[Description("Open Range Breakout Condition")]
 	[IsEntryAttribute(true)]
 	[IsStopAttribute(false)]
 	[IsTargetAttribute(false)]
@@ -36,7 +31,26 @@ namespace AgenaTrader.UserCode
 	{
 		#region Variables
 
+        //input
+        private int _orbminutes = 75;
+        private Color _col_orb = Color.Brown;
+        private Color _col_target_short = Color.PaleVioletRed;
+        private Color _col_target_long = Color.PaleGreen;
+
+        private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);    //09:00:00   
+        private TimeSpan _tim_OpenRangeEndDE = new TimeSpan(10, 15, 0);    //09:00:00   
+
+        private TimeSpan _tim_OpenRangeStartUS = new TimeSpan(15, 30, 0);  //15:30:00   
+        private TimeSpan _tim_OpenRangeEndUS = new TimeSpan(16, 45, 0);  //15:30:00   
+
+        private TimeSpan _tim_EndOfDay_DE = new TimeSpan(16, 30, 0);  //16:30:00   
+        private TimeSpan _tim_EndOfDay_US = new TimeSpan(21, 30, 0);  //21:30:00
+
+        //output
 		private int _myCondition1 = 1;
+
+        //internal
+
 
 		#endregion
 
@@ -53,22 +67,12 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnBarUpdate()
 		{
-			//TODO: Write your owner OnBarUpdate handling
+    
 
-
-            DrawArrowUp("Arrowup" + CurrentBar, true, Bars.GetTime(Count - 1), Bars.GetLow(CurrentBar) - 300 * TickSize, Color.Red);
-            DrawArrowDown("Arrowdown" + CurrentBar, true, Bars.GetTime(Count - 1), Bars.GetHigh(CurrentBar) + 300 * TickSize, Color.Green);
-
-            Occurred.Set(-1);
-            Entry.Set(Close[0]);
+            //Occurred.Set(-1);
+            //Entry.Set(Close[0]);
 
 		}
-
-
-        public string HelloWorld() {
-            return "Hello World!";
-        }
-
 
 
         public override string ToString()
@@ -84,34 +88,250 @@ namespace AgenaTrader.UserCode
             }
         }
 
-		#region Properties
+        #region Public Functions for usage in other ORB Indicators, Targets, Stops, and so on
 
-		[Browsable(false)]
-		[XmlIgnore()]
-		public DataSeries Occurred
-		{
-			get { return Values[0]; }
-		}
+      /// <summary>
+      /// 
+      /// </summary>
+      /// <param name="time_openrangestartde"></param>
+      /// <param name="time_openrangestartus"></param>
+      /// <returns></returns>
+        public TimeSpan getOpenRangeStart(TimeSpan time_openrangestartde, TimeSpan time_openrangestartus)
+            {
+                if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
+                {
+                    //return new TimeSpan(9,00,00);
+                    return time_openrangestartde;
+                }
+                else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
+                {
+                    //return new TimeSpan(15,30,00);
+                    return time_openrangestartus;
+                }
+                else
+                {
+                    return time_openrangestartde;
+                }
+            }
 
-		[Browsable(false)]
-		[XmlIgnore()]
-		public DataSeries Entry
-		{
-			get { return Values[1]; }
-		}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="time_openrangeendde"></param>
+        /// <param name="time_openrangeendus"></param>
+        /// <returns></returns>
+            public TimeSpan getEODTime(TimeSpan time_openrangeendde, TimeSpan time_openrangeendus)
+            {
 
-		public override IList<DataSeries> GetEntries()
-		{
-			return new[]{Entry};
-		}
+                if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
+                {
+                    //return new TimeSpan(9,00,00);
+                    return time_openrangeendde;
+                }
+                else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
+                {
+                    //return new TimeSpan(15,30,00);
+                    return time_openrangeendus;
+                }
+                else
+                {
+                    return time_openrangeendde;
+                }
+            }
 
-		[Description("")]
-		[Category("Parameters")]
-		public int MyCondition1
-		{
-			get { return _myCondition1; }
-			set { _myCondition1 = Math.Max(1, value); }
-		}
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <returns></returns>
+            public DateTime GetStartTime(DateTime start)
+            {
+                TimeSpan temp_time_OpenRangeStart = this.getOpenRangeStart(this.Time_OpenRangeStartDE, this.Time_OpenRangeStartUS);
+                start = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);  //Uhrzeit auf 00:00:00 zurücksetzen, ist vorbefüllt aus SessionStart
+                return start.Add(temp_time_OpenRangeStart);
+            }
+
+
+            /// <summary>
+            /// 
+            /// </summary>
+            /// <param name="OpenRangeStart"></param>
+            /// <param name="OpenRangeEnd"></param>
+            public void CalcOpenRange(out DateTime openrangestart, out DateTime openrangeend)
+            {
+                //Print("CalcOpenRange");
+
+                //get the first candle of the day
+                openrangestart = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
+                //Set open range start
+                openrangestart = GetStartTime(openrangestart);
+                //Set open range end
+                openrangeend = GetEndTime(openrangestart, this.ORBMinutes);
+            }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="minutes"></param>
+        /// <returns></returns>
+            public DateTime GetEndTime(DateTime start, int minutes)
+            {
+                return start.AddMinutes(minutes);
+            }
+
+        #endregion
+
+
+        #region Properties
+
+
+        #region Input
+
+        /// <summary>
+            /// </summary>
+            [Description("Period in minutes for ORB")]
+            [Category("TimeSpan")]
+            [DisplayName("Minutes ORB")]
+            public int ORBMinutes
+            {
+                get { return _orbminutes; }
+                set { _orbminutes = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("Select Color")]
+            [Category("Colors")]
+            [DisplayName("ORB")]
+            public Color Color_ORB
+            {
+                get { return _col_orb; }
+                set { _col_orb = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("Select Color TargetAreaShort")]
+            [Category("Colors")]
+            [DisplayName("TargetAreaShort")]
+            public Color Color_TargetAreaShort
+            {
+                get { return _col_target_short; }
+                set { _col_target_short = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("Select Color TargetAreaLong")]
+            [Category("Colors")]
+            [DisplayName("TargetAreaLong")]
+            public Color Color_TargetAreaLong
+            {
+                get { return _col_target_long; }
+                set { _col_target_long = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
+            [Category("TimeSpan")]
+            [DisplayName("1. OpenRange Start DE")]
+            public TimeSpan Time_OpenRangeStartDE
+            {
+                get { return _tim_OpenRangeStartDE; }
+                set { _tim_OpenRangeStartDE = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("OpenRange DE End: Uhrzeit wann Range geschlossen wird")]
+            [Category("TimeSpan")]
+            [DisplayName("2. OpenRange End DE")]
+            public TimeSpan Time_OpenRangeEndDE
+            {
+                get { return _tim_OpenRangeEndDE; }
+                set { _tim_OpenRangeEndDE = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
+            [Category("TimeSpan")]
+            [DisplayName("3. OpenRange Start US")]
+            public TimeSpan Time_OpenRangeStartUS
+            {
+                get { return _tim_OpenRangeStartUS; }
+                set { _tim_OpenRangeStartUS = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("OpenRange US End: Uhrzeit wann Range geschlossen wird")]
+            [Category("TimeSpan")]
+            [DisplayName("4. OpenRange End US")]
+            public TimeSpan Time_OpenRangeEndUS
+            {
+                get { return _tim_OpenRangeEndUS; }
+                set { _tim_OpenRangeEndUS = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("EndOfDay DE: Uhrzeit spätestens verkauft wird")]
+            [Category("TimeSpan")]
+            [DisplayName("5. EndOfDay DE")]
+            public TimeSpan Time_EndOfDay_DE
+            {
+                get { return _tim_EndOfDay_DE; }
+                set { _tim_EndOfDay_DE = value; }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("EndOfDay US: Uhrzeit spätestens verkauft wird")]
+            [Category("TimeSpan")]
+            [DisplayName("5. EndOfDay US")]
+            public TimeSpan Time_EndOfDay_US
+            {
+                get { return _tim_EndOfDay_US; }
+                set { _tim_EndOfDay_US = value; }
+            }
+            #endregion
+
+
+            #region Output
+
+                [Browsable(false)]
+                [XmlIgnore()]
+                public DataSeries Occurred
+                {
+                    get { return Values[0]; }
+                }
+
+                [Browsable(false)]
+                [XmlIgnore()]
+                public DataSeries Entry
+                {
+                    get { return Values[1]; }
+                }
+
+                public override IList<DataSeries> GetEntries()
+                {
+                    return new[] { Entry };
+                }
+
+                [Description("")]
+                [Category("Parameters")]
+                public int MyCondition1
+                {
+                    get { return _myCondition1; }
+                    set { _myCondition1 = Math.Max(1, value); }
+                }
+            #endregion
+
+
 
 		#endregion
 	}
