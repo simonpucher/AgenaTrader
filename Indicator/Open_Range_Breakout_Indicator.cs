@@ -12,7 +12,6 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 using System.Globalization;
 
-
 /// <summary>
 /// Version: in progress
 /// -------------------------------------------------------------------------
@@ -87,7 +86,6 @@ namespace AgenaTrader.UserCode
         protected override void OnStartUp()
         {
             //Print("OnStartUp");
-
         }
 
         protected override void OnBarUpdate()
