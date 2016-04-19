@@ -55,6 +55,7 @@ namespace AgenaTrader.UserCode
                 return Color.FromArgb((int)(originalColour.A * opacityFactor), originalColour.R, originalColour.G, originalColour.B);
             }
 
+        #endregion
 
             public static TimeSpan GetOfficialMarketOpeningTime(string Symbol)
             {
@@ -96,15 +97,39 @@ namespace AgenaTrader.UserCode
             }
 
 
-
-            public static IBar GetFirstBarOfCurrentSession(IBars Bars) {
+            public static IBar GetFirstBarOfCurrentSession(IBars Bars, DateTime Date)
+            {
                 //returns the first Bar of the latest(=current) Session
-                return Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault();
+                return Bars.Where(x => x.Time.Date == Date).FirstOrDefault();
             }
 
 
+        public static double GetHighestHigh(IBars Bars, int BarsAgo) {
+//HighestHigh Method is not available in Conditions, therefore this alternative can be used
+                double HighestHigh = 0;
+                for (int i = 0; i < BarsAgo; i++)
 
-        #endregion
+                    if (HighestHigh < Bars[i].High)
+                    { 
+                    HighestHigh = Bars[i].High;
+                    }
+                    ;
+                    return HighestHigh;   
+            }
+
+        public static double GetLowestLow(IBars Bars, int BarsAgo)
+        {
+            //LowestLow Method is not available in Conditions, therefore this alternative can be used
+            double LowestLow = 9999999999;
+            for (int i = 0; i < BarsAgo; i++)
+                if (LowestLow > Bars[i].High)
+                {
+                    LowestLow = Bars[i].High;
+                }
+            ;
+            return LowestLow;
+        }
+
 
         #region DateTimeHelpers taken from  http://www.codeproject.com/Articles/9706/C-DateTime-Library
 
@@ -239,27 +264,27 @@ namespace AgenaTrader.UserCode
             public static DateTime GetStartOfLastMonth()
             {
                 if (DateTime.Now.Month == 1)
-                    return GetStartOfMonth(12, DateTime.Now.Year - 1);
+                    return GetStartOfMonth((Month)12, DateTime.Now.Year - 1);
                 else
-                    return GetStartOfMonth(DateTime.Now.Month - 1, DateTime.Now.Year);
+                    return GetStartOfMonth((Month)DateTime.Now.Month - 1, DateTime.Now.Year);
             }
 
             public static DateTime GetEndOfLastMonth()
             {
                 if (DateTime.Now.Month == 1)
-                    return GetEndOfMonth(12, DateTime.Now.Year - 1);
+                    return GetEndOfMonth((Month)12, DateTime.Now.Year - 1);
                 else
-                    return GetEndOfMonth(DateTime.Now.Month - 1, DateTime.Now.Year);
+                    return GetEndOfMonth((Month)DateTime.Now.Month - 1, DateTime.Now.Year);
             }
 
             public static DateTime GetStartOfCurrentMonth()
             {
-                return GetStartOfMonth(DateTime.Now.Month, DateTime.Now.Year);
+                return GetStartOfMonth((Month)DateTime.Now.Month, DateTime.Now.Year);
             }
 
             public static DateTime GetEndOfCurrentMonth()
             {
-                return GetEndOfMonth(DateTime.Now.Month, DateTime.Now.Year);
+                return GetEndOfMonth((Month)DateTime.Now.Month, DateTime.Now.Year);
             }
     
             public static DateTime GetStartOfYear(int Year)
