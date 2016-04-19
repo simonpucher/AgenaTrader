@@ -22,7 +22,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-	[Description("Adds the instrument to a static list.")]
+	[Description("Adds an instrument to a static list (e.g. watchlist) by clicking on a button in the chart.")]
 	public class QuickAdd : UserIndicator
 	{
 		#region Variables
