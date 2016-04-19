@@ -11,6 +11,16 @@ using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
+/// <summary>
+/// Version: in progress
+/// -------------------------------------------------------------------------
+/// Simon Pucher 2016
+/// Christian Kovar 2016
+/// -------------------------------------------------------------------------
+/// 
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
 	[Description("Prüft auf Gap und ob die nachfolgenden 15Mins Kerzen den Gap verstärken oder aufheben")]
