@@ -131,11 +131,6 @@ namespace AgenaTrader.UserCode
         }
 
 
-
-
-
-        
-
         #region DateTimeHelpers taken from  http://www.codeproject.com/Articles/9706/C-DateTime-Library
 
         public enum Quarter

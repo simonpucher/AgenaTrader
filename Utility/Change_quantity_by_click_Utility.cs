@@ -18,6 +18,8 @@ using AgenaTrader.Helper.TradingManager;
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
+/// Changes the quantity of an order by clicking on the chart.
+/// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode

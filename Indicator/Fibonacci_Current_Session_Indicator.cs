@@ -11,10 +11,18 @@ using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
+/// <summary>
 /// Version: 1.0
+/// -------------------------------------------------------------------------
+/// Simon Pucher 2016
+/// -------------------------------------------------------------------------
+/// Plots the Fibonacci Lines of the current session.
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
-	[Description("Plots the Fibonacci Lines of the current session.,")]
+	[Description("Plots the Fibonacci Lines of the current session.")]
 	public class Fibonacci_Current_Session : UserIndicator
 	{
 
