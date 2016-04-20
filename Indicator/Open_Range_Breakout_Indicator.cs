@@ -28,11 +28,38 @@ using System.Globalization;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+
+    interface IORB
+    {
+        //input
+        int ORBMinutes { get; set; }
+        Color Color_ORB { get; set; }
+        string Color_ORBSerialize { get; set; }
+        Color Color_TargetAreaShort { get; set; }
+        string Color_TargetAreaShortSerialize { get; set; }
+        Color Color_TargetAreaLong { get; set; }
+        string Color_TargetAreaLongSerialize { get; set; }
+        TimeSpan Time_OpenRangeStartDE { get; set; }
+        TimeSpan Time_OpenRangeEndDE { get; set; }
+        TimeSpan Time_OpenRangeStartUS { get; set; }
+        TimeSpan Time_OpenRangeEndUS { get; set; }
+        TimeSpan Time_EndOfDay_DE { get; set; }
+        TimeSpan Time_EndOfDay_US { get; set; }
+        string EmailAdress { get; set; }
+        bool Send_email { get; set; }
+
+        //output
+
+
+        //internal
+        bool IsEmailFunctionActive { get; }
+    }
+
    
     [Description("ORB Indicator")]
-	public class ORB_Indicator : UserIndicator
+    public class ORB_Indicator : UserIndicator, IORB
 	{
-        
+        //input
         private int _orbminutes = 75;
         private Color _col_orb          = Color.Brown;
         private Color _col_target_short = Color.PaleVioletRed;                      
@@ -47,13 +74,23 @@ namespace AgenaTrader.UserCode
         private TimeSpan _tim_EndOfDay_DE = new TimeSpan(16, 30, 0);  //16:30:00   
         private TimeSpan _tim_EndOfDay_US = new TimeSpan(21, 30, 0);  //21:30:00
 
+        private bool _send_email = false;
+        private string _emailaddress = String.Empty;
+
+        //output
+        private double _range_height = Double.NaN;
+        private double _rangelow = Double.NaN;
+        private double _rangehigh = Double.NaN;
+
+
+        //internal 
         private DateTime DayStart;                                                                                          
         private DateTime DayEnd;
         private DateTime OpenRangeStart;
         private DateTime OpenRangeEnd;
         private TimeSpan EOD;
-        double RangeLow;
-        double RangeHigh;
+        //double RangeLow;
+        //double RangeHigh;
         private double target_short;
         private double target_long;
         private bool SessionSuccessful;
@@ -70,10 +107,10 @@ namespace AgenaTrader.UserCode
 
 		protected override void Initialize()
 		{
-			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
-			Overlay = true;
+			Add(new Plot(Color.FromKnownColor(KnownColor.Blue), "MyPlot1"));
+			Overlay = false;
 			CalculateOnBarClose = true;
-            ClearOutputWindow();
+            //ClearOutputWindow(); 
 		}
         
 
@@ -91,7 +128,9 @@ namespace AgenaTrader.UserCode
         protected override void OnBarUpdate()
 		{
             //MyPlot1.Set(Input[0]);
-           // if (Bars != null && Bars.Count > 0 && IsCurrentBarLast)
+            Value.Set(0);
+
+      
             if (Bars != null && Bars.Count > 0 && Bars.BarsSinceSession == 0)
             {
                 EOD_Done=SessionOrderTriggered_Long = SessionOrderTriggered_Short = SessionSuccessful = false; //zurücksetzen
@@ -104,11 +143,13 @@ namespace AgenaTrader.UserCode
                 if (Bars.GetLow(CurrentBar) <= RangeLow && Bars.GetTime(Count - 1) > OpenRangeEnd && SessionOrderTriggered_Short == false)
                 {
                     SessionOrderTriggered_Short = true;
+                    Value.Set(-1);
                 }
 //Order Long Trigger
                 else if (Bars.GetHigh(CurrentBar) >= RangeHigh && Bars.GetTime(Count - 1) > OpenRangeEnd && SessionOrderTriggered_Long == false)
                 {
-                    SessionOrderTriggered_Long = true;                
+                    SessionOrderTriggered_Long = true;
+                    Value.Set(1);
                 }
 
 //Short Target erreicht
@@ -117,6 +158,7 @@ namespace AgenaTrader.UserCode
                     SessionSuccessful = true;
                     SessionOrderTriggered_Short = true;
                     drawShortTarget();
+                   
                 }
 //Long Target erreicht
                 else if (Bars.GetHigh(CurrentBar) >= target_long && Bars.GetTime(Count - 1) > OpenRangeEnd)
@@ -124,6 +166,11 @@ namespace AgenaTrader.UserCode
                     SessionSuccessful = true;
                     SessionOrderTriggered_Long = true;
                     drawLongTarget();
+                   
+                }
+                else
+                {
+                    Value.Set(0);
                 }
             }
 //EOD  und Target nicht erreicht, aber Orders schon getriggert
@@ -154,6 +201,8 @@ namespace AgenaTrader.UserCode
             Print("EOD Verkäufe: " + CounterEOD);
             Print("EOD Long Punkte: " + CounterEODPoints_Long);
             Print("EOD Short Punkte: " + CounterEODPoints_Short);
+
+
                     }
 		}
 
@@ -176,13 +225,14 @@ namespace AgenaTrader.UserCode
 
         private TimeSpan getOpenRangeStart( )
         {
+            //Print(this.Instrument.Symbol);
 
-            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
+            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB") || Bars.Instrument.Symbol.Contains("DAX.IND"))
                 {
                     //return new TimeSpan(9,00,00);
                        return _tim_OpenRangeStartDE;
                 }
-            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
+            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB") || Bars.Instrument.Symbol.Contains("DOW.IND") || Bars.Instrument.Symbol.Contains("NDX.IND"))
                 {
                         //return new TimeSpan(15,30,00);
                         return _tim_OpenRangeStartUS;
@@ -196,12 +246,12 @@ namespace AgenaTrader.UserCode
         private TimeSpan getEODTime()
         {
 
-            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
+            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB") || Bars.Instrument.Symbol.Contains("DAX.IND"))
             {
                 //return new TimeSpan(9,00,00);
                 return _tim_EndOfDay_DE;
             }
-            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
+            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB") || Bars.Instrument.Symbol.Contains("DOW.IND") || Bars.Instrument.Symbol.Contains("NDX.IND"))
             {
                 //return new TimeSpan(15,30,00);
                 return _tim_EndOfDay_US;
@@ -248,6 +298,7 @@ namespace AgenaTrader.UserCode
                 //Targets
                 target_long = RangeHigh + (RangeHigh - RangeLow);
                 target_short = RangeLow - (RangeHigh - RangeLow);
+                this.RangeHeight = RangeHigh - RangeLow;
                 strTargetAreaLong = "TargetAreaLong" + OpenRangeStart;
                 strTargetAreaShort = "TargetAreaShort" + OpenRangeStart;
 
@@ -255,7 +306,7 @@ namespace AgenaTrader.UserCode
                 DrawRectangle(strTargetAreaShort, true, OpenRangeEnd, RangeLow, DayEnd, target_short, _col_target_short, _col_target_short, 70);
 
                 //Text Min/Max
-                string maxtext = RangeHigh.ToString() + "(" + Math.Round((RangeHigh - RangeLow), 2) + ")";
+                string maxtext = RangeHigh.ToString() + "(" + Math.Round((this.RangeHeight), 2) + ")";
                 strMaxValue = "MaxValue" + OpenRangeStart;
                 strMinValue = "MinValue" + OpenRangeStart;
 
@@ -285,6 +336,7 @@ namespace AgenaTrader.UserCode
                 IEnumerable<IBar> list = Bars.Where(x => x.Time >= OpenRangeStart).Where(x => x.Time <= OpenRangeEnd);
 
                 DrawOpenRange(list, OpenRangeStart, OpenRangeEnd, DayEnd, out target_long, out target_short);
+
             
             }
 
@@ -491,45 +543,103 @@ namespace AgenaTrader.UserCode
                     set { _tim_EndOfDay_US = new TimeSpan(value); }
                 }
 
-            #endregion
 
-                #region Output
+             [Description("Recipient Email Address")]
+             [Category("Email")]
+             [DisplayName("Email Address")]
+             public string EmailAdress
+             {
+                 get { return _emailaddress; }
+                 set { _emailaddress = value; }
+             }
 
-                //[Browsable(false)]
-                //[XmlIgnore()]
-                //public DataSeries MyPlot1
-                //{
-                //    get { return Values[0]; }
-                //}
-
-                #endregion
-
-                #region Internal
-
-                private ORB_Condition _sc;
-                /// <summary>
-                /// Access to the condition with global code.
-                /// </summary>
-                [Browsable(false)]
-                [XmlIgnore()]
-                public ORB_Condition SC
-                {
-                    get
-                    {
-                        if (_sc == null)
-                        {
-                            //typeof(ORB_Condition).Name.ToString()
-                            _sc = (AgenaTrader.UserCode.ORB_Condition)GetScriptedCondition("ORB_Condition") as AgenaTrader.UserCode.ORB_Condition;
-                            if (_sc == null)
-                            {
-                                Log(this.DisplayName + ": Access to Condition " + typeof(ORB_Condition).ToString() + " is missing.", InfoLogLevel.AlertLog);
-                            }
-                        }
-                        return _sc;
-                    }
-                }
+             [Description("If true an email will be send on open range breakout.")]
+             [Category("Email")]
+             [DisplayName("Send email on breakout")]
+             public bool Send_email
+             {
+                 get { return _send_email; }
+                 set { _send_email = value; }
+             }
+       
 
             #endregion
+
+            #region Output
+
+             [Browsable(false)]
+             [XmlIgnore()]
+             public DataSeries MyPlot1
+             {
+                 get { return Values[0]; }
+             }
+
+
+             [Browsable(false)]
+             [XmlIgnore()]
+             public double RangeHeight
+             {
+                 get { return _range_height; }
+                 set { _range_height = value; }
+             }
+
+             [Browsable(false)]
+             [XmlIgnore()]
+             public double RangeLow
+             {
+                 get { return _rangelow; }
+                 set { _rangelow = value; }
+             }
+
+             [Browsable(false)]
+             [XmlIgnore()]
+             public double RangeHigh
+             {
+                 get { return _rangehigh; }
+                 set { _rangehigh = value; }
+             }
+
+            #endregion
+
+            #region Internal
+
+             [Browsable(false)]
+             public bool IsEmailFunctionActive
+             {
+                 get
+                 {
+                     if (this.Send_email && GlobalUtilities.IsValidEmail(this.EmailAdress))
+                     {
+                         return true;
+                     }
+                     return false;
+                 }
+             }
+
+            //private ORB_Condition _sc;
+            ///// <summary>
+            ///// Access to the condition with global code.
+            ///// </summary>
+            //[Browsable(false)]
+            //[XmlIgnore()]
+            //public ORB_Condition SC
+            //{
+            //    get
+            //    {
+            //        if (_sc == null)
+            //        {
+            //            //typeof(ORB_Condition).Name.ToString()
+            //            _sc = (AgenaTrader.UserCode.ORB_Condition)GetScriptedCondition("ORB_Condition") as AgenaTrader.UserCode.ORB_Condition;
+            //            if (_sc == null)
+            //            {
+            //                Log(this.DisplayName + ": Access to Condition " + typeof(ORB_Condition).ToString() + " is missing.", InfoLogLevel.AlertLog);
+            //            }
+            //        }
+            //        return _sc;
+            //    }
+            //}
+
+        #endregion
 
 
        

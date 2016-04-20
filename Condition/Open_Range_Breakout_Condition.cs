@@ -27,7 +27,7 @@ namespace AgenaTrader.UserCode
 	[IsStopAttribute(false)]
 	[IsTargetAttribute(false)]
 	[OverrulePreviousStopPrice(false)]
-	public class ORB_Condition : UserScriptedCondition
+    public class ORB_Condition : UserScriptedCondition, IORB
 	{
 		#region Variables
 
@@ -46,10 +46,15 @@ namespace AgenaTrader.UserCode
         private TimeSpan _tim_EndOfDay_DE = new TimeSpan(16, 30, 0);  //16:30:00   
         private TimeSpan _tim_EndOfDay_US = new TimeSpan(21, 30, 0);  //21:30:00
 
+        private bool _send_email = false;
+        private string _emailaddress = String.Empty;
+
+
         //output
 		private int _myCondition1 = 1;
 
         //internal
+        private ORB_Indicator _orb_indicator = null;
 
 
 		#endregion
@@ -65,12 +70,52 @@ namespace AgenaTrader.UserCode
 			CalculateOnBarClose = true;
 		}
 
+        protected override void OnStartUp()
+        {
+            base.OnStartUp();
+
+            _orb_indicator = new ORB_Indicator();
+        }
+
+        protected override void InitRequirements()
+        {
+            base.InitRequirements();
+
+
+        }
+
 		protected override void OnBarUpdate()
 		{
     
+            //Initalize Indicator parameters
+            _orb_indicator.ORBMinutes = this.ORBMinutes;
+            _orb_indicator.Time_OpenRangeStartDE = this.Time_OpenRangeStartDE;
+            _orb_indicator.Time_OpenRangeEndDE = this.Time_OpenRangeEndDE;
+            _orb_indicator.Time_OpenRangeStartUS = this.Time_OpenRangeStartUS;
+            _orb_indicator.Time_OpenRangeEndUS = this.Time_OpenRangeEndUS;
+            _orb_indicator.Time_EndOfDay_DE = this.Time_EndOfDay_DE;
+            _orb_indicator.Time_EndOfDay_US = this.Time_EndOfDay_US;
 
-            //Occurred.Set(-1);
-            //Entry.Set(Close[0]);
+            switch ((int)_orb_indicator[0])
+            {
+                case 1:
+                   //Long Signal
+                    Occurred.Set(1);
+                    Entry.Set(Close[0]);
+                    break;
+                case -1:
+                  //Short Signal
+                    Occurred.Set(-1);
+                    Entry.Set(Close[0]);
+                    break;
+                default:
+                    //nothing to do
+                    Occurred.Set(0);
+                    Entry.Set(Close[0]);
+                    break;
+            }
+
+
 
 		}
 
@@ -88,100 +133,7 @@ namespace AgenaTrader.UserCode
             }
         }
 
-        #region Public Functions for usage in other ORB Indicators, Targets, Stops, and so on
-
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <param name="time_openrangestartde"></param>
-      /// <param name="time_openrangestartus"></param>
-      /// <returns></returns>
-        public TimeSpan getOpenRangeStart(TimeSpan time_openrangestartde, TimeSpan time_openrangestartus)
-            {
-                if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
-                {
-                    //return new TimeSpan(9,00,00);
-                    return time_openrangestartde;
-                }
-                else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
-                {
-                    //return new TimeSpan(15,30,00);
-                    return time_openrangestartus;
-                }
-                else
-                {
-                    return time_openrangestartde;
-                }
-            }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="time_openrangeendde"></param>
-        /// <param name="time_openrangeendus"></param>
-        /// <returns></returns>
-            public TimeSpan getEODTime(TimeSpan time_openrangeendde, TimeSpan time_openrangeendus)
-            {
-
-                if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
-                {
-                    //return new TimeSpan(9,00,00);
-                    return time_openrangeendde;
-                }
-                else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
-                {
-                    //return new TimeSpan(15,30,00);
-                    return time_openrangeendus;
-                }
-                else
-                {
-                    return time_openrangeendde;
-                }
-            }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="start"></param>
-        /// <returns></returns>
-            public DateTime GetStartTime(DateTime start)
-            {
-                TimeSpan temp_time_OpenRangeStart = this.getOpenRangeStart(this.Time_OpenRangeStartDE, this.Time_OpenRangeStartUS);
-                start = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);  //Uhrzeit auf 00:00:00 zurücksetzen, ist vorbefüllt aus SessionStart
-                return start.Add(temp_time_OpenRangeStart);
-            }
-
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="OpenRangeStart"></param>
-            /// <param name="OpenRangeEnd"></param>
-            public void CalcOpenRange(out DateTime openrangestart, out DateTime openrangeend)
-            {
-                //Print("CalcOpenRange");
-
-                //get the first candle of the day
-                openrangestart = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
-                //Set open range start
-                openrangestart = GetStartTime(openrangestart);
-                //Set open range end
-                openrangeend = GetEndTime(openrangestart, this.ORBMinutes);
-            }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="minutes"></param>
-        /// <returns></returns>
-            public DateTime GetEndTime(DateTime start, int minutes)
-            {
-                return start.AddMinutes(minutes);
-            }
-
-        #endregion
+     
 
 
         #region Properties
@@ -211,6 +163,13 @@ namespace AgenaTrader.UserCode
                 set { _col_orb = value; }
             }
 
+            [Browsable(false)]
+            public string Color_ORBSerialize
+            {
+                get { return SerializableColor.ToString(_col_orb); }
+                set { _col_orb = SerializableColor.FromString(value); }
+            }
+
             /// <summary>
             /// </summary>
             [Description("Select Color TargetAreaShort")]
@@ -222,6 +181,13 @@ namespace AgenaTrader.UserCode
                 set { _col_target_short = value; }
             }
 
+           [Browsable(false)]
+            public string Color_TargetAreaShortSerialize
+            {
+                get { return SerializableColor.ToString(_col_target_short); }
+                set { _col_target_short = SerializableColor.FromString(value); }
+            }
+
             /// <summary>
             /// </summary>
             [Description("Select Color TargetAreaLong")]
@@ -231,6 +197,13 @@ namespace AgenaTrader.UserCode
             {
                 get { return _col_target_long; }
                 set { _col_target_long = value; }
+            }
+
+            [Browsable(false)]
+            public string Color_TargetAreaLongSerialize
+            {
+                get { return SerializableColor.ToString(_col_target_long); }
+                set { _col_target_long = SerializableColor.FromString(value); }
             }
 
             /// <summary>
@@ -292,12 +265,32 @@ namespace AgenaTrader.UserCode
             /// </summary>
             [Description("EndOfDay US: Uhrzeit spätestens verkauft wird")]
             [Category("TimeSpan")]
-            [DisplayName("5. EndOfDay US")]
+            [DisplayName("6. EndOfDay US")]
             public TimeSpan Time_EndOfDay_US
             {
                 get { return _tim_EndOfDay_US; }
                 set { _tim_EndOfDay_US = value; }
             }
+
+            [Description("Recipient Email Address")]
+            [Category("Email")]
+            [DisplayName("Email Address")]
+            public string EmailAdress
+            {
+                get { return _emailaddress; }
+                set { _emailaddress = value; }
+            }
+
+            [Description("If true an email will be send on open range breakout.")]
+            [Category("Email")]
+            [DisplayName("Send email on breakout")]
+            public bool Send_email
+            {
+                get { return _send_email; }
+                set { _send_email = value; }
+            }
+
+
             #endregion
 
 
@@ -322,17 +315,28 @@ namespace AgenaTrader.UserCode
                     return new[] { Entry };
                 }
 
-                [Description("")]
-                [Category("Parameters")]
-                public int MyCondition1
-                {
-                    get { return _myCondition1; }
-                    set { _myCondition1 = Math.Max(1, value); }
-                }
+              
             #endregion
 
+        #region Internals
 
 
-		#endregion
-	}
+            [Browsable(false)]
+            public bool IsEmailFunctionActive
+            {
+                get
+                {
+                    if (this.Send_email && GlobalUtilities.IsValidEmail(this.EmailAdress))
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+
+        #endregion
+
+
+        #endregion
+    }
 }
