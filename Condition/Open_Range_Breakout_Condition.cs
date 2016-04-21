@@ -272,14 +272,14 @@ namespace AgenaTrader.UserCode
                 set { _tim_EndOfDay_US = value; }
             }
 
-            [Description("Recipient Email Address")]
-            [Category("Email")]
-            [DisplayName("Email Address")]
-            public string EmailAdress
-            {
-                get { return _emailaddress; }
-                set { _emailaddress = value; }
-            }
+            //[Description("Recipient Email Address")]
+            //[Category("Email")]
+            //[DisplayName("Email Address")]
+            //public string EmailAdress
+            //{
+            //    get { return _emailaddress; }
+            //    set { _emailaddress = value; }
+            //}
 
             [Description("If true an email will be send on open range breakout.")]
             [Category("Email")]
@@ -326,7 +326,7 @@ namespace AgenaTrader.UserCode
             {
                 get
                 {
-                    if (this.Send_email && GlobalUtilities.IsValidEmail(this.EmailAdress))
+                    if (this.Send_email) // && GlobalUtilities.IsValidEmail(this.EmailAdress))
                     {
                         return true;
                     }

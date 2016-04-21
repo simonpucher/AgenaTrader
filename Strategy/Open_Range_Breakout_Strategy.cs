@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 
 namespace AgenaTrader.UserCode
 {
-	[Description("ORB Strategy")]
+	[Description("Handelsautomatik für ORB Strategy")]
     public class ORB_Strategy : UserStrategy, IORB
 	{
         //input
@@ -43,6 +43,7 @@ namespace AgenaTrader.UserCode
         private IOrder _orderenterlong_stop;
         private IOrder _orderentershort_stop;
         private ORB_Indicator _orb_indicator = null;
+        //protected TimeFrame tf = new TimeFrame(DatafeedHistoryPeriodicity.Minute, 10);
 
 
 		protected override void Initialize()
@@ -177,7 +178,7 @@ namespace AgenaTrader.UserCode
             _orderenterlong_stop = SubmitOrder(0, OrderAction.Sell, OrderType.Stop, 1, 0, this._orb_indicator.RangeLow, "long_ocoId" + this.Instrument.ISIN, "ORB");
 
             //Core.PreferenceManager.DefaultEmailAddress
-            if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, this.EmailAdress,
+            if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, this.Core.PreferenceManager.DefaultEmailAddress,
                 this.Instrument.Symbol + " ORB Long", "Open Range Breakout in Richtung Long bei " + Close[0]);
         }
 
@@ -189,7 +190,7 @@ namespace AgenaTrader.UserCode
             _orderentershort_stop = SubmitOrder(0, OrderAction.BuyToCover, OrderType.Stop, 1, 0, this._orb_indicator.RangeHigh, "short_ocoId" + this.Instrument.ISIN, "ORB");
 
             //Core.PreferenceManager.DefaultEmailAddress
-            if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, this.EmailAdress,
+            if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, this.Core.PreferenceManager.DefaultEmailAddress,
                 this.Instrument.Symbol + " ORB Short", "Open Range Breakout in Richtung Short bei " + Close[0]);
         }
 
@@ -367,14 +368,14 @@ namespace AgenaTrader.UserCode
             }
 
 
-            [Description("Recipient Email Address")]
-            [Category("Email")]
-            [DisplayName("Email Address")]
-            public string EmailAdress
-            {
-                get { return _emailaddress; }
-                set { _emailaddress = value; }
-            }
+            //[Description("Recipient Email Address")]
+            //[Category("Email")]
+            //[DisplayName("Email Address")]
+            //public string EmailAdress
+            //{
+            //    get { return _emailaddress; }
+            //    set { _emailaddress = value; }
+            //}
 
             [Description("If true an email will be send on open range breakout.")]
             [Category("Email")]
@@ -401,7 +402,7 @@ namespace AgenaTrader.UserCode
         {
             get
             {
-                if (this.Send_email && GlobalUtilities.IsValidEmail(this.EmailAdress))
+                if (this.Send_email) //&& GlobalUtilities.IsValidEmail(this.EmailAdress))
                 {
                     return true;
                 }

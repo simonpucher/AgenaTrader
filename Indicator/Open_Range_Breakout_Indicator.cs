@@ -45,7 +45,7 @@ namespace AgenaTrader.UserCode
         TimeSpan Time_OpenRangeEndUS { get; set; }
         TimeSpan Time_EndOfDay_DE { get; set; }
         TimeSpan Time_EndOfDay_US { get; set; }
-        string EmailAdress { get; set; }
+        //string EmailAdress { get; set; }
         bool Send_email { get; set; }
 
         //output
@@ -61,7 +61,7 @@ namespace AgenaTrader.UserCode
 	{
         //input
         private int _orbminutes = 75;
-        private Color _col_orb          = Color.Brown;
+        private Color _col_orb = Color.Brown;
         private Color _col_target_short = Color.PaleVioletRed;                      
         private Color _col_target_long  = Color.PaleGreen;
 
@@ -129,7 +129,7 @@ namespace AgenaTrader.UserCode
 		{
             //MyPlot1.Set(Input[0]);
             Value.Set(0);
-
+      
       
             if (Bars != null && Bars.Count > 0 && Bars.BarsSinceSession == 0)
             {
@@ -544,14 +544,14 @@ namespace AgenaTrader.UserCode
                 }
 
 
-             [Description("Recipient Email Address")]
-             [Category("Email")]
-             [DisplayName("Email Address")]
-             public string EmailAdress
-             {
-                 get { return _emailaddress; }
-                 set { _emailaddress = value; }
-             }
+             //[Description("Recipient Email Address")]
+             //[Category("Email")]
+             //[DisplayName("Email Address")]
+             //public string EmailAdress
+             //{
+             //    get { return _emailaddress; }
+             //    set { _emailaddress = value; }
+             //}
 
              [Description("If true an email will be send on open range breakout.")]
              [Category("Email")]
@@ -608,7 +608,7 @@ namespace AgenaTrader.UserCode
              {
                  get
                  {
-                     if (this.Send_email && GlobalUtilities.IsValidEmail(this.EmailAdress))
+                     if (this.Send_email) // && GlobalUtilities.IsValidEmail(this.EmailAdress))
                      {
                          return true;
                      }
