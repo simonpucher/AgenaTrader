@@ -57,6 +57,40 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
+
+        #region Email
+
+            /// <summary>
+            /// True if the email address is valid.
+            /// </summary>
+            /// <param name="email"></param>
+            /// <returns></returns>
+            public static bool IsValidEmail(string email)
+            {
+                if (String.IsNullOrEmpty(email))
+                {
+                    return false;
+                }
+
+                //one liner for .net 4.5
+                //Note that EmailAddressAttribute is less permissive than System.Net.Mail.MailAddress
+                //if (new EmailAddressAttribute().IsValid(email))
+                //   return true; 
+
+                try
+                {
+                    var addr = new System.Net.Mail.MailAddress(email);
+                    return addr.Address == email;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+
+
+        #endregion
+
             public static TimeSpan GetOfficialMarketOpeningTime(string Symbol)
             {
                 //Gets official Stock Market Opening Time

@@ -27,8 +27,9 @@ namespace AgenaTrader.UserCode
 	[IsStopAttribute(false)]
 	[IsTargetAttribute(true)]
 	[OverrulePreviousStopPrice(false)]
-	public class ORB_Condition_Target : UserScriptedCondition
+    public class ORB_Condition_Target : UserScriptedCondition
 	{
+        //todo implement interface IORB
 		#region Variables
 
         //private int _myCondition1 = 1;

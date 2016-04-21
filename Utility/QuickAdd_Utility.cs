@@ -240,7 +240,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator : Indicator
 	{
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// Adds an instrument to a static list (e.g. watchlist) by clicking on a button in the chart.
 		/// </summary>
 		public QuickAdd QuickAdd()
         {
@@ -248,7 +248,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// Adds an instrument to a static list (e.g. watchlist) by clicking on a button in the chart.
 		/// </summary>
 		public QuickAdd QuickAdd(IDataSeries input)
 		{
@@ -278,7 +278,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// Adds an instrument to a static list (e.g. watchlist) by clicking on a button in the chart.
 		/// </summary>
 		public QuickAdd QuickAdd()
 		{
@@ -286,7 +286,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// Adds an instrument to a static list (e.g. watchlist) by clicking on a button in the chart.
 		/// </summary>
 		public QuickAdd QuickAdd(IDataSeries input)
 		{
@@ -304,7 +304,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// Adds an instrument to a static list (e.g. watchlist) by clicking on a button in the chart.
 		/// </summary>
 		public QuickAdd QuickAdd()
 		{
@@ -312,7 +312,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// Adds an instrument to a static list (e.g. watchlist) by clicking on a button in the chart.
 		/// </summary>
 		public QuickAdd QuickAdd(IDataSeries input)
 		{
@@ -327,7 +327,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// Adds an instrument to a static list (e.g. watchlist) by clicking on a button in the chart.
 		/// </summary>
 		public QuickAdd QuickAdd()
 		{
@@ -335,7 +335,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Adds the instrument to a static list.
+		/// Adds an instrument to a static list (e.g. watchlist) by clicking on a button in the chart.
 		/// </summary>
 		public QuickAdd QuickAdd(IDataSeries input)
 		{
