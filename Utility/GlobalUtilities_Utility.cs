@@ -103,11 +103,17 @@ namespace AgenaTrader.UserCode
                 return Bars.Where(x => x.Time.Date == Date).FirstOrDefault();
             }
 
+            public static IBar GetLastBarOfLastSession(IBars Bars, DateTime Date)
+            {
+                //returns the Last Bar of the last Session
+                return Bars.Where(x => x.Time.Date < Date).LastOrDefault();
+            }
+
 
         public static double GetHighestHigh(IBars Bars, int BarsAgo) {
 //HighestHigh Method is not available in Conditions, therefore this alternative can be used
                 double HighestHigh = 0;
-                for (int i = 0; i < BarsAgo; i++)
+                for (int i = 1; i <= BarsAgo; i++)
 
                     if (HighestHigh < Bars[i].High)
                     { 
@@ -121,10 +127,10 @@ namespace AgenaTrader.UserCode
         {
             //LowestLow Method is not available in Conditions, therefore this alternative can be used
             double LowestLow = 9999999999;
-            for (int i = 0; i < BarsAgo; i++)
-                if (LowestLow > Bars[i].High)
+            for (int i = 1; i <= BarsAgo; i++)
+                if (LowestLow > Bars[i].Low)
                 {
-                    LowestLow = Bars[i].High;
+                    LowestLow = Bars[i].Low;
                 }
             ;
             return LowestLow;
