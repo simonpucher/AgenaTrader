@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -91,6 +91,8 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
+        #region Markets
+
             public static TimeSpan GetOfficialMarketOpeningTime(string Symbol)
             {
                 //Gets official Stock Market Opening Time
@@ -131,6 +133,10 @@ namespace AgenaTrader.UserCode
             }
 
 
+        #endregion
+
+        #region Bars
+
             public static IBar GetFirstBarOfCurrentSession(IBars Bars, DateTime Date)
             {
                 //returns the first Bar of the latest(=current) Session
@@ -138,31 +144,32 @@ namespace AgenaTrader.UserCode
             }
 
 
-        public static double GetHighestHigh(IBars Bars, int BarsAgo) {
-//HighestHigh Method is not available in Conditions, therefore this alternative can be used
+            public static double GetHighestHigh(IBars Bars, int BarsAgo)
+            {
+                //HighestHigh Method is not available in Conditions, therefore this alternative can be used
                 double HighestHigh = 0;
                 for (int i = 0; i < BarsAgo; i++)
 
                     if (HighestHigh < Bars[i].High)
-                    { 
-                    HighestHigh = Bars[i].High;
+                    {
+                        HighestHigh = Bars[i].High;
                     }
-                    ;
-                    return HighestHigh;   
+                return HighestHigh;
             }
 
-        public static double GetLowestLow(IBars Bars, int BarsAgo)
-        {
-            //LowestLow Method is not available in Conditions, therefore this alternative can be used
-            double LowestLow = 9999999999;
-            for (int i = 0; i < BarsAgo; i++)
-                if (LowestLow > Bars[i].High)
-                {
-                    LowestLow = Bars[i].High;
-                }
-            ;
-            return LowestLow;
-        }
+            public static double GetLowestLow(IBars Bars, int BarsAgo)
+            {
+                //LowestLow Method is not available in Conditions, therefore this alternative can be used
+                double LowestLow = 9999999999;
+                for (int i = 0; i < BarsAgo; i++)
+                    if (LowestLow > Bars[i].High)
+                    {
+                        LowestLow = Bars[i].High;
+                    }
+                return LowestLow;
+            }
+
+        #endregion
 
 
         #region DateTimeHelpers taken from  http://www.codeproject.com/Articles/9706/C-DateTime-Library
