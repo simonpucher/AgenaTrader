@@ -1,1 +1,7 @@
-﻿Conditions for Agena Trader
+﻿#Conditions for Agena Trader
+
+##Show Gap
+*** In Progress ***
+
+##Open Range
+*** In Progress ***
