@@ -115,6 +115,11 @@ namespace AgenaTrader.UserCode
         protected override void OnStartUp()
         {
             //Print("OnStartUp");
+
+            //IExchangeDescription exdescrip = this.Root.Core.MarketplaceManager.GetExchangeDescription(this.Instrument.Exchange);
+            //Print(exdescrip.ExtentedTradingHours);
+            //Print(exdescrip.TradingHours);
+
             timeperiod = this.Root.Core.MarketplaceManager.GetExchangeDescription(this.Instrument.Exchange).TradingHours;
         }
 
@@ -242,26 +247,25 @@ namespace AgenaTrader.UserCode
         /// <returns></returns>
         private DateTime getOpenRangeStart(DateTime date)
         {
-           //Use Marketplace-Escort
-            //IExchangeDescription exdescrip = this.Root.Core.MarketplaceManager.GetExchangeDescription(this.Instrument.Exchange);
-            //Print(exdescrip.ExtentedTradingHours);
-            //Print(exdescrip.TradingHours);
-            return new DateTime(date.Year, date.Month, date.Day, this.timeperiod.StartTime.Hours, this.timeperiod.StartTime.Minutes, this.timeperiod.StartTime.Seconds);
+            //Use Marketplace-Escort
+            DateTime returnvalue = new DateTime(date.Year, date.Month, date.Day, this.timeperiod.StartTime.Hours, this.timeperiod.StartTime.Minutes, this.timeperiod.StartTime.Seconds);
 
-            //if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB") || Bars.Instrument.Symbol.Contains("DAX.IND"))
-            //{
-            //    //return new TimeSpan(9,00,00);
-            //    return new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartDE.Hours, this._tim_OpenRangeStartDE.Minutes, this._tim_OpenRangeStartDE.Seconds);
-            //}
-            //else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB") || Bars.Instrument.Symbol.Contains("DOW.IND") || Bars.Instrument.Symbol.Contains("NDX.IND"))
-            //{
-            //    //return new TimeSpan(15,30,00);
-            //    return new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartUS.Hours, this._tim_OpenRangeStartUS.Minutes, this._tim_OpenRangeStartUS.Seconds);
-            //}
+            //Use CFD data
+            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
+            {
+                //return new TimeSpan(9,00,00);
+                returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartDE.Hours, this._tim_OpenRangeStartDE.Minutes, this._tim_OpenRangeStartDE.Seconds);
+            }
+            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
+            {
+                //return new TimeSpan(15,30,00);
+                returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartUS.Hours, this._tim_OpenRangeStartUS.Minutes, this._tim_OpenRangeStartUS.Seconds);
+            }
             //else
             //{
-            //    return new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartDE.Hours, this._tim_OpenRangeStartDE.Minutes, this._tim_OpenRangeStartDE.Seconds);
+            //    returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartDE.Hours, this._tim_OpenRangeStartDE.Minutes, this._tim_OpenRangeStartDE.Seconds);
             //}
+            return returnvalue;
         }
 
         /// <summary>
@@ -281,22 +285,26 @@ namespace AgenaTrader.UserCode
         /// <returns></returns>
         private DateTime getEndOfTradingDay(DateTime date)
         {
-            return new DateTime(date.Year, date.Month, date.Day, this.timeperiod.EndTime.Hours, this.timeperiod.EndTime.Minutes, this.timeperiod.EndTime.Seconds);
+            //Use Marketplace-Escort
+            DateTime returnvalue = new DateTime(date.Year, date.Month, date.Day, this.timeperiod.EndTime.Hours, this.timeperiod.EndTime.Minutes, this.timeperiod.EndTime.Seconds);
 
-            //if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB") || Bars.Instrument.Symbol.Contains("DAX.IND"))
-            //{
-            //    //return new TimeSpan(9,00,00);
-            //    return new DateTime(date.Year, date.Month, date.Day, this.Time_EndOfDay_DE.Hours, this.Time_EndOfDay_DE.Minutes, this.Time_EndOfDay_DE.Seconds);
-            //}
-            //else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB") || Bars.Instrument.Symbol.Contains("DOW.IND") || Bars.Instrument.Symbol.Contains("NDX.IND"))
-            //{
-            //    //return new TimeSpan(15,30,00);
-            //    return new DateTime(date.Year, date.Month, date.Day, this._tim_EndOfDay_US.Hours, this._tim_EndOfDay_US.Minutes, this._tim_EndOfDay_US.Seconds);
-            //}
+            //Use CFD data
+            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
+            {
+                //return new TimeSpan(9,00,00);
+                returnvalue = new DateTime(date.Year, date.Month, date.Day, this.Time_EndOfDay_DE.Hours, this.Time_EndOfDay_DE.Minutes, this.Time_EndOfDay_DE.Seconds);
+            }
+            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
+            {
+                //return new TimeSpan(15,30,00);
+                returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_EndOfDay_US.Hours, this._tim_EndOfDay_US.Minutes, this._tim_EndOfDay_US.Seconds);
+            }
             //else
             //{
-            //    return new DateTime(date.Year, date.Month, date.Day, this.Time_EndOfDay_DE.Hours, this.Time_EndOfDay_DE.Minutes, this.Time_EndOfDay_DE.Seconds);
+            //    returnvalue = new DateTime(date.Year, date.Month, date.Day, this.Time_EndOfDay_DE.Hours, this.Time_EndOfDay_DE.Minutes, this.Time_EndOfDay_DE.Seconds);
             //}
+
+            return returnvalue;
         }
 
 
