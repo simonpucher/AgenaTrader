@@ -28,7 +28,9 @@ using System.Globalization;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-
+    /// <summary>
+    /// This interface must be used in each ORB indicator, ORB condition and ORB strategy.
+    /// </summary>
     interface IORB
     {
         //input
@@ -83,7 +85,6 @@ namespace AgenaTrader.UserCode
         private TimeSpan _tim_EndOfDay_US = new TimeSpan(21, 30, 0);  //21:30:00
 
         private bool _send_email = false;
-        private string _emailaddress = String.Empty;
 
         //output
         private double _rangelow = Double.NaN;
@@ -94,6 +95,7 @@ namespace AgenaTrader.UserCode
         private IBar short_breakout = null;
         private IBar long_target_reached = null;
         private IBar short_target_reached = null;
+        private DateTime currentdayofupdate = DateTime.MinValue;
 
 
 		protected override void Initialize()
@@ -113,8 +115,6 @@ namespace AgenaTrader.UserCode
         {
             //Print("OnStartUp");
         }
-
-        DateTime currentdayofupdate = DateTime.MinValue;
 
 		protected override void OnBarUpdate()
 		{
@@ -289,6 +289,21 @@ namespace AgenaTrader.UserCode
             else
             {
                 return new DateTime(date.Year, date.Month, date.Day, this.Time_EndOfDay_DE.Hours, this.Time_EndOfDay_DE.Minutes, this.Time_EndOfDay_DE.Seconds);
+            }
+        }
+
+
+
+        public override string ToString()
+        {
+            return "ORB";
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "ORB";
             }
         }
 
