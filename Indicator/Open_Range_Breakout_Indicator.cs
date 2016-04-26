@@ -19,7 +19,7 @@ using System.Globalization;
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
 /// ToDo
-/// 1)  Customzing f√ºr B√∂rsenstart 09.00 oder 15.30
+/// 1)  Customzing f¸r Bˆrsenstart 09.00 oder 15.30
 /// 2)  Drawings in Background bringen, aktuell verdecken sie andere Indikatoren wie zB SMA200 -> erledigt mit Opacity
 /// 3)  automatische Ordererstellung (http://www.tradeescort.com/phpbb_de/viewtopic.php?f=19&t=2401)
 /// 4)  Im 1-Stundenchart wird automatisch das High/Low von dem kompletten Bar genommen. Es wird also die OpenRange von 2 Stunden genommen (120 Mins statt 75) Noch testen!
@@ -28,7 +28,9 @@ using System.Globalization;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-
+    /// <summary>
+    /// This interface must be used in each ORB indicator, ORB condition and ORB strategy.
+    /// </summary>
     interface IORB
     {
         //input
@@ -55,15 +57,23 @@ namespace AgenaTrader.UserCode
         bool IsEmailFunctionActive { get; }
     }
 
-   
+
     [Description("ORB Indicator")]
     public class ORB_Indicator : UserIndicator, IORB
-	{
+    {
+
         //input
+        private Color _currentsessionlinecolor = Color.LightBlue;
+        private int _currentsessionlinewidth = 2;
+        private DashStyle _currentsessionlinestyle = DashStyle.Solid;
+
+        private Color _plot1color = Color.Orange;
+        private int _plot1width = 2;
+        private DashStyle _plot1dashstyle = DashStyle.Solid;
         private int _orbminutes = 75;
-        private Color _col_orb = Color.Brown;
-        private Color _col_target_short = Color.PaleVioletRed;                      
-        private Color _col_target_long  = Color.PaleGreen;
+        private Color _col_orb = Color.LightBlue;
+        private Color _col_target_short = Color.PaleVioletRed;
+        private Color _col_target_long = Color.PaleGreen;
 
         private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);    //09:00:00   
         private TimeSpan _tim_OpenRangeEndDE = new TimeSpan(10, 15, 0);    //09:00:00   
@@ -75,577 +85,573 @@ namespace AgenaTrader.UserCode
         private TimeSpan _tim_EndOfDay_US = new TimeSpan(21, 30, 0);  //21:30:00
 
         private bool _send_email = false;
-        private string _emailaddress = String.Empty;
 
         //output
-        private double _range_height = Double.NaN;
         private double _rangelow = Double.NaN;
         private double _rangehigh = Double.NaN;
 
-
         //internal 
-        private DateTime DayStart;                                                                                          
-        private DateTime DayEnd;
-        private DateTime OpenRangeStart;
-        private DateTime OpenRangeEnd;
-        private TimeSpan EOD;
-        //double RangeLow;
-        //double RangeHigh;
-        private double target_short;
-        private double target_long;
-        private bool SessionSuccessful;
-        private bool SessionOrderTriggered_Short;
-        private bool SessionOrderTriggered_Long;
-        private bool EOD_Done;  //TODO: h√§sslich
-        private decimal CounterShort;
-        private decimal CounterLong;
-        private decimal CounterSessions;
-        private decimal CounterEOD;
-        private decimal CounterEODPoints_Short;
-        private decimal CounterEODPoints_Long;
-        
+        private IBar long_breakout = null;
+        private IBar short_breakout = null;
+        private IBar long_target_reached = null;
+        private IBar short_target_reached = null;
+        private DateTime currentdayofupdate = DateTime.MinValue;
+        private ITimePeriod timeperiod = null;
+
 
 		protected override void Initialize()
 		{
-			Add(new Plot(Color.FromKnownColor(KnownColor.Blue), "MyPlot1"));
-			Overlay = false;
-			CalculateOnBarClose = true;
-            //ClearOutputWindow(); 
+            Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "IndicatorPlot1"));
+            Overlay = false;
+            CalculateOnBarClose = true;
 		}
-        
 
         protected override void InitRequirements()
         {
             //Print("InitRequirements");
- 
+
         }
 
         protected override void OnStartUp()
         {
             //Print("OnStartUp");
+
+            //IExchangeDescription exdescrip = this.Root.Core.MarketplaceManager.GetExchangeDescription(this.Instrument.Exchange);
+            //Print(exdescrip.ExtentedTradingHours);
+            //Print(exdescrip.TradingHours);
+
+            timeperiod = this.Root.Core.MarketplaceManager.GetExchangeDescription(this.Instrument.Exchange).TradingHours;
         }
 
-        protected override void OnBarUpdate()
+		protected override void OnBarUpdate()
 		{
-            //MyPlot1.Set(Input[0]);
-            Value.Set(0);
-      
-      
-            if (Bars != null && Bars.Count > 0 && Bars.BarsSinceSession == 0)
+            //new day session is beginning so we need to calculate the open range breakout
+            if (currentdayofupdate.Date < Time[0].Date) 
             {
-                EOD_Done=SessionOrderTriggered_Long = SessionOrderTriggered_Short = SessionSuccessful = false; //zur√ºcksetzen
-                ProcessOpenRange();
+                //reset session day data
+                this.long_breakout = null;
+                this.short_breakout = null;
+
+                //draw the open range
+                calculateanddrawOpenRange();
             }
-            else if (SessionSuccessful == false && Bars.GetTime(Count - 1).TimeOfDay < EOD && RangeHigh > 0) // Bar-Uhrzeit ist kleiner als EOD-Verkauf und Success noch nicht eingetreten
+
+
+            //Set the indicator value on each bar update
+            if (long_breakout != null && long_breakout.Time == Bars[0].Time)
             {
-
-//Order Short Trigger
-                if (Bars.GetLow(CurrentBar) <= RangeLow && Bars.GetTime(Count - 1) > OpenRangeEnd && SessionOrderTriggered_Short == false)
-                {
-                    SessionOrderTriggered_Short = true;
-                    Value.Set(-1);
-                }
-//Order Long Trigger
-                else if (Bars.GetHigh(CurrentBar) >= RangeHigh && Bars.GetTime(Count - 1) > OpenRangeEnd && SessionOrderTriggered_Long == false)
-                {
-                    SessionOrderTriggered_Long = true;
-                    Value.Set(1);
-                }
-
-//Short Target erreicht
-                else if (Bars.GetLow(CurrentBar) <= target_short && Bars.GetTime(Count - 1) > OpenRangeEnd )
-                {
-                    SessionSuccessful = true;
-                    SessionOrderTriggered_Short = true;
-                    drawShortTarget();
-                   
-                }
-//Long Target erreicht
-                else if (Bars.GetHigh(CurrentBar) >= target_long && Bars.GetTime(Count - 1) > OpenRangeEnd)
-                {
-                    SessionSuccessful = true;
-                    SessionOrderTriggered_Long = true;
-                    drawLongTarget();
-                   
-                }
-                else
-                {
-                    Value.Set(0);
-                }
-            }
-//EOD  und Target nicht erreicht, aber Orders schon getriggert
-            else if (EOD_Done == false && Bars.GetTime(Count - 1).TimeOfDay >= EOD && SessionSuccessful == false && (SessionOrderTriggered_Long == true || SessionOrderTriggered_Short == true && RangeHigh > 0))
-            { 
-                CounterEOD += 1;
-                EOD_Done = true;
-            if (SessionOrderTriggered_Long == true){
-                CounterEODPoints_Long = CounterEODPoints_Long + ((decimal)Bars.GetClose(CurrentBar) - (decimal)RangeHigh);
-                Print("EOD Punkte Long: " + DayStart.ToShortDateString() + " " + ((decimal)Bars.GetClose(CurrentBar) - (decimal)RangeHigh));
                 BarColor = Color.Turquoise;
+                Value.Set(1);
             }
-            else if (SessionOrderTriggered_Short == true){
-                CounterEODPoints_Short = CounterEODPoints_Short - ((decimal)Bars.GetClose(CurrentBar) - (decimal)RangeLow);
-                Print("EOD Punkte Short: " + DayStart.ToShortDateString() + " " + ((decimal)Bars.GetClose(CurrentBar) - (decimal)RangeLow));
+            else if (short_breakout != null && short_breakout.Time == Bars[0].Time)
+            {
                 BarColor = Color.Purple;
-                } 
-            }
-
-//Beim allerletzten Bar des Charts den Status schreiben
-            if (Count == Bars.Count)
-                {
-            Print("Counter Erfolg Long: " + CounterLong);
-            Print("Counter Erfolg Short: " + CounterShort);
-            Print("Counter Erfolg Gesamt: " + (CounterShort + CounterLong));
-            Print("Erfolg %: " + (((CounterShort + CounterLong) / CounterSessions) * 100));
-            Print("CounterSessions: " + CounterSessions);
-            Print("EOD Verk√§ufe: " + CounterEOD);
-            Print("EOD Long Punkte: " + CounterEODPoints_Long);
-            Print("EOD Short Punkte: " + CounterEODPoints_Short);
-
-
-                    }
-		}
-
-
-        protected override void OnTermination()
-        {
-            //Print("OnTermination");
-        }
-
-
-        private void CalcOpenRange(ref DateTime OpenRangeStart, ref DateTime OpenRangeEnd)
-        {
-            //Print("CalcOpenRange");
-
-            OpenRangeStart = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;    //liefert erste tageskerze
-            OpenRangeStart = GetStartTime(OpenRangeStart);
-            OpenRangeEnd = GetEndTime(OpenRangeStart);
-        }
-
-
-        private TimeSpan getOpenRangeStart( )
-        {
-            //Print(this.Instrument.Symbol);
-
-            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB") || Bars.Instrument.Symbol.Contains("DAX.IND"))
-                {
-                    //return new TimeSpan(9,00,00);
-                       return _tim_OpenRangeStartDE;
-                }
-            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB") || Bars.Instrument.Symbol.Contains("DOW.IND") || Bars.Instrument.Symbol.Contains("NDX.IND"))
-                {
-                        //return new TimeSpan(15,30,00);
-                        return _tim_OpenRangeStartUS;
-                }
-                else
-                {
-                    return _tim_OpenRangeStartDE;
-                }
-        }
-
-        private TimeSpan getEODTime()
-        {
-
-            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB") || Bars.Instrument.Symbol.Contains("DAX.IND"))
-            {
-                //return new TimeSpan(9,00,00);
-                return _tim_EndOfDay_DE;
-            }
-            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB") || Bars.Instrument.Symbol.Contains("DOW.IND") || Bars.Instrument.Symbol.Contains("NDX.IND"))
-            {
-                //return new TimeSpan(15,30,00);
-                return _tim_EndOfDay_US;
+                Value.Set(-1);
             }
             else
             {
-                return _tim_EndOfDay_DE;
+                Value.Set(0);
+            }
+
+            //Set the color
+            PlotColors[0][0] = this.Plot1Color;
+            Plots[0].PenStyle = this.Dash0Style;
+            Plots[0].Pen.Width = this.Plot0Width;
+
+
+            //When finished set the last day variable
+            //If we are online during the day session we do not set this variable so we ·re redrawing and recalculating the current session 
+            if (Time[0].Date != DateTime.Now.Date)
+            {
+                currentdayofupdate = Time[0].Date;   
             }
         }
 
 
-        private DateTime GetStartTime(DateTime start)
-        {
-                TimeSpan tim_OpenRangeStart = getOpenRangeStart();
-                start = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);  //Uhrzeit auf 00:00:00 zur√ºcksetzen, ist vorbef√ºllt aus SessionStart
-                return start.Add(tim_OpenRangeStart);
-        }
+        /// <summary>
+        /// Draws the open range per day.
+        /// </summary>
+        private void calculateanddrawOpenRange() {
 
-        private DateTime GetEndTime(DateTime start)
-        {
-            return start.AddMinutes(_orbminutes);        
-        }
+            //Print(Time[0]);
 
-        private void DrawOpenRange(IEnumerable<IBar> list, DateTime OpenRangeStart, DateTime OpenRangeEnd, DateTime DayEnd, out double target_long, out double target_short)
-        {
-            target_long = 99999999;
-            target_short = 0;
+            DateTime start = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
+            DateTime start_date = start.Date;
+            DateTime end = this.getOpenRangeEnd(start);
+
+            //Selektiere alle g¸ltigen Kurse und finde low und high.
+            IEnumerable<IBar> list = Bars.Where(x => x.Time >= start).Where(x => x.Time <= end);
             if (list != null && !list.IsEmpty())
             {
+                this.RangeLow = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
+                this.RangeHigh = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
 
-                RangeLow = list.Min(y => y.Low);
-                RangeHigh = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
-                string strMyRect;
-                string strTargetAreaLong;
-                string strTargetAreaShort;
-                string strMinValue;
-                String strMaxValue;
+                DrawRectangle("ORBRect" + start_date.Ticks, true, start, this.RangeLow, end, this.RangeHigh, this.Color_ORB, this.Color_ORB, 70);
+                DrawText("ORBRangeString" + start_date.Ticks, true, Math.Round((this.RangeHeight), 2).ToString(), start, this.RangeHigh, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, this.Color_ORB, 70);
 
-                strMyRect = "MyRect" + OpenRangeStart;
-
-                DrawRectangle(strMyRect, true, OpenRangeStart, RangeLow, OpenRangeEnd, RangeHigh, _col_orb, _col_orb, 70);
-
+                //if we are live on the trading day
+                if (DateTime.Now.Date == start_date)
+                {
+                    DrawHorizontalLine("LowLine" + start_date.Ticks, true, this.RangeLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                    DrawHorizontalLine("HighLine" + start_date.Ticks, true, this.RangeHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                    DrawVerticalLine("BeginnSession" + start_date.Ticks, start_date, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                }
 
                 //Targets
-                target_long = RangeHigh + (RangeHigh - RangeLow);
-                target_short = RangeLow - (RangeHigh - RangeLow);
-                this.RangeHeight = RangeHigh - RangeLow;
-                strTargetAreaLong = "TargetAreaLong" + OpenRangeStart;
-                strTargetAreaShort = "TargetAreaShort" + OpenRangeStart;
+                double target_long = this.RangeHigh + this.RangeHeight;
+                double target_short = this.RangeLow - this.RangeHeight;
+                DrawRectangle("TargetAreaLong" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeHigh, this.getEndOfTradingDay(start_date), target_long, this.Color_TargetAreaLong, this.Color_TargetAreaLong, 70);
+                DrawRectangle("TargetAreaShort" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeLow, this.getEndOfTradingDay(start_date), target_short, this.Color_TargetAreaShort, this.Color_TargetAreaShort, 70);
 
-                DrawRectangle(strTargetAreaLong, true, OpenRangeEnd, RangeHigh, DayEnd, target_long, _col_target_long, _col_target_long, 70);
-                DrawRectangle(strTargetAreaShort, true, OpenRangeEnd, RangeLow, DayEnd, target_short, _col_target_short, _col_target_short, 70);
+                //load the data after the open range
+                list = Bars.Where(x => x.Time >= end).Where(x => x.Time <= this.getEndOfTradingDay(start));
 
-                //Text Min/Max
-                string maxtext = RangeHigh.ToString() + "(" + Math.Round((this.RangeHeight), 2) + ")";
-                strMaxValue = "MaxValue" + OpenRangeStart;
-                strMinValue = "MinValue" + OpenRangeStart;
+                //find the first breakout to the long side
+                long_breakout = list.Where(x => x.Close > this.RangeHigh).FirstOrDefault();
+                if (long_breakout != null)
+                {
+                    DrawArrowUp("ArrowLong" + start_date.Ticks, true, long_breakout.Time, long_breakout.Low - 100 * TickSize, Color.Green);
+                }
 
-                DrawText(strMaxValue, true, maxtext, OpenRangeStart, RangeHigh, 9, Color.Black, new Font("Areal", 9), StringAlignment.Center, Color.Black, Color.Red, 70);
-                DrawText(strMinValue, true, RangeLow.ToString(), OpenRangeStart, RangeLow, -9, Color.Black, new Font("Areal", 9), StringAlignment.Center, Color.Black, Color.Red, 70);
+                //find the first breakout to the short side
+                short_breakout = list.Where(x => x.Close < this.RangeLow).FirstOrDefault();
+                if (short_breakout != null)
+                {
+                    DrawArrowDown("ArrowShort" + start_date.Ticks, true, short_breakout.Time, short_breakout.High + 100 * TickSize, Color.Red);
+                }
+
+                //find the first target to the long side
+                long_target_reached = list.Where(x => x.Close > target_long).FirstOrDefault();
+                if (long_target_reached != null)
+                {
+                    DrawArrowDown("ArrowTargetLong" + start_date.Ticks, true, long_target_reached.Time, long_target_reached.High + 100 * TickSize, Color.Red);
+                }
+
+                //find the first target to the short side
+                short_target_reached = list.Where(x => x.Close < target_short).FirstOrDefault();
+                if (short_target_reached != null)
+                {
+                    DrawArrowUp("ArrowTargetShort" + start_date.Ticks, true, short_target_reached.Time, short_target_reached.Low - 100 * TickSize, Color.Green);
+                }
+
             }
+
         }
 
-            private void ProcessOpenRange() {
-            
-                CounterSessions += 1;
-
-                //Liefert RangeStart und RangeEnde
-                CalcOpenRange(ref OpenRangeStart, ref OpenRangeEnd);
 
 
-                //Liefert TagesStart und TagesEnde        
-                Bars.GetNextBeginEnd(Bars, 0, out DayStart, out DayEnd);
+        /// <summary>
+        /// Returns the start of the open range on the dedicated date.
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        private DateTime getOpenRangeStart(DateTime date)
+        {
+            //Use Marketplace-Escort
+            DateTime returnvalue = new DateTime(date.Year, date.Month, date.Day, this.timeperiod.StartTime.Hours, this.timeperiod.StartTime.Minutes, this.timeperiod.StartTime.Seconds);
 
-
-                DayEnd = new DateTime(DayEnd.Year, DayEnd.Month, DayEnd.Day, 0, 0, 0);  //Uhrzeit auf 00:00:00 zur√ºcksetzen
-                EOD = getEODTime();
-                DayEnd = DayStart.Add(EOD);
-
-
-                //Selektiere alle g√ºltigen Kurse und finde low und high.
-                IEnumerable<IBar> list = Bars.Where(x => x.Time >= OpenRangeStart).Where(x => x.Time <= OpenRangeEnd);
-
-                DrawOpenRange(list, OpenRangeStart, OpenRangeEnd, DayEnd, out target_long, out target_short);
-
-            
-            }
-
-            private void drawShortTarget() {
-                CounterShort += 1;
-                BarColor = Color.Purple;
-                string strArrowDown = "ArrowDown" + OpenRangeStart;
-                DrawArrowUp(strArrowDown, true, Bars.GetTime(Count - 1), Bars.GetLow(CurrentBar) - 300 * TickSize, Color.Red);
-                Print("Treffer Short" + DayStart.ToShortDateString());
-            }
-
-            private void drawLongTarget()
+            //Use CFD data
+            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
             {
-                CounterLong += 1;
-                BarColor = Color.Turquoise;
-                string strArrowUp = "ArrowUp" + OpenRangeStart;
-                DrawArrowDown(strArrowUp, true, Bars.GetTime(Count - 1), Bars.GetHigh(CurrentBar) + 300 * TickSize, Color.Green);
-                Print("Treffer Long" + DayStart.ToShortDateString());
+                //return new TimeSpan(9,00,00);
+                returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartDE.Hours, this._tim_OpenRangeStartDE.Minutes, this._tim_OpenRangeStartDE.Seconds);
             }
+            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
+            {
+                //return new TimeSpan(15,30,00);
+                returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartUS.Hours, this._tim_OpenRangeStartUS.Minutes, this._tim_OpenRangeStartUS.Seconds);
+            }
+            //else
+            //{
+            //    returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartDE.Hours, this._tim_OpenRangeStartDE.Minutes, this._tim_OpenRangeStartDE.Seconds);
+            //}
+            return returnvalue;
+        }
+
+        /// <summary>
+        ///  Returns the end of the open range on the dedicated date.
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        private DateTime getOpenRangeEnd(DateTime date)
+        {
+            return date.AddMinutes(_orbminutes);
+        }
+
+        /// <summary>
+        ///  Returns the end of the trading day on the dedicated date.
+        /// </summary>
+        /// <param name="date"></param>
+        /// <returns></returns>
+        private DateTime getEndOfTradingDay(DateTime date)
+        {
+            //Use Marketplace-Escort
+            DateTime returnvalue = new DateTime(date.Year, date.Month, date.Day, this.timeperiod.EndTime.Hours, this.timeperiod.EndTime.Minutes, this.timeperiod.EndTime.Seconds);
+
+            //Use CFD data
+            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
+            {
+                //return new TimeSpan(9,00,00);
+                returnvalue = new DateTime(date.Year, date.Month, date.Day, this.Time_EndOfDay_DE.Hours, this.Time_EndOfDay_DE.Minutes, this.Time_EndOfDay_DE.Seconds);
+            }
+            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
+            {
+                //return new TimeSpan(15,30,00);
+                returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_EndOfDay_US.Hours, this._tim_EndOfDay_US.Minutes, this._tim_EndOfDay_US.Seconds);
+            }
+            //else
+            //{
+            //    returnvalue = new DateTime(date.Year, date.Month, date.Day, this.Time_EndOfDay_DE.Hours, this.Time_EndOfDay_DE.Minutes, this.Time_EndOfDay_DE.Seconds);
+            //}
+
+            return returnvalue;
+        }
 
 
-            public override string ToString()
+
+        public override string ToString()
+        {
+            return "ORB";
+        }
+
+        public override string DisplayName
+        {
+            get
             {
                 return "ORB";
             }
+        }
 
-            public override string DisplayName
-            {
-                get
-                {
-                    return "ORB";
-                }
-            }
 
 
 		#region Properties
 
+        #region Input
 
 
-            #region Input
-
-                /// <summary>
-                /// </summary>
-                [Description("Period in minutes for ORB")]
-                [Category("Minutes")]
-                [DisplayName("Minutes ORB")]
-                public int ORBMinutes
-                {
-                    get { return _orbminutes; }
-                    set { _orbminutes = value; }
-                }
-
-                /// <summary>
-                /// </summary>
-                [Description("Select Color")]
-                [Category("Colors")]
-                [DisplayName("ORB")]
-                public Color Color_ORB
-                {
-                    get { return _col_orb; }
-                    set { _col_orb = value; }
-                }
-
-                [Browsable(false)]
-                public string Color_ORBSerialize
-                {
-                    get { return SerializableColor.ToString(_col_orb); }
-                    set { _col_orb = SerializableColor.FromString(value); }
-                }
-
-                /// <summary>
-                /// </summary>
-                [Description("Select Color TargetAreaShort")]
-                [Category("Colors")]
-                [DisplayName("TargetAreaShort")]
-                public Color Color_TargetAreaShort
-                {
-                    get { return _col_target_short; }
-                    set { _col_target_short = value; }
-                }
-                [Browsable(false)]
-                public string Color_TargetAreaShortSerialize
-                {
-                    get { return SerializableColor.ToString(_col_target_short); }
-                    set { _col_target_short = SerializableColor.FromString(value); }
-                }
-
-                /// <summary>
-                /// </summary>
-                [Description("Select Color TargetAreaLong")]
-                [Category("Colors")]
-                [DisplayName("TargetAreaLong")]
-                public Color Color_TargetAreaLong
-                {
-                    get { return _col_target_long; }
-                    set { _col_target_long = value; }
-                }
-                [Browsable(false)]
-                public string Color_TargetAreaLongSerialize
-                {
-                    get { return SerializableColor.ToString(_col_target_long); }
-                    set { _col_target_long = SerializableColor.FromString(value); }
-                }
-
-                /// <summary>
-                /// </summary>
-                [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
-                [Category("TimeSpan")]
-                [DisplayName("1. OpenRange Start DE")]
-                public TimeSpan Time_OpenRangeStartDE
-                {
-                    get { return _tim_OpenRangeStartDE; }
-                    set { _tim_OpenRangeStartDE = value; }
-                }
-                [Browsable(false)]
-                public long Time_OpenRangeStartDESerialize
-                {
-                    get { return _tim_OpenRangeStartDE.Ticks; }
-                    set { _tim_OpenRangeStartDE = new TimeSpan(value); }
-                }
-
-                /// <summary>
-                /// </summary>
-                [Description("OpenRange DE End: Uhrzeit wann Range geschlossen wird")]
-                [Category("TimeSpan")]
-                [DisplayName("2. OpenRange End DE")]
-                public TimeSpan Time_OpenRangeEndDE
-                {
-                    get { return _tim_OpenRangeEndDE; }
-                    set { _tim_OpenRangeEndDE = value; }
-                }
-                [Browsable(false)]
-                public long Time_OpenRangeEndDESerialize
-                {
-                    get { return _tim_OpenRangeEndDE.Ticks; }
-                    set { _tim_OpenRangeEndDE = new TimeSpan(value); }
-                }
-
-                /// <summary>
-                /// </summary>
-                [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
-                [Category("TimeSpan")]
-                [DisplayName("3. OpenRange Start US")]
-                public TimeSpan Time_OpenRangeStartUS
-                {
-                    get { return _tim_OpenRangeStartUS; }
-                    set { _tim_OpenRangeStartUS = value; }
-                }
-             [Browsable(false)]
-                public long Time_OpenRangeStartUSSerialize
-                {
-                    get { return _tim_OpenRangeStartUS.Ticks; }
-                    set { _tim_OpenRangeStartUS = new TimeSpan(value); }
-                }
-
-                /// <summary>
-                /// </summary>
-                [Description("OpenRange US End: Uhrzeit wann Range geschlossen wird")]
-                [Category("TimeSpan")]
-                [DisplayName("4. OpenRange End US")]
-                public TimeSpan Time_OpenRangeEndUS
-                {
-                    get { return _tim_OpenRangeEndUS; }
-                    set { _tim_OpenRangeEndUS = value; }
-                }
-             [Browsable(false)]
-                public long Time_OpenRangeEndUSSerialize
-                {
-                    get { return _tim_OpenRangeEndUS.Ticks; }
-                    set { _tim_OpenRangeEndUS = new TimeSpan(value); }
-                }
-
-                /// <summary>
-                /// </summary>
-                [Description("EndOfDay DE: Uhrzeit sp√§testens verkauft wird")]
-                [Category("TimeSpan")]
-                [DisplayName("5. EndOfDay DE")]
-                public TimeSpan Time_EndOfDay_DE
-                {
-                    get { return _tim_EndOfDay_DE; }
-                    set { _tim_EndOfDay_DE = value; }
-                }
-             [Browsable(false)]
-                public long Time_EndOfDay_DESerialize
-                {
-                    get { return _tim_EndOfDay_DE.Ticks; }
-                    set { _tim_EndOfDay_DE = new TimeSpan(value); }
-                }
-
-                /// <summary>
-                /// </summary>
-                [Description("EndOfDay US: Uhrzeit sp√§testens verkauft wird")]
-                [Category("TimeSpan")]
-                [DisplayName("5. EndOfDay US")]
-                public TimeSpan Time_EndOfDay_US
-                {
-                    get { return _tim_EndOfDay_US; }
-                    set { _tim_EndOfDay_US = value; }
-                }
-             [Browsable(false)]
-                public long Time_EndOfDay_USSerialize
-                {
-                    get { return _tim_EndOfDay_US.Ticks; }
-                    set { _tim_EndOfDay_US = new TimeSpan(value); }
-                }
+        /// <summary>
+        /// </summary>
+        [Description("Period in minutes for ORB")]
+        [Category("Minutes")]
+        [DisplayName("Minutes ORB")]
+        public int ORBMinutes
+        {
+            get { return _orbminutes; }
+            set { _orbminutes = value; }
+        }
 
 
-             //[Description("Recipient Email Address")]
-             //[Category("Email")]
-             //[DisplayName("Email Address")]
-             //public string EmailAdress
-             //{
-             //    get { return _emailaddress; }
-             //    set { _emailaddress = value; }
-             //}
 
-             [Description("If true an email will be send on open range breakout.")]
-             [Category("Email")]
-             [DisplayName("Send email on breakout")]
-             public bool Send_email
-             {
-                 get { return _send_email; }
-                 set { _send_email = value; }
-             }
-       
+        [XmlIgnore()]
+        [Description("Select color for the current session")]
+        [Category("Colors")]
+        [DisplayName("Current Session")]
+        public Color CurrentSessionLineColor
+        {
+            get { return _currentsessionlinecolor; }
+            set { _currentsessionlinecolor = value; }
+        }
 
-            #endregion
+        [Browsable(false)]
+        public string CurrentSessionLineColorSerialize
+        {
+            get { return SerializableColor.ToString(_currentsessionlinecolor); }
+            set { _currentsessionlinecolor = SerializableColor.FromString(value); }
+        }
 
-            #region Output
+        /// <summary>
+        /// </summary>
+        [Description("Width for the line of the current session.")]
+        [Category("Plots")]
+        [DisplayName("Line Width current session")]
+        public int CurrentSessionLineWidth
+        {
+            get { return _currentsessionlinewidth; }
+            set { _currentsessionlinewidth = Math.Max(1, value); }
+        }
 
-             [Browsable(false)]
-             [XmlIgnore()]
-             public DataSeries MyPlot1
-             {
-                 get { return Values[0]; }
-             }
+
+        /// <summary>
+        /// </summary>
+        [Description("DashStyle for line of the current session.")]
+        [Category("Plots")]
+        [DisplayName("Dash Style current session")]
+        public DashStyle CurrentSessionLineStyle
+        {
+            get { return _currentsessionlinestyle; }
+            set { _currentsessionlinestyle = value; }
+        }
 
 
-             [Browsable(false)]
-             [XmlIgnore()]
-             public double RangeHeight
-             {
-                 get { return _range_height; }
-                 set { _range_height = value; }
-             }
+        /// <summary>
+        /// </summary>
+        [Description("Open Range Color")]
+        [Category("Colors")]
+        [DisplayName("Open Range")]
+        public Color Color_ORB
+        {
+            get { return _col_orb; }
+            set { _col_orb = value; }
+        }
 
-             [Browsable(false)]
-             [XmlIgnore()]
-             public double RangeLow
-             {
-                 get { return _rangelow; }
-                 set { _rangelow = value; }
-             }
+        [Browsable(false)]
+        public string Color_ORBSerialize
+        {
+            get { return SerializableColor.ToString(_col_orb); }
+            set { _col_orb = SerializableColor.FromString(value); }
+        }
 
-             [Browsable(false)]
-             [XmlIgnore()]
-             public double RangeHigh
-             {
-                 get { return _rangehigh; }
-                 set { _rangehigh = value; }
-             }
+        /// <summary>
+        /// </summary>
+        [Description("Select Color TargetAreaShort")]
+        [Category("Colors")]
+        [DisplayName("TargetAreaShort")]
+        public Color Color_TargetAreaShort
+        {
+            get { return _col_target_short; }
+            set { _col_target_short = value; }
+        }
+        [Browsable(false)]
+        public string Color_TargetAreaShortSerialize
+        {
+            get { return SerializableColor.ToString(_col_target_short); }
+            set { _col_target_short = SerializableColor.FromString(value); }
+        }
 
-            #endregion
+        /// <summary>
+        /// </summary>
+        [Description("Select Color TargetAreaLong")]
+        [Category("Colors")]
+        [DisplayName("TargetAreaLong")]
+        public Color Color_TargetAreaLong
+        {
+            get { return _col_target_long; }
+            set { _col_target_long = value; }
+        }
+        [Browsable(false)]
+        public string Color_TargetAreaLongSerialize
+        {
+            get { return SerializableColor.ToString(_col_target_long); }
+            set { _col_target_long = SerializableColor.FromString(value); }
+        }
 
-            #region Internal
+        /// <summary>
+        /// </summary>
+        [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
+        [Category("TimeSpan")]
+        [DisplayName("1. OpenRange Start DE")]
+        public TimeSpan Time_OpenRangeStartDE
+        {
+            get { return _tim_OpenRangeStartDE; }
+            set { _tim_OpenRangeStartDE = value; }
+        }
+        [Browsable(false)]
+        public long Time_OpenRangeStartDESerialize
+        {
+            get { return _tim_OpenRangeStartDE.Ticks; }
+            set { _tim_OpenRangeStartDE = new TimeSpan(value); }
+        }
 
-             [Browsable(false)]
-             public bool IsEmailFunctionActive
-             {
-                 get
-                 {
-                     if (this.Send_email) // && GlobalUtilities.IsValidEmail(this.EmailAdress))
-                     {
-                         return true;
-                     }
-                     return false;
-                 }
-             }
+        /// <summary>
+        /// </summary>
+        [Description("OpenRange DE End: Uhrzeit wann Range geschlossen wird")]
+        [Category("TimeSpan")]
+        [DisplayName("2. OpenRange End DE")]
+        public TimeSpan Time_OpenRangeEndDE
+        {
+            get { return _tim_OpenRangeEndDE; }
+            set { _tim_OpenRangeEndDE = value; }
+        }
+        [Browsable(false)]
+        public long Time_OpenRangeEndDESerialize
+        {
+            get { return _tim_OpenRangeEndDE.Ticks; }
+            set { _tim_OpenRangeEndDE = new TimeSpan(value); }
+        }
 
-            //private ORB_Condition _sc;
-            ///// <summary>
-            ///// Access to the condition with global code.
-            ///// </summary>
-            //[Browsable(false)]
-            //[XmlIgnore()]
-            //public ORB_Condition SC
-            //{
-            //    get
-            //    {
-            //        if (_sc == null)
-            //        {
-            //            //typeof(ORB_Condition).Name.ToString()
-            //            _sc = (AgenaTrader.UserCode.ORB_Condition)GetScriptedCondition("ORB_Condition") as AgenaTrader.UserCode.ORB_Condition;
-            //            if (_sc == null)
-            //            {
-            //                Log(this.DisplayName + ": Access to Condition " + typeof(ORB_Condition).ToString() + " is missing.", InfoLogLevel.AlertLog);
-            //            }
-            //        }
-            //        return _sc;
-            //    }
-            //}
+        /// <summary>
+        /// </summary>
+        [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
+        [Category("TimeSpan")]
+        [DisplayName("3. OpenRange Start US")]
+        public TimeSpan Time_OpenRangeStartUS
+        {
+            get { return _tim_OpenRangeStartUS; }
+            set { _tim_OpenRangeStartUS = value; }
+        }
+        [Browsable(false)]
+        public long Time_OpenRangeStartUSSerialize
+        {
+            get { return _tim_OpenRangeStartUS.Ticks; }
+            set { _tim_OpenRangeStartUS = new TimeSpan(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("OpenRange US End: Uhrzeit wann Range geschlossen wird")]
+        [Category("TimeSpan")]
+        [DisplayName("4. OpenRange End US")]
+        public TimeSpan Time_OpenRangeEndUS
+        {
+            get { return _tim_OpenRangeEndUS; }
+            set { _tim_OpenRangeEndUS = value; }
+        }
+        [Browsable(false)]
+        public long Time_OpenRangeEndUSSerialize
+        {
+            get { return _tim_OpenRangeEndUS.Ticks; }
+            set { _tim_OpenRangeEndUS = new TimeSpan(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("EndOfDay DE: Uhrzeit sp‰testens verkauft wird")]
+        [Category("TimeSpan")]
+        [DisplayName("5. EndOfDay DE")]
+        public TimeSpan Time_EndOfDay_DE
+        {
+            get { return _tim_EndOfDay_DE; }
+            set { _tim_EndOfDay_DE = value; }
+        }
+        [Browsable(false)]
+        public long Time_EndOfDay_DESerialize
+        {
+            get { return _tim_EndOfDay_DE.Ticks; }
+            set { _tim_EndOfDay_DE = new TimeSpan(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("EndOfDay US: Uhrzeit sp‰testens verkauft wird")]
+        [Category("TimeSpan")]
+        [DisplayName("5. EndOfDay US")]
+        public TimeSpan Time_EndOfDay_US
+        {
+            get { return _tim_EndOfDay_US; }
+            set { _tim_EndOfDay_US = value; }
+        }
+        [Browsable(false)]
+        public long Time_EndOfDay_USSerialize
+        {
+            get { return _tim_EndOfDay_US.Ticks; }
+            set { _tim_EndOfDay_US = new TimeSpan(value); }
+        }
+
+
+        [Description("If true an email will be send on open range breakout.")]
+        [Category("Email")]
+        [DisplayName("Send email on breakout")]
+        public bool Send_email
+        {
+            get { return _send_email; }
+            set { _send_email = value; }
+        }
+
+
+        #region Plotstyle
+
+        [XmlIgnore()]
+        [Description("Select Color")]
+        [Category("Colors")]
+        [DisplayName("ORB Indicator")]
+        public Color Plot1Color
+        {
+            get { return _plot1color; }
+            set { _plot1color = value; }
+        }
+
+        [Browsable(false)]
+        public string Plot1ColorSerialize
+        {
+            get { return SerializableColor.ToString(_plot1color); }
+            set { _plot1color = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Width for Indicator.")]
+        [Category("Plots")]
+        [DisplayName("Line Width Indicator")]
+        public int Plot0Width
+        {
+            get { return _plot1width; }
+            set { _plot1width = Math.Max(1, value); }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("DashStyle for Indicator.")]
+        [Category("Plots")]
+        [DisplayName("Dash Style Indicator")]
+        public DashStyle Dash0Style
+        {
+            get { return _plot1dashstyle; }
+            set { _plot1dashstyle = value; }
+        }
 
         #endregion
 
+        #endregion
 
-       
-		#endregion
-	}
+        #region Output
+
+            [Browsable(false)]
+            [XmlIgnore()]
+            public DataSeries MyPlot1
+            {
+                get { return Values[0]; }
+            }
+
+
+            [Browsable(false)]
+            [XmlIgnore()]
+            public double RangeHeight
+            {
+                get { return this.RangeHigh - this.RangeLow; }
+            }
+
+            [Browsable(false)]
+            [XmlIgnore()]
+            public double RangeLow
+            {
+                get { return _rangelow; }
+                set { _rangelow = value; }
+            }
+
+            [Browsable(false)]
+            [XmlIgnore()]
+            public double RangeHigh
+            {
+                get { return _rangehigh; }
+                set { _rangehigh = value; }
+            }
+
+        #endregion
+
+        #region Internals
+
+
+            [Browsable(false)]
+            public bool IsEmailFunctionActive
+            {
+                get
+                {
+                    if (this.Send_email)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+
+
+        #endregion
+
+        #endregion
+    }
 }
+
 
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 

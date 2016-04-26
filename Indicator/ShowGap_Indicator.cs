@@ -166,7 +166,7 @@ namespace AgenaTrader.UserCode
                     {
 //Long
                         DrawRectangle(strMyRect, true, LastDayCloseDate, LastDayClose, LastPeriod, GlobalUtilities.GetHighestHigh(Bars, Bars.BarsSinceSession), _col_gap, _col_gap, 70);
-                        DrawText(strMyGapSize, true, Math.Round(GapSize, 1).ToString(), GapOpenBar.Time, LastDayClose - (60 * TickSize), 9, Color.Black, new Font("Areal", 9), StringAlignment.Center, Color.Black, Color.Azure, 1);
+                        DrawText(strMyGapSize, true, Math.Round(GapSize, 1).ToString(), GapOpenBar.Time, LastDayClose - (60 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, Color.Azure, 1);
 
 
                         if (GapIndicatesTradeLong() == true)
@@ -181,7 +181,7 @@ namespace AgenaTrader.UserCode
                     {
 //Short                 
                         DrawRectangle(strMyRect, true, LastDayCloseDate, LastDayClose, LastPeriod, GlobalUtilities.GetLowestLow(Bars, Bars.BarsSinceSession), _col_gap, _col_gap, 70);
-                        DrawText(strMyGapSize, true, Math.Round(GapSize, 1).ToString(), GapOpenBar.Time, LastDayClose + (60 * TickSize), 9, Color.Black, new Font("Areal", 9), StringAlignment.Center, Color.Black, Color.Azure, 1);
+                        DrawText(strMyGapSize, true, Math.Round(GapSize, 1).ToString(), GapOpenBar.Time, LastDayClose + (60 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, Color.Azure, 1);
 
                         if (GapIndicatesTradeShort() == true)
                         {
@@ -349,7 +349,7 @@ namespace AgenaTrader.UserCode
                     strTradeResultLong = "Win " + GapTradeResult.ToString();
                     colorTextBox = colWin;
                 }
-                DrawText(strGapeTradeLong, true, strTradeResultLong, Time[1], Bars.GetHigh(CurrentBar - 1) + (100 * TickSize), 9, Color.Black, new Font("Areal", 9), StringAlignment.Center, Color.Black, colorTextBox, 70);
+                DrawText(strGapeTradeLong, true, strTradeResultLong, Time[1], Bars.GetHigh(CurrentBar - 1) + (100 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, colorTextBox, 70);
 
             }
             else if (GapTradeShort == true)
@@ -381,7 +381,7 @@ namespace AgenaTrader.UserCode
                     strTradeResultShort = "Win " + GapTradeResult.ToString();
                     colorTextBox = colWin;
                 }
-                DrawText(strGapeTradeShort, true, strTradeResultShort, Time[1], Bars.GetLow(CurrentBar - 1) - (100 * TickSize), 9, Color.Black, new Font("Areal", 9), StringAlignment.Center, Color.Black, colorTextBox, 70);
+                DrawText(strGapeTradeShort, true, strTradeResultShort, Time[1], Bars.GetLow(CurrentBar - 1) - (100 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, colorTextBox, 70);
             }
             if (_print_info == true)
             {

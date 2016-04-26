@@ -32,7 +32,7 @@ namespace AgenaTrader.UserCode
 	public class TDI_Indicator : UserIndicator
 	{
 
-
+        //input
         private int _rsiPeriod = 13;
 		private int _pricePeriod = 2;
 		private int	_signalPeriod = 7;
@@ -56,6 +56,9 @@ namespace AgenaTrader.UserCode
         private int _plot3Width = 1;
         private DashStyle _dash3Style = DashStyle.Solid;
 
+        //output
+
+        //internal
         private DataSeries _RSI_List;
 
 

@@ -49,6 +49,13 @@ namespace AgenaTrader.UserCode
 		protected override void Initialize()
 		{
             this.IsAutomated = false;
+
+            //Set the default time frame if you start the strategy via the strategy-escort
+            //if you start the strategy on a chart the TimeFrame is automatically set.
+            if (this.TimeFrame == null || this.TimeFrame.PeriodicityValue == 0)
+            {
+                 this.TimeFrame = new TimeFrame(DatafeedHistoryPeriodicity.Minute, 1);
+            }
 		}
 
         protected override void OnStartUp()
@@ -409,6 +416,7 @@ namespace AgenaTrader.UserCode
                 return false;
             }
         }
+
 
         #endregion
 
