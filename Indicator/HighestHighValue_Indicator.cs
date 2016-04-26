@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: in progress
+/// Version: 1.0
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -26,40 +26,55 @@ namespace AgenaTrader.UserCode
         EMA = 2
     }
 
-	[Description("Compare the currenty value of an indicator to latest high value of the indicator.")]
+	[Description("Compare the current value of an indicator to latest high value of the indicator in a defined period of time.")]
 	public class HighestHighValue_Indicator : UserIndicator
 	{
         //input
-        private int _indicatorPeriod = 200;
+        private Color _plot1color = Color.Orange;
+        private int _plot1width = 2;
+        private DashStyle _plot1dashstyle = DashStyle.Solid;
+        private int _indicatorEMAPeriod = 200;
+        private int _indicatorSMAPeriod = 200;
         private int _comparisonPeriod = 30;
         private IndicatorEnum _indicatorenum = IndicatorEnum.SMA;
+
+        //output
+
 
         //internal
         private DataSeries _DATA_List;
 
+        /// <summary>
+        /// Initalizie the Plot.
+        /// </summary>
 		protected override void Initialize()
 		{
-			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
+            Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "IndicatorPlot1"));
+
+            CalculateOnBarClose = true;
 		}
 
         /// <summary>
-        /// Calculates the indicator value(s) at the current index.
+        /// Init all variables on startup.
         /// </summary>
         protected override void OnStartUp()
         {
             this._DATA_List = new DataSeries(this);
         }
 
+        /// <summary>
+        /// Recalculate all data on each each bar update. 
+        /// </summary>
 		protected override void OnBarUpdate()
 		{
             double currentvalue = 0.0;
             switch (_indicatorenum)
             {
                 case IndicatorEnum.SMA:
-                    currentvalue = SMA(IndicatorPeriod)[0];
+                    currentvalue = SMA(IndicatorSMAPeriod)[0];
                     break;
                 case IndicatorEnum.EMA:
-                    currentvalue = EMA(IndicatorPeriod)[0];
+                    currentvalue = EMA(IndicatorEMAPeriod)[0];
                     break;
                 default:
                     break;
@@ -77,6 +92,12 @@ namespace AgenaTrader.UserCode
             }
 
             this._DATA_List.Set(currentvalue);
+
+            //set the color
+            PlotColors[0][0] = this.Plot1Color;
+            Plots[0].PenStyle = this.Dash0Style;
+            Plots[0].Pen.Width = this.Plot0Width;
+
 		}
 
 
@@ -108,13 +129,22 @@ namespace AgenaTrader.UserCode
         }
 
 
-            [Description("Period for the indicator")]
+            [Description("Period for the SMA")]
             [Category("Values")]
-            [DisplayName("Period for indicator")]
-            public int IndicatorPeriod
+            [DisplayName("Period SMA")]
+            public int IndicatorSMAPeriod
             {
-                get { return _indicatorPeriod; }
-                set { _indicatorPeriod = value; }
+                get { return _indicatorSMAPeriod; }
+                set { _indicatorSMAPeriod = value; }
+            }
+
+            [Description("Period for the EMA")]
+            [Category("Values")]
+            [DisplayName("Period EMA")]
+            public int IndicatorEMAPeriod
+            {
+                get { return _indicatorEMAPeriod; }
+                set { _indicatorEMAPeriod = value; }
             }
 
 
@@ -128,10 +158,54 @@ namespace AgenaTrader.UserCode
                 set { _comparisonPeriod = value; }
             }
 
-        #endregion
+            #region Plotstyle
+
+                [XmlIgnore()]
+                [Description("Select Color")]
+                [Category("Colors")]
+                [DisplayName("Pricline")]
+                public Color Plot1Color
+                {
+                    get { return _plot1color; }
+                    set { _plot1color = value; }
+                }
+
+                [Browsable(false)]
+                public string Plot1ColorSerialize
+                {
+                    get { return SerializableColor.ToString(_plot1color); }
+                    set { _plot1color = SerializableColor.FromString(value); }
+                }
+
+                /// <summary>
+                /// </summary>
+                [Description("Width for Indicator.")]
+                [Category("Plots")]
+                [DisplayName("Line Width Indicator")]
+                public int Plot0Width
+                {
+                    get { return _plot1width; }
+                    set { _plot1width = Math.Max(1, value); }
+                }
 
 
-        #region Output
+                /// <summary>
+                /// </summary>
+                [Description("DashStyle for Indicator.")]
+                [Category("Plots")]
+                [DisplayName("Dash Style Indicator")]
+                public DashStyle Dash0Style
+                {
+                    get { return _plot1dashstyle; }
+                    set { _plot1dashstyle = value; }
+                }
+
+            #endregion
+
+            #endregion
+
+
+            #region Output
 
             [Browsable(false)]
             [XmlIgnore()]
@@ -154,7 +228,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator : Indicator
 	{
 		/// <summary>
-		/// Compare the currenty value of an indicator to latest high value of the indicator.
+		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
 		/// </summary>
 		public HighestHighValue_Indicator HighestHighValue_Indicator()
         {
@@ -162,7 +236,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Compare the currenty value of an indicator to latest high value of the indicator.
+		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
 		/// </summary>
 		public HighestHighValue_Indicator HighestHighValue_Indicator(IDataSeries input)
 		{
@@ -192,7 +266,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Compare the currenty value of an indicator to latest high value of the indicator.
+		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
 		/// </summary>
 		public HighestHighValue_Indicator HighestHighValue_Indicator()
 		{
@@ -200,7 +274,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Compare the currenty value of an indicator to latest high value of the indicator.
+		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
 		/// </summary>
 		public HighestHighValue_Indicator HighestHighValue_Indicator(IDataSeries input)
 		{
@@ -218,7 +292,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Compare the currenty value of an indicator to latest high value of the indicator.
+		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
 		/// </summary>
 		public HighestHighValue_Indicator HighestHighValue_Indicator()
 		{
@@ -226,7 +300,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Compare the currenty value of an indicator to latest high value of the indicator.
+		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
 		/// </summary>
 		public HighestHighValue_Indicator HighestHighValue_Indicator(IDataSeries input)
 		{
@@ -241,7 +315,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Compare the currenty value of an indicator to latest high value of the indicator.
+		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
 		/// </summary>
 		public HighestHighValue_Indicator HighestHighValue_Indicator()
 		{
@@ -249,7 +323,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Compare the currenty value of an indicator to latest high value of the indicator.
+		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
 		/// </summary>
 		public HighestHighValue_Indicator HighestHighValue_Indicator(IDataSeries input)
 		{

@@ -21,4 +21,4 @@
 *** In Progress ***
 
 ##HighestHighValue
-*** In Progress ***
+Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
