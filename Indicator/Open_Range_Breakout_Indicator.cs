@@ -370,9 +370,9 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("Select Color")]
+        [Description("Open Range Color")]
         [Category("Colors")]
-        [DisplayName("ORB")]
+        [DisplayName("Open Range")]
         public Color Color_ORB
         {
             get { return _col_orb; }
@@ -538,7 +538,7 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         [Description("Select Color")]
         [Category("Colors")]
-        [DisplayName("Pricline")]
+        [DisplayName("ORB Indicator")]
         public Color Plot1Color
         {
             get { return _plot1color; }
