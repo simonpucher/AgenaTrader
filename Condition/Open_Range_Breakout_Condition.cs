@@ -37,14 +37,14 @@ namespace AgenaTrader.UserCode
         private Color _col_target_short = Color.PaleVioletRed;
         private Color _col_target_long = Color.PaleGreen;
 
-        private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);    //09:00:00   
-        private TimeSpan _tim_OpenRangeEndDE = new TimeSpan(10, 15, 0);    //09:00:00   
+        private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);
+        //private TimeSpan _tim_OpenRangeEndDE = new TimeSpan(10, 15, 0);  
 
-        private TimeSpan _tim_OpenRangeStartUS = new TimeSpan(15, 30, 0);  //15:30:00   
-        private TimeSpan _tim_OpenRangeEndUS = new TimeSpan(16, 45, 0);  //15:30:00   
+        private TimeSpan _tim_OpenRangeStartUS = new TimeSpan(15, 30, 0);
+        //private TimeSpan _tim_OpenRangeEndUS = new TimeSpan(16, 45, 0);    
 
-        private TimeSpan _tim_EndOfDay_DE = new TimeSpan(16, 30, 0);  //16:30:00   
-        private TimeSpan _tim_EndOfDay_US = new TimeSpan(21, 30, 0);  //21:30:00
+        private TimeSpan _tim_EndOfDay_DE = new TimeSpan(17, 30, 0);
+        private TimeSpan _tim_EndOfDay_US = new TimeSpan(22, 00, 0);  
 
         private bool _send_email = false;
         private string _emailaddress = String.Empty;
@@ -90,9 +90,9 @@ namespace AgenaTrader.UserCode
             //Initalize Indicator parameters
             _orb_indicator.ORBMinutes = this.ORBMinutes;
             _orb_indicator.Time_OpenRangeStartDE = this.Time_OpenRangeStartDE;
-            _orb_indicator.Time_OpenRangeEndDE = this.Time_OpenRangeEndDE;
+            //_orb_indicator.Time_OpenRangeEndDE = this.Time_OpenRangeEndDE;
             _orb_indicator.Time_OpenRangeStartUS = this.Time_OpenRangeStartUS;
-            _orb_indicator.Time_OpenRangeEndUS = this.Time_OpenRangeEndUS;
+            //_orb_indicator.Time_OpenRangeEndUS = this.Time_OpenRangeEndUS;
             _orb_indicator.Time_EndOfDay_DE = this.Time_EndOfDay_DE;
             _orb_indicator.Time_EndOfDay_US = this.Time_EndOfDay_US;
 
@@ -210,51 +210,51 @@ namespace AgenaTrader.UserCode
             /// </summary>
             [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
             [Category("TimeSpan")]
-            [DisplayName("1. OpenRange Start DE")]
+            [DisplayName("OpenRange Start DE")]
             public TimeSpan Time_OpenRangeStartDE
             {
                 get { return _tim_OpenRangeStartDE; }
                 set { _tim_OpenRangeStartDE = value; }
             }
 
-            /// <summary>
-            /// </summary>
-            [Description("OpenRange DE End: Uhrzeit wann Range geschlossen wird")]
-            [Category("TimeSpan")]
-            [DisplayName("2. OpenRange End DE")]
-            public TimeSpan Time_OpenRangeEndDE
-            {
-                get { return _tim_OpenRangeEndDE; }
-                set { _tim_OpenRangeEndDE = value; }
-            }
+            ///// <summary>
+            ///// </summary>
+            //[Description("OpenRange DE End: Uhrzeit wann Range geschlossen wird")]
+            //[Category("TimeSpan")]
+            //[DisplayName("2. OpenRange End DE")]
+            //public TimeSpan Time_OpenRangeEndDE
+            //{
+            //    get { return _tim_OpenRangeEndDE; }
+            //    set { _tim_OpenRangeEndDE = value; }
+            //}
 
             /// <summary>
             /// </summary>
             [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
             [Category("TimeSpan")]
-            [DisplayName("3. OpenRange Start US")]
+            [DisplayName("OpenRange Start US")]
             public TimeSpan Time_OpenRangeStartUS
             {
                 get { return _tim_OpenRangeStartUS; }
                 set { _tim_OpenRangeStartUS = value; }
             }
 
-            /// <summary>
-            /// </summary>
-            [Description("OpenRange US End: Uhrzeit wann Range geschlossen wird")]
-            [Category("TimeSpan")]
-            [DisplayName("4. OpenRange End US")]
-            public TimeSpan Time_OpenRangeEndUS
-            {
-                get { return _tim_OpenRangeEndUS; }
-                set { _tim_OpenRangeEndUS = value; }
-            }
+            ///// <summary>
+            ///// </summary>
+            //[Description("OpenRange US End: Uhrzeit wann Range geschlossen wird")]
+            //[Category("TimeSpan")]
+            //[DisplayName("4. OpenRange End US")]
+            //public TimeSpan Time_OpenRangeEndUS
+            //{
+            //    get { return _tim_OpenRangeEndUS; }
+            //    set { _tim_OpenRangeEndUS = value; }
+            //}
 
             /// <summary>
             /// </summary>
             [Description("EndOfDay DE: Uhrzeit spätestens verkauft wird")]
             [Category("TimeSpan")]
-            [DisplayName("5. EndOfDay DE")]
+            [DisplayName("EndOfDay DE")]
             public TimeSpan Time_EndOfDay_DE
             {
                 get { return _tim_EndOfDay_DE; }
@@ -265,7 +265,7 @@ namespace AgenaTrader.UserCode
             /// </summary>
             [Description("EndOfDay US: Uhrzeit spätestens verkauft wird")]
             [Category("TimeSpan")]
-            [DisplayName("6. EndOfDay US")]
+            [DisplayName("EndOfDay US")]
             public TimeSpan Time_EndOfDay_US
             {
                 get { return _tim_EndOfDay_US; }
