@@ -24,6 +24,16 @@ using AgenaTrader.Helper;
 namespace AgenaTrader.UserCode
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public static class Const {
+
+        //Default opacity for drawing
+        public static int DefaultOpacity = 70;
+
+    }
+
+    /// <summary>
     /// Global static Helper.
     /// </summary>
     public static class GlobalUtilities
@@ -31,7 +41,7 @@ namespace AgenaTrader.UserCode
 
         #region Colors
 
-            /// <summary>
+        /// <summary>
             /// Adjust the brightness of a color. 
             /// e.g. use this function to create a similiar color in a button click event or on mouse hover.
             /// </summary>
