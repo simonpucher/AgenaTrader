@@ -28,12 +28,15 @@ namespace AgenaTrader.UserCode
     /// </summary>
     public static class Const {
 
+        //Default Strings
+        public const string DefaultStringDatafeedPeriodicity = "Periodicity of your data feed is suboptimal for this indicator!";
+
         //Default values for indicators
-        public static const int DefaultOpenRangeSizeinMinutes = 75;
+        public const int DefaultOpenRangeSizeinMinutes = 75;
 
         //Default opacity for drawing
-        public static const int DefaultOpacity = 70;
-        public static const int DefaultLineWidth = 2;
+        public const int DefaultOpacity = 70;
+        public const int DefaultLineWidth = 2;
 
     }
 

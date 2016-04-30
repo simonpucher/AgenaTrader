@@ -18,9 +18,6 @@ using System.Globalization;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// ToDo
-/// 3)  automatische Ordererstellung (http://www.tradeescort.com/phpbb_de/viewtopic.php?f=19&t=2401)
-/// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode
@@ -121,55 +118,68 @@ namespace AgenaTrader.UserCode
 
             timeperiod = this.Root.Core.MarketplaceManager.GetExchangeDescription(this.Instrument.Exchange).TradingHours;
 
-            //Check if datafeed periodicity is the right one for ORB Minutes!
-            TimeFrame tf = (TimeFrame)Bars.TimeFrame;
-            if (tf.Periodicity == DatafeedHistoryPeriodicity.Tick || tf.Periodicity == DatafeedHistoryPeriodicity.Second || tf.Periodicity == DatafeedHistoryPeriodicity.Minute)
-            {
-                Log("Periodicity of your data feed is not optimal for this indicator!", InfoLogLevel.Warning);
-            }
+            ////Check if datafeed periodicity is the right one for this indicator
+            //if (this.DatafeedPeriodicityIsValid)
+            //{
+            //    //ok
+            //}
+            //else {
+            //    Log(Const.DefaultStringDatafeedPeriodicity, InfoLogLevel.Warning);
+            //}
         }
 
 		protected override void OnBarUpdate()
 		{
-            //new day session is beginning so we need to calculate the open range breakout
-            if (currentdayofupdate.Date < Time[0].Date) 
+            if (this.DatafeedPeriodicityIsValid)
             {
-                //reset session day data
-                this.long_breakout = null;
-                this.short_breakout = null;
+               //new day session is beginning so we need to calculate the open range breakout
+                if (currentdayofupdate.Date < Time[0].Date) 
+                {
+                    //reset session day data
+                    this.long_breakout = null;
+                    this.short_breakout = null;
 
-                //draw the open range
-                calculateanddrawOpenRange();
-            }
+                    //draw the open range
+                    calculateanddrawOpenRange();
+                }
 
 
-            //Set the indicator value on each bar update
-            if (long_breakout != null && long_breakout.Time == Bars[0].Time)
-            {
-                BarColor = Color.Turquoise;
-                Value.Set(1);
-            }
-            else if (short_breakout != null && short_breakout.Time == Bars[0].Time)
-            {
-                BarColor = Color.Purple;
-                Value.Set(-1);
+                //Set the indicator value on each bar update
+                if (long_breakout != null && long_breakout.Time == Bars[0].Time)
+                {
+                    BarColor = Color.Turquoise;
+                    Value.Set(1);
+                }
+                else if (short_breakout != null && short_breakout.Time == Bars[0].Time)
+                {
+                    BarColor = Color.Purple;
+                    Value.Set(-1);
+                }
+                else
+                {
+                    Value.Set(0);
+                }
+
+                //Set the color
+                PlotColors[0][0] = this.Plot1Color;
+                Plots[0].PenStyle = this.Dash0Style;
+                Plots[0].Pen.Width = this.Plot0Width;
+
+
+                //When finished set the last day variable
+                //If we are online during the day session we do not set this variable so we áre redrawing and recalculating the current session 
+                if (Time[0].Date != DateTime.Now.Date)
+                {
+                    currentdayofupdate = Time[0].Date;   
+                }
             }
             else
             {
-                Value.Set(0);
-            }
-
-            //Set the color
-            PlotColors[0][0] = this.Plot1Color;
-            Plots[0].PenStyle = this.Dash0Style;
-            Plots[0].Pen.Width = this.Plot0Width;
-
-
-            //When finished set the last day variable
-            //If we are online during the day session we do not set this variable so we áre redrawing and recalculating the current session 
-            if (Time[0].Date != DateTime.Now.Date)
-            {
-                currentdayofupdate = Time[0].Date;   
+                //Data feed perodicity is not valid, print info in chart panel 
+                if (IsCurrentBarLast)
+                {
+                    DrawTextFixed("AlertText", Const.DefaultStringDatafeedPeriodicity, TextPosition.Center, Color.Red, new Font("Arial", 30), Color.Red, Color.Red, 20);
+                }
             }
         }
 
@@ -179,9 +189,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         private void calculateanddrawOpenRange() {
 
-            //Print(Time[0]);
-
-            DateTime start = this.getOpenRangeStart(Time[0]);//Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
+            DateTime start = this.getOpenRangeStart(Time[0]);
             DateTime start_date = start.Date;
             DateTime end = this.getOpenRangeEnd(start);
 
@@ -200,9 +208,6 @@ namespace AgenaTrader.UserCode
             {
                 this.RangeLow = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
                 this.RangeHigh = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
-
-                //Print("High: " + this.RangeHigh.ToString());
-                //Print("Low: " + this.RangeLow.ToString());
 
                 DrawRectangle("ORBRect" + start_date.Ticks, true, start, this.RangeLow, end, this.RangeHigh, this.Color_ORB, this.Color_ORB, this.Opacity);
                 DrawText("ORBRangeString" + start_date.Ticks, true, Math.Round((this.RangeHeight), 2).ToString(), start, this.RangeHigh, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, this.Color_ORB, this.Opacity);
@@ -251,9 +256,7 @@ namespace AgenaTrader.UserCode
                 {
                     DrawArrowUp("ArrowTargetShort" + start_date.Ticks, true, short_target_reached.Time, short_target_reached.Low, Color.Green);
                 }
-                
             }
-
         }
 
 
@@ -279,10 +282,6 @@ namespace AgenaTrader.UserCode
                 //return new TimeSpan(15,30,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartUS.Hours, this._tim_OpenRangeStartUS.Minutes, this._tim_OpenRangeStartUS.Seconds);
             }
-            //else
-            //{
-            //    returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartDE.Hours, this._tim_OpenRangeStartDE.Minutes, this._tim_OpenRangeStartDE.Seconds);
-            //}
             return returnvalue;
         }
 
@@ -317,12 +316,25 @@ namespace AgenaTrader.UserCode
                 //return new TimeSpan(15,30,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_EndOfDay_US.Hours, this._tim_EndOfDay_US.Minutes, this._tim_EndOfDay_US.Seconds);
             }
-            //else
-            //{
-            //    returnvalue = new DateTime(date.Year, date.Month, date.Day, this.Time_EndOfDay_DE.Hours, this.Time_EndOfDay_DE.Minutes, this.Time_EndOfDay_DE.Seconds);
-            //}
-
             return returnvalue;
+        }
+
+        /// <summary>
+        /// True if the Periodicity of the data feed is correct for this indicator.
+        /// </summary>
+        /// <returns></returns>
+        private bool DatafeedPeriodicityIsValid {
+            get {
+                TimeFrame tf = (TimeFrame)Bars.TimeFrame;
+                if (tf.Periodicity == DatafeedHistoryPeriodicity.Tick || tf.Periodicity == DatafeedHistoryPeriodicity.Second || tf.Periodicity == DatafeedHistoryPeriodicity.Minute)
+                {
+                    return true;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
 
@@ -816,3 +828,4 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
