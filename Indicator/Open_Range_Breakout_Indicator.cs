@@ -19,13 +19,10 @@ using System.Globalization;
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
 /// ToDo
-/// 1)  Customzing für Börsenstart 09.00 oder 15.30
-/// 2)  Drawings in Background bringen, aktuell verdecken sie andere Indikatoren wie zB SMA200 -> erledigt mit Opacity
 /// 3)  automatische Ordererstellung (http://www.tradeescort.com/phpbb_de/viewtopic.php?f=19&t=2401)
 /// 4)  Im 1-Stundenchart wird automatisch das High/Low von dem kompletten Bar genommen. Es wird also die OpenRange von 2 Stunden genommen (120 Mins statt 75) Noch testen!
 /// 
 /// Tickgröße bei DrawArrow funktiniert nicht für alle Instrumente.
-/// Bei manchen Instrumenten müsste geprüft werden ob die ORB VALIDE ist das manchmal Daten fehlen (Stichwort: 500 Kerzen). => erledigt.
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -70,6 +67,7 @@ namespace AgenaTrader.UserCode
         private int _currentsessionlinewidth = 2;
         private DashStyle _currentsessionlinestyle = DashStyle.Solid;
 
+        private int _opacity = Const.DefaultOpacity;
         private Color _plot1color = Color.Orange;
         private int _plot1width = 2;
         private DashStyle _plot1dashstyle = DashStyle.Solid;
@@ -351,7 +349,26 @@ namespace AgenaTrader.UserCode
             get { return _orbminutes; }
             set { _orbminutes = value; }
         }
-
+        
+        /// <summary>
+        /// </summary>
+        [Description("Opacity for Drawing")]
+        [Category("Colors")]
+        [DisplayName("Opacity")]
+        public int Opacity
+        {
+            get { return _opacity; }
+            set {
+                    if (value >= 1 && value <= 100)
+                    {
+                        _opacity = value;
+                    }
+                    else
+                    {
+                        _opacity = Const.DefaultOpacity;
+                    }
+            }
+        }
 
 
         [XmlIgnore()]
