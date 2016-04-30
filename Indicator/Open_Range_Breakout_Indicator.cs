@@ -21,8 +21,6 @@ using System.Globalization;
 /// ToDo
 /// 3)  automatische Ordererstellung (http://www.tradeescort.com/phpbb_de/viewtopic.php?f=19&t=2401)
 /// 4)  Im 1-Stundenchart wird automatisch das High/Low von dem kompletten Bar genommen. Es wird also die OpenRange von 2 Stunden genommen (120 Mins statt 75) Noch testen!
-/// 
-/// Tickgröße bei DrawArrow funktiniert nicht für alle Instrumente.
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -220,30 +218,30 @@ namespace AgenaTrader.UserCode
                 long_breakout = list.Where(x => x.Close > this.RangeHigh).FirstOrDefault();
                 if (long_breakout != null)
                 {
-                    DrawArrowUp("ArrowLong" + start_date.Ticks, true, long_breakout.Time, long_breakout.Low - 100 * TickSize, Color.Green);
+                    DrawArrowUp("ArrowLong" + start_date.Ticks, true, long_breakout.Time, long_breakout.Low, Color.Green);
                 }
 
                 //find the first breakout to the short side
                 short_breakout = list.Where(x => x.Close < this.RangeLow).FirstOrDefault();
                 if (short_breakout != null)
                 {
-                    DrawArrowDown("ArrowShort" + start_date.Ticks, true, short_breakout.Time, short_breakout.High + 100 * TickSize, Color.Red);
+                    DrawArrowDown("ArrowShort" + start_date.Ticks, true, short_breakout.Time, short_breakout.High, Color.Red);
                 }
 
                 //find the first target to the long side
                 long_target_reached = list.Where(x => x.Close > target_long).FirstOrDefault();
                 if (long_target_reached != null)
                 {
-                    DrawArrowDown("ArrowTargetLong" + start_date.Ticks, true, long_target_reached.Time, long_target_reached.High + 100 * TickSize, Color.Red);
+                    DrawArrowDown("ArrowTargetLong" + start_date.Ticks, true, long_target_reached.Time, long_target_reached.High, Color.Red);
                 }
 
                 //find the first target to the short side
                 short_target_reached = list.Where(x => x.Close < target_short).FirstOrDefault();
                 if (short_target_reached != null)
                 {
-                    DrawArrowUp("ArrowTargetShort" + start_date.Ticks, true, short_target_reached.Time, short_target_reached.Low - 100 * TickSize, Color.Green);
+                    DrawArrowUp("ArrowTargetShort" + start_date.Ticks, true, short_target_reached.Time, short_target_reached.Low, Color.Green);
                 }
-
+                
             }
 
         }
