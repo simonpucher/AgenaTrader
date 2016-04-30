@@ -28,8 +28,12 @@ namespace AgenaTrader.UserCode
     /// </summary>
     public static class Const {
 
+        //Default values for indicators
+        public static const int DefaultOpenRangeSizeinMinutes = 75;
+
         //Default opacity for drawing
-        public static int DefaultOpacity = 70;
+        public static const int DefaultOpacity = 70;
+        public static const int DefaultLineWidth = 2;
 
     }
 

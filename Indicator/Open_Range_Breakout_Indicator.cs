@@ -20,7 +20,6 @@ using System.Globalization;
 /// -------------------------------------------------------------------------
 /// ToDo
 /// 3)  automatische Ordererstellung (http://www.tradeescort.com/phpbb_de/viewtopic.php?f=19&t=2401)
-/// 4)  Im 1-Stundenchart wird automatisch das High/Low von dem kompletten Bar genommen. Es wird also die OpenRange von 2 Stunden genommen (120 Mins statt 75) Noch testen!
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -62,14 +61,14 @@ namespace AgenaTrader.UserCode
 
         //input
         private Color _currentsessionlinecolor = Color.LightBlue;
-        private int _currentsessionlinewidth = 2;
+        private int _currentsessionlinewidth = Const.DefaultLineWidth;
         private DashStyle _currentsessionlinestyle = DashStyle.Solid;
 
         private int _opacity = Const.DefaultOpacity;
         private Color _plot1color = Color.Orange;
-        private int _plot1width = 2;
+        private int _plot1width = Const.DefaultLineWidth;
         private DashStyle _plot1dashstyle = DashStyle.Solid;
-        private int _orbminutes = 75;
+        private int _orbminutes = Const.DefaultOpenRangeSizeinMinutes;
         private Color _col_orb = Color.LightBlue;
         private Color _col_target_short = Color.PaleVioletRed;
         private Color _col_target_long = Color.PaleGreen;
@@ -109,6 +108,7 @@ namespace AgenaTrader.UserCode
         {
             //Print("InitRequirements");
 
+            //Add(DatafeedHistoryPeriodicity.Minute, 1);
         }
 
         protected override void OnStartUp()
@@ -120,6 +120,13 @@ namespace AgenaTrader.UserCode
             //Print(exdescrip.TradingHours);
 
             timeperiod = this.Root.Core.MarketplaceManager.GetExchangeDescription(this.Instrument.Exchange).TradingHours;
+
+            //Check if datafeed periodicity is the right one for ORB Minutes!
+            TimeFrame tf = (TimeFrame)Bars.TimeFrame;
+            if (tf.Periodicity == DatafeedHistoryPeriodicity.Tick || tf.Periodicity == DatafeedHistoryPeriodicity.Second || tf.Periodicity == DatafeedHistoryPeriodicity.Minute)
+            {
+                Log("Periodicity of your data feed is not optimal for this indicator!", InfoLogLevel.Warning);
+            }
         }
 
 		protected override void OnBarUpdate()
@@ -194,8 +201,11 @@ namespace AgenaTrader.UserCode
                 this.RangeLow = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
                 this.RangeHigh = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
 
-                DrawRectangle("ORBRect" + start_date.Ticks, true, start, this.RangeLow, end, this.RangeHigh, this.Color_ORB, this.Color_ORB, 70);
-                DrawText("ORBRangeString" + start_date.Ticks, true, Math.Round((this.RangeHeight), 2).ToString(), start, this.RangeHigh, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, this.Color_ORB, 70);
+                //Print("High: " + this.RangeHigh.ToString());
+                //Print("Low: " + this.RangeLow.ToString());
+
+                DrawRectangle("ORBRect" + start_date.Ticks, true, start, this.RangeLow, end, this.RangeHigh, this.Color_ORB, this.Color_ORB, this.Opacity);
+                DrawText("ORBRangeString" + start_date.Ticks, true, Math.Round((this.RangeHeight), 2).ToString(), start, this.RangeHigh, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, this.Color_ORB, this.Opacity);
 
                 //if we are live on the trading day
                 if (DateTime.Now.Date == start_date)
@@ -208,8 +218,8 @@ namespace AgenaTrader.UserCode
                 //Targets
                 double target_long = this.RangeHigh + this.RangeHeight;
                 double target_short = this.RangeLow - this.RangeHeight;
-                DrawRectangle("TargetAreaLong" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeHigh, this.getEndOfTradingDay(start_date), target_long, this.Color_TargetAreaLong, this.Color_TargetAreaLong, 70);
-                DrawRectangle("TargetAreaShort" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeLow, this.getEndOfTradingDay(start_date), target_short, this.Color_TargetAreaShort, this.Color_TargetAreaShort, 70);
+                DrawRectangle("TargetAreaLong" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeHigh, this.getEndOfTradingDay(start_date), target_long, this.Color_TargetAreaLong, this.Color_TargetAreaLong, this.Opacity);
+                DrawRectangle("TargetAreaShort" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeLow, this.getEndOfTradingDay(start_date), target_short, this.Color_TargetAreaShort, this.Color_TargetAreaShort, this.Opacity);
 
                 //load the data after the open range
                 list = Bars.Where(x => x.Time >= end).Where(x => x.Time <= this.getEndOfTradingDay(start));
@@ -345,7 +355,16 @@ namespace AgenaTrader.UserCode
         public int ORBMinutes
         {
             get { return _orbminutes; }
-            set { _orbminutes = value; }
+            set {
+                if (value >= 1 && value <= 300)
+                {
+                    _orbminutes = value;
+                }
+                else
+                {
+                    _orbminutes = Const.DefaultOpenRangeSizeinMinutes;
+                }
+            }
         }
         
         /// <summary>
