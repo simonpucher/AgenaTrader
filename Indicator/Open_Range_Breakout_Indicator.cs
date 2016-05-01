@@ -326,9 +326,17 @@ namespace AgenaTrader.UserCode
         private bool DatafeedPeriodicityIsValid {
             get {
                 TimeFrame tf = (TimeFrame)Bars.TimeFrame;
-                if (tf.Periodicity == DatafeedHistoryPeriodicity.Tick || tf.Periodicity == DatafeedHistoryPeriodicity.Second || tf.Periodicity == DatafeedHistoryPeriodicity.Minute)
+                if (tf.Periodicity == DatafeedHistoryPeriodicity.Tick || tf.Periodicity == DatafeedHistoryPeriodicity.Second )
                 {
                     return true;
+                }
+                else if(tf.Periodicity == DatafeedHistoryPeriodicity.Minute) {
+                    //Periodicity in minutes is right but in this case we need to check the modulus!
+                    if (this.ORBMinutes % tf.PeriodicityValue == 0)
+                    {
+                        return true;
+                    }
+                    return false;
                 }
                 else
                 {

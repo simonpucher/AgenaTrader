@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2
+/// Version: 1.3
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -73,7 +73,6 @@ namespace AgenaTrader.UserCode
             }
 
         #endregion
-
 
         #region Email
 
@@ -194,7 +193,6 @@ namespace AgenaTrader.UserCode
             return LowestLow;
         }
 #endregion
-
 
         #region DateTimeHelpers taken from  http://www.codeproject.com/Articles/9706/C-DateTime-Library
 
@@ -428,9 +426,7 @@ public static class StringExtensions {
 	[Description("We use this indicator to share global code in agena trader.")]
 	public class GlobalUtility : AgenaTrader.UserCode.UserIndicator
 	{
-
-        
-
+        //https://www.youtube.com/watch?v=5NNOrp_83RU
     }
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 
