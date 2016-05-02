@@ -37,27 +37,21 @@ namespace AgenaTrader.UserCode
         private int _roclongPeriod = 14;
         private int _rocshortPeriod = 11;
 		private int	_wmaperiod	= 10;
-		private int	_bandPeriod	= 34;
-		private double _stdDevNumber = 1.62;
 
-		private Color	main			= Color.Lime;
+		private Color main = Color.Orange;
         private int plot0Width = Const.DefaultLineWidth;
-		private DashStyle dash0Style 	= DashStyle.Solid;
+		private DashStyle dash0Style = DashStyle.Solid;
         private int plot1Width = Const.DefaultLineWidth;
-		private DashStyle dash1Style 	= DashStyle.Solid;
+		private DashStyle dash1Style = DashStyle.Solid;
         private int plot2Width = Const.DefaultLineWidth;
-		private DashStyle dash2Style 	= DashStyle.Solid;
+		private DashStyle dash2Style = DashStyle.Solid;
         private int plot3Width = Const.DefaultLineWidth;
-		private DashStyle dash3Style 	= DashStyle.Solid;
+		private DashStyle dash3Style = DashStyle.Solid;
 
         //internal
-        //private ROC _ROCLONG;
-        //private ROC _ROCSHORT;
-        //private WMA _WMA;
-
         private DataSeries _ROC_Long;
         private DataSeries _ROC_Short;
-        private DataSeries _WMA;
+        private DataSeries _ROC_Combined;
 
 
 		#endregion
@@ -68,18 +62,10 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		protected override void Initialize()
 		{
-            //Add(new Plot(new Pen(Color.Gray, 1), PlotStyle.Line, "PriceLine"));
-            Add(new Plot(new Pen(Color.Gray, 1), PlotStyle.Line, "Signalline"));
-            //Add(new Plot(new Pen(Color.Gray, 1), PlotStyle.Line, "Average"));
-            //Add(new Plot(new Pen(Color.Gray, 1), PlotStyle.Line, "Upper"));
-            //Add(new Plot(new Pen(Color.Gray, 1), PlotStyle.Line, "Lower"));
-            //Add(new Plot(new Pen(Color.Gray, 1), PlotStyle.Line, "MidLine"));
-
-
+            Add(new Plot(new Pen(this.Main, this.Plot0Width), PlotStyle.Line, "Coppock_Curve"));
 
             CalculateOnBarClose = true;
 
-          
             
 		}
 
@@ -92,56 +78,16 @@ namespace AgenaTrader.UserCode
 		{
             this._ROC_Long = new DataSeries(this);
             this._ROC_Short = new DataSeries(this);
-            this._WMA = new DataSeries(this);
-
-
-           //_ROCLONG = ROC(Input, ROCLongPeriod);
-           // _ROCSHORT = ROC(Input, ROCShortPeriod);
-            //List<double> WMAEnumerable = new List<double>();
-
-            //for (int i = 0; i < ROCLONG.Count; i++)
-            //{
-            //    WMAEnumerable.Add(ROCLONG.GetByIndex(i) + ROCSHORT.GetByIndex(i));
-            //}
-
-
-            //double[] WMAEnumerable = new double[Input.Count];
-
-            //for (int i = 0; i < _ROCLONG.Count; i++)
-            //{
-
-
-            //    WMAEnumerable[i] = _ROCLONG.GetByIndex(i) + _ROCSHORT.GetByIndex(i);
-
-
-
-            //}
-          
-
-
-            
-
-            //IEnumerable<double> mumumu = WMAEnumerable.AsEnumerable<double>();
-            //FloatSeries huhu = new FloatSeries();
-            //IDataSeries bubu = (IDataSeries)huhu;
-
-            //_WMA = WMA(huhu, WMAPeriod);
- 
-            //DYNRSI = RSI(Input,RSIPeriod,1);
-            //DYNPrice = SMA(DYNRSI,PricePeriod);
-            //DYNSignal = SMA(DYNRSI,SignalPeriod);
-            //DYNAverage = SMA(DYNRSI, BandPeriod);
-            //SDBB = StdDev(DYNRSI,BandPeriod);
+            this._ROC_Combined = new DataSeries(this);
 		}
 
 
 
-		
+		/// <summary>
+		/// 
+		/// </summary>
 		protected override void OnBarUpdate()
 		{
-
-            //double roclong = _ROCLONG[CurrentBar];
-            //double rocshort = _ROCSHORT[CurrentBar];
 
             double roc_long_value = ROC(this.ROCLongPeriod)[0];
             this._ROC_Long.Set(roc_long_value);
@@ -149,8 +95,10 @@ namespace AgenaTrader.UserCode
             double roc_short_value = ROC(this.ROCShortPeriod)[0];
             this._ROC_Short.Set(roc_short_value);
 
-            double wma_value = roc_long_value + roc_short_value;
-            this._WMA.Set(wma_value);
+            this._ROC_Combined.Set(roc_long_value + roc_short_value);
+
+            double wma_value = WMA(this._ROC_Combined, this.WMAPeriod)[0];
+            this.Coppock_Curve.Set(wma_value);
 
             
 
@@ -168,42 +116,12 @@ namespace AgenaTrader.UserCode
             //newvalue = ROC(ROCLongPeriod)[0];
 
 
-
-            //PriceLine.Set(ROCLONG.GetByIndex(CurrentBar));
-            //SignalLine.Set(ROCSHORT.GetByIndex(CurrentBar));
-
-            //Addition.Set(_ROCLONG.GetByIndex(CurrentBar) + _ROCSHORT.GetByIndex(CurrentBar));
-
-            //SignalLine.Set(SMA(Addition, WMAPeriod)[0]);
-
-            //Average.Set(_WMA.GetByIndex(CurrentBar));
-
-            //PriceLine.Set(roclong);
-           // SignalLine.Set(rocshort);
-
-            //double avg = DYNAverage[countbar];
-            //Average.Set(avg);
-            //MidLine.Set(50);
-
-            //double stdDevValue = SDBB[countbar];
-            //Upper.Set(avg + StdDevNumber * stdDevValue);
-            //Lower.Set(avg - StdDevNumber * stdDevValue);
-
             PlotColors[0][0] = Main;
 
             Plots[0].PenStyle = this.Dash0Style;
             Plots[0].Pen.Width = this.Plot0Width;
 
-            //PlotColors[1][0] = Signal;
-            //PlotColors[2][0] = BBAverage;
-            //PlotColors[3][0] = BBUpper;
 
-            //PlotColors[4][0] = BBLower;
-
-            //if (avg > 50)
-            //    PlotColors[5][0] = MidPositive;
-            //else
-            //    PlotColors[5][0] = MidNegative;
 		}
 
         protected override void OnTermination()
@@ -237,23 +155,23 @@ namespace AgenaTrader.UserCode
         //    get { return Values[0]; }
         //}
 
-        /// <summary>
-        /// </summary>
-        [Browsable(false)]
-		[XmlIgnore()]
-		public DataSeries SignalLine
-		{
-			get { return Values[0]; }
-		}
+        ///// <summary>
+        ///// </summary>
+        //[Browsable(false)]
+        //[XmlIgnore()]
+        //public DataSeries SignalLine
+        //{
+        //    get { return Values[0]; }
+        //}
 
-        /// <summary>
-        /// </summary>
-        [Browsable(false)]
-        [XmlIgnore()]
-        public DataSeries Addition
-        {
-            get { return Values[1]; }
-        }
+        ///// <summary>
+        ///// </summary>
+        //[Browsable(false)]
+        //[XmlIgnore()]
+        //public DataSeries Addition
+        //{
+        //    get { return Values[1]; }
+        //}
 
         ///// <summary>
         ///// </summary>
@@ -306,9 +224,9 @@ namespace AgenaTrader.UserCode
 
 		/// <summary>
 		/// </summary>
-		[Description("Period for Signalline")]
+		[Description("Period for WMA")]
 		[Category("Parameters")]
-		[DisplayName("Period for Signalline")]
+		[DisplayName("Period for WMA")]
 		public int WMAPeriod
 		{
             get { return _wmaperiod; }
@@ -339,9 +257,9 @@ namespace AgenaTrader.UserCode
 
 		/// <summary>
 		/// </summary>
-		[Description("Select Color")]
+		[Description("Select Color for Coppock Curve")]
 		[Category("Colors")]
-		[DisplayName("Pricline")]
+		[DisplayName("Coppock Curve")]
 		public Color Main
 		{
 			get { return main; }
