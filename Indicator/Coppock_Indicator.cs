@@ -33,29 +33,31 @@ namespace AgenaTrader.UserCode
 	{
 		#region Variables
 
+        //input
         private int _roclongPeriod = 14;
         private int _rocshortPeriod = 11;
 		private int	_wmaperiod	= 10;
+		private int	_bandPeriod	= 34;
+		private double _stdDevNumber = 1.62;
 
-		private int		bandPeriod		= 34;
-		private double	stdDevNumber	= 1.62;
 		private Color	main			= Color.Lime;
-		private int plot0Width 			= 1;
-		private PlotStyle plot0Style 	= PlotStyle.Line;
+        private int plot0Width = Const.DefaultLineWidth;
 		private DashStyle dash0Style 	= DashStyle.Solid;
-		private int plot1Width 			= 1;
-		private PlotStyle plot1Style 	= PlotStyle.Line;
+        private int plot1Width = Const.DefaultLineWidth;
 		private DashStyle dash1Style 	= DashStyle.Solid;
-		private int plot2Width 			= 1;
-		private PlotStyle plot2Style 	= PlotStyle.Line;
+        private int plot2Width = Const.DefaultLineWidth;
 		private DashStyle dash2Style 	= DashStyle.Solid;
-		private int plot3Width 			= 1;
-		private PlotStyle plot3Style 	= PlotStyle.Line;
+        private int plot3Width = Const.DefaultLineWidth;
 		private DashStyle dash3Style 	= DashStyle.Solid;
-			
-		private ROC _ROCLONG;
-		private ROC _ROCSHORT;
-        private WMA _WMA;
+
+        //internal
+        //private ROC _ROCLONG;
+        //private ROC _ROCSHORT;
+        //private WMA _WMA;
+
+        private DataSeries _ROC_Long;
+        private DataSeries _ROC_Short;
+        private DataSeries _WMA;
 
 
 		#endregion
@@ -73,7 +75,7 @@ namespace AgenaTrader.UserCode
             //Add(new Plot(new Pen(Color.Gray, 1), PlotStyle.Line, "Lower"));
             //Add(new Plot(new Pen(Color.Gray, 1), PlotStyle.Line, "MidLine"));
 
-        
+
 
             CalculateOnBarClose = true;
 
@@ -88,9 +90,13 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		protected override void OnStartUp()
 		{
+            this._ROC_Long = new DataSeries(this);
+            this._ROC_Short = new DataSeries(this);
+            this._WMA = new DataSeries(this);
 
-           _ROCLONG = ROC(Input, ROCLongPeriod);
-            _ROCSHORT = ROC(Input, ROCShortPeriod);
+
+           //_ROCLONG = ROC(Input, ROCLongPeriod);
+           // _ROCSHORT = ROC(Input, ROCShortPeriod);
             //List<double> WMAEnumerable = new List<double>();
 
             //for (int i = 0; i < ROCLONG.Count; i++)
@@ -134,10 +140,19 @@ namespace AgenaTrader.UserCode
 		protected override void OnBarUpdate()
 		{
 
-            double roclong = _ROCLONG[CurrentBar];
-            double rocshort = _ROCSHORT[CurrentBar];
+            //double roclong = _ROCLONG[CurrentBar];
+            //double rocshort = _ROCSHORT[CurrentBar];
 
-           
+            double roc_long_value = ROC(this.ROCLongPeriod)[0];
+            this._ROC_Long.Set(roc_long_value);
+
+            double roc_short_value = ROC(this.ROCShortPeriod)[0];
+            this._ROC_Short.Set(roc_short_value);
+
+            double wma_value = roc_long_value + roc_short_value;
+            this._WMA.Set(wma_value);
+
+            
 
             //double newvalue = 0;
             //if (CurrentBar - ROCLongPeriod > 0)
@@ -157,9 +172,9 @@ namespace AgenaTrader.UserCode
             //PriceLine.Set(ROCLONG.GetByIndex(CurrentBar));
             //SignalLine.Set(ROCSHORT.GetByIndex(CurrentBar));
 
-            Addition.Set(_ROCLONG.GetByIndex(CurrentBar) + _ROCSHORT.GetByIndex(CurrentBar));
+            //Addition.Set(_ROCLONG.GetByIndex(CurrentBar) + _ROCSHORT.GetByIndex(CurrentBar));
 
-            SignalLine.Set(SMA(Addition, WMAPeriod)[0]);
+            //SignalLine.Set(SMA(Addition, WMAPeriod)[0]);
 
             //Average.Set(_WMA.GetByIndex(CurrentBar));
 
@@ -175,6 +190,10 @@ namespace AgenaTrader.UserCode
             //Lower.Set(avg - StdDevNumber * stdDevValue);
 
             PlotColors[0][0] = Main;
+
+            Plots[0].PenStyle = this.Dash0Style;
+            Plots[0].Pen.Width = this.Plot0Width;
+
             //PlotColors[1][0] = Signal;
             //PlotColors[2][0] = BBAverage;
             //PlotColors[3][0] = BBUpper;
@@ -462,16 +481,7 @@ namespace AgenaTrader.UserCode
 			set { plot0Width = Math.Max(1, value); }
 		}
 		
-		/// <summary>
-		/// </summary>
-		[Description("PlotStyle for Priceline.")]
-		[Category("Plots")]
-		[DisplayName("Plot Style Priceline")]
-		public PlotStyle Plot0Style
-		{
-			get { return plot0Style; }
-			set { plot0Style = value; }
-		}
+
 		
 		/// <summary>
 		/// </summary>
@@ -495,16 +505,7 @@ namespace AgenaTrader.UserCode
 			set { plot1Width = Math.Max(1, value); }
 		}
 		
-		/// <summary>
-		/// </summary>
-		[Description("PlotStyle for Signalline.")]
-		[Category("Plots")]
-		[DisplayName("Plot Style Signal")]
-		public PlotStyle Plot1Style
-		{
-			get { return plot1Style; }
-			set { plot1Style = value; }
-		}
+
 		
 		/// <summary>
 		/// </summary>
@@ -527,17 +528,7 @@ namespace AgenaTrader.UserCode
 			get { return plot2Width; }
 			set { plot2Width = Math.Max(1, value); }
 		}
-		
-		/// <summary>
-		/// </summary>
-		[Description("PlotStyle for Midband.")]
-		[Category("Plots")]
-		[DisplayName("Plot Style Midband")]
-		public PlotStyle Plot2Style
-		{
-			get { return plot2Style; }
-			set { plot2Style = value; }
-		}
+
 		
 		/// <summary>
 		/// </summary>
@@ -561,16 +552,7 @@ namespace AgenaTrader.UserCode
 			set { plot3Width = Math.Max(1, value); }
 		}
 		
-		/// <summary>
-		/// </summary>
-		[Description("PlotStyle for Bollinger Bands.")]
-		[Category("Plots")]
-		[DisplayName("Plot Style BBAnds")]
-		public PlotStyle Plot3Style
-		{
-			get { return plot3Style; }
-			set { plot3Style = value; }
-		}
+
 		
 		/// <summary>
 		/// </summary>
@@ -581,10 +563,23 @@ namespace AgenaTrader.UserCode
 		{
 			get { return dash3Style; }
 			set { dash3Style = value; }
-		} 
+        }
 
-		#endregion
-	}
+
+
+        #region Output
+
+            [Browsable(false)]
+            [XmlIgnore()]
+            public DataSeries Coppock_Curve
+            {
+                get { return Values[0]; }
+            }
+
+        #endregion
+
+        #endregion
+    }
 }
 
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
