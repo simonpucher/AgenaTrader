@@ -62,9 +62,9 @@ namespace AgenaTrader.UserCode
         private DashStyle _currentsessionlinestyle = DashStyle.Solid;
 
         private int _opacity = Const.DefaultOpacity;
-        private Color _plot1color = Color.Orange;
+        private Color _plot1color = Const.DefaultIndicatorColor;
         private int _plot1width = Const.DefaultLineWidth;
-        private DashStyle _plot1dashstyle = DashStyle.Solid;
+        private DashStyle _plot1dashstyle = Const.DefaultIndicatorDashStyle;
         private int _orbminutes = Const.DefaultOpenRangeSizeinMinutes;
         private Color _col_orb = Color.LightBlue;
         private Color _col_target_short = Color.PaleVioletRed;
@@ -518,23 +518,6 @@ namespace AgenaTrader.UserCode
             set { _tim_OpenRangeStartDE = new TimeSpan(value); }
         }
 
-        ///// <summary>
-        ///// </summary>
-        //[Description("OpenRange DE End: Uhrzeit wann Range geschlossen wird")]
-        //[Category("TimeSpan")]
-        //[DisplayName("2. OpenRange End DE")]
-        //public TimeSpan Time_OpenRangeEndDE
-        //{
-        //    get { return _tim_OpenRangeEndDE; }
-        //    set { _tim_OpenRangeEndDE = value; }
-        //}
-        //[Browsable(false)]
-        //public long Time_OpenRangeEndDESerialize
-        //{
-        //    get { return _tim_OpenRangeEndDE.Ticks; }
-        //    set { _tim_OpenRangeEndDE = new TimeSpan(value); }
-        //}
-
         /// <summary>
         /// </summary>
         [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
@@ -552,22 +535,6 @@ namespace AgenaTrader.UserCode
             set { _tim_OpenRangeStartUS = new TimeSpan(value); }
         }
 
-        ///// <summary>
-        ///// </summary>
-        //[Description("OpenRange US End: Uhrzeit wann Range geschlossen wird")]
-        //[Category("TimeSpan")]
-        //[DisplayName("4. OpenRange End US")]
-        //public TimeSpan Time_OpenRangeEndUS
-        //{
-        //    get { return _tim_OpenRangeEndUS; }
-        //    set { _tim_OpenRangeEndUS = value; }
-        //}
-        //[Browsable(false)]
-        //public long Time_OpenRangeEndUSSerialize
-        //{
-        //    get { return _tim_OpenRangeEndUS.Ticks; }
-        //    set { _tim_OpenRangeEndUS = new TimeSpan(value); }
-        //}
 
         /// <summary>
         /// </summary>

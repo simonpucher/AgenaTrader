@@ -37,6 +37,11 @@ namespace AgenaTrader.UserCode
         //Default opacity for drawing
         public const int DefaultOpacity = 70;
         public const int DefaultLineWidth = 2;
+        public const int DefaultLineWidth_small = 1;
+        public const int DefaultLineWidth_large = 3;
+        public static readonly Color DefaultIndicatorColor = Color.Orange;
+        public static readonly DashStyle DefaultIndicatorDashStyle = DashStyle.Solid;
+
 
     }
 
