@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -30,9 +30,9 @@ namespace AgenaTrader.UserCode
 	public class HighestHighValue_Indicator : UserIndicator
 	{
         //input
-        private Color _plot1color = Color.Orange;
-        private int _plot1width = 2;
-        private DashStyle _plot1dashstyle = DashStyle.Solid;
+        private Color _plot1color = Const.DefaultIndicatorColor;
+        private int _plot1width = Const.DefaultLineWidth;
+        private DashStyle _plot1dashstyle = Const.DefaultIndicatorDashStyle;
         private int _indicatorEMAPeriod = 200;
         private int _indicatorSMAPeriod = 200;
         private int _comparisonPeriod = 30;
@@ -49,7 +49,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
 		protected override void Initialize()
 		{
-            Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "IndicatorPlot1"));
+            Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "HighestHighValue_Indicator"));
 
             CalculateOnBarClose = true;
 		}
