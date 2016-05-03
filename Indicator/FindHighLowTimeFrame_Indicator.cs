@@ -11,6 +11,13 @@ using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
+/// <summary>
+/// Version: 1.0
+/// -------------------------------------------------------------------------
+/// Simon Pucher 2016
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
 	[Description("This indicator finds the high and low value in a dedicated timeframe.")]
@@ -45,13 +52,12 @@ namespace AgenaTrader.UserCode
             //new day session is beginning so we need to calculate and redraw the lines
             if (_currentdayofupdate.Date < Time[0].Date)
             {
-                //Print("we are going to calculate the following date: " + Time[0].Date.ToString());
                 this.calculateanddrawhighlowlines();
             }
 
 
             //When finished set the last day variable
-            //If we are online during the day session we do not set this variable so we are redrawing and recalculating the current session.
+            //If we are online during the day session we do not set this variable so we are redrawing and recalculating the current session
             if (Time[0].Date != DateTime.Now.Date)
             {
                 _currentdayofupdate = Time[0].Date;
@@ -85,15 +91,15 @@ namespace AgenaTrader.UserCode
                 double low = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
                 double high = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
 
+                //Draw current lines for this day session
                 if (Time[0].Date == DateTime.Now.Date)
                 {
                     DrawHorizontalLine("LowLine" + start.Ticks, true, low, this.CurrentSessionLineColor, DashStyle.Solid, 2);
                     DrawHorizontalLine("HighLine" + start.Ticks, true, high, this.CurrentSessionLineColor, DashStyle.Solid, 2);
                 }
 
-
+                //Draw a rectangle at the dedicated time frame
                 DrawRectangle("HighLowRect" + start.Ticks, true, start, low, end, high, this.Color_TimeFrame, this.Color_TimeFrame, this.Opacity);
-                
             }
         }
 
@@ -202,12 +208,12 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-        [Browsable(false)]
-		[XmlIgnore()]
-		public DataSeries MyPlot1
-		{
-			get { return Values[0]; }
-		}
+        //[Browsable(false)]
+        //[XmlIgnore()]
+        //public DataSeries MyPlot1
+        //{
+        //    get { return Values[0]; }
+        //}
 
 
 
