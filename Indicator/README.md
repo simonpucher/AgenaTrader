@@ -7,6 +7,9 @@
 ##Fibonacci Current Session
 *** In Progress ***
 
+##FindHighLowTimeFrame_Indicator
+Finds the high and low value in a dedicated time frame. Indicator draws a rectangle on this dedicated time frame. Draws a high and low line at the current session.
+
 ##HighestHighValue
 Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
 
