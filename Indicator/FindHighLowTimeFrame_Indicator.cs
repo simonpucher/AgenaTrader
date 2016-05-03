@@ -14,7 +14,7 @@ using AgenaTrader.Helper;
 namespace AgenaTrader.UserCode
 {
 	[Description("This indicator finds the high and low value in a dedicated timeframe.")]
-	public class FindHighLowinTimeFrame : UserIndicator
+	public class FindHighLowTimeFrame_Indicator : UserIndicator
 	{
         //input
 
@@ -139,6 +139,7 @@ namespace AgenaTrader.UserCode
 		#endregion
 	}
 }
+
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 
 namespace AgenaTrader.UserCode
@@ -150,22 +151,22 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator finds the high and low value in a dedicated timeframe.
 		/// </summary>
-		public FindHighLowinTimeFrame FindHighLowinTimeFrame()
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator()
         {
-			return FindHighLowinTimeFrame(Input);
+			return FindHighLowTimeFrame_Indicator(Input);
 		}
 
 		/// <summary>
 		/// This indicator finds the high and low value in a dedicated timeframe.
 		/// </summary>
-		public FindHighLowinTimeFrame FindHighLowinTimeFrame(IDataSeries input)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<FindHighLowinTimeFrame>(input);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<FindHighLowTimeFrame_Indicator>(input);
 
 			if (indicator != null)
 				return indicator;
 
-			indicator = new FindHighLowinTimeFrame
+			indicator = new FindHighLowTimeFrame_Indicator
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
@@ -188,20 +189,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator finds the high and low value in a dedicated timeframe.
 		/// </summary>
-		public FindHighLowinTimeFrame FindHighLowinTimeFrame()
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator()
 		{
-			return LeadIndicator.FindHighLowinTimeFrame(Input);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input);
 		}
 
 		/// <summary>
 		/// This indicator finds the high and low value in a dedicated timeframe.
 		/// </summary>
-		public FindHighLowinTimeFrame FindHighLowinTimeFrame(IDataSeries input)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.FindHighLowinTimeFrame(input);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(input);
 		}
 	}
 
@@ -214,17 +215,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator finds the high and low value in a dedicated timeframe.
 		/// </summary>
-		public FindHighLowinTimeFrame FindHighLowinTimeFrame()
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator()
 		{
-			return LeadIndicator.FindHighLowinTimeFrame(Input);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input);
 		}
 
 		/// <summary>
 		/// This indicator finds the high and low value in a dedicated timeframe.
 		/// </summary>
-		public FindHighLowinTimeFrame FindHighLowinTimeFrame(IDataSeries input)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input)
 		{
-			return LeadIndicator.FindHighLowinTimeFrame(input);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(input);
 		}
 	}
 
@@ -237,17 +238,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator finds the high and low value in a dedicated timeframe.
 		/// </summary>
-		public FindHighLowinTimeFrame FindHighLowinTimeFrame()
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator()
 		{
-			return LeadIndicator.FindHighLowinTimeFrame(Input);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input);
 		}
 
 		/// <summary>
 		/// This indicator finds the high and low value in a dedicated timeframe.
 		/// </summary>
-		public FindHighLowinTimeFrame FindHighLowinTimeFrame(IDataSeries input)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input)
 		{
-			return LeadIndicator.FindHighLowinTimeFrame(input);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(input);
 		}
 	}
 
