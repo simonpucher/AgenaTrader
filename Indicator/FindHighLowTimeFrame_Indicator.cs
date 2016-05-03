@@ -17,13 +17,19 @@ namespace AgenaTrader.UserCode
 	public class FindHighLowTimeFrame_Indicator : UserIndicator
 	{
         //input
+        private int _opacity = 70;
+        private Color _currentsessionlinecolor = Color.Brown;
+        private Color _col_timeframe = Color.Brown;
+        private int _currentsessionlinewidth = 1;
+        private DashStyle _currentsessionlinestyle = DashStyle.Solid;
+        private TimeSpan _tim_start = new TimeSpan(12, 0, 0);
+        private TimeSpan _tim_end = new TimeSpan(13, 0, 0);
 
         //output
 
         //internal
         private DateTime _currentdayofupdate = DateTime.MinValue;
-        private TimeSpan _tim_start = new TimeSpan(12, 0, 0);
-        private TimeSpan _tim_end = new TimeSpan(13, 0, 0);
+
 
 		protected override void Initialize()
 		{
@@ -66,8 +72,8 @@ namespace AgenaTrader.UserCode
             //Select all data and find high & low.
             IEnumerable<IBar> list = Bars.Where(x => x.Time >= start).Where(x => x.Time <= end);
 
-            //Check if data for open range is valid.
-            //we need to ignore the first day which is normally invalid.
+            //Check if data for timeframe is valid.
+            //we need to get sure that data for the whole time frame is available.
             bool isvalidtimeframe = false;
             if (list != null && !list.IsEmpty() && list.First().Time == start)
             {
@@ -79,20 +85,124 @@ namespace AgenaTrader.UserCode
                 double low = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
                 double high = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
 
-                DrawHorizontalLine("LowLine" + start.Ticks, true, low, Color.Brown, DashStyle.Solid, 2);
-                DrawHorizontalLine("HighLine" + start.Ticks, true, high, Color.Brown, DashStyle.Solid, 2);
+                if (Time[0].Date == DateTime.Now.Date)
+                {
+                    DrawHorizontalLine("LowLine" + start.Ticks, true, low, this.CurrentSessionLineColor, DashStyle.Solid, 2);
+                    DrawHorizontalLine("HighLine" + start.Ticks, true, high, this.CurrentSessionLineColor, DashStyle.Solid, 2);
+                }
 
-                DrawRectangle("HighLowRect" + start.Ticks, true, start, low, end, high, Color.Brown, Color.Brown, 70);
+
+                DrawRectangle("HighLowRect" + start.Ticks, true, start, low, end, high, this.Color_TimeFrame, this.Color_TimeFrame, this.Opacity);
                 
             }
         }
 
 
+        public override string ToString()
+        {
+            return "FindHighLowTimeFrame";
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "FindHighLowTimeFrame";
+            }
+        }
+
 
 
 		#region Properties
 
-		[Browsable(false)]
+
+        #region Input
+
+
+        /// <summary>
+        /// </summary>
+        [Description("Opacity for Drawing")]
+        [Category("Colors")]
+        [DisplayName("Opacity")]
+        public int Opacity
+        {
+            get { return _opacity; }
+            set
+            {
+                if (value >= 1 && value <= 100)
+                {
+                    _opacity = value;
+                }
+                else
+                {
+                    _opacity = 70;
+                }
+            }
+        }
+
+
+        [XmlIgnore()]
+        [Description("Select color for the current session")]
+        [Category("Colors")]
+        [DisplayName("Current Session")]
+        public Color CurrentSessionLineColor
+        {
+            get { return _currentsessionlinecolor; }
+            set { _currentsessionlinecolor = value; }
+        }
+
+        [Browsable(false)]
+        public string CurrentSessionLineColorSerialize
+        {
+            get { return SerializableColor.ToString(_currentsessionlinecolor); }
+            set { _currentsessionlinecolor = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Width for the line of the current session.")]
+        [Category("Plots")]
+        [DisplayName("Line Width current session")]
+        public int CurrentSessionLineWidth
+        {
+            get { return _currentsessionlinewidth; }
+            set { _currentsessionlinewidth = Math.Max(1, value); }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("DashStyle for line of the current session.")]
+        [Category("Plots")]
+        [DisplayName("Dash Style current session")]
+        public DashStyle CurrentSessionLineStyle
+        {
+            get { return _currentsessionlinestyle; }
+            set { _currentsessionlinestyle = value; }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("Time Frame Color")]
+        [Category("Colors")]
+        [DisplayName("Time Frame")]
+        public Color Color_TimeFrame
+        {
+            get { return _col_timeframe; }
+            set { _col_timeframe = value; }
+        }
+
+        [Browsable(false)]
+        public string Color_TimeFrameSerialize
+        {
+            get { return SerializableColor.ToString(_col_timeframe); }
+            set { _col_timeframe = SerializableColor.FromString(value); }
+        }
+
+        #endregion
+
+        [Browsable(false)]
 		[XmlIgnore()]
 		public DataSeries MyPlot1
 		{
@@ -103,16 +213,16 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
+        [Description("The start time of the time frame.")]
         [Category("TimeSpan")]
-        [DisplayName("OpenRange Start DE")]
+        [DisplayName("Start")]
         public TimeSpan Time_Start
         {
             get { return _tim_start; }
             set { _tim_start = value; }
         }
         [Browsable(false)]
-        public long Time_OpenRangeStartDESerialize
+        public long Time_StartSerialize
         {
             get { return _tim_start.Ticks; }
             set { _tim_start = new TimeSpan(value); }
@@ -120,16 +230,16 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
+         [Description("The end time of the time frame.")]
         [Category("TimeSpan")]
-        [DisplayName("OpenRange Start US")]
+        [DisplayName("End")]
         public TimeSpan Time_End
         {
             get { return _tim_end; }
             set { _tim_end = value; }
         }
         [Browsable(false)]
-        public long Time_OpenRangeStartUSSerialize
+         public long Time_EndSerialize
         {
             get { return _tim_end.Ticks; }
             set { _tim_end = new TimeSpan(value); }
