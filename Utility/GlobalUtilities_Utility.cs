@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2
+/// Version: 1.3
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -24,6 +24,28 @@ using AgenaTrader.Helper;
 namespace AgenaTrader.UserCode
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public static class Const {
+
+        //Default Strings
+        public const string DefaultStringDatafeedPeriodicity = "Periodicity of your data feed is suboptimal for this indicator!";
+
+        //Default values for indicators
+        public const int DefaultOpenRangeSizeinMinutes = 75;
+
+        //Default opacity for drawing
+        public const int DefaultOpacity = 70;
+        public const int DefaultLineWidth = 2;
+        public const int DefaultLineWidth_small = 1;
+        public const int DefaultLineWidth_large = 3;
+        public static readonly Color DefaultIndicatorColor = Color.Orange;
+        public static readonly DashStyle DefaultIndicatorDashStyle = DashStyle.Solid;
+
+
+    }
+
+    /// <summary>
     /// Global static Helper.
     /// </summary>
     public static class GlobalUtilities
@@ -31,7 +53,7 @@ namespace AgenaTrader.UserCode
 
         #region Colors
 
-            /// <summary>
+        /// <summary>
             /// Adjust the brightness of a color. 
             /// e.g. use this function to create a similiar color in a button click event or on mouse hover.
             /// </summary>
@@ -56,7 +78,6 @@ namespace AgenaTrader.UserCode
             }
 
         #endregion
-
 
         #region Email
 
@@ -177,7 +198,6 @@ namespace AgenaTrader.UserCode
             return LowestLow;
         }
 #endregion
-
 
         #region DateTimeHelpers taken from  http://www.codeproject.com/Articles/9706/C-DateTime-Library
 
@@ -411,9 +431,7 @@ public static class StringExtensions {
 	[Description("We use this indicator to share global code in agena trader.")]
 	public class GlobalUtility : AgenaTrader.UserCode.UserIndicator
 	{
-
-        
-
+        //https://www.youtube.com/watch?v=5NNOrp_83RU
     }
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 

@@ -47,14 +47,14 @@ namespace AgenaTrader.UserCode
 		private Color _midPositive = Color.Olive;
 		private Color _midNegative = Color.RosyBrown;
 
-		private int _plot0Width = 2;
-        private DashStyle _dash0Style = DashStyle.Solid;
-        private int _plot1Width = 2;
-        private DashStyle _dash1Style = DashStyle.Solid;
-        private int _plot2Width = 2;
-        private DashStyle _dash2Style = DashStyle.Solid;
-        private int _plot3Width = 1;
-        private DashStyle _dash3Style = DashStyle.Solid;
+        private int _plot0Width = Const.DefaultLineWidth;
+        private DashStyle _dash0Style = Const.DefaultIndicatorDashStyle;
+        private int _plot1Width = Const.DefaultLineWidth;
+        private DashStyle _dash1Style = Const.DefaultIndicatorDashStyle;
+        private int _plot2Width = Const.DefaultLineWidth;
+        private DashStyle _dash2Style = Const.DefaultIndicatorDashStyle;
+        private int _plot3Width = Const.DefaultLineWidth_small;
+        private DashStyle _dash3Style = Const.DefaultIndicatorDashStyle;
 
         //output
 

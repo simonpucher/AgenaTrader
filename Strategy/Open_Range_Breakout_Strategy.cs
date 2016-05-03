@@ -119,10 +119,12 @@ namespace AgenaTrader.UserCode
             {
                 case 1:
                     //Long Signal
+                    //Print("Enter Long");
                     EnterLong();
                     break;
                 case -1:
                     //Short Signal
+                    //Print("Enter Short");
                     EnterShort();
                     break;
                 default:

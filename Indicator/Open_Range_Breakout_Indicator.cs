@@ -18,15 +18,6 @@ using System.Globalization;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// ToDo
-/// 1)  Customzing für Börsenstart 09.00 oder 15.30
-/// 2)  Drawings in Background bringen, aktuell verdecken sie andere Indikatoren wie zB SMA200 -> erledigt mit Opacity
-/// 3)  automatische Ordererstellung (http://www.tradeescort.com/phpbb_de/viewtopic.php?f=19&t=2401)
-/// 4)  Im 1-Stundenchart wird automatisch das High/Low von dem kompletten Bar genommen. Es wird also die OpenRange von 2 Stunden genommen (120 Mins statt 75) Noch testen!
-/// 
-/// Tickgröße bei DrawArrow funktiniert nicht für alle Instrumente.
-/// Bei manchen Instrumenten müsste geprüft werden ob die ORB VALIDE ist das manchmal Daten fehlen (Stichwort: 500 Kerzen). => erledigt.
-/// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode
@@ -67,13 +58,14 @@ namespace AgenaTrader.UserCode
 
         //input
         private Color _currentsessionlinecolor = Color.LightBlue;
-        private int _currentsessionlinewidth = 2;
+        private int _currentsessionlinewidth = Const.DefaultLineWidth;
         private DashStyle _currentsessionlinestyle = DashStyle.Solid;
 
-        private Color _plot1color = Color.Orange;
-        private int _plot1width = 2;
-        private DashStyle _plot1dashstyle = DashStyle.Solid;
-        private int _orbminutes = 75;
+        private int _opacity = Const.DefaultOpacity;
+        private Color _plot1color = Const.DefaultIndicatorColor;
+        private int _plot1width = Const.DefaultLineWidth;
+        private DashStyle _plot1dashstyle = Const.DefaultIndicatorDashStyle;
+        private int _orbminutes = Const.DefaultOpenRangeSizeinMinutes;
         private Color _col_orb = Color.LightBlue;
         private Color _col_target_short = Color.PaleVioletRed;
         private Color _col_target_long = Color.PaleGreen;
@@ -113,6 +105,7 @@ namespace AgenaTrader.UserCode
         {
             //Print("InitRequirements");
 
+            //Add(DatafeedHistoryPeriodicity.Minute, 1);
         }
 
         protected override void OnStartUp()
@@ -124,49 +117,69 @@ namespace AgenaTrader.UserCode
             //Print(exdescrip.TradingHours);
 
             timeperiod = this.Root.Core.MarketplaceManager.GetExchangeDescription(this.Instrument.Exchange).TradingHours;
+
+            ////Check if datafeed periodicity is the right one for this indicator
+            //if (this.DatafeedPeriodicityIsValid)
+            //{
+            //    //ok
+            //}
+            //else {
+            //    Log(Const.DefaultStringDatafeedPeriodicity, InfoLogLevel.Warning);
+            //}
         }
 
 		protected override void OnBarUpdate()
 		{
-            //new day session is beginning so we need to calculate the open range breakout
-            if (currentdayofupdate.Date < Time[0].Date) 
+            if (this.DatafeedPeriodicityIsValid)
             {
-                //reset session day data
-                this.long_breakout = null;
-                this.short_breakout = null;
+               //new day session is beginning so we need to calculate the open range breakout
+                if (currentdayofupdate.Date < Time[0].Date) 
+                {
+                    //reset session day data
+                    this.long_breakout = null;
+                    this.short_breakout = null;
 
-                //draw the open range
-                calculateanddrawOpenRange();
-            }
+                    //draw the open range
+                    calculateanddrawOpenRange();
+                }
 
 
-            //Set the indicator value on each bar update
-            if (long_breakout != null && long_breakout.Time == Bars[0].Time)
-            {
-                BarColor = Color.Turquoise;
-                Value.Set(1);
-            }
-            else if (short_breakout != null && short_breakout.Time == Bars[0].Time)
-            {
-                BarColor = Color.Purple;
-                Value.Set(-1);
+                //Set the indicator value on each bar update
+                if (long_breakout != null && long_breakout.Time == Bars[0].Time)
+                {
+                    BarColor = Color.Turquoise;
+                    Value.Set(1);
+                }
+                else if (short_breakout != null && short_breakout.Time == Bars[0].Time)
+                {
+                    BarColor = Color.Purple;
+                    Value.Set(-1);
+                }
+                else
+                {
+                    Value.Set(0);
+                }
+
+                //Set the color
+                PlotColors[0][0] = this.Plot1Color;
+                Plots[0].PenStyle = this.Dash0Style;
+                Plots[0].Pen.Width = this.Plot0Width;
+
+
+                //When finished set the last day variable
+                //If we are online during the day session we do not set this variable so we áre redrawing and recalculating the current session 
+                if (Time[0].Date != DateTime.Now.Date)
+                {
+                    currentdayofupdate = Time[0].Date;   
+                }
             }
             else
             {
-                Value.Set(0);
-            }
-
-            //Set the color
-            PlotColors[0][0] = this.Plot1Color;
-            Plots[0].PenStyle = this.Dash0Style;
-            Plots[0].Pen.Width = this.Plot0Width;
-
-
-            //When finished set the last day variable
-            //If we are online during the day session we do not set this variable so we áre redrawing and recalculating the current session 
-            if (Time[0].Date != DateTime.Now.Date)
-            {
-                currentdayofupdate = Time[0].Date;   
+                //Data feed perodicity is not valid, print info in chart panel 
+                if (IsCurrentBarLast)
+                {
+                    DrawTextFixed("AlertText", Const.DefaultStringDatafeedPeriodicity, TextPosition.Center, Color.Red, new Font("Arial", 30), Color.Red, Color.Red, 20);
+                }
             }
         }
 
@@ -176,9 +189,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         private void calculateanddrawOpenRange() {
 
-            //Print(Time[0]);
-
-            DateTime start = this.getOpenRangeStart(Time[0]);//Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
+            DateTime start = this.getOpenRangeStart(Time[0]);
             DateTime start_date = start.Date;
             DateTime end = this.getOpenRangeEnd(start);
 
@@ -198,22 +209,22 @@ namespace AgenaTrader.UserCode
                 this.RangeLow = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
                 this.RangeHigh = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
 
-                DrawRectangle("ORBRect" + start_date.Ticks, true, start, this.RangeLow, end, this.RangeHigh, this.Color_ORB, this.Color_ORB, 70);
-                DrawText("ORBRangeString" + start_date.Ticks, true, Math.Round((this.RangeHeight), 2).ToString(), start, this.RangeHigh, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, this.Color_ORB, 70);
+                DrawRectangle("ORBRect" + start_date.Ticks, true, start, this.RangeLow, end, this.RangeHigh, this.Color_ORB, this.Color_ORB, this.Opacity);
+                DrawText("ORBRangeString" + start_date.Ticks, true, Math.Round((this.RangeHeight), 2).ToString(), start, this.RangeHigh, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, this.Color_ORB, this.Opacity);
 
                 //if we are live on the trading day
                 if (DateTime.Now.Date == start_date)
                 {
                     DrawHorizontalLine("LowLine" + start_date.Ticks, true, this.RangeLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                     DrawHorizontalLine("HighLine" + start_date.Ticks, true, this.RangeHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
-                    DrawVerticalLine("BeginnSession" + start_date.Ticks, start_date, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                    DrawVerticalLine("BeginnSession" + start_date.Ticks, start, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                 }
 
                 //Targets
                 double target_long = this.RangeHigh + this.RangeHeight;
                 double target_short = this.RangeLow - this.RangeHeight;
-                DrawRectangle("TargetAreaLong" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeHigh, this.getEndOfTradingDay(start_date), target_long, this.Color_TargetAreaLong, this.Color_TargetAreaLong, 70);
-                DrawRectangle("TargetAreaShort" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeLow, this.getEndOfTradingDay(start_date), target_short, this.Color_TargetAreaShort, this.Color_TargetAreaShort, 70);
+                DrawRectangle("TargetAreaLong" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeHigh, this.getEndOfTradingDay(start_date), target_long, this.Color_TargetAreaLong, this.Color_TargetAreaLong, this.Opacity);
+                DrawRectangle("TargetAreaShort" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeLow, this.getEndOfTradingDay(start_date), target_short, this.Color_TargetAreaShort, this.Color_TargetAreaShort, this.Opacity);
 
                 //load the data after the open range
                 list = Bars.Where(x => x.Time >= end).Where(x => x.Time <= this.getEndOfTradingDay(start));
@@ -222,32 +233,30 @@ namespace AgenaTrader.UserCode
                 long_breakout = list.Where(x => x.Close > this.RangeHigh).FirstOrDefault();
                 if (long_breakout != null)
                 {
-                    DrawArrowUp("ArrowLong" + start_date.Ticks, true, long_breakout.Time, long_breakout.Low - 100 * TickSize, Color.Green);
+                    DrawArrowUp("ArrowLong" + start_date.Ticks, true, long_breakout.Time, long_breakout.Low, Color.Green);
                 }
 
                 //find the first breakout to the short side
                 short_breakout = list.Where(x => x.Close < this.RangeLow).FirstOrDefault();
                 if (short_breakout != null)
                 {
-                    DrawArrowDown("ArrowShort" + start_date.Ticks, true, short_breakout.Time, short_breakout.High + 100 * TickSize, Color.Red);
+                    DrawArrowDown("ArrowShort" + start_date.Ticks, true, short_breakout.Time, short_breakout.High, Color.Red);
                 }
 
                 //find the first target to the long side
                 long_target_reached = list.Where(x => x.Close > target_long).FirstOrDefault();
                 if (long_target_reached != null)
                 {
-                    DrawArrowDown("ArrowTargetLong" + start_date.Ticks, true, long_target_reached.Time, long_target_reached.High + 100 * TickSize, Color.Red);
+                    DrawArrowDown("ArrowTargetLong" + start_date.Ticks, true, long_target_reached.Time, long_target_reached.High, Color.Red);
                 }
 
                 //find the first target to the short side
                 short_target_reached = list.Where(x => x.Close < target_short).FirstOrDefault();
                 if (short_target_reached != null)
                 {
-                    DrawArrowUp("ArrowTargetShort" + start_date.Ticks, true, short_target_reached.Time, short_target_reached.Low - 100 * TickSize, Color.Green);
+                    DrawArrowUp("ArrowTargetShort" + start_date.Ticks, true, short_target_reached.Time, short_target_reached.Low, Color.Green);
                 }
-
             }
-
         }
 
 
@@ -273,10 +282,6 @@ namespace AgenaTrader.UserCode
                 //return new TimeSpan(15,30,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartUS.Hours, this._tim_OpenRangeStartUS.Minutes, this._tim_OpenRangeStartUS.Seconds);
             }
-            //else
-            //{
-            //    returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartDE.Hours, this._tim_OpenRangeStartDE.Minutes, this._tim_OpenRangeStartDE.Seconds);
-            //}
             return returnvalue;
         }
 
@@ -311,12 +316,33 @@ namespace AgenaTrader.UserCode
                 //return new TimeSpan(15,30,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_EndOfDay_US.Hours, this._tim_EndOfDay_US.Minutes, this._tim_EndOfDay_US.Seconds);
             }
-            //else
-            //{
-            //    returnvalue = new DateTime(date.Year, date.Month, date.Day, this.Time_EndOfDay_DE.Hours, this.Time_EndOfDay_DE.Minutes, this.Time_EndOfDay_DE.Seconds);
-            //}
-
             return returnvalue;
+        }
+
+        /// <summary>
+        /// True if the Periodicity of the data feed is correct for this indicator.
+        /// </summary>
+        /// <returns></returns>
+        private bool DatafeedPeriodicityIsValid {
+            get {
+                TimeFrame tf = (TimeFrame)Bars.TimeFrame;
+                if (tf.Periodicity == DatafeedHistoryPeriodicity.Tick || tf.Periodicity == DatafeedHistoryPeriodicity.Second )
+                {
+                    return true;
+                }
+                else if(tf.Periodicity == DatafeedHistoryPeriodicity.Minute) {
+                    //Periodicity in minutes is right but in this case we need to check the modulus!
+                    if (this.ORBMinutes % tf.PeriodicityValue == 0)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+                else
+                {
+                    return false;
+                }
+            }
         }
 
 
@@ -349,9 +375,37 @@ namespace AgenaTrader.UserCode
         public int ORBMinutes
         {
             get { return _orbminutes; }
-            set { _orbminutes = value; }
+            set {
+                if (value >= 1 && value <= 300)
+                {
+                    _orbminutes = value;
+                }
+                else
+                {
+                    _orbminutes = Const.DefaultOpenRangeSizeinMinutes;
+                }
+            }
         }
-
+        
+        /// <summary>
+        /// </summary>
+        [Description("Opacity for Drawing")]
+        [Category("Colors")]
+        [DisplayName("Opacity")]
+        public int Opacity
+        {
+            get { return _opacity; }
+            set {
+                    if (value >= 1 && value <= 100)
+                    {
+                        _opacity = value;
+                    }
+                    else
+                    {
+                        _opacity = Const.DefaultOpacity;
+                    }
+            }
+        }
 
 
         [XmlIgnore()]
@@ -464,23 +518,6 @@ namespace AgenaTrader.UserCode
             set { _tim_OpenRangeStartDE = new TimeSpan(value); }
         }
 
-        ///// <summary>
-        ///// </summary>
-        //[Description("OpenRange DE End: Uhrzeit wann Range geschlossen wird")]
-        //[Category("TimeSpan")]
-        //[DisplayName("2. OpenRange End DE")]
-        //public TimeSpan Time_OpenRangeEndDE
-        //{
-        //    get { return _tim_OpenRangeEndDE; }
-        //    set { _tim_OpenRangeEndDE = value; }
-        //}
-        //[Browsable(false)]
-        //public long Time_OpenRangeEndDESerialize
-        //{
-        //    get { return _tim_OpenRangeEndDE.Ticks; }
-        //    set { _tim_OpenRangeEndDE = new TimeSpan(value); }
-        //}
-
         /// <summary>
         /// </summary>
         [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
@@ -498,22 +535,6 @@ namespace AgenaTrader.UserCode
             set { _tim_OpenRangeStartUS = new TimeSpan(value); }
         }
 
-        ///// <summary>
-        ///// </summary>
-        //[Description("OpenRange US End: Uhrzeit wann Range geschlossen wird")]
-        //[Category("TimeSpan")]
-        //[DisplayName("4. OpenRange End US")]
-        //public TimeSpan Time_OpenRangeEndUS
-        //{
-        //    get { return _tim_OpenRangeEndUS; }
-        //    set { _tim_OpenRangeEndUS = value; }
-        //}
-        //[Browsable(false)]
-        //public long Time_OpenRangeEndUSSerialize
-        //{
-        //    get { return _tim_OpenRangeEndUS.Ticks; }
-        //    set { _tim_OpenRangeEndUS = new TimeSpan(value); }
-        //}
 
         /// <summary>
         /// </summary>
@@ -782,3 +803,4 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
