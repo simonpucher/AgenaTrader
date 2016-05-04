@@ -12,9 +12,13 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
+/// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -24,19 +28,17 @@ namespace AgenaTrader.UserCode
 	public class FindHighLowTimeFrame_Indicator : UserIndicator
 	{
         //input
-        private int _opacity = 70;
-        private Color _currentsessionlinecolor = Color.Brown;
-        private Color _col_timeframe = Color.Brown;
-        private int _currentsessionlinewidth = 1;
-        private DashStyle _currentsessionlinestyle = DashStyle.Solid;
+        private int _opacity = Const.DefaultOpacity;
+        private Color _currentsessionlinecolor = Const.DefaultIndicatorColor;
+        private Color _col_timeframe = Const.DefaultIndicatorColor;
+        private int _currentsessionlinewidth = Const.DefaultLineWidth_small;
+        private DashStyle _currentsessionlinestyle = Const.DefaultIndicatorDashStyle;
         private TimeSpan _tim_start = new TimeSpan(12, 0, 0);
         private TimeSpan _tim_end = new TimeSpan(13, 0, 0);
 
         //output
         private double _lastlow = Double.NaN;
         private double _lasthigh = Double.NaN;
-
-
 
         //internal
         private DateTime _currentdayofupdate = DateTime.MinValue;
@@ -99,13 +101,15 @@ namespace AgenaTrader.UserCode
                 //Draw current lines for this day session
                 if (Time[0].Date == DateTime.Now.Date)
                 {
-                    DrawHorizontalLine("LowLine" + start.Ticks, true, this.LastLow, this.CurrentSessionLineColor, DashStyle.Solid, 2);
-                    DrawHorizontalLine("HighLine" + start.Ticks, true, this.LastHigh, this.CurrentSessionLineColor, DashStyle.Solid, 2);
+                    DrawHorizontalLine("LowLine" + start.Ticks, true, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                    DrawHorizontalLine("HighLine" + start.Ticks, true, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                 }
 
                 //Draw a rectangle at the dedicated time frame
                 DrawRectangle("HighLowRect" + start.Ticks, true, start, this.LastLow, end, this.LastHigh, this.Color_TimeFrame, this.Color_TimeFrame, this.Opacity);
             }
+
+            //Print(start.ToString() + " - Low: " + this.LastLow + " - High: " + this.LastHigh);
         }
 
 
@@ -146,7 +150,7 @@ namespace AgenaTrader.UserCode
                 }
                 else
                 {
-                    _opacity = 70;
+                    _opacity = Const.DefaultOpacity;
                 }
             }
         }
