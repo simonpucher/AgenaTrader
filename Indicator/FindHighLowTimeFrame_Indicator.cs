@@ -33,6 +33,10 @@ namespace AgenaTrader.UserCode
         private TimeSpan _tim_end = new TimeSpan(13, 0, 0);
 
         //output
+        private double _lastlow = Double.NaN;
+        private double _lasthigh = Double.NaN;
+
+
 
         //internal
         private DateTime _currentdayofupdate = DateTime.MinValue;
@@ -88,18 +92,19 @@ namespace AgenaTrader.UserCode
 
             if (isvalidtimeframe)
             {
-                double low = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
-                double high = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
+                //We save the high and low values in public variables to get access from other scripts
+                this.LastLow = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
+                this.LastHigh = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
 
                 //Draw current lines for this day session
                 if (Time[0].Date == DateTime.Now.Date)
                 {
-                    DrawHorizontalLine("LowLine" + start.Ticks, true, low, this.CurrentSessionLineColor, DashStyle.Solid, 2);
-                    DrawHorizontalLine("HighLine" + start.Ticks, true, high, this.CurrentSessionLineColor, DashStyle.Solid, 2);
+                    DrawHorizontalLine("LowLine" + start.Ticks, true, this.LastLow, this.CurrentSessionLineColor, DashStyle.Solid, 2);
+                    DrawHorizontalLine("HighLine" + start.Ticks, true, this.LastHigh, this.CurrentSessionLineColor, DashStyle.Solid, 2);
                 }
 
                 //Draw a rectangle at the dedicated time frame
-                DrawRectangle("HighLowRect" + start.Ticks, true, start, low, end, high, this.Color_TimeFrame, this.Color_TimeFrame, this.Opacity);
+                DrawRectangle("HighLowRect" + start.Ticks, true, start, this.LastLow, end, this.LastHigh, this.Color_TimeFrame, this.Color_TimeFrame, this.Opacity);
             }
         }
 
@@ -206,8 +211,6 @@ namespace AgenaTrader.UserCode
             set { _col_timeframe = SerializableColor.FromString(value); }
         }
 
-        #endregion
-
         //[Browsable(false)]
         //[XmlIgnore()]
         //public DataSeries MyPlot1
@@ -236,7 +239,7 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-         [Description("The end time of the time frame.")]
+        [Description("The end time of the time frame.")]
         [Category("TimeSpan")]
         [DisplayName("End")]
         public TimeSpan Time_End
@@ -245,15 +248,46 @@ namespace AgenaTrader.UserCode
             set { _tim_end = value; }
         }
         [Browsable(false)]
-         public long Time_EndSerialize
+        public long Time_EndSerialize
         {
             get { return _tim_end.Ticks; }
             set { _tim_end = new TimeSpan(value); }
         }
 
 
-		#endregion
-	}
+        #endregion
+
+       
+
+
+        #region Output
+
+            /// <summary>
+            /// Last Low Values in dedicated time frame.
+            /// </summary>
+            [Browsable(false)]
+            [XmlIgnore()]
+            public double LastLow
+            {
+                get { return _lastlow; }
+                set { _lastlow = value; }
+            }
+
+            /// <summary>
+            /// Last High Values in dedicated time frame.
+            /// </summary>
+            [Browsable(false)]
+            [XmlIgnore()]
+            public double LastHigh
+            {
+                get { return _lasthigh; }
+                set { _lasthigh = value; }
+            }
+
+        #endregion
+
+        #endregion
+    }
 }
 
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
