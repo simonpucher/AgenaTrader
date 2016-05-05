@@ -18,6 +18,10 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
+/// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode
@@ -70,13 +74,6 @@ namespace AgenaTrader.UserCode
 			CalculateOnBarClose = true;
 		}
 
-        protected override void OnStartUp()
-        {
-            base.OnStartUp();
-
-            _orb_indicator = new ORB_Indicator();
-        }
-
         protected override void InitRequirements()
         {
             base.InitRequirements();
@@ -84,9 +81,20 @@ namespace AgenaTrader.UserCode
 
         }
 
+
+        protected override void OnStartUp()
+        {
+            base.OnStartUp();
+
+            _orb_indicator = new ORB_Indicator();
+        }
+
+       
+
 		protected override void OnBarUpdate()
 		{
-    
+            Print(_orb_indicator.RangeLow);
+
             //Initalize Indicator parameters
             _orb_indicator.ORBMinutes = this.ORBMinutes;
             _orb_indicator.Time_OpenRangeStartDE = this.Time_OpenRangeStartDE;
@@ -95,6 +103,8 @@ namespace AgenaTrader.UserCode
             //_orb_indicator.Time_OpenRangeEndUS = this.Time_OpenRangeEndUS;
             _orb_indicator.Time_EndOfDay_DE = this.Time_EndOfDay_DE;
             _orb_indicator.Time_EndOfDay_US = this.Time_EndOfDay_US;
+
+          
 
             switch ((int)_orb_indicator[0])
             {

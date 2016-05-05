@@ -101,12 +101,21 @@ namespace AgenaTrader.UserCode
         private DateTime currentdayofupdate = DateTime.MinValue;
         private ITimePeriod timeperiod = null;
 
+        /// <summary>
+        /// If we use this indicator from another script we need to initalize all important data.
+        /// </summary>
+        public ORB_Indicator() { 
+        
+        }
 
 		protected override void Initialize()
 		{
             Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "IndicatorPlot1"));
             Overlay = false;
             CalculateOnBarClose = true;
+
+            //We are able to start at the first bar.
+            this.BarsRequired = 0;
 		}
 
         protected override void InitRequirements()
@@ -176,7 +185,7 @@ namespace AgenaTrader.UserCode
 
                 //When finished set the last day variable
                 //If we are online during the day session we do not set this variable so we áre redrawing and recalculating the current session 
-                if (Time[0].Date != DateTime.Now.Date)
+                if (Time[0].Date != Bars.Last().Time.Date)
                 {
                     currentdayofupdate = Time[0].Date;   
                 }
@@ -221,7 +230,7 @@ namespace AgenaTrader.UserCode
                 DrawText("ORBRangeString" + start_date.Ticks, true, Math.Round((this.RangeHeight), 2).ToString(), start, this.RangeHigh, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, this.Color_ORB, this.Opacity);
 
                 //if we are live on the trading day
-                if (DateTime.Now.Date == start_date)
+                if (Bars.Last().Time.Date == start_date)
                 {
                     DrawHorizontalLine("LowLine" + start_date.Ticks, true, this.RangeLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                     DrawHorizontalLine("HighLine" + start_date.Ticks, true, this.RangeHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
