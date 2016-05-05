@@ -86,6 +86,7 @@ namespace AgenaTrader.UserCode
         {
             base.OnStartUp();
 
+            //Init our indicator to get code access
             this._orb_indicator = new ORB_Indicator();
             this._orb_indicator.SetData(this.Instrument, this.Bars);
 
@@ -105,7 +106,7 @@ namespace AgenaTrader.UserCode
 		{
             Print(_orb_indicator.RangeLow);
 
-            switch ((int)_orb_indicator.goforit(Bars[0]))
+            switch ((int)_orb_indicator.calculate(Bars[0]))
             {
                 case 1:
                    //Long Signal
