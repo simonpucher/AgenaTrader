@@ -104,26 +104,48 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnBarUpdate()
 		{
-            Print(_orb_indicator.RangeLow);
+            int returnvalue = _orb_indicator.calculate(Bars[0]);
+            //Occurred.Set(returnvalue);
+            //Entry.Set(Bars[0].Close);
 
-            switch ((int)_orb_indicator.calculate(Bars[0]))
+            if (_orb_indicator.long_breakout != null && _orb_indicator.long_breakout.Time == Bars[0].Time)
             {
-                case 1:
-                   //Long Signal
-                    Occurred.Set(1);
-                    Entry.Set(Close[0]);
-                    break;
-                case -1:
-                  //Short Signal
-                    Occurred.Set(-1);
-                    Entry.Set(Close[0]);
-                    break;
-                default:
-                    //nothing to do
-                    Occurred.Set(0);
-                    Entry.Set(Close[0]);
-                    break;
+                //Long Signal
+                Occurred.Set(1);
+                Entry.Set(Close[0]);
             }
+            else if (_orb_indicator.short_breakout != null && _orb_indicator.short_breakout.Time == Bars[0].Time)
+            {
+                //Short Signal
+                Occurred.Set(-1);
+                Entry.Set(Close[0]);
+            }
+            else
+            {
+                //No Signal
+                Occurred.Set(0);
+                Entry.Set(Close[0]);
+            }
+
+
+            //switch ((int)returnvalue)
+            //{
+            //    case 1:
+            //       //Long Signal
+            //        Occurred.Set(1);
+            //        Entry.Set(Close[0]);
+            //        break;
+            //    case -1:
+            //      //Short Signal
+            //        Occurred.Set(-1);
+            //        Entry.Set(Close[0]);
+            //        break;
+            //    default:
+            //        //nothing to do
+            //        Occurred.Set(0);
+            //        Entry.Set(Close[0]);
+            //        break;
+            //}
 
 
 

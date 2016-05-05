@@ -96,8 +96,8 @@ namespace AgenaTrader.UserCode
         //internal 
         private IBar long_breakout = null;
         private IBar short_breakout = null;
-        private IBar long_target_reached = null;
-        private IBar short_target_reached = null;
+        public IBar long_target_reached = null;
+        public IBar short_target_reached = null;
         private DateTime currentdayofupdate = DateTime.MinValue;
         private ITimePeriod timeperiod = null;
         private IBars bardata = null;
@@ -162,24 +162,24 @@ namespace AgenaTrader.UserCode
                 int resultvalue = calculate(Bars[0]);
 
                 //Set Value in indicator
-                Value.Set(resultvalue);
+                //Value.Set(resultvalue);
 
                 //Set the indicator value on each bar update
                if (long_breakout != null && long_breakout.Time == Bars[0].Time)
                 {
                     BarColor = Color.Turquoise;
-                    //Value.Set(1);
+                    Value.Set(1);
                     DrawArrowUp("ArrowLong" + Bars[0].Time.Date.Ticks, true, long_breakout.Time, long_breakout.Low, Color.Green);
                 }
                else if (short_breakout != null && short_breakout.Time == Bars[0].Time)
                 {
                     BarColor = Color.Purple;
-                    //Value.Set(-1);
+                    Value.Set(-1);
                     DrawArrowDown("ArrowShort" + Bars[0].Time.Date.Ticks, true, short_breakout.Time, short_breakout.High, Color.Red);
                 }
                 else
                 {
-                    //Value.Set(0);
+                    Value.Set(0);
                 }
 
                 //Set the color
@@ -262,17 +262,25 @@ namespace AgenaTrader.UserCode
 
                     //find the first breakout to the long side
                     long_breakout = list.Where(x => x.Close > this.RangeHigh).FirstOrDefault();
-                    if ((long_breakout != null && currentbar.Time.Date != this.bardata.Last().Time.Date) || (long_breakout != null && currentbar.Time.Date == this.bardata.Last().Time.Date && long_breakout.Time == currentbar.Time))
+                    if (long_breakout != null)
                     {
-                        returnvalue = 1;
+                        if ((currentbar.Time.Date != this.bardata.Last().Time.Date) || (currentbar.Time.Date == this.bardata.Last().Time.Date && long_breakout.Time == currentbar.Time))
+                        {
+                            returnvalue = 1;
+                        }
                     }
+                  
 
                     //find the first breakout to the short side
                     short_breakout = list.Where(x => x.Close < this.RangeLow).FirstOrDefault();
-                    if ((short_breakout != null && currentbar.Time.Date != this.bardata.Last().Time.Date) || (short_breakout != null && currentbar.Time.Date == this.bardata.Last().Time.Date && short_breakout.Time == currentbar.Time))
+                    if (short_breakout != null)
                     {
-                        returnvalue = -1;
+                        if ((currentbar.Time.Date != this.bardata.Last().Time.Date) || (currentbar.Time.Date == this.bardata.Last().Time.Date && short_breakout.Time == currentbar.Time))
+                        {
+                            returnvalue = -1;
+                        }   
                     }
+
 
                     if (shoulddrawonchart)
                     {
@@ -302,7 +310,7 @@ namespace AgenaTrader.UserCode
                 currentdayofupdate = currentbar.Time.Date;
             }
             else { 
-            
+                //the last session has started.
             }
 
             return returnvalue;
