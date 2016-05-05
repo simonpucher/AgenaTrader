@@ -86,14 +86,8 @@ namespace AgenaTrader.UserCode
         {
             base.OnStartUp();
 
-            _orb_indicator = new ORB_Indicator();
-        }
-
-       
-
-		protected override void OnBarUpdate()
-		{
-            Print(_orb_indicator.RangeLow);
+            this._orb_indicator = new ORB_Indicator();
+            this._orb_indicator.SetData(this.Instrument, this.Bars);
 
             //Initalize Indicator parameters
             _orb_indicator.ORBMinutes = this.ORBMinutes;
@@ -103,10 +97,15 @@ namespace AgenaTrader.UserCode
             //_orb_indicator.Time_OpenRangeEndUS = this.Time_OpenRangeEndUS;
             _orb_indicator.Time_EndOfDay_DE = this.Time_EndOfDay_DE;
             _orb_indicator.Time_EndOfDay_US = this.Time_EndOfDay_US;
+        }
 
-          
+       
 
-            switch ((int)_orb_indicator[0])
+		protected override void OnBarUpdate()
+		{
+            Print(_orb_indicator.RangeLow);
+
+            switch ((int)_orb_indicator.goforit(Bars[0]))
             {
                 case 1:
                    //Long Signal
