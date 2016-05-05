@@ -162,22 +162,37 @@ namespace AgenaTrader.UserCode
 
             #region Bars
 
+            /// <summary>
+            /// Returns the first Bar of the latest(=current) Session.
+            /// </summary>
+            /// <param name="Bars"></param>
+            /// <param name="Date"></param>
+            /// <returns></returns>
             public static IBar GetFirstBarOfCurrentSession(IBars Bars, DateTime Date)
             {
-                //returns the first Bar of the latest(=current) Session
                 return Bars.Where(x => x.Time.Date == Date).FirstOrDefault();
             }
 
+            /// <summary>
+            /// Returns the Last Bar of the last Session
+            /// During Simulation the latest session could also be a date older than today.
+            /// </summary>
+            /// <param name="Bars"></param>
+            /// <param name="Date"></param>
+            /// <returns></returns>
             public static IBar GetLastBarOfLastSession(IBars Bars, DateTime Date)
             {
-                //returns the Last Bar of the last Session
                 return Bars.Where(x => x.Time.Date < Date).LastOrDefault();
             }
 
-
+            /// <summary>
+            /// HighestHigh Method is not available in Conditions, therefore this alternative can be used
+            /// </summary>
+            /// <param name="Bars"></param>
+            /// <param name="BarsAgo"></param>
+            /// <returns></returns>
             public static double GetHighestHigh(IBars Bars, int BarsAgo)
             {
-                //HighestHigh Method is not available in Conditions, therefore this alternative can be used
                 double HighestHigh = 0;
                 for (int i = 1; i <= BarsAgo; i++)
 
@@ -188,10 +203,14 @@ namespace AgenaTrader.UserCode
                 return HighestHigh;
             }
 
-
+            /// <summary>
+            /// LowestLow Method is not available in Conditions, therefore this alternative can be used
+            /// </summary>
+            /// <param name="Bars"></param>
+            /// <param name="BarsAgo"></param>
+            /// <returns></returns>
             public static double GetLowestLow(IBars Bars, int BarsAgo)
             {
-                //LowestLow Method is not available in Conditions, therefore this alternative can be used
                 double LowestLow = 9999999999;
                 for (int i = 1; i <= BarsAgo; i++)
                     if (LowestLow > Bars[i].Low)
