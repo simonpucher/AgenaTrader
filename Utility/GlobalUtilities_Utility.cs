@@ -23,37 +23,41 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public static class Const {
 
-        //Default Strings
-        public const string DefaultStringDatafeedPeriodicity = "Periodicity of your data feed is suboptimal for this indicator!";
-
-        //Default values for indicators
-        public const int DefaultOpenRangeSizeinMinutes = 75;
-
-        //Default opacity for drawing
-        public const int DefaultOpacity = 70;
-        public const int DefaultLineWidth = 2;
-        public const int DefaultLineWidth_small = 1;
-        public const int DefaultLineWidth_large = 3;
-        public static readonly Color DefaultIndicatorColor = Color.Orange;
-        public static readonly DashStyle DefaultIndicatorDashStyle = DashStyle.Solid;
-
-
-    }
-
-    /// <summary>
-    /// Global static Helper.
-    /// </summary>
-    public static class GlobalUtilities
-    {
-
-        #region Colors
+    #region Static Classes
 
         /// <summary>
+        /// 
+        /// </summary>
+        public static class Const
+        {
+
+            //Default Strings
+            public const string DefaultStringDatafeedPeriodicity = "Periodicity of your data feed is suboptimal for this indicator!";
+
+            //Default values for indicators
+            public const int DefaultOpenRangeSizeinMinutes = 75;
+
+            //Default opacity for drawing
+            public const int DefaultOpacity = 70;
+            public const int DefaultLineWidth = 2;
+            public const int DefaultLineWidth_small = 1;
+            public const int DefaultLineWidth_large = 3;
+            public static readonly Color DefaultIndicatorColor = Color.Orange;
+            public static readonly DashStyle DefaultIndicatorDashStyle = DashStyle.Solid;
+
+
+        }
+
+        /// <summary>
+        /// Global static Helper.
+        /// </summary>
+        public static class GlobalUtilities
+        {
+
+            #region Colors
+
+            /// <summary>
             /// Adjust the brightness of a color. 
             /// e.g. use this function to create a similiar color in a button click event or on mouse hover.
             /// </summary>
@@ -77,9 +81,9 @@ namespace AgenaTrader.UserCode
                 return Color.FromArgb((int)(originalColour.A * opacityFactor), originalColour.R, originalColour.G, originalColour.B);
             }
 
-        #endregion
+            #endregion
 
-        #region Email
+            #region Email
 
             /// <summary>
             /// True if the email address is valid.
@@ -110,9 +114,9 @@ namespace AgenaTrader.UserCode
             }
 
 
-        #endregion
+            #endregion
 
-        #region Markets
+            #region Markets
 
             public static TimeSpan GetOfficialMarketOpeningTime(string Symbol)
             {
@@ -154,9 +158,9 @@ namespace AgenaTrader.UserCode
             }
 
 
-        #endregion
+            #endregion
 
-        #region Bars
+            #region Bars
 
             public static IBar GetFirstBarOfCurrentSession(IBars Bars, DateTime Date)
             {
@@ -185,45 +189,45 @@ namespace AgenaTrader.UserCode
             }
 
 
-        public static double GetLowestLow(IBars Bars, int BarsAgo)
-        {
-            //LowestLow Method is not available in Conditions, therefore this alternative can be used
-            double LowestLow = 9999999999;
-            for (int i = 1; i <= BarsAgo; i++)
-                if (LowestLow > Bars[i].Low)
-                {
-                    LowestLow = Bars[i].Low;
-                }
-            ;
-            return LowestLow;
-        }
-#endregion
+            public static double GetLowestLow(IBars Bars, int BarsAgo)
+            {
+                //LowestLow Method is not available in Conditions, therefore this alternative can be used
+                double LowestLow = 9999999999;
+                for (int i = 1; i <= BarsAgo; i++)
+                    if (LowestLow > Bars[i].Low)
+                    {
+                        LowestLow = Bars[i].Low;
+                    }
+                ;
+                return LowestLow;
+            }
+            #endregion
 
-        #region DateTimeHelpers taken from  http://www.codeproject.com/Articles/9706/C-DateTime-Library
+            #region DateTimeHelpers taken from  http://www.codeproject.com/Articles/9706/C-DateTime-Library
 
-        public enum Quarter
-        {
-            First = 1,
-            Second = 2,
-            Third = 3,
-            Fourth = 4
-        }
+            public enum Quarter
+            {
+                First = 1,
+                Second = 2,
+                Third = 3,
+                Fourth = 4
+            }
 
-        public enum Month
-        {
-            January = 1,
-            February = 2,
-            March = 3,
-            April = 4,
-            May = 5,
-            June = 6,
-            July = 7,
-            August = 8,
-            September = 9,
-            October = 10,
-            November = 11,
-            December = 12
-        }
+            public enum Month
+            {
+                January = 1,
+                February = 2,
+                March = 3,
+                April = 4,
+                May = 5,
+                June = 6,
+                July = 7,
+                August = 8,
+                September = 9,
+                October = 10,
+                November = 11,
+                December = 12
+            }
 
             public static DateTime GetStartOfQuarter(int Year, Quarter Qtr)
             {
@@ -291,7 +295,7 @@ namespace AgenaTrader.UserCode
             {
                 return GetEndOfQuarter(DateTime.Now.Year, GetQuarter((Month)DateTime.Now.Month));
             }
-           
+
             public static DateTime GetStartOfLastWeek()
             {
                 int DaysToSubtract = (int)DateTime.Now.DayOfWeek + 7;
@@ -317,7 +321,7 @@ namespace AgenaTrader.UserCode
                 DateTime dt = GetStartOfCurrentWeek().AddDays(6);
                 return new DateTime(dt.Year, dt.Month, dt.Day, 23, 59, 59, 999);
             }
-    
+
 
             public static DateTime GetStartOfMonth(Month Month, int Year)
             {
@@ -354,7 +358,7 @@ namespace AgenaTrader.UserCode
             {
                 return GetEndOfMonth((Month)DateTime.Now.Month, DateTime.Now.Year);
             }
-    
+
             public static DateTime GetStartOfYear(int Year)
             {
                 return new DateTime(Year, 1, 1, 0, 0, 0, 0);
@@ -384,7 +388,7 @@ namespace AgenaTrader.UserCode
             {
                 return GetEndOfYear(DateTime.Now.Year);
             }
-    
+
             public static DateTime GetStartOfDay(DateTime date)
             {
                 return new DateTime(date.Year, date.Month, date.Day, 0, 0, 0, 0);
@@ -394,10 +398,83 @@ namespace AgenaTrader.UserCode
             {
                 return new DateTime(date.Year, date.Month, date.Day, 23, 59, 59, 999);
             }
-       
+
+            #endregion
+
+        }
+    
+    #endregion
+
+
+
+    #region Utility Classes
+
+    /// <summary>
+    /// Statistic object to compare strategies.
+    /// </summary>
+    public class Statistic {
+
+        public Statistic(string nameofthestrategy) {
+            this.NameOfTheStrategy = nameofthestrategy;
+        }
+
+        /// <summary>
+        /// Returns a string with csv data.
+        /// </summary>
+        /// <returns></returns>
+        public string getCSVData()
+        {
+            return string.Format("{0},{1},{2},{3},{4},{5}", this.NameOfTheStrategy, "Long or Short", this.EntryDateTime.ToString(), this.ExitDateTime.ToString(), this.MinutesInMarket, this.Instrument);
+        }
+
+        #region Properties
+
+        private string _nameofthestrategy = null;
+        public string NameOfTheStrategy
+        {
+            get { return _nameofthestrategy; }
+            set { _nameofthestrategy = value; }
+        }
+
+        private DateTime _entrydatetime = DateTime.MinValue;
+
+        public DateTime EntryDateTime
+        {
+            get { return _entrydatetime; }
+            set { _entrydatetime = value; }
+        }
+
+        private DateTime _exitdatetime = DateTime.MinValue;
+
+        public DateTime ExitDateTime
+        {
+            get { return _exitdatetime; }
+            set { _exitdatetime = value; }
+        }
+
+        public double MinutesInMarket {
+            get {
+                return this.ExitDateTime.Subtract(this.EntryDateTime).TotalMinutes;
+            }
+        }
+
+
+        private string _instrument = String.Empty;
+
+        public string Instrument
+        {
+            get { return _instrument; }
+            set { _instrument = value; }
+        }
+
+
         #endregion
 
+
     }
+
+    #endregion
+
 }
 
 /// <summary>
@@ -440,3 +517,5 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
+
