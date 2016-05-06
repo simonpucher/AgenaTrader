@@ -105,7 +105,6 @@ namespace AgenaTrader.UserCode
         private bool _shoulddrawonchart = true;
 
 
-   
 
         /// <summary>
         /// If we use this indicator from another script we need to initalize all important data first.
