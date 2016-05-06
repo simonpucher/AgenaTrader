@@ -18,6 +18,14 @@ using System.Globalization;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
+/// The initial version of this strategy was inspired by the work of Birger Schäfermeier: https://www.whselfinvest.at/de/Store_Birger_Schaefermeier_Trading_Strategie_Open_Range_Break_Out.php
+/// Further developments are inspired by the work of Mehmet Emre Cekirdekci and Veselin Iliev from the Worcester Polytechnic Institute (2010)
+/// Trading System Development: Trading the Opening Range Breakouts https://www.wpi.edu/Pubs/E-project/Available/E-project-042910-142422/unrestricted/Veselin_Iliev_IQP.pdf
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
+/// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode
@@ -88,23 +96,40 @@ namespace AgenaTrader.UserCode
         //internal 
         private IBar long_breakout = null;
         private IBar short_breakout = null;
-        private IBar long_target_reached = null;
-        private IBar short_target_reached = null;
+        public IBar long_target_reached = null;
+        public IBar short_target_reached = null;
         private DateTime currentdayofupdate = DateTime.MinValue;
         private ITimePeriod timeperiod = null;
+        private IBars bardata = null;
+        private bool shoulddrawonchart = true;
 
+   
+
+        /// <summary>
+        /// If we use this indicator from another script we need to initalize all important data first.
+        /// </summary>
+        public void SetData(IInstrument instrument, IBars bars)
+        {
+            this.timeperiod = this.Root.Core.MarketplaceManager.GetExchangeDescription(instrument.Exchange).TradingHours;
+            this.bardata = bars;
+
+            //We do not need to draw any chart
+            shoulddrawonchart = false;
+        }
 
 		protected override void Initialize()
 		{
             Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "IndicatorPlot1"));
             Overlay = false;
             CalculateOnBarClose = true;
+
+            //We are able to start at the first bar.
+            this.BarsRequired = 0;
 		}
 
         protected override void InitRequirements()
         {
             //Print("InitRequirements");
-
             //Add(DatafeedHistoryPeriodicity.Minute, 1);
         }
 
@@ -117,6 +142,8 @@ namespace AgenaTrader.UserCode
             //Print(exdescrip.TradingHours);
 
             timeperiod = this.Root.Core.MarketplaceManager.GetExchangeDescription(this.Instrument.Exchange).TradingHours;
+
+            this.bardata = Bars;
 
             ////Check if datafeed periodicity is the right one for this indicator
             //if (this.DatafeedPeriodicityIsValid)
@@ -132,28 +159,23 @@ namespace AgenaTrader.UserCode
 		{
             if (this.DatafeedPeriodicityIsValid)
             {
-               //new day session is beginning so we need to calculate the open range breakout
-                if (currentdayofupdate.Date < Time[0].Date) 
-                {
-                    //reset session day data
-                    this.long_breakout = null;
-                    this.short_breakout = null;
+                int resultvalue = calculate(Bars[0]);
 
-                    //draw the open range
-                    calculateanddrawOpenRange();
-                }
-
+                //Set Value in indicator
+                //Value.Set(resultvalue);
 
                 //Set the indicator value on each bar update
-                if (long_breakout != null && long_breakout.Time == Bars[0].Time)
+               if (long_breakout != null && long_breakout.Time == Bars[0].Time)
                 {
                     BarColor = Color.Turquoise;
                     Value.Set(1);
+                    DrawArrowUp("ArrowLong" + Bars[0].Time.Date.Ticks, true, long_breakout.Time, long_breakout.Low, Color.Green);
                 }
-                else if (short_breakout != null && short_breakout.Time == Bars[0].Time)
+               else if (short_breakout != null && short_breakout.Time == Bars[0].Time)
                 {
                     BarColor = Color.Purple;
                     Value.Set(-1);
+                    DrawArrowDown("ArrowShort" + Bars[0].Time.Date.Ticks, true, short_breakout.Time, short_breakout.High, Color.Red);
                 }
                 else
                 {
@@ -164,14 +186,6 @@ namespace AgenaTrader.UserCode
                 PlotColors[0][0] = this.Plot1Color;
                 Plots[0].PenStyle = this.Dash0Style;
                 Plots[0].Pen.Width = this.Plot0Width;
-
-
-                //When finished set the last day variable
-                //If we are online during the day session we do not set this variable so we áre redrawing and recalculating the current session 
-                if (Time[0].Date != DateTime.Now.Date)
-                {
-                    currentdayofupdate = Time[0].Date;   
-                }
             }
             else
             {
@@ -183,81 +197,126 @@ namespace AgenaTrader.UserCode
             }
         }
 
-
         /// <summary>
-        /// Draws the open range per day.
+        /// Calculate Open Range with current IBar 
         /// </summary>
-        private void calculateanddrawOpenRange() {
+        /// <param name="currentbar"></param>
+        /// <returns></returns>
+        public int calculate(IBar currentbar) {
 
-            DateTime start = this.getOpenRangeStart(Time[0]);
-            DateTime start_date = start.Date;
-            DateTime end = this.getOpenRangeEnd(start);
+            int returnvalue = 0;
 
-            //Select all data and find high & low.
-            IEnumerable<IBar> list = Bars.Where(x => x.Time >= start).Where(x => x.Time <= end);
-
-            //Check if data for open range is valid.
-            //we need to ignore the first day which is normally invalid.
-            bool isvalidORB = false;
-            if (list != null && !list.IsEmpty() && list.First().Time == start)
+            //new day session is beginning so we need to calculate the open range breakout
+            if (currentdayofupdate.Date < currentbar.Time.Date)
             {
-                isvalidORB = true;
+                //reset session day data
+                this.long_breakout = null;
+                this.short_breakout = null;
+
+                //draw the open range
+                DateTime start = this.getOpenRangeStart(currentbar.Time);
+                DateTime start_date = start.Date;
+                DateTime end = this.getOpenRangeEnd(start);
+
+                //Select all data and find high & low.
+                IEnumerable<IBar> list = this.bardata.Where(x => x.Time >= start).Where(x => x.Time <= end);
+
+                //Check if data for open range is valid.
+                //we need to ignore the first day which is normally invalid.
+                bool isvalidORB = false;
+                if (list != null && !list.IsEmpty() && list.First().Time == start)
+                {
+                    isvalidORB = true;
+                }
+
+                if (isvalidORB)
+                {
+                    //Range
+                    this.RangeLow = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
+                    this.RangeHigh = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
+
+                    //Targets
+                    double target_long = this.RangeHigh + this.RangeHeight;
+                    double target_short = this.RangeLow - this.RangeHeight;
+
+                    if (shoulddrawonchart)
+                    {
+                        DrawRectangle("ORBRect" + start_date.Ticks, true, start, this.RangeLow, end, this.RangeHigh, this.Color_ORB, this.Color_ORB, this.Opacity);
+                        DrawText("ORBRangeString" + start_date.Ticks, true, Math.Round((this.RangeHeight), 2).ToString(), start, this.RangeHigh, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, this.Color_ORB, this.Opacity);
+
+                        //if we are live on the trading day
+                        if (this.bardata.Last().Time.Date == start_date)
+                        {
+                            DrawHorizontalLine("LowLine" + start_date.Ticks, true, this.RangeLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            DrawHorizontalLine("HighLine" + start_date.Ticks, true, this.RangeHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            //DrawVerticalLine("BeginnSession" + start_date.Ticks, start, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                        }
+
+                        //Draw the target areas
+                        DrawRectangle("TargetAreaLong" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeHigh, this.getEndOfTradingDay(start_date), target_long, this.Color_TargetAreaLong, this.Color_TargetAreaLong, this.Opacity);
+                        DrawRectangle("TargetAreaShort" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeLow, this.getEndOfTradingDay(start_date), target_short, this.Color_TargetAreaShort, this.Color_TargetAreaShort, this.Opacity);  
+                    }
+                    
+                    //load the data after the open range
+                    list = this.bardata.Where(x => x.Time >= end).Where(x => x.Time <= this.getEndOfTradingDay(start));
+
+                    //find the first breakout to the long side
+                    long_breakout = list.Where(x => x.Close > this.RangeHigh).FirstOrDefault();
+                    if (long_breakout != null)
+                    {
+                        if ((currentbar.Time.Date != this.bardata.Last().Time.Date) || (currentbar.Time.Date == this.bardata.Last().Time.Date && long_breakout.Time == currentbar.Time))
+                        {
+                            returnvalue = 1;
+                        }
+                    }
+                  
+
+                    //find the first breakout to the short side
+                    short_breakout = list.Where(x => x.Close < this.RangeLow).FirstOrDefault();
+                    if (short_breakout != null)
+                    {
+                        if ((currentbar.Time.Date != this.bardata.Last().Time.Date) || (currentbar.Time.Date == this.bardata.Last().Time.Date && short_breakout.Time == currentbar.Time))
+                        {
+                            returnvalue = -1;
+                        }   
+                    }
+
+
+                    if (shoulddrawonchart)
+                    {
+                        //find the first target to the long side
+                        long_target_reached = list.Where(x => x.Close > target_long).FirstOrDefault();
+                        if (long_target_reached != null)
+                        {
+                            DrawArrowDown("ArrowTargetLong" + start_date.Ticks, true, long_target_reached.Time, long_target_reached.High, Color.Red);
+                        }
+
+                        //find the first target to the short side
+                        short_target_reached = list.Where(x => x.Close < target_short).FirstOrDefault();
+                        if (short_target_reached != null)
+                        {
+                            DrawArrowUp("ArrowTargetShort" + start_date.Ticks, true, short_target_reached.Time, short_target_reached.Low, Color.Green);
+                        }  
+                    }
+                }
             }
 
-            if (isvalidORB)
+
+
+            //When finished set the last day variable
+            //If we are online during the day session we do not set this variable so we are redrawing and recalculating the current session 
+            if (currentbar.Time.Date != this.bardata.Last().Time.Date)
             {
-                this.RangeLow = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
-                this.RangeHigh = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
-
-                DrawRectangle("ORBRect" + start_date.Ticks, true, start, this.RangeLow, end, this.RangeHigh, this.Color_ORB, this.Color_ORB, this.Opacity);
-                DrawText("ORBRangeString" + start_date.Ticks, true, Math.Round((this.RangeHeight), 2).ToString(), start, this.RangeHigh, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, this.Color_ORB, this.Opacity);
-
-                //if we are live on the trading day
-                if (DateTime.Now.Date == start_date)
-                {
-                    DrawHorizontalLine("LowLine" + start_date.Ticks, true, this.RangeLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
-                    DrawHorizontalLine("HighLine" + start_date.Ticks, true, this.RangeHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
-                    DrawVerticalLine("BeginnSession" + start_date.Ticks, start, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
-                }
-
-                //Targets
-                double target_long = this.RangeHigh + this.RangeHeight;
-                double target_short = this.RangeLow - this.RangeHeight;
-                DrawRectangle("TargetAreaLong" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeHigh, this.getEndOfTradingDay(start_date), target_long, this.Color_TargetAreaLong, this.Color_TargetAreaLong, this.Opacity);
-                DrawRectangle("TargetAreaShort" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeLow, this.getEndOfTradingDay(start_date), target_short, this.Color_TargetAreaShort, this.Color_TargetAreaShort, this.Opacity);
-
-                //load the data after the open range
-                list = Bars.Where(x => x.Time >= end).Where(x => x.Time <= this.getEndOfTradingDay(start));
-
-                //find the first breakout to the long side
-                long_breakout = list.Where(x => x.Close > this.RangeHigh).FirstOrDefault();
-                if (long_breakout != null)
-                {
-                    DrawArrowUp("ArrowLong" + start_date.Ticks, true, long_breakout.Time, long_breakout.Low, Color.Green);
-                }
-
-                //find the first breakout to the short side
-                short_breakout = list.Where(x => x.Close < this.RangeLow).FirstOrDefault();
-                if (short_breakout != null)
-                {
-                    DrawArrowDown("ArrowShort" + start_date.Ticks, true, short_breakout.Time, short_breakout.High, Color.Red);
-                }
-
-                //find the first target to the long side
-                long_target_reached = list.Where(x => x.Close > target_long).FirstOrDefault();
-                if (long_target_reached != null)
-                {
-                    DrawArrowDown("ArrowTargetLong" + start_date.Ticks, true, long_target_reached.Time, long_target_reached.High, Color.Red);
-                }
-
-                //find the first target to the short side
-                short_target_reached = list.Where(x => x.Close < target_short).FirstOrDefault();
-                if (short_target_reached != null)
-                {
-                    DrawArrowUp("ArrowTargetShort" + start_date.Ticks, true, short_target_reached.Time, short_target_reached.Low, Color.Green);
-                }
+                currentdayofupdate = currentbar.Time.Date;
             }
+            else { 
+                //the last session has started.
+            }
+
+            return returnvalue;
+        
         }
+
 
 
 
@@ -272,12 +331,12 @@ namespace AgenaTrader.UserCode
             DateTime returnvalue = new DateTime(date.Year, date.Month, date.Day, this.timeperiod.StartTime.Hours, this.timeperiod.StartTime.Minutes, this.timeperiod.StartTime.Seconds);
 
             //Use CFD data
-            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
+            if (this.bardata.Instrument.Symbol.Contains("DE.30") || this.bardata.Instrument.Symbol.Contains("DE-XTB"))
             {
                 //return new TimeSpan(9,00,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartDE.Hours, this._tim_OpenRangeStartDE.Minutes, this._tim_OpenRangeStartDE.Seconds);
             }
-            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
+            else if (this.bardata.Instrument.Symbol.Contains("US.30") || this.bardata.Instrument.Symbol.Contains("US-XTB"))
             {
                 //return new TimeSpan(15,30,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartUS.Hours, this._tim_OpenRangeStartUS.Minutes, this._tim_OpenRangeStartUS.Seconds);
@@ -306,12 +365,12 @@ namespace AgenaTrader.UserCode
             DateTime returnvalue = new DateTime(date.Year, date.Month, date.Day, this.timeperiod.EndTime.Hours, this.timeperiod.EndTime.Minutes, this.timeperiod.EndTime.Seconds);
 
             //Use CFD data
-            if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
+            if (this.bardata.Instrument.Symbol.Contains("DE.30") || this.bardata.Instrument.Symbol.Contains("DE-XTB"))
             {
                 //return new TimeSpan(9,00,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this.Time_EndOfDay_DE.Hours, this.Time_EndOfDay_DE.Minutes, this.Time_EndOfDay_DE.Seconds);
             }
-            else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
+            else if (this.bardata.Instrument.Symbol.Contains("US.30") || this.bardata.Instrument.Symbol.Contains("US-XTB"))
             {
                 //return new TimeSpan(15,30,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_EndOfDay_US.Hours, this._tim_EndOfDay_US.Minutes, this._tim_EndOfDay_US.Seconds);
@@ -325,7 +384,7 @@ namespace AgenaTrader.UserCode
         /// <returns></returns>
         private bool DatafeedPeriodicityIsValid {
             get {
-                TimeFrame tf = (TimeFrame)Bars.TimeFrame;
+                TimeFrame tf = (TimeFrame)this.bardata.TimeFrame;
                 if (tf.Periodicity == DatafeedHistoryPeriodicity.Tick || tf.Periodicity == DatafeedHistoryPeriodicity.Second )
                 {
                     return true;

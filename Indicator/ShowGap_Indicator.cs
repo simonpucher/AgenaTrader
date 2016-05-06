@@ -17,7 +17,9 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// 
+/// ****** Important ******
+/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
+/// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -73,14 +75,15 @@ namespace AgenaTrader.UserCode
                 //Print("Total Long Punkte: " + GapTradeResultTotalLong);
                 //Print("Total Short Punkte: " + GapTradeResultTotalShort);
 
-                if (GapTradeResultTotalShort > 0)
-                {
-                    Print("Total Punkte;" +Instrument.Name +";"+ (GapTradeResultTotalLong - GapTradeResultTotalShort));
-                }
-                else
-                {
-                    Print("Total Punkte;" + Instrument.Name + ";" + (GapTradeResultTotalLong + Math.Abs(GapTradeResultTotalShort)));
-                }
+                //if (GapTradeResultTotalShort > 0)
+                //{
+                //    Print("Total Punkte;" +Instrument.Name +";"+ (GapTradeResultTotalLong - GapTradeResultTotalShort));
+                //}
+                //else
+                //{
+                //    Print("Total Punkte;" + Instrument.Name + ";" + (GapTradeResultTotalLong + Math.Abs(GapTradeResultTotalShort)));
+                //}
+
                 //Print("Total Long Trades: " + (GapTradeWinCounterLong + GapTradeFailCounterLong));                
                 //Print("Long Wins: " + GapTradeWinCounterLong);
                 //Print("Long Fails: " + GapTradeFailCounterLong);

@@ -62,7 +62,8 @@ namespace AgenaTrader.UserCode
         {
             base.OnStartUp();
 
-            _orb_indicator = new ORB_Indicator();
+            this._orb_indicator = new ORB_Indicator();
+            this._orb_indicator.SetData(this.Instrument, this.Bars);
         }
 
 		protected override void OnBarUpdate()

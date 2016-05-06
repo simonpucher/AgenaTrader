@@ -18,6 +18,10 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
+/// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode
@@ -70,13 +74,6 @@ namespace AgenaTrader.UserCode
 			CalculateOnBarClose = true;
 		}
 
-        protected override void OnStartUp()
-        {
-            base.OnStartUp();
-
-            _orb_indicator = new ORB_Indicator();
-        }
-
         protected override void InitRequirements()
         {
             base.InitRequirements();
@@ -84,9 +81,15 @@ namespace AgenaTrader.UserCode
 
         }
 
-		protected override void OnBarUpdate()
-		{
-    
+
+        protected override void OnStartUp()
+        {
+            base.OnStartUp();
+
+            //Init our indicator to get code access
+            this._orb_indicator = new ORB_Indicator();
+            this._orb_indicator.SetData(this.Instrument, this.Bars);
+
             //Initalize Indicator parameters
             _orb_indicator.ORBMinutes = this.ORBMinutes;
             _orb_indicator.Time_OpenRangeStartDE = this.Time_OpenRangeStartDE;
@@ -95,25 +98,54 @@ namespace AgenaTrader.UserCode
             //_orb_indicator.Time_OpenRangeEndUS = this.Time_OpenRangeEndUS;
             _orb_indicator.Time_EndOfDay_DE = this.Time_EndOfDay_DE;
             _orb_indicator.Time_EndOfDay_US = this.Time_EndOfDay_US;
+        }
 
-            switch ((int)_orb_indicator[0])
+       
+
+		protected override void OnBarUpdate()
+		{
+            int returnvalue = _orb_indicator.calculate(Bars[0]);
+            //Occurred.Set(returnvalue);
+            //Entry.Set(Bars[0].Close);
+
+            if (_orb_indicator.long_breakout != null && _orb_indicator.long_breakout.Time == Bars[0].Time)
             {
-                case 1:
-                   //Long Signal
-                    Occurred.Set(1);
-                    Entry.Set(Close[0]);
-                    break;
-                case -1:
-                  //Short Signal
-                    Occurred.Set(-1);
-                    Entry.Set(Close[0]);
-                    break;
-                default:
-                    //nothing to do
-                    Occurred.Set(0);
-                    Entry.Set(Close[0]);
-                    break;
+                //Long Signal
+                Occurred.Set(1);
+                Entry.Set(Close[0]);
             }
+            else if (_orb_indicator.short_breakout != null && _orb_indicator.short_breakout.Time == Bars[0].Time)
+            {
+                //Short Signal
+                Occurred.Set(-1);
+                Entry.Set(Close[0]);
+            }
+            else
+            {
+                //No Signal
+                Occurred.Set(0);
+                Entry.Set(Close[0]);
+            }
+
+
+            //switch ((int)returnvalue)
+            //{
+            //    case 1:
+            //       //Long Signal
+            //        Occurred.Set(1);
+            //        Entry.Set(Close[0]);
+            //        break;
+            //    case -1:
+            //      //Short Signal
+            //        Occurred.Set(-1);
+            //        Entry.Set(Close[0]);
+            //        break;
+            //    default:
+            //        //nothing to do
+            //        Occurred.Set(0);
+            //        Entry.Set(Close[0]);
+            //        break;
+            //}
 
 
 
