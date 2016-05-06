@@ -94,8 +94,8 @@ namespace AgenaTrader.UserCode
         private double _rangehigh = Double.NaN;
 
         //internal 
-        private IBar long_breakout = null;
-        private IBar short_breakout = null;
+        public IBar long_breakout = null;
+        public IBar short_breakout = null;
         public IBar long_target_reached = null;
         public IBar short_target_reached = null;
         private DateTime currentdayofupdate = DateTime.MinValue;
