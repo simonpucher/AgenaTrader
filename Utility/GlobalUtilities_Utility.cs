@@ -102,6 +102,7 @@ namespace AgenaTrader.UserCode
                 //if (new EmailAddressAttribute().IsValid(email))
                 //   return true; 
 
+                //for .net 3.x
                 try
                 {
                     var addr = new System.Net.Mail.MailAddress(email);
@@ -161,6 +162,22 @@ namespace AgenaTrader.UserCode
             #endregion
 
             #region Bars
+
+            /// <summary>
+            /// Returns true if the currentbar is last day in the Bars object.
+            /// We use this function to determine if the currentbar is a current active session or if this is the last shown trading day.
+            /// </summary>
+            /// <param name="bars"></param>
+            /// <param name="currentbar"></param>
+            /// <returns></returns>
+            public static bool IsCurrentBarLastDayInBars(IBars bars, IBar currentbar)
+            {
+                if (currentbar.Time.Date == bars.Last().Time.Date)
+                {
+                    return true;
+                }
+                return false;
+            }
 
             /// <summary>
             /// Returns the first Bar of the latest(=current) Session.
