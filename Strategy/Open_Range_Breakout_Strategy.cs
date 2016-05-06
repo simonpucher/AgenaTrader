@@ -61,6 +61,11 @@ namespace AgenaTrader.UserCode
 
 		protected override void Initialize()
 		{
+
+            //ClearOutputWindow();
+            //TraceOrders = true;
+
+
             this.IsAutomated = false;
 
             //Set the default time frame if you start the strategy via the strategy-escort
