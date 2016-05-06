@@ -18,6 +18,10 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
+/// The initial version of this strategy was inspired by the work of Birger Schäfermeier: https://www.whselfinvest.at/de/Store_Birger_Schaefermeier_Trading_Strategie_Open_Range_Break_Out.php
+/// Further developments are inspired by the work of Mehmet Emre Cekirdekci and Veselin Iliev from the Worcester Polytechnic Institute (2010)
+/// Trading System Development: Trading the Opening Range Breakouts https://www.wpi.edu/Pubs/E-project/Available/E-project-042910-142422/unrestricted/Veselin_Iliev_IQP.pdf
+/// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
 /// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
@@ -37,9 +41,6 @@ namespace AgenaTrader.UserCode
 
         //input
         private int _orbminutes = 75;
-        private Color _col_orb = Color.Brown;
-        private Color _col_target_short = Color.PaleVioletRed;
-        private Color _col_target_long = Color.PaleGreen;
 
         private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);
         //private TimeSpan _tim_OpenRangeEndDE = new TimeSpan(10, 15, 0);  
@@ -51,7 +52,6 @@ namespace AgenaTrader.UserCode
         private TimeSpan _tim_EndOfDay_US = new TimeSpan(22, 00, 0);  
 
         private bool _send_email = false;
-        private string _emailaddress = String.Empty;
 
 
         //output
@@ -88,7 +88,7 @@ namespace AgenaTrader.UserCode
 
             //Init our indicator to get code access
             this._orb_indicator = new ORB_Indicator();
-            this._orb_indicator.SetData(this.Bars);
+            this._orb_indicator.SetData(this.Instrument, this.Bars);
 
             //Initalize Indicator parameters
             _orb_indicator.ORBMinutes = this.ORBMinutes;
@@ -104,12 +104,11 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnBarUpdate()
 		{
-            int returnvalue = _orb_indicator.calculate(Bars[0]);
+            _orb_indicator.calculate(Bars[0]);
             //Occurred.Set(returnvalue);
             //Entry.Set(Bars[0].Close);
-            //log
 
-
+            //If there was a breakout and the current bar is the same bar as the long/short breakout, then trigger signal.
             if (_orb_indicator.LongBreakout != null && _orb_indicator.LongBreakout.Time == Bars[0].Time)
             {
                 //Long Signal
@@ -128,28 +127,6 @@ namespace AgenaTrader.UserCode
                 Occurred.Set(0);
                 Entry.Set(Close[0]);
             }
-
-
-            //switch ((int)returnvalue)
-            //{
-            //    case 1:
-            //       //Long Signal
-            //        Occurred.Set(1);
-            //        Entry.Set(Close[0]);
-            //        break;
-            //    case -1:
-            //      //Short Signal
-            //        Occurred.Set(-1);
-            //        Entry.Set(Close[0]);
-            //        break;
-            //    default:
-            //        //nothing to do
-            //        Occurred.Set(0);
-            //        Entry.Set(Close[0]);
-            //        break;
-            //}
-
-
 
 		}
 
@@ -186,60 +163,7 @@ namespace AgenaTrader.UserCode
                 set { _orbminutes = value; }
             }
 
-            /// <summary>
-            /// </summary>
-            [Description("Select Color")]
-            [Category("Colors")]
-            [DisplayName("ORB")]
-            public Color Color_ORB
-            {
-                get { return _col_orb; }
-                set { _col_orb = value; }
-            }
-
-            [Browsable(false)]
-            public string Color_ORBSerialize
-            {
-                get { return SerializableColor.ToString(_col_orb); }
-                set { _col_orb = SerializableColor.FromString(value); }
-            }
-
-            /// <summary>
-            /// </summary>
-            [Description("Select Color TargetAreaShort")]
-            [Category("Colors")]
-            [DisplayName("TargetAreaShort")]
-            public Color Color_TargetAreaShort
-            {
-                get { return _col_target_short; }
-                set { _col_target_short = value; }
-            }
-
-           [Browsable(false)]
-            public string Color_TargetAreaShortSerialize
-            {
-                get { return SerializableColor.ToString(_col_target_short); }
-                set { _col_target_short = SerializableColor.FromString(value); }
-            }
-
-            /// <summary>
-            /// </summary>
-            [Description("Select Color TargetAreaLong")]
-            [Category("Colors")]
-            [DisplayName("TargetAreaLong")]
-            public Color Color_TargetAreaLong
-            {
-                get { return _col_target_long; }
-                set { _col_target_long = value; }
-            }
-
-            [Browsable(false)]
-            public string Color_TargetAreaLongSerialize
-            {
-                get { return SerializableColor.ToString(_col_target_long); }
-                set { _col_target_long = SerializableColor.FromString(value); }
-            }
-
+           
             /// <summary>
             /// </summary>
             [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
@@ -251,16 +175,6 @@ namespace AgenaTrader.UserCode
                 set { _tim_OpenRangeStartDE = value; }
             }
 
-            ///// <summary>
-            ///// </summary>
-            //[Description("OpenRange DE End: Uhrzeit wann Range geschlossen wird")]
-            //[Category("TimeSpan")]
-            //[DisplayName("2. OpenRange End DE")]
-            //public TimeSpan Time_OpenRangeEndDE
-            //{
-            //    get { return _tim_OpenRangeEndDE; }
-            //    set { _tim_OpenRangeEndDE = value; }
-            //}
 
             /// <summary>
             /// </summary>
@@ -273,16 +187,6 @@ namespace AgenaTrader.UserCode
                 set { _tim_OpenRangeStartUS = value; }
             }
 
-            ///// <summary>
-            ///// </summary>
-            //[Description("OpenRange US End: Uhrzeit wann Range geschlossen wird")]
-            //[Category("TimeSpan")]
-            //[DisplayName("4. OpenRange End US")]
-            //public TimeSpan Time_OpenRangeEndUS
-            //{
-            //    get { return _tim_OpenRangeEndUS; }
-            //    set { _tim_OpenRangeEndUS = value; }
-            //}
 
             /// <summary>
             /// </summary>
@@ -306,14 +210,7 @@ namespace AgenaTrader.UserCode
                 set { _tim_EndOfDay_US = value; }
             }
 
-            //[Description("Recipient Email Address")]
-            //[Category("Email")]
-            //[DisplayName("Email Address")]
-            //public string EmailAdress
-            //{
-            //    get { return _emailaddress; }
-            //    set { _emailaddress = value; }
-            //}
+
 
             [Description("If true an email will be send on open range breakout.")]
             [Category("Email")]
