@@ -38,6 +38,7 @@ namespace AgenaTrader.UserCode
         private Color colFail = Color.Brown;
         bool _print_info= false;
         bool _dev_mode = false;
+        bool _Snapshots = false;
         bool existgap;
         bool GapTradeShort;
         bool GapTradeLong;
@@ -212,6 +213,7 @@ namespace AgenaTrader.UserCode
             {
 //Auswertung nach ShowGap Handelszeit (=09.30)   
                 printAuswertung();
+                GlobalUtilities.SaveSnapShot("ShowGap", Instrument.Name, this.Root.Core.ChartManager.AllCharts.FirstOrDefault(), Bars[0].Time);
             }
         }
 
@@ -454,6 +456,15 @@ namespace AgenaTrader.UserCode
         {
             get { return _dev_mode; }
             set { _dev_mode = value; }
+        }
+
+        [Description("Snapshots speichern")]
+        [Category("Behaviour")]
+        [DisplayName("Snapshots")]
+        public bool Snapshots
+        {
+            get { return _Snapshots; }
+            set { _Snapshots = value; }
         }
 
 		#endregion

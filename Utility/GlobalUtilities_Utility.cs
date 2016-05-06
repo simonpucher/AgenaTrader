@@ -239,6 +239,20 @@ namespace AgenaTrader.UserCode
             }
             #endregion
 
+            #region Chart
+            public static void SaveSnapShot(string Indicator, String InsturmentName, IChart Chart, DateTime CurrentDateTime)
+            {
+                string directory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\" + Indicator + "_" + InsturmentName + "_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm") + "\\";
+                System.IO.Directory.CreateDirectory(directory);
+                string fileName = InsturmentName + "_" + CurrentDateTime.ToString("yyyy.MM.dd_HH.mm") + ".jpg";
+                fileName = fileName.Replace(":", "_");
+
+                Chart.SetDateRange(CurrentDateTime.AddDays(-1), CurrentDateTime.AddDays(1));
+                Chart.SaveChart(directory + fileName);
+            }
+
+            #endregion
+
             #region DateTimeHelpers taken from  http://www.codeproject.com/Articles/9706/C-DateTime-Library
 
             public enum Quarter
