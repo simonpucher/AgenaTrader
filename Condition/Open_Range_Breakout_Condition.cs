@@ -88,7 +88,7 @@ namespace AgenaTrader.UserCode
 
             //Init our indicator to get code access
             this._orb_indicator = new ORB_Indicator();
-            this._orb_indicator.SetData(this.Instrument, this.Bars);
+            this._orb_indicator.SetData(this.Bars);
 
             //Initalize Indicator parameters
             _orb_indicator.ORBMinutes = this.ORBMinutes;
@@ -107,14 +107,16 @@ namespace AgenaTrader.UserCode
             int returnvalue = _orb_indicator.calculate(Bars[0]);
             //Occurred.Set(returnvalue);
             //Entry.Set(Bars[0].Close);
+            //log
 
-            if (_orb_indicator.long_breakout != null && _orb_indicator.long_breakout.Time == Bars[0].Time)
+
+            if (_orb_indicator.LongBreakout != null && _orb_indicator.LongBreakout.Time == Bars[0].Time)
             {
                 //Long Signal
                 Occurred.Set(1);
                 Entry.Set(Close[0]);
             }
-            else if (_orb_indicator.short_breakout != null && _orb_indicator.short_breakout.Time == Bars[0].Time)
+            else if (_orb_indicator.ShortBreakout != null && _orb_indicator.ShortBreakout.Time == Bars[0].Time)
             {
                 //Short Signal
                 Occurred.Set(-1);

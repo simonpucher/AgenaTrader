@@ -54,8 +54,10 @@ namespace AgenaTrader.UserCode
         {
             //MyGap.Set(Input[0]);
 
-           
 
+            Occurred.Set(1);
+            Entry.Set(Close[0]);
+           
 
         }
 
