@@ -25,10 +25,10 @@ using System.Collections;
 namespace AgenaTrader.UserCode
 {
 
-    #region Static Classes
+    #region Constants
 
-        /// <summary>
-        /// 
+    /// <summary>
+        /// Constants to use in Agena Trader Scripts
         /// </summary>
         public static class Const
         {
@@ -50,8 +50,13 @@ namespace AgenaTrader.UserCode
 
         }
 
+    #endregion
+
+    #region GlobalUtilities with global static Helper with functions and methods.
+
+
         /// <summary>
-        /// Global static Helper.
+        /// Global static Helper with functions and methods.
         /// </summary>
         public static class GlobalUtilities
         {
@@ -453,10 +458,11 @@ namespace AgenaTrader.UserCode
             #endregion
 
         }
-    
-    #endregion
 
-    #region Utility Classes
+        #endregion
+
+
+   #region Global defined classes
 
     /// <summary>
     /// Statistic object to compare strategies.
@@ -522,6 +528,27 @@ namespace AgenaTrader.UserCode
 
     }
 
+
+    /// <summary>
+    /// We use this class to compare two IBar if they are equal on time.
+    /// true when the time of the IBar is the same on x as on y.
+    /// </summary>
+    public class IBarTimeComparer : IEqualityComparer<IBar>
+    {
+        bool IEqualityComparer<IBar>.Equals(IBar x, IBar y)
+        {
+            return (x.Time.Equals(y.Time) && x.Time.Equals(y.Time));
+        }
+
+        int IEqualityComparer<IBar>.GetHashCode(IBar obj)
+        {
+            if (Object.ReferenceEquals(obj, null))
+                return 0;
+
+            return obj.Time.GetHashCode() + obj.Time.GetHashCode();
+        }
+    }
+
     #endregion
 
 }
@@ -530,6 +557,18 @@ namespace AgenaTrader.UserCode
 /// This class contains all extension methods for IEnumerable.
 /// </summary>
 public static class IEnumerableExtensions {
+
+    public static IEnumerable<DateTime> GetDateRange(this DateTime startDate, DateTime endDate)
+    {
+        if (endDate < startDate)
+            throw new ArgumentException("endDate must be greater than or equal to startDate");
+
+        while (startDate <= endDate)
+        {
+            yield return startDate;
+            startDate = startDate.AddDays(1);
+        }
+    }
 
     public static IEnumerable Append(this IEnumerable first, params object[] second)
     {
@@ -547,6 +586,8 @@ public static class IEnumerableExtensions {
     {
         return second.Concat(first);
     }
+
+
 
 }
 
@@ -583,6 +624,7 @@ public static class StringExtensions {
 	{
         //https://www.youtube.com/watch?v=5NNOrp_83RU
     }
+
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 
 namespace AgenaTrader.UserCode
