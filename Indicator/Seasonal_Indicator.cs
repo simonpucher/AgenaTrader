@@ -43,39 +43,65 @@ namespace AgenaTrader.UserCode
 
         }
 
-        private IEnumerable<IBar> list_sellinmayandgoaway = null;
-        private bool drawing_sellinmayandgoway = false;
+        private IEnumerable<IBar> list_sellinmayandgoaway_buy = null;
+        private IEnumerable<IBar> list_sellinmayandgoaway_sell = null;
         private IBar last_start_sellinmayandgoway = null;
+        private IBar last_end_sellinmayandgoway = null;
 
         protected override void OnStartUp()
         {
             //Print("OnStartUp");
-            list_sellinmayandgoaway = Bars.Where(x => x.Time.Month <= 4 || x.Time.Month >= 10);
+            list_sellinmayandgoaway_buy = Bars.Where(x => x.Time.Month <= 4 || x.Time.Month >= 10);
+            list_sellinmayandgoaway_sell = Bars.Where(x => x.Time.Month >= 5 && x.Time.Month <= 9);
         }
 
 		protected override void OnBarUpdate()
 		{
 			MyPlot1.Set(Input[0]);
 
-            if (list_sellinmayandgoaway.Select(x=>x.Time).Contains(Bars[0].Time))
+            if (list_sellinmayandgoaway_buy.Select(x => x.Time).Contains(Bars[0].Time))
             {
                 if (last_start_sellinmayandgoway == null)
                 {
-                    this.last_start_sellinmayandgoway = Bars[0];  
+                    this.last_start_sellinmayandgoway = Bars[0];
+
                 }
-     
+
+                if (last_end_sellinmayandgoway != null)
+                {
+                    IEnumerable<IBar> area = list_sellinmayandgoaway_sell.Where(x => x.Time >= last_end_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time);
+                    double low = area.Min(x => x.Low);
+                    double high = area.Max(x => x.High);
+
+                    double difference = Bars[0].Close - this.last_end_sellinmayandgoway.Open;
+
+                    DrawRectangle("sellinmayRect_sell" + Bars[0].Time.ToString(), true, this.last_end_sellinmayandgoway.Time, high, Bars[0].Time, low, Color.Red, Color.Red, 70);
+                    DrawText("sellinmayString_sell" + Bars[0].Time.ToString(), true, Math.Round((difference), 2).ToString(), this.last_end_sellinmayandgoway.Time, high, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, Color.Red, 70);
+
+                    last_end_sellinmayandgoway = null;
+                }
 
 
             }
             else
             {
+                if (last_end_sellinmayandgoway == null)
+                {
+                    this.last_end_sellinmayandgoway = Bars[0];
+
+                }
+
                 if (last_start_sellinmayandgoway != null)
                 {
-                    IEnumerable<IBar> area = list_sellinmayandgoaway.Where(x => x.Time >= last_start_sellinmayandgoway.Time).Where(x=>x.Time <= Bars[0].Time);
+                    IEnumerable<IBar> area = list_sellinmayandgoaway_buy.Where(x => x.Time >= last_start_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time);
                     double low = area.Min(x=>x.Low);
                     double high = area.Max(x=>x.High);
 
-                    DrawRectangle(Bars[0].Time.ToString(), true, this.last_start_sellinmayandgoway.Time, high, Bars[0].Time, low, Color.Green, Color.Green, 70);
+                    double difference = Bars[0].Close - this.last_start_sellinmayandgoway.Open;
+
+                    DrawRectangle("sellinmayRect_buy" + Bars[0].Time.ToString(), true, this.last_start_sellinmayandgoway.Time, high, Bars[0].Time, low, Color.Green, Color.Green, 70);
+                    DrawText("sellinmayString_buy" + Bars[0].Time.ToString(), true, Math.Round((difference), 2).ToString(), this.last_start_sellinmayandgoway.Time, high, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, Color.Green, 70);
+
                     last_start_sellinmayandgoway = null;
                 }
 
