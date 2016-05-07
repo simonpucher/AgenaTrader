@@ -10,9 +10,10 @@ using AgenaTrader.API;
 using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
+using System.Collections;
 
 /// <summary>
-/// Version: 1.3
+/// Version: 1.4
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -455,8 +456,6 @@ namespace AgenaTrader.UserCode
     
     #endregion
 
-
-
     #region Utility Classes
 
     /// <summary>
@@ -524,6 +523,30 @@ namespace AgenaTrader.UserCode
     }
 
     #endregion
+
+}
+
+/// <summary>
+/// This class contains all extension methods for IEnumerable.
+/// </summary>
+public static class IEnumerableExtensions {
+
+    public static IEnumerable Append(this IEnumerable first, params object[] second)
+    {
+        return first.OfType<object>().Concat(second);
+    }
+    public static IEnumerable<T> Append<T>(this IEnumerable<T> first, params T[] second)
+    {
+        return first.Concat(second);
+    }
+    public static IEnumerable Prepend(this IEnumerable first, params object[] second)
+    {
+        return second.Concat(first.OfType<object>());
+    }
+    public static IEnumerable<T> Prepend<T>(this IEnumerable<T> first, params T[] second)
+    {
+        return second.Concat(first);
+    }
 
 }
 
