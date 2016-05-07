@@ -113,6 +113,7 @@ namespace AgenaTrader.UserCode
             _orb_indicator.calculate(Bars[0]);
 
             double targetprice = 0.0;
+            int occured = 0;
 
             switch (TradeDirection)
             {
@@ -120,9 +121,11 @@ namespace AgenaTrader.UserCode
                     break;
                 case PositionType.Long:
                     targetprice = _orb_indicator.TargetLong;
+                    occured = 1;
                     break;
                 case PositionType.Short:
                     targetprice = _orb_indicator.TargetShort;
+                    occured = 1;
                     break;
                 default:
                     break;
@@ -130,12 +133,14 @@ namespace AgenaTrader.UserCode
 
             //We stop an last bar of the day.
             IEnumerable<IBar> list = Bars.Where(x => x.Time.Date == Bars[0].Time.Date);
-            if (list.LastOrDefault().Time == Bars[0].Time)
+            if (list.GetByIndex(list.Count()-1).Time == Bars[0].Time)
             {
                 targetprice = Bars[0].Close;
+                occured = 1;
             }
 
             Target.Set(targetprice);
+            Occurred.Set(occured);
         }
 
 
