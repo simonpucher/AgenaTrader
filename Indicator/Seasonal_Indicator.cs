@@ -20,6 +20,8 @@ using AgenaTrader.Helper;
 /// -------------------------------------------------------------------------
 /// The initial version of this strategy was inspired by this link: http://emini-watch.com/stock-market-seasonal-trades/5701/
 /// -------------------------------------------------------------------------
+/// todo tax time, 4th of july, september effect, Thanksgiving
+/// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
 /// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
