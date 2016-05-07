@@ -10,6 +10,7 @@ using AgenaTrader.API;
 using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
+using System.Runtime.CompilerServices;
 
 
 /// <summary>
@@ -48,21 +49,31 @@ namespace AgenaTrader.UserCode
         #region Variables
 
         //input
-        private SeasonalType _seasonal = SeasonalType.SantaClausRally;
+        private SeasonalType _seasonal = SeasonalType.SellInMay;
 
         //output
 
 
         //internal
         private RectangleF _rect;
-        private Brush _brush = Brushes.Gray;
+
+        private IEnumerable<IBar> _list_sellinmayandgoaway_buy = null;
+        private IEnumerable<IBar> _list_sellinmayandgoaway_sell = null;
+        private IBar _last_start_sellinmayandgoway = null;
+        private IBar _last_end_sellinmayandgoway = null;
+
+        private IEnumerable<IBar> _list_santaclausrally_buy = null;
+        private IBar _last_start_santaclausrally = null;
+
+        //Save data into hashset for a performance boost on the contains method
+        private HashSet<DateTime> hashset = null;
 
         #endregion
 
 
 		protected override void Initialize()
 		{
-			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
+			//Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
 			Overlay = true;
 		}
 
@@ -71,38 +82,55 @@ namespace AgenaTrader.UserCode
             //Print("InitRequirements");
 
         }
-
-        private IEnumerable<IBar> list_sellinmayandgoaway_buy = null;
-        private IEnumerable<IBar> list_sellinmayandgoaway_sell = null;
-        private IBar last_start_sellinmayandgoway = null;
-        private IBar last_end_sellinmayandgoway = null;
-
-        private IEnumerable<IBar> list_santaclausrally_buy = null;
-        private IBar last_start_santaclausrally = null;
+   
 
         protected override void OnStartUp()
         {
             //Print("OnStartUp");
 
-            //// Add event listener
-            //if (ChartControl != null)
-            //    ChartControl.ChartPanelMouseDown += OnChartPanelMouseDown;
+            //DateTime start = DateTime.Now;
 
-            //Sell in May
-            list_sellinmayandgoaway_buy = Bars.Where(x => x.Time.Month <= 4 || x.Time.Month >= 10);
-            list_sellinmayandgoaway_sell = Bars.Except(list_sellinmayandgoaway_buy);
+            switch (SeasonalType)
+            {
+                case SeasonalType.SellInMay:
+                    _list_sellinmayandgoaway_buy = Bars.Where(x => x.Time.Month <= 4 || x.Time.Month >= 10);
+                    _list_sellinmayandgoaway_sell = Bars.Except(_list_sellinmayandgoaway_buy);
+                    hashset = new HashSet<DateTime>(_list_sellinmayandgoaway_buy.Select(x => x.Time));
+                    break;
+                case SeasonalType.SantaClausRally:
+                    _list_santaclausrally_buy = from b in Bars
+                                               where (b.Time.Month == 12 && b.Time.Day >= 15) || (b.Time.Month == 1 && b.Time.Day <= 9)
+                                               select b;
+                    hashset = new HashSet<DateTime>(_list_santaclausrally_buy.Select(x => x.Time));
+                    break;
+                default:
+                    break;
+            }
 
-            //Santa Claus Rally
-            list_santaclausrally_buy = from b in Bars
-                                       where (b.Time.Month == 12 && b.Time.Day >= 15) || (b.Time.Month == 1 && b.Time.Day <= 9) 
-                                       select b;
- 
-                //Bars.Where(x => x.Time.Month == 12 && x.Time.Day >= 15).Where(x => x.Time.Month == 1 && x.Time.Day <= 9);
+
+           //DateTime stop = DateTime.Now;
+           //TimeSpan dif = stop - start;
+           //Print(dif.TotalMilliseconds);
         }
+
+        DateTime start_onbarupdate = DateTime.Now;
+        DateTime stop_onbarudate = DateTime.Now;
 
 		protected override void OnBarUpdate()
 		{
-			MyPlot1.Set(Input[0]);
+            if (CurrentBar == 0)
+            {
+                start_onbarupdate = DateTime.Now;
+            }
+
+			//MyPlot1.Set(Input[0]);
+
+            ////Because of performance just draw on the last bar update.
+            //if (this.IsCurrentBarLast)
+            //{
+            //    DrawAreaRectangle(list_sellinmayandgoaway_buy_new, Color.Green);
+            //    DrawAreaRectangle(list_sellinmayandgoaway_sell_new, Color.Red);
+            //}
 
             switch (SeasonalType)
             {
@@ -115,9 +143,33 @@ namespace AgenaTrader.UserCode
                 default:
                     break;
             }
+
+
+            if (this.IsCurrentBarLast)
+            {
+                DateTime stop_onbarudate = DateTime.Now;
+                TimeSpan dif = stop_onbarudate - start_onbarupdate;
+                Print(dif.TotalMilliseconds);
+            }
         
             
 		}
+
+        /// <summary>
+        /// Draws a rectangle in the chart to visualize the seasonality.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="col"></param>
+        private void DrawAreaRectangle(IEnumerable<IBar> list, Color color)
+        {
+               double low = list.Min(x => x.Low);
+                double high = list.Max(x => x.High);
+
+                double difference = list.Last().Close - list.First().Open;
+
+                DrawRectangle("sellinmayRect_buy" + list.First().Time.ToString(), true, list.First().Time, high, list.Last().Time, low, color, color, 70);
+                DrawText("sellinmayString_buy" + list.First().Time.ToString(), true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
+        }
 
         protected override void OnTermination()
         {
@@ -131,27 +183,21 @@ namespace AgenaTrader.UserCode
         /// </summary>
         private void calculate_Santa_Claus_Rally()
         {
-            if (list_santaclausrally_buy.Select(x => x.Time).Contains(Bars[0].Time))
+            //if (list_santaclausrally_buy.Select(x => x.Time).Contains(Bars[0].Time))
+            if (hashset.Contains(Bars[0].Time))
             {
-                if (last_start_santaclausrally == null)
+                if (this._last_start_santaclausrally == null)
                 {
-                    this.last_start_santaclausrally = Bars[0];
+                    this._last_start_santaclausrally = Bars[0];
                 }
             }
             else
             {
-                if (last_start_santaclausrally != null)
+                if (this._last_start_santaclausrally != null)
                 {
-                    IEnumerable<IBar> area = list_santaclausrally_buy.Where(x => x.Time >= last_start_santaclausrally.Time).Where(x => x.Time <= Bars[0].Time);
-                    double low = area.Min(x => x.Low);
-                    double high = area.Max(x => x.High);
+                    DrawAreaRectangle(this._list_santaclausrally_buy.Where(x => x.Time >= this._last_start_santaclausrally.Time).Where(x => x.Time <= Bars[0].Time), Color.Green);
 
-                    double difference = Bars[0].Close - this.last_start_santaclausrally.Open;
-
-                    DrawRectangle("sellinmayRect_buy" + Bars[0].Time.ToString(), true, this.last_start_santaclausrally.Time, high, Bars[0].Time, low, Color.Green, Color.Green, 70);
-                    DrawText("sellinmayString_buy" + Bars[0].Time.ToString(), true, Math.Round((difference), 2).ToString(), this.last_start_santaclausrally.Time, high, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, Color.Green, 100);
-
-                    last_start_santaclausrally = null;
+                    this._last_start_santaclausrally = null;
                 }
             }
         }
@@ -161,143 +207,38 @@ namespace AgenaTrader.UserCode
         /// Calculate the seasonal indicator for "Sell in May".
         /// </summary>
         private void calculate_Sell_in_May() {
-            if (list_sellinmayandgoaway_buy.Select(x => x.Time).Contains(Bars[0].Time))
+            //if (list_sellinmayandgoaway_buy.Select(x=>x.Time).Contains(Bars[0].Time))
+            if (hashset.Contains(Bars[0].Time))
             {
-                if (last_start_sellinmayandgoway == null)
+                if (_last_start_sellinmayandgoway == null)
                 {
-                    this.last_start_sellinmayandgoway = Bars[0];
+                    this._last_start_sellinmayandgoway = Bars[0];
                 }
 
-                if (last_end_sellinmayandgoway != null)
+                if (_last_end_sellinmayandgoway != null)
                 {
-                    IEnumerable<IBar> area = list_sellinmayandgoaway_sell.Where(x => x.Time >= last_end_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time);
-                    double low = area.Min(x => x.Low);
-                    double high = area.Max(x => x.High);
+                    DrawAreaRectangle(_list_sellinmayandgoaway_sell.Where(x => x.Time >= _last_end_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time), Color.Red);
 
-                    double difference = Bars[0].Close - this.last_end_sellinmayandgoway.Open;
-
-                    DrawRectangle("sellinmayRect_sell" + Bars[0].Time.ToString(), true, this.last_end_sellinmayandgoway.Time, high, Bars[0].Time, low, Color.Red, Color.Red, 70);
-                    DrawText("sellinmayString_sell" + Bars[0].Time.ToString(), true, Math.Round((difference), 2).ToString(), this.last_end_sellinmayandgoway.Time, high, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, Color.Red, 70);
-
-                    last_end_sellinmayandgoway = null;
+                    _last_end_sellinmayandgoway = null;
                 }
 
             }
             else
             {
-                if (last_end_sellinmayandgoway == null)
+                if (_last_end_sellinmayandgoway == null)
                 {
-                    this.last_end_sellinmayandgoway = Bars[0];
-
+                    this._last_end_sellinmayandgoway = Bars[0];
                 }
 
-                if (last_start_sellinmayandgoway != null)
+                if (_last_start_sellinmayandgoway != null)
                 {
-                    IEnumerable<IBar> area = list_sellinmayandgoaway_buy.Where(x => x.Time >= last_start_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time);
-                    double low = area.Min(x => x.Low);
-                    double high = area.Max(x => x.High);
+                    DrawAreaRectangle(_list_sellinmayandgoaway_buy.Where(x => x.Time >= _last_start_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time), Color.Green);
 
-                    double difference = Bars[0].Close - this.last_start_sellinmayandgoway.Open;
-
-                    DrawRectangle("sellinmayRect_buy" + Bars[0].Time.ToString(), true, this.last_start_sellinmayandgoway.Time, high, Bars[0].Time, low, Color.Green, Color.Green, 70);
-                    DrawText("sellinmayString_buy" + Bars[0].Time.ToString(), true, Math.Round((difference), 2).ToString(), this.last_start_sellinmayandgoway.Time, high, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, Color.Green, 70);
-
-                    last_start_sellinmayandgoway = null;
+                    _last_start_sellinmayandgoway = null;
                 }
             }
         }
 
-
-        //#region Events
-
-
-
-        //public override void Plot(Graphics g, Rectangle r, double min, double max)
-        //{
-        //    if (Bars == null || ChartControl == null) return;
-
-        //    //Only draw button if parameters are available.
-        //    if (this.Instrument != null)
-        //    {
-        //        using (Font font1 = new Font("Arial", 10, FontStyle.Bold, GraphicsUnit.Point))
-        //        {
-        //            StringFormat stringFormat = new StringFormat();
-        //            stringFormat.Alignment = StringAlignment.Center;
-        //            stringFormat.LineAlignment = StringAlignment.Center;
-
-        //            //if (String.IsNullOrEmpty(Shortcut_list))
-        //            //{
-        //            //    if (this.Name_of_list.Count() >= 5)
-        //            //    {
-        //            //        this.Shortcut_list = this.Name_of_list.Substring(0, 5);
-        //            //    }
-        //            //    else
-        //            //    {
-        //            //        this.Shortcut_list = this.Name_of_list;
-        //            //    }
-        //            //}
-
-        //            Brush tempbrush = new SolidBrush(GlobalUtilities.AdjustOpacity(((SolidBrush)_brush).Color, 0.5F));
-
-        //            _rect = new RectangleF(r.Width - 100, 10, 86, 27);
-        //            g.FillRectangle(tempbrush, _rect);
-        //            g.DrawString("bubu", font1, Brushes.White, _rect, stringFormat);
-        //            //g.DrawRectangle(_pen, Rectangle.Round(_rect));
-        //        }
-        //    }
-        //}
-
-
-       
-
-        //private void OnChartPanelMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        //{
-        //    //Print("X = {0}, Y = {1}", e.X, e.Y);
-        //    //Print("X = {0}, Y = {1}", ChartControl.GetDateTimeByX(e.X), ChartControl.GetPriceByY(e.Y));
-
-        //    Point cursorPos = new Point(e.X, e.Y);
-        //    if (_rect.Contains(cursorPos))
-        //    {
-        //        DatafeedHistoryRequest mumu = this.ChartControl.HistoryRequest;
-        //        mumu.DaysBack = 1000;
-        //        //mumu.SetFromDate(DateTime.Now.AddDays(1000));
-        //        //mumu.CalculateStartDate();
-
-        //        this.Root.Core.ChartManager.FormatWindowCaption2HistoryRequest(mumu);
-
-        //        this.Root.Core.ChartManager.ReloadCharts(this.Instrument);
-
-        //        //this.ShowEditor(this.Root.Core.GuiManager.MainWindow);
-                
-       
-
-        //        //this.Root.Core.ChartManager.Se
-
-        //        //DatafeedHistoryRequestInfo bubu = new DatafeedHistoryRequestInfo();
-        //        //DatafeedHistoryRequest mumu = bubu.Request;
-
-        //        // mumu.BarsCount = 1000;
-        //        //// this.Root.Core.HistoryManager.UpdateBar(mumu, null);
-
-        //        //if (!_list.Contains((Instrument)this.Instrument))
-        //        //{
-        //        //    this.Root.Core.InstrumentManager.AddInstrument2List(this.Instrument, this.Name_of_list);
-        //        //}
-        //        //else
-        //        //{
-        //        //    this.Root.Core.InstrumentManager.RemoveInstrumentFromList(this.Name_of_list, this.Instrument);
-        //        //}
-        //    }
-        //    else
-        //    {
-        //        //nothing to do
-        //    }
-
-        //    this.OnBarUpdate();
-
-        //}
-
-        //#endregion
 
 
         public override string ToString()
@@ -333,12 +274,12 @@ namespace AgenaTrader.UserCode
 
 	    #endregion
 
-		[Browsable(false)]
-		[XmlIgnore()]
-		public DataSeries MyPlot1
-		{
-			get { return Values[0]; }
-		}
+        //[Browsable(false)]
+        //[XmlIgnore()]
+        //public DataSeries MyPlot1
+        //{
+        //    get { return Values[0]; }
+        //}
 
 
         
