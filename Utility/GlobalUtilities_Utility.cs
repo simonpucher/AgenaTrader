@@ -103,7 +103,7 @@ namespace AgenaTrader.UserCode
                     return false;
                 }
 
-                //one liner for .net 4.5
+                //todo one liner for .net 4.5
                 //Note that EmailAddressAttribute is less permissive than System.Net.Mail.MailAddress
                 //if (new EmailAddressAttribute().IsValid(email))
                 //   return true; 
