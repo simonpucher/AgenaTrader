@@ -14,12 +14,12 @@ using System.Runtime.CompilerServices;
 
 
 /// <summary>
-/// Version: in progress
+/// Version: 1.0
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// The initial version of this strategy was inspired by this link: http://emini-watch.com/stock-market-seasonal-trades/5701/
+/// The initial version was inspired by this link: http://emini-watch.com/stock-market-seasonal-trades/5701/
 /// -------------------------------------------------------------------------
 /// todo tax time, 4th of july, september effect, Thanksgiving
 /// -------------------------------------------------------------------------
@@ -113,15 +113,15 @@ namespace AgenaTrader.UserCode
            //Print(dif.TotalMilliseconds);
         }
 
-        DateTime start_onbarupdate = DateTime.Now;
-        DateTime stop_onbarudate = DateTime.Now;
+        //DateTime start_onbarupdate = DateTime.Now;
+        //DateTime stop_onbarudate = DateTime.Now;
 
 		protected override void OnBarUpdate()
 		{
-            if (CurrentBar == 0)
-            {
-                start_onbarupdate = DateTime.Now;
-            }
+            //if (CurrentBar == 0)
+            //{
+            //    start_onbarupdate = DateTime.Now;
+            //}
 
 			//MyPlot1.Set(Input[0]);
 
@@ -145,12 +145,12 @@ namespace AgenaTrader.UserCode
             }
 
 
-            if (this.IsCurrentBarLast)
-            {
-                DateTime stop_onbarudate = DateTime.Now;
-                TimeSpan dif = stop_onbarudate - start_onbarupdate;
-                Print(dif.TotalMilliseconds);
-            }
+            //if (this.IsCurrentBarLast)
+            //{
+            //    DateTime stop_onbarudate = DateTime.Now;
+            //    TimeSpan dif = stop_onbarudate - start_onbarupdate;
+            //    Print(dif.TotalMilliseconds);
+            //}
         
             
 		}
@@ -167,8 +167,8 @@ namespace AgenaTrader.UserCode
 
                 double difference = list.Last().Close - list.First().Open;
 
-                DrawRectangle("sellinmayRect_buy" + list.First().Time.ToString(), true, list.First().Time, high, list.Last().Time, low, color, color, 70);
-                DrawText("sellinmayString_buy" + list.First().Time.ToString(), true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
+                DrawRectangle("sellinmayRect_buy" + list.First().Time.Ticks, true, list.First().Time, high, list.Last().Time, low, color, color, 70);
+                DrawText("sellinmayString_buy" + list.First().Time.Ticks, true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
         }
 
         protected override void OnTermination()

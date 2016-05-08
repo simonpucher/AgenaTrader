@@ -20,6 +20,10 @@ Compare the current value of an indicator to latest high value of the indicator 
 [Funktionsweise](https://www.whselfinvest.at/de/Store_Birger_Schaefermeier_Trading_Strategie_Open_Range_Break_Out.php)
 *** In Progress ***
 
+##Reversal2NextBar
+
+##Seasonal
+
 ##Quantitative Qualitative Estimation (QQE)
 [Funktionsweise](https://en.wikipedia.org/wiki/Zero_lag_exponential_moving_average)
 *** In Progress ***
