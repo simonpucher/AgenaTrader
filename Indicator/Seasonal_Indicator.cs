@@ -44,29 +44,29 @@ namespace AgenaTrader.UserCode
     [Description("Show seasonal trends")]
 	public class Seasonal_Indicator : UserIndicator
 	{
-      
 
         #region Variables
 
         //input
         private SeasonalType _seasonal = SeasonalType.SellInMay;
 
+
         //output
 
 
         //internal
-        private RectangleF _rect;
-
+        //Save data into hashset for a performance boost on the contains method
+        private HashSet<DateTime> hashset = null;
+        //sell in may
         private IEnumerable<IBar> _list_sellinmayandgoaway_buy = null;
         private IEnumerable<IBar> _list_sellinmayandgoaway_sell = null;
         private IBar _last_start_sellinmayandgoway = null;
         private IBar _last_end_sellinmayandgoway = null;
-
+        //internal santa claus
         private IEnumerable<IBar> _list_santaclausrally_buy = null;
         private IBar _last_start_santaclausrally = null;
 
-        //Save data into hashset for a performance boost on the contains method
-        private HashSet<DateTime> hashset = null;
+    
 
         #endregion
 
@@ -80,15 +80,12 @@ namespace AgenaTrader.UserCode
         protected override void InitRequirements()
         {
             //Print("InitRequirements");
-
         }
    
 
         protected override void OnStartUp()
         {
             //Print("OnStartUp");
-
-            //DateTime start = DateTime.Now;
 
             switch (SeasonalType)
             {
@@ -106,32 +103,10 @@ namespace AgenaTrader.UserCode
                 default:
                     break;
             }
-
-
-           //DateTime stop = DateTime.Now;
-           //TimeSpan dif = stop - start;
-           //Print(dif.TotalMilliseconds);
         }
-
-        //DateTime start_onbarupdate = DateTime.Now;
-        //DateTime stop_onbarudate = DateTime.Now;
 
 		protected override void OnBarUpdate()
 		{
-            //if (CurrentBar == 0)
-            //{
-            //    start_onbarupdate = DateTime.Now;
-            //}
-
-			//MyPlot1.Set(Input[0]);
-
-            ////Because of performance just draw on the last bar update.
-            //if (this.IsCurrentBarLast)
-            //{
-            //    DrawAreaRectangle(list_sellinmayandgoaway_buy_new, Color.Green);
-            //    DrawAreaRectangle(list_sellinmayandgoaway_sell_new, Color.Red);
-            //}
-
             switch (SeasonalType)
             {
                 case SeasonalType.SellInMay:
@@ -143,16 +118,6 @@ namespace AgenaTrader.UserCode
                 default:
                     break;
             }
-
-
-            //if (this.IsCurrentBarLast)
-            //{
-            //    DateTime stop_onbarudate = DateTime.Now;
-            //    TimeSpan dif = stop_onbarudate - start_onbarupdate;
-            //    Print(dif.TotalMilliseconds);
-            //}
-        
-            
 		}
 
         /// <summary>
@@ -160,30 +125,27 @@ namespace AgenaTrader.UserCode
         /// </summary>
         /// <param name="list"></param>
         /// <param name="col"></param>
-        private void DrawAreaRectangle(IEnumerable<IBar> list, Color color)
+        private void DrawAreaRectangle(IEnumerable<IBar> list, Color color, string name)
         {
-               double low = list.Min(x => x.Low);
-                double high = list.Max(x => x.High);
+            double low = list.Min(x => x.Low);
+            double high = list.Max(x => x.High);
 
-                double difference = list.Last().Close - list.First().Open;
+            double difference = list.Last().Close - list.First().Open;
 
-                DrawRectangle("sellinmayRect_buy" + list.First().Time.Ticks, true, list.First().Time, high, list.Last().Time, low, color, color, 70);
-                DrawText("sellinmayString_buy" + list.First().Time.Ticks, true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
+            //We need to get ensure that each name is unique.
+            name = name + list.First().Time.Ticks;
+
+            DrawRectangle(name, true, list.First().Time, high, list.Last().Time, low, color, color, 70);
+            DrawText(name, true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
         }
 
-        protected override void OnTermination()
-        {
-            //// Remove event listener
-            //if (ChartControl != null)
-            //    ChartControl.ChartPanelMouseDown -= OnChartPanelMouseDown;
-        }
+        #region calculation
 
         /// <summary>
         /// Calculate the seasonal indicator for "Santa Claus Rally".
         /// </summary>
         private void calculate_Santa_Claus_Rally()
         {
-            //if (list_santaclausrally_buy.Select(x => x.Time).Contains(Bars[0].Time))
             if (hashset.Contains(Bars[0].Time))
             {
                 if (this._last_start_santaclausrally == null)
@@ -195,7 +157,7 @@ namespace AgenaTrader.UserCode
             {
                 if (this._last_start_santaclausrally != null)
                 {
-                    DrawAreaRectangle(this._list_santaclausrally_buy.Where(x => x.Time >= this._last_start_santaclausrally.Time).Where(x => x.Time <= Bars[0].Time), Color.Green);
+                    DrawAreaRectangle(this._list_santaclausrally_buy.Where(x => x.Time >= this._last_start_santaclausrally.Time).Where(x => x.Time <= Bars[0].Time), Color.Green, "santaclausrally_buy");
 
                     this._last_start_santaclausrally = null;
                 }
@@ -206,8 +168,8 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// Calculate the seasonal indicator for "Sell in May".
         /// </summary>
-        private void calculate_Sell_in_May() {
-            //if (list_sellinmayandgoaway_buy.Select(x=>x.Time).Contains(Bars[0].Time))
+        private void calculate_Sell_in_May()
+        {
             if (hashset.Contains(Bars[0].Time))
             {
                 if (_last_start_sellinmayandgoway == null)
@@ -217,7 +179,7 @@ namespace AgenaTrader.UserCode
 
                 if (_last_end_sellinmayandgoway != null)
                 {
-                    DrawAreaRectangle(_list_sellinmayandgoaway_sell.Where(x => x.Time >= _last_end_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time), Color.Red);
+                    DrawAreaRectangle(_list_sellinmayandgoaway_sell.Where(x => x.Time >= _last_end_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time), Color.Red, "sellinmay_sell");
 
                     _last_end_sellinmayandgoway = null;
                 }
@@ -232,12 +194,14 @@ namespace AgenaTrader.UserCode
 
                 if (_last_start_sellinmayandgoway != null)
                 {
-                    DrawAreaRectangle(_list_sellinmayandgoaway_buy.Where(x => x.Time >= _last_start_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time), Color.Green);
+                    DrawAreaRectangle(_list_sellinmayandgoaway_buy.Where(x => x.Time >= _last_start_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time), Color.Green, "sellinmay_buy");
 
                     _last_start_sellinmayandgoway = null;
                 }
             }
         }
+
+        #endregion
 
 
 
