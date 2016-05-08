@@ -272,6 +272,9 @@ namespace AgenaTrader.UserCode
                     this.TargetLong = this.RangeHigh + this.RangeHeight;
                     this.TargetShort = this.RangeLow - this.RangeHeight;
 
+                    Print("Long Target: " + this.TargetLong);
+                    Print("Short Target: " + this.TargetShort);
+
                     //todo move this to the indicator
                     if (this.ShouldDrawOnChart)
                     {

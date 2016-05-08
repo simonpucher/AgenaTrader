@@ -31,10 +31,10 @@ using AgenaTrader.Helper;
 namespace AgenaTrader.UserCode
 {
     [Description("Open Range Breakout Target")]
-	[IsEntryAttribute(false)]
-	[IsStopAttribute(false)]
-	[IsTargetAttribute(true)]
-	[OverrulePreviousStopPrice(false)]
+    [IsEntryAttribute(false)]
+    [IsStopAttribute(false)]
+  [IsTargetAttribute(true)]
+    [OverrulePreviousStopPrice(false)]
     public class ORB_Condition_Target : UserScriptedCondition, IORB
 	{
 
@@ -82,20 +82,20 @@ namespace AgenaTrader.UserCode
             //Initalize Indicator parameters
             _orb_indicator.ORBMinutes = this.ORBMinutes;
             _orb_indicator.Time_OpenRangeStartDE = this.Time_OpenRangeStartDE;
-            //_orb_indicator.Time_OpenRangeEndDE = this.Time_OpenRangeEndDE;
             _orb_indicator.Time_OpenRangeStartUS = this.Time_OpenRangeStartUS;
-            //_orb_indicator.Time_OpenRangeEndUS = this.Time_OpenRangeEndUS;
             _orb_indicator.Time_EndOfDay_DE = this.Time_EndOfDay_DE;
             _orb_indicator.Time_EndOfDay_US = this.Time_EndOfDay_US;
         }
 
-        public override void Recalculate()
+        protected override void Recalculate()
         {
             //base.Recalculate();
 
             calculate();
         }
 
+   
+       
 
         protected override void OnBarUpdate()
         {
