@@ -209,7 +209,7 @@ namespace AgenaTrader.UserCode
 
 //09.15. - 09.30 Kerze
 //            else if (Bars.BarsSinceSession == 6 && existgap == true)
-            else if (Bars[0].Time.TimeOfDay == new TimeSpan(9,30,0))
+            else if (Bars[0].Time.TimeOfDay == new TimeSpan(9,15,0))
             {
 //Auswertung nach ShowGap Handelszeit (=09.30)   
                 printAuswertung();
