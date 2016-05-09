@@ -203,9 +203,9 @@ namespace AgenaTrader.UserCode
             /// <param name="Bars"></param>
             /// <param name="Date"></param>
             /// <returns></returns>
-            public static IBar GetLastBarOfLastSession(IBars Bars, DateTime Date)
+            public static IBar GetLastBarOfLastSession(IBars Bars, DateTime date)
             {
-                return Bars.Where(x => x.Time.Date < Date).LastOrDefault();
+                return Bars.Where(x => x.Time.Date < date).LastOrDefault();
             }
 
             /// <summary>
@@ -246,14 +246,78 @@ namespace AgenaTrader.UserCode
             #endregion
 
             #region Chart
-            public static void SaveSnapShot(string Indicator, String InsturmentName, IChart Chart, DateTime CurrentDateTime)
+             public static void SaveSnapShot(string Indicator, String InsturmentName, IChart Chart, IBars Bars, ITimeFrame TimeFrame )
             {
-                string directory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\" + Indicator + "_" + InsturmentName + "_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm") + "\\";
+                string directory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\" + Indicator + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + InsturmentName + "_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm") + "\\";
                 System.IO.Directory.CreateDirectory(directory);
-                string fileName = InsturmentName + "_" + CurrentDateTime.ToString("yyyy.MM.dd_HH.mm") + ".jpg";
+                string fileName = InsturmentName + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + Bars[0].Time.ToString("yyyy.MM.dd_HH.mm") + ".jpg";
                 fileName = fileName.Replace(":", "_");
 
-                Chart.SetDateRange(CurrentDateTime.AddDays(-1), CurrentDateTime.AddDays(1));
+
+                int i = 1;
+                int j = 1;
+                DateTime ChartStart = DateTime.MinValue;
+                DateTime ChartEnd = DateTime.MinValue;
+
+                ChartStart = Bars[0].Time;
+                while (i < 100000)
+                {
+                    if (Bars[i] == null) break; //prüfen, ob BarsAgo existiert
+                    
+                    if (Bars[i].Time.Date < Bars[0].Time.Date)
+                    {
+                        j = i;
+                        while (j < 100000)
+                        {
+                            if (Bars[j] == null) break; //prüfen, ob BarsAgo existiert
+
+                            if (Bars[j].Time.Date < Bars[i].Time.Date)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                ChartStart = Bars[j].Time;
+                            }
+                            j++;
+                        }
+                        break;
+                    }
+                    i++;
+                }
+
+                i = -1;
+                while (i > -100000)
+                {
+                    if (Bars[i] == null) break; //prüfen, ob BarsAgo existiert
+                    if (Bars[i].Time.Date > Bars[0].Time.Date)
+                    {
+                        j = i;
+                        while (j > -100000)
+                        {
+                            if (Bars[j] == null) break; //prüfen, ob BarsAgo existiert
+
+                            if (Bars[j].Time.Date > Bars[i].Time.Date)
+                            {
+                                break;
+                            }
+                            else
+                            {
+                                ChartEnd = Bars[j].Time;
+                            }
+                            j--;
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        ChartEnd = Bars[i].Time;
+                    }
+                    i--;
+                }
+
+
+                Chart.SetDateRange(ChartStart, ChartEnd);
                 Chart.SaveChart(directory + fileName);
             }
 
