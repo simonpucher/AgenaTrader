@@ -11,9 +11,10 @@ using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 using System.Collections;
+using System.IO;
 
 /// <summary>
-/// Version: 1.4
+/// Version: 1.5
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -245,13 +246,42 @@ namespace AgenaTrader.UserCode
             }
             #endregion
 
-            #region Chart
-             public static void SaveSnapShot(string Indicator, String InsturmentName, IChart Chart, IBars Bars, ITimeFrame TimeFrame )
+            #region Files
+
+            /// <summary>
+            /// Removes illegal letters on filenames and folders..
+            /// </summary>
+            /// <param name="fileName"></param>
+            /// <returns></returns>
+            public static string CleanFileName(string filename)
             {
-                string directory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\" + Indicator + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + InsturmentName + "_" + DateTime.Now.ToString("yyyy.MM.dd_HH.mm") + "\\";
+                filename = filename.Replace(" ", "_");
+                filename = filename.Replace(":", "_");
+                //filename = filename.Replace(".", "_");
+                return Path.GetInvalidFileNameChars().Aggregate(filename, (current, c) => current.Replace(c.ToString(), string.Empty));
+                //return string.Join("_", filename.Split(Path.GetInvalidFileNameChars()));
+            }
+
+            #endregion
+
+            #region Chart
+
+
+            /// <summary>
+            /// Saves a snapshot of the current chart.
+            /// </summary>
+            /// <param name="Indicator"></param>
+            /// <param name="InstrumentName"></param>
+            /// <param name="Chart"></param>
+            /// <param name="Bars"></param>
+            /// <param name="TimeFrame"></param>
+            public static void SaveSnapShot(string Indicator, String InstrumentName, IChart Chart, IBars Bars, ITimeFrame TimeFrame )
+            {
+                string filepart = GlobalUtilities.CleanFileName(Indicator + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + InstrumentName + "_" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm"));
+                string directory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\" + filepart + "\\";
                 System.IO.Directory.CreateDirectory(directory);
-                string fileName = InsturmentName + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + Bars[0].Time.ToString("yyyy.MM.dd_HH.mm") + ".jpg";
-                fileName = fileName.Replace(":", "_");
+                string fileName = InstrumentName + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + Bars[0].Time.ToString("yyyy_MM_dd_HH_mm") + ".jpg";
+                fileName = GlobalUtilities.CleanFileName(fileName);
 
 
                 int i = 1;
