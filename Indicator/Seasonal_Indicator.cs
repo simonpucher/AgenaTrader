@@ -10,15 +10,18 @@ using AgenaTrader.API;
 using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
+using System.Runtime.CompilerServices;
 
 
 /// <summary>
-/// Version: in progress
+/// Version: 1.0
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// The initial version of this strategy was inspired by this link: http://emini-watch.com/stock-market-seasonal-trades/5701/
+/// The initial version was inspired by this link: http://emini-watch.com/stock-market-seasonal-trades/5701/
+/// -------------------------------------------------------------------------
+/// todo tax time, 4th of july, september effect, Thanksgiving
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
@@ -28,85 +31,177 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+  
+    /// <summary>
+    /// Differend types of seasonal indictors.
+    /// </summary>
+    public enum SeasonalType
+    {
+        SellInMay = 1,
+        SantaClausRally = 2
+    }
+
     [Description("Show seasonal trends")]
 	public class Seasonal_Indicator : UserIndicator
 	{
+
+        #region Variables
+
+        //input
+        private SeasonalType _seasonal = SeasonalType.SellInMay;
+
+
+        //output
+
+
+        //internal
+        //Save data into hashset for a performance boost on the contains method
+        private HashSet<DateTime> hashset = null;
+        //sell in may
+        private IEnumerable<IBar> _list_sellinmayandgoaway_buy = null;
+        private IEnumerable<IBar> _list_sellinmayandgoaway_sell = null;
+        private IBar _last_start_sellinmayandgoway = null;
+        private IBar _last_end_sellinmayandgoway = null;
+        //internal santa claus
+        private IEnumerable<IBar> _list_santaclausrally_buy = null;
+        private IBar _last_start_santaclausrally = null;
+
+    
+
+        #endregion
+
+
 		protected override void Initialize()
 		{
-			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
+			//Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
 			Overlay = true;
 		}
 
         protected override void InitRequirements()
         {
             //Print("InitRequirements");
-
         }
-
-        private IEnumerable<IBar> list_sellinmayandgoaway_buy = null;
-        private IEnumerable<IBar> list_sellinmayandgoaway_sell = null;
-        private IBar last_start_sellinmayandgoway = null;
-        private IBar last_end_sellinmayandgoway = null;
+   
 
         protected override void OnStartUp()
         {
             //Print("OnStartUp");
-            list_sellinmayandgoaway_buy = Bars.Where(x => x.Time.Month <= 4 || x.Time.Month >= 10);
-            list_sellinmayandgoaway_sell = Bars.Where(x => x.Time.Month >= 5 && x.Time.Month <= 9);
+
+            switch (SeasonalType)
+            {
+                case SeasonalType.SellInMay:
+                    _list_sellinmayandgoaway_buy = Bars.Where(x => x.Time.Month <= 4 || x.Time.Month >= 10);
+                    _list_sellinmayandgoaway_sell = Bars.Except(_list_sellinmayandgoaway_buy);
+                    hashset = new HashSet<DateTime>(_list_sellinmayandgoaway_buy.Select(x => x.Time));
+                    break;
+                case SeasonalType.SantaClausRally:
+                    _list_santaclausrally_buy = from b in Bars
+                                               where (b.Time.Month == 12 && b.Time.Day >= 15) || (b.Time.Month == 1 && b.Time.Day <= 9)
+                                               select b;
+                    hashset = new HashSet<DateTime>(_list_santaclausrally_buy.Select(x => x.Time));
+                    break;
+                default:
+                    break;
+            }
         }
 
 		protected override void OnBarUpdate()
 		{
-			MyPlot1.Set(Input[0]);
-
-            if (list_sellinmayandgoaway_buy.Select(x => x.Time).Contains(Bars[0].Time))
+            switch (SeasonalType)
             {
-                if (last_start_sellinmayandgoway == null)
-                {
-                    this.last_start_sellinmayandgoway = Bars[0];
+                case SeasonalType.SellInMay:
+                    this.calculate_Sell_in_May();
+                    break;
+                case SeasonalType.SantaClausRally:
+                    this.calculate_Santa_Claus_Rally();
+                    break;
+                default:
+                    break;
+            }
+		}
 
+        /// <summary>
+        /// Draws a rectangle in the chart to visualize the seasonality.
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="col"></param>
+        private void DrawAreaRectangle(IEnumerable<IBar> list, Color color, string name)
+        {
+            double low = list.Min(x => x.Low);
+            double high = list.Max(x => x.High);
+
+            double difference = list.Last().Close - list.First().Open;
+
+            //We need to get ensure that each name is unique.
+            name = name + list.First().Time.Ticks;
+
+            DrawRectangle(name, true, list.First().Time, high, list.Last().Time, low, color, color, 70);
+            DrawText(name, true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
+        }
+
+        #region calculation
+
+        /// <summary>
+        /// Calculate the seasonal indicator for "Santa Claus Rally".
+        /// </summary>
+        private void calculate_Santa_Claus_Rally()
+        {
+            if (hashset.Contains(Bars[0].Time))
+            {
+                if (this._last_start_santaclausrally == null)
+                {
+                    this._last_start_santaclausrally = Bars[0];
+                }
+            }
+            else
+            {
+                if (this._last_start_santaclausrally != null)
+                {
+                    DrawAreaRectangle(this._list_santaclausrally_buy.Where(x => x.Time >= this._last_start_santaclausrally.Time).Where(x => x.Time <= Bars[0].Time), Color.Green, "santaclausrally_buy");
+
+                    this._last_start_santaclausrally = null;
+                }
+            }
+        }
+
+
+        /// <summary>
+        /// Calculate the seasonal indicator for "Sell in May".
+        /// </summary>
+        private void calculate_Sell_in_May()
+        {
+            if (hashset.Contains(Bars[0].Time))
+            {
+                if (_last_start_sellinmayandgoway == null)
+                {
+                    this._last_start_sellinmayandgoway = Bars[0];
                 }
 
-                if (last_end_sellinmayandgoway != null)
+                if (_last_end_sellinmayandgoway != null)
                 {
-                    IEnumerable<IBar> area = list_sellinmayandgoaway_sell.Where(x => x.Time >= last_end_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time);
-                    double low = area.Min(x => x.Low);
-                    double high = area.Max(x => x.High);
+                    DrawAreaRectangle(_list_sellinmayandgoaway_sell.Where(x => x.Time >= _last_end_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time), Color.Red, "sellinmay_sell");
 
-                    double difference = Bars[0].Close - this.last_end_sellinmayandgoway.Open;
-
-                    DrawRectangle("sellinmayRect_sell" + Bars[0].Time.ToString(), true, this.last_end_sellinmayandgoway.Time, high, Bars[0].Time, low, Color.Red, Color.Red, 70);
-                    DrawText("sellinmayString_sell" + Bars[0].Time.ToString(), true, Math.Round((difference), 2).ToString(), this.last_end_sellinmayandgoway.Time, high, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, Color.Red, 70);
-
-                    last_end_sellinmayandgoway = null;
+                    _last_end_sellinmayandgoway = null;
                 }
-
 
             }
             else
             {
-                if (last_end_sellinmayandgoway == null)
+                if (_last_end_sellinmayandgoway == null)
                 {
-                    this.last_end_sellinmayandgoway = Bars[0];
-
+                    this._last_end_sellinmayandgoway = Bars[0];
                 }
 
-                if (last_start_sellinmayandgoway != null)
+                if (_last_start_sellinmayandgoway != null)
                 {
-                    IEnumerable<IBar> area = list_sellinmayandgoaway_buy.Where(x => x.Time >= last_start_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time);
-                    double low = area.Min(x=>x.Low);
-                    double high = area.Max(x=>x.High);
+                    DrawAreaRectangle(_list_sellinmayandgoaway_buy.Where(x => x.Time >= _last_start_sellinmayandgoway.Time).Where(x => x.Time <= Bars[0].Time), Color.Green, "sellinmay_buy");
 
-                    double difference = Bars[0].Close - this.last_start_sellinmayandgoway.Open;
-
-                    DrawRectangle("sellinmayRect_buy" + Bars[0].Time.ToString(), true, this.last_start_sellinmayandgoway.Time, high, Bars[0].Time, low, Color.Green, Color.Green, 70);
-                    DrawText("sellinmayString_buy" + Bars[0].Time.ToString(), true, Math.Round((difference), 2).ToString(), this.last_start_sellinmayandgoway.Time, high, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, Color.Green, 70);
-
-                    last_start_sellinmayandgoway = null;
+                    _last_start_sellinmayandgoway = null;
                 }
-
             }
-		}
+        }
+
+        #endregion
 
 
 
@@ -123,14 +218,35 @@ namespace AgenaTrader.UserCode
             }
         }
 
+
+
+
 		#region Properties
 
-		[Browsable(false)]
-		[XmlIgnore()]
-		public DataSeries MyPlot1
-		{
-			get { return Values[0]; }
-		}
+        #region Input 
+        
+            /// <summary>
+            /// </summary>
+            [Description("Seasonal Type")]
+            [Category("Parameters")]
+            [DisplayName("Seasonal Type")]
+            public SeasonalType SeasonalType
+            {
+                get { return _seasonal; }
+                set { _seasonal = value; }
+            }
+
+	    #endregion
+
+        //[Browsable(false)]
+        //[XmlIgnore()]
+        //public DataSeries MyPlot1
+        //{
+        //    get { return Values[0]; }
+        //}
+
+
+        
 
 		#endregion
 	}
@@ -146,17 +262,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator()
+		public Seasonal_Indicator Seasonal_Indicator(SeasonalType seasonalType)
         {
-			return Seasonal_Indicator(Input);
+			return Seasonal_Indicator(Input, seasonalType);
 		}
 
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator(IDataSeries input)
+		public Seasonal_Indicator Seasonal_Indicator(IDataSeries input, SeasonalType seasonalType)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Seasonal_Indicator>(input);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<Seasonal_Indicator>(input, i => i.SeasonalType == seasonalType);
 
 			if (indicator != null)
 				return indicator;
@@ -165,7 +281,8 @@ namespace AgenaTrader.UserCode
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							Input = input,
+							SeasonalType = seasonalType
 						};
 			indicator.SetUp();
 
@@ -184,20 +301,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator()
+		public Seasonal_Indicator Seasonal_Indicator(SeasonalType seasonalType)
 		{
-			return LeadIndicator.Seasonal_Indicator(Input);
+			return LeadIndicator.Seasonal_Indicator(Input, seasonalType);
 		}
 
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator(IDataSeries input)
+		public Seasonal_Indicator Seasonal_Indicator(IDataSeries input, SeasonalType seasonalType)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.Seasonal_Indicator(input);
+			return LeadIndicator.Seasonal_Indicator(input, seasonalType);
 		}
 	}
 
@@ -210,17 +327,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator()
+		public Seasonal_Indicator Seasonal_Indicator(SeasonalType seasonalType)
 		{
-			return LeadIndicator.Seasonal_Indicator(Input);
+			return LeadIndicator.Seasonal_Indicator(Input, seasonalType);
 		}
 
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator(IDataSeries input)
+		public Seasonal_Indicator Seasonal_Indicator(IDataSeries input, SeasonalType seasonalType)
 		{
-			return LeadIndicator.Seasonal_Indicator(input);
+			return LeadIndicator.Seasonal_Indicator(input, seasonalType);
 		}
 	}
 
@@ -233,17 +350,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator()
+		public Seasonal_Indicator Seasonal_Indicator(SeasonalType seasonalType)
 		{
-			return LeadIndicator.Seasonal_Indicator(Input);
+			return LeadIndicator.Seasonal_Indicator(Input, seasonalType);
 		}
 
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator(IDataSeries input)
+		public Seasonal_Indicator Seasonal_Indicator(IDataSeries input, SeasonalType seasonalType)
 		{
-			return LeadIndicator.Seasonal_Indicator(input);
+			return LeadIndicator.Seasonal_Indicator(input, seasonalType);
 		}
 	}
 
