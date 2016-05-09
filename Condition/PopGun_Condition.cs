@@ -22,11 +22,16 @@ namespace AgenaTrader.UserCode
 	{
 		#region Variables
 
-		private int _popGun = 1;
+        //private int _popGun = 1;
         int _PopGunExpires = 5;
-        double PopGun_Indicator_Value;
+        //double PopGun_Indicator_Value;
+
+        //internal
+        private PopGun_Indicator _popgun_indicator = null;
 
 		#endregion
+
+        
 
 		protected override void Initialize()
 		{
@@ -39,18 +44,42 @@ namespace AgenaTrader.UserCode
 			CalculateOnBarClose = true;
 		}
 
+        protected override void InitRequirements()
+        {
+            base.InitRequirements();
+
+        }
+
+        protected override void OnStartUp()
+        {
+            base.OnStartUp();
+
+            //Init our indicator to get code access
+            this._popgun_indicator = new PopGun_Indicator();
+            this._popgun_indicator.SetData(this.PopGunExpires);
+
+        }
+
 		protected override void OnBarUpdate()
 		{
-            //ShowGap Indikator aufrufen. Dieser liefert 100 für Long Einstieg und -100 für Short Einstieg. Liefert 0 für kein Einstiegssignal
-            PopGun_Indicator_Value = PopGun_Indicator(_PopGunExpires)[0];
+            if (this.Bars != null && this.Bars.Count > 0)
+            {
+                //ShowGap Indikator aufrufen. Dieser liefert 100 für Long Einstieg und -100 für Short Einstieg. Liefert 0 für kein Einstiegssignal
+               // PopGun_Indicator_Value = PopGun_Indicator(_PopGunExpires)[0];
+                double PopGun_Indicator_Value = this._popgun_indicator.calculate(this.Bars, this.CurrentBar);
 
-            if (PopGun_Indicator_Value == 100)
-            {
-                Occurred.Set(1);
-            }
-            else
-            {
-                Occurred.Set(0);
+               //// Print(Time[0].ToString() + ": " + PopGun_Indicator_Value);
+
+                if (PopGun_Indicator_Value == 100)
+                {
+                    Occurred.Set(1);
+                    Entry.Set(this.Bars[0].Close);
+                }
+                else
+                {
+                    Occurred.Set(0);
+                    Entry.Set(this.Bars[0].Close);
+                }
             }
 		}
 
@@ -75,13 +104,13 @@ namespace AgenaTrader.UserCode
 			return new[]{Entry};
 		}
 
-		[Description("")]
-		[Category("Parameters")]
-		public int PopGun
-		{
-			get { return _popGun; }
-			set { _popGun = Math.Max(1, value); }
-		}
+        //[Description("")]
+        //[Category("Parameters")]
+        //public int PopGun
+        //{
+        //    get { return _popGun; }
+        //    set { _popGun = Math.Max(1, value); }
+        //}
         [Description("Wieviel Bars ist PopGunTrigger gültig?")]
         [Category("Parameters")]
         [DisplayName("PopGunExpires")]

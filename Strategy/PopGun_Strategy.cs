@@ -37,14 +37,14 @@ namespace AgenaTrader.UserCode
 		{
             if (!IsCurrentBarLast || oEnter != null) return;
 
-            //PopGun Indikator aufrufen. Dieser liefert für Mustererkennung
-            PopGun_Indicator_Value = PopGun_Indicator(_PopGunExpires)[0];
-            if (PopGun_Indicator_Value == 100)
-            {
+            ////PopGun Indikator aufrufen. Dieser liefert für Mustererkennung
+            //PopGun_Indicator_Value = PopGun_Indicator(_PopGunExpires)[0];
+            //if (PopGun_Indicator_Value == 100)
+            //{
 
 
 
-            }
+            //}
 		}
 
         #region Properties
