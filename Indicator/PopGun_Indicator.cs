@@ -13,9 +13,9 @@ using AgenaTrader.Helper;
 
 namespace AgenaTrader.UserCode
 {
-	[Description("PopGun Bar Pattern")]
-	public class PopGun_Indicator : UserIndicator
-	{
+    [Description("PopGun Bar Pattern")]
+    public class PopGun_Indicator : UserIndicator
+    {
         //Definition Outside Bar (not to be confused with the Outside Bar Markttechnik Defition based on Michael Voigt)
         // ->An outside bar occurs when the range of a bar encompasses the previous bar
         //http://www.debeurs.nl/Forum/Upload/2015/8690735.pdf
@@ -88,6 +88,9 @@ namespace AgenaTrader.UserCode
 
                 DrawLine(strPopGunLong, 5, Bars[_PopGunExpires].High, 0, Bars[_PopGunExpires].High, Color.Green);
                 DrawLine(strPopGunShort, 5, Bars[_PopGunExpires].Low, 0, Bars[_PopGunExpires].Low, Color.Red);
+
+                GlobalUtilities.SaveSnapShot("PopGun", Instrument.Name, this.Root.Core.ChartManager.AllCharts.FirstOrDefault(), Bars, TimeFrame);
+
             }
         }
 

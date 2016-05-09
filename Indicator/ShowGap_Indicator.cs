@@ -213,7 +213,7 @@ namespace AgenaTrader.UserCode
             {
 //Auswertung nach ShowGap Handelszeit (=09.30)   
                 printAuswertung();
-                GlobalUtilities.SaveSnapShot("ShowGap", Instrument.Name, this.Root.Core.ChartManager.AllCharts.FirstOrDefault(), Bars[0].Time);
+                GlobalUtilities.SaveSnapShot("ShowGap", Instrument.Name, this.Root.Core.ChartManager.AllCharts.FirstOrDefault(), Bars, TimeFrame);
             }
         }
 
