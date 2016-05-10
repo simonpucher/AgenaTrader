@@ -71,7 +71,7 @@ namespace AgenaTrader.UserCode
 			Add(new Plot(Color.FromKnownColor(KnownColor.Black), "Occurred"));
 			Add(new Plot(Color.FromArgb(255, 187, 128, 238), "Entry"));
 			Overlay = true;
-			CalculateOnBarClose = true;
+			CalculateOnBarClose = false;
 		}
 
         protected override void InitRequirements()
@@ -102,6 +102,8 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnBarUpdate()
 		{
+
+
             _orb_indicator.calculate(Bars[0]);
             //Occurred.Set(returnvalue);
             //Entry.Set(Bars[0].Close);

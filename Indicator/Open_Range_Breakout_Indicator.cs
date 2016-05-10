@@ -233,7 +233,7 @@ namespace AgenaTrader.UserCode
         /// <param name="currentbar"></param>
         /// <returns></returns>
         public void calculate(IBar currentbar) {
-
+            
             //int returnvalue = 0;
 
             //new day session is beginning so we need to calculate the open range breakout
@@ -272,8 +272,8 @@ namespace AgenaTrader.UserCode
                     this.TargetLong = this.RangeHigh + this.RangeHeight;
                     this.TargetShort = this.RangeLow - this.RangeHeight;
 
-                    Print("Long Target: " + this.TargetLong);
-                    Print("Short Target: " + this.TargetShort);
+                    //Print("Long Target: " + this.TargetLong);
+                    //Print("Short Target: " + this.TargetShort);
 
                     //todo move this to the indicator
                     if (this.ShouldDrawOnChart)
