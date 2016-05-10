@@ -66,9 +66,9 @@ namespace AgenaTrader.UserCode
 			IsStop = false;
 			IsTarget = true;
 			Add(new Plot(Color.FromKnownColor(KnownColor.Black), "Occurred"));
-			Add(new Plot(Color.FromArgb(255, 187, 128, 238), "Entry"));
+			Add(new Plot(Color.FromArgb(255, 187, 128, 238), "Target"));
 			Overlay = true;
-			CalculateOnBarClose = true;
+			CalculateOnBarClose = false;
 		}
 
         protected override void OnStartUp()
@@ -87,7 +87,7 @@ namespace AgenaTrader.UserCode
             _orb_indicator.Time_EndOfDay_US = this.Time_EndOfDay_US;
         }
 
-        protected override void Recalculate()
+        public override void Recalculate()
         {
             //base.Recalculate();
 

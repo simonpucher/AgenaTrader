@@ -33,7 +33,7 @@ namespace AgenaTrader.UserCode
     /// Optimized execution by predefining instances of external indicators (Zondor August 10 2010)    
     /// </summary>
     [Description("The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.")]
-	public class Coppock : UserIndicator
+	public class Coppock_Indicator : UserIndicator
 	{
 		#region Variables
 
@@ -254,22 +254,22 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public Coppock Coppock()
+		public Coppock_Indicator Coppock_Indicator()
         {
-			return Coppock(Input);
+			return Coppock_Indicator(Input);
 		}
 
 		/// <summary>
 		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public Coppock Coppock(IDataSeries input)
+		public Coppock_Indicator Coppock_Indicator(IDataSeries input)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Coppock>(input);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<Coppock_Indicator>(input);
 
 			if (indicator != null)
 				return indicator;
 
-			indicator = new Coppock
+			indicator = new Coppock_Indicator
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
@@ -292,20 +292,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public Coppock Coppock()
+		public Coppock_Indicator Coppock_Indicator()
 		{
-			return LeadIndicator.Coppock(Input);
+			return LeadIndicator.Coppock_Indicator(Input);
 		}
 
 		/// <summary>
 		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public Coppock Coppock(IDataSeries input)
+		public Coppock_Indicator Coppock_Indicator(IDataSeries input)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.Coppock(input);
+			return LeadIndicator.Coppock_Indicator(input);
 		}
 	}
 
@@ -318,17 +318,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public Coppock Coppock()
+		public Coppock_Indicator Coppock_Indicator()
 		{
-			return LeadIndicator.Coppock(Input);
+			return LeadIndicator.Coppock_Indicator(Input);
 		}
 
 		/// <summary>
 		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public Coppock Coppock(IDataSeries input)
+		public Coppock_Indicator Coppock_Indicator(IDataSeries input)
 		{
-			return LeadIndicator.Coppock(input);
+			return LeadIndicator.Coppock_Indicator(input);
 		}
 	}
 
@@ -341,17 +341,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public Coppock Coppock()
+		public Coppock_Indicator Coppock_Indicator()
 		{
-			return LeadIndicator.Coppock(Input);
+			return LeadIndicator.Coppock_Indicator(Input);
 		}
 
 		/// <summary>
 		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
 		/// </summary>
-		public Coppock Coppock(IDataSeries input)
+		public Coppock_Indicator Coppock_Indicator(IDataSeries input)
 		{
-			return LeadIndicator.Coppock(input);
+			return LeadIndicator.Coppock_Indicator(input);
 		}
 	}
 
@@ -360,5 +360,3 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
-
-
