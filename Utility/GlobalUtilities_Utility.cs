@@ -275,80 +275,47 @@ namespace AgenaTrader.UserCode
             /// <param name="Chart"></param>
             /// <param name="Bars"></param>
             /// <param name="TimeFrame"></param>
-            public static void SaveSnapShot(string Indicator, String InstrumentName, IChart Chart, IBars Bars, ITimeFrame TimeFrame )
+            public static void SaveSnapShot(string Indicator, String InstrumentName,IEnumerable <IChart> AllCharts, IBars Bars, ITimeFrame TimeFrame )
             {
+
                 string filepart = GlobalUtilities.CleanFileName(Indicator + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + InstrumentName + "_" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm"));
                 string directory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\" + filepart + "\\";
                 System.IO.Directory.CreateDirectory(directory);
                 string fileName = InstrumentName + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + Bars[0].Time.ToString("yyyy_MM_dd_HH_mm") + ".jpg";
                 fileName = GlobalUtilities.CleanFileName(fileName);
 
-
-                int i = 1;
-                int j = 1;
+                //take 20 Bars to future and 20 Bars from the past (but only if they exist, if not, just take first or last)
                 DateTime ChartStart = DateTime.MinValue;
                 DateTime ChartEnd = DateTime.MinValue;
 
-                ChartStart = Bars[0].Time;
-                while (i < 100000)
+                if (Bars.GetByIndex(Bars.GetIndex(Bars[0])+20) != null)
                 {
-                    if (Bars[i] == null) break; //prüfen, ob BarsAgo existiert
-                    
-                    if (Bars[i].Time.Date < Bars[0].Time.Date)
-                    {
-                        j = i;
-                        while (j < 100000)
-                        {
-                            if (Bars[j] == null) break; //prüfen, ob BarsAgo existiert
-
-                            if (Bars[j].Time.Date < Bars[i].Time.Date)
-                            {
-                                break;
-                            }
-                            else
-                            {
-                                ChartStart = Bars[j].Time;
-                            }
-                            j++;
-                        }
-                        break;
-                    }
-                    i++;
+                    ChartEnd = Bars.GetByIndex(Bars.GetIndex(Bars[0]) + 20).Time;
+                }
+                else
+                {
+                    ChartEnd = Bars.First().Time;
                 }
 
-                i = -1;
-                while (i > -100000)
+                if (Bars.GetByIndex(Bars.GetIndex(Bars[0]) - 20) != null)
                 {
-                    if (Bars[i] == null) break; //prüfen, ob BarsAgo existiert
-                    if (Bars[i].Time.Date > Bars[0].Time.Date)
-                    {
-                        j = i;
-                        while (j > -100000)
-                        {
-                            if (Bars[j] == null) break; //prüfen, ob BarsAgo existiert
-
-                            if (Bars[j].Time.Date > Bars[i].Time.Date)
-                            {
-                                break;
-                            }
-                            else
-                            {
-                                ChartEnd = Bars[j].Time;
-                            }
-                            j--;
-                        }
-                        break;
-                    }
-                    else
-                    {
-                        ChartEnd = Bars[i].Time;
-                    }
-                    i--;
+                    ChartStart = Bars.GetByIndex(Bars.GetIndex(Bars[0]) - 20).Time;
+                }
+                else
+                {
+                    ChartStart = Bars.Last().Time;
                 }
 
-
-                Chart.SetDateRange(ChartStart, ChartEnd);
-                Chart.SaveChart(directory + fileName);
+                //pick the right chart matching the current timeframe
+                foreach (IChart chart in AllCharts)
+                {
+                    if (chart.HistoryRequest.TimeFrame.Periodicity == TimeFrame.Periodicity
+                     && chart.HistoryRequest.TimeFrame.PeriodicityValue == TimeFrame.PeriodicityValue)
+                    {
+                        chart.SetDateRange(ChartStart, ChartEnd);
+                        chart.SaveChart(directory + fileName);
+                    }
+                }
             }
 
             #endregion

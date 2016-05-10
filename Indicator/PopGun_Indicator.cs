@@ -63,37 +63,6 @@ namespace AgenaTrader.UserCode
            drawTarget();
         }
 
-        //public void calculate()
-        //{
-        //    if (CurrentBar < 2) return;
-
-        //    double TwoBarsAgo_High = Bars[2].High;
-        //    double TwoBarsAgo_Low = Bars[2].Low;
-
-        //    double OneBarAgo_High = Bars[1].High;
-        //    double OneBarAgo_Low = Bars[1].Low;
-
-        //    double CurrentBar_High = Bars[0].High;
-        //    double CurrentBar_Low = Bars[0].Low;
-
-        //    // 2) Determine, if 1 Bar ago, there was an inside bar
-        //    if (TwoBarsAgo_High > OneBarAgo_High
-        //    && TwoBarsAgo_Low < OneBarAgo_Low)
-        //    {
-        //        //One Bar ago was an inside bar, so lets check if current bar is outside bar
-        //        if (TwoBarsAgo_High < CurrentBar_High
-        //        && TwoBarsAgo_Low > CurrentBar_Low)
-        //        {
-        //            // current bar is outside bar -> lets pop the gun
-        //            BarColor = Color.Turquoise;
-        //            PopGunTarget = CurrentBar + _PopGunExpires;
-        //            Value.Set(100);
-        //            return;
-        //        }
-        //    }
-        //    Value.Set(0);
-        //}
-
         //todo -100 wird noch nicht zurückgegeben oder?
         public int calculate(IBars bars, int curbar)
         {
@@ -120,12 +89,9 @@ namespace AgenaTrader.UserCode
                     // current bar is outside bar -> lets pop the gun
                     this.BarColor = Color.Turquoise;
                     this.PopGunTarget = curbar + this.PopGunExpires;
-                    //Value.Set(100);
-                    //return;
                     return 100;
                 }
             }
-            //Value.Set(0);
             return 0;
         }
 
@@ -143,7 +109,7 @@ namespace AgenaTrader.UserCode
 
                 if (this.IsSnapshotActive)
                 {
-                    GlobalUtilities.SaveSnapShot("PopGun", Instrument.Name, this.Root.Core.ChartManager.AllCharts.FirstOrDefault(), Bars, TimeFrame); 
+                    GlobalUtilities.SaveSnapShot("PopGun", Instrument.Name, this.Root.Core.ChartManager.AllCharts, Bars, TimeFrame); 
                 }
             }
         }
