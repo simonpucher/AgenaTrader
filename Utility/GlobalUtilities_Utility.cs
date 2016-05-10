@@ -249,9 +249,9 @@ namespace AgenaTrader.UserCode
             #region Files
 
             /// <summary>
-            /// Removes illegal letters on filenames and folders..
+            /// Removes illegal letters on strings for filenames and folders.
             /// </summary>
-            /// <param name="fileName"></param>
+            /// <param name="filename"></param>
             /// <returns></returns>
             public static string CleanFileName(string filename)
             {
@@ -677,6 +677,18 @@ public static class StringExtensions {
     {
         return str.Split(new char[] { ' ', '.', '?' }, StringSplitOptions.RemoveEmptyEntries).Length;
     }
+
+    /// <summary>
+    /// Removes illegal letters on strings for filenames and folders.
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    public static string CleanFileName(this String str)
+    {
+        return CleanFileName(str);
+    }
+
+    
 }
 
 
@@ -685,6 +697,9 @@ public static class StringExtensions {
 	{
         //https://www.youtube.com/watch?v=5NNOrp_83RU
     }
+
+
+
 
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 
