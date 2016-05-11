@@ -65,20 +65,26 @@ namespace AgenaTrader.UserCode
             if (this.Bars != null && this.Bars.Count > 0)
             {
                 //ShowGap Indikator aufrufen. Dieser liefert 100 für Long Einstieg und -100 für Short Einstieg. Liefert 0 für kein Einstiegssignal
-               // PopGun_Indicator_Value = PopGun_Indicator(_PopGunExpires)[0];
                 double PopGun_Indicator_Value = this._popgun_indicator.calculate(this.Bars, this.CurrentBar);
-
-               //// Print(Time[0].ToString() + ": " + PopGun_Indicator_Value);
-
+                Print("Condition Entry CurrentBid:" + GetCurrentBid());
                 if (PopGun_Indicator_Value == 100)
                 {
                     Occurred.Set(1);
-                    Entry.Set(this.Bars[0].Close);
+                    //Entry.Set(this.Bars[0].Close);
+                    Entry.Set(GetCurrentBid());
                 }
+                else if (PopGun_Indicator_Value == -100)
+                {
+                    Occurred.Set(-1);
+                    //Entry.Set(this.Bars[0].Close);
+                    Entry.Set(GetCurrentBid());
+                }
+
                 else
                 {
                     Occurred.Set(0);
-                    Entry.Set(this.Bars[0].Close);
+                    //Entry.Set(this.Bars[0].Close);
+                    Entry.Set(GetCurrentBid());
                 }
             }
 		}

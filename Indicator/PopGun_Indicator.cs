@@ -33,12 +33,13 @@ namespace AgenaTrader.UserCode
         private bool _issnapshotactive = false;
 
         //output
+        private double _popGunTriggerLong;
+        private double _popGunTriggerShort;
 
         //internal
         bool IsPopGun;
         int PopGunTarget;
-       
-
+        int PopGunTriggerBar;
 
         /// <summary>
         /// If we use this indicator from another script we need to initalize all important data first.
@@ -52,7 +53,9 @@ namespace AgenaTrader.UserCode
         protected override void Initialize()
         {
             Add(new Plot(Color.Orange, "PopGun"));
-            Overlay = true;
+            Add(new Plot(Color.Green, PlotStyle.Block,"PopGunTrigger"));
+            Overlay = false; //underneath the price chart in his own subchart
+            DrawOnPricePanel = true;
             CalculateOnBarClose = true;
         }
 
@@ -60,12 +63,17 @@ namespace AgenaTrader.UserCode
         {
             int returnvalue = calculate(Bars, CurrentBar);
             Value.Set(returnvalue);
-           drawTarget();
+            if (CurrentBar <= this.PopGunTarget)
+            {
+                Values[1].Set(0); //Indicates that there is a PopGun Trigger!         
+            }
+            drawTarget();
         }
 
         //todo -100 wird noch nicht zurückgegeben oder?
         public int calculate(IBars bars, int curbar)
         {
+            //Values[1].Set(0);
             //We need at least three bars
             if (curbar < 2) return 0;
 
@@ -87,9 +95,22 @@ namespace AgenaTrader.UserCode
                 && TwoBarsAgo_Low > CurrentBar_Low)
                 {
                     // current bar is outside bar -> lets pop the gun
-                    this.BarColor = Color.Turquoise;
                     this.PopGunTarget = curbar + this.PopGunExpires;
-                    return 100;
+                    PopGunTriggerBar = CurrentBar;
+                    this.PopGunTriggerLong = CurrentBar_High;
+                    this.PopGunTriggerShort = CurrentBar_Low;
+                }
+            }
+
+            if (curbar < this.PopGunTarget)                
+            {
+                if (bars[0].Close > this.PopGunTriggerLong)
+                {
+                    return 100; 
+                }
+                else if (bars[0].Close < this.PopGunTriggerShort)
+                {
+                    return -100; 
                 }
             }
             return 0;
@@ -98,14 +119,20 @@ namespace AgenaTrader.UserCode
         public void drawTarget()
         {
 
-            if (CurrentBar == PopGunTarget
-              && CurrentBar > 0)
+            if (CurrentBar <= PopGunTarget
+             && CurrentBar > PopGunTriggerBar
+             && CurrentBar > 0)
             {
                 string strPopGunLong = "PopGunLong" + CurrentBar;
                 string strPopGunShort = "PopGunShort" + CurrentBar;
 
-                DrawLine(strPopGunLong, 5, Bars[_PopGunExpires].High, 0, Bars[_PopGunExpires].High, Color.Green);
-                DrawLine(strPopGunShort, 5, Bars[_PopGunExpires].Low, 0, Bars[_PopGunExpires].Low, Color.Red);
+                DateTime lineend = GlobalUtilities.GetTargetBar(Bars, Bars.GetByIndex(PopGunTriggerBar).Time, TimeFrame, PopGunExpires);
+
+                DrawLine(strPopGunLong, true, Bars.GetByIndex(PopGunTriggerBar).Time, PopGunTriggerLong, lineend, PopGunTriggerLong, 
+                                                        Color.Green, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
+
+                DrawLine(strPopGunShort, true, Bars.GetByIndex(PopGunTriggerBar).Time, PopGunTriggerShort, lineend, PopGunTriggerShort, 
+                                                        Color.Red, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
 
                 if (this.IsSnapshotActive)
                 {
@@ -115,7 +142,6 @@ namespace AgenaTrader.UserCode
         }
 
         #region Properties
-
         [Description("Wieviel Bars ist PopGunTrigger gültig?")]
         [Category("Parameters")]
         [DisplayName("PopGunExpires")]
@@ -137,6 +163,23 @@ namespace AgenaTrader.UserCode
         
         #endregion
 
+        #region Output
+        [Browsable(false)]
+        [XmlIgnore()]
+        public double PopGunTriggerLong
+        {
+            get { return _popGunTriggerLong; }
+            set { _popGunTriggerLong = value; }
+        }
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public double PopGunTriggerShort
+        {
+            get { return _popGunTriggerShort; }
+            set { _popGunTriggerShort = value; }
+        }
+        #endregion
     }
 }
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy

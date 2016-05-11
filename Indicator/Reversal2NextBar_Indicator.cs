@@ -52,7 +52,8 @@ namespace AgenaTrader.UserCode
             if (IsReversalLongTrade() == true)
             {
                 ReversalTradeStartTSLong = Bars[0].Time;
-                TargetBarTime = GetTargetBar(Bars[0].Time);
+                //TargetBarTime = GetTargetBar(Bars[0].Time);
+                TargetBarTime = GlobalUtilities.GetTargetBar(Bars, Bars[0].Time, TimeFrame, 1);
                 Value.Set(100);
                 Reversal2NextBar.Set(100);
             }
@@ -60,7 +61,8 @@ namespace AgenaTrader.UserCode
             {
 
                 ReversalTradeStartTSShort = Bars[0].Time;
-                TargetBarTime = GetTargetBar(Bars[0].Time);
+                //TargetBarTime = GetTargetBar(Bars[0].Time);
+                TargetBarTime = GlobalUtilities.GetTargetBar(Bars, Bars[0].Time, TimeFrame, 1);
                 Value.Set(-100);
 
             }
@@ -145,54 +147,54 @@ namespace AgenaTrader.UserCode
 
         }
 
-        public DateTime GetTargetBar(DateTime CurrentBarDateTime)
-        {
-            switch (TimeFrame.Periodicity)
-            {
-                case DatafeedHistoryPeriodicity.Minute:
-                    switch (TimeFrame.PeriodicityValue)
-                    {
-                        case 1:
-                            return CurrentBarDateTime.AddMinutes(1);
-                        //break;
-                        case 5:
-                            return CurrentBarDateTime.AddMinutes(5);
-                        //break;
-                        case 15:
-                            return CurrentBarDateTime.AddMinutes(15);
-                        //break;
-                        case 30:
-                            return CurrentBarDateTime.AddMinutes(30);
-                        //break;
-                    }
-                    break;
-                case DatafeedHistoryPeriodicity.Hour:
-                    switch (TimeFrame.PeriodicityValue)
-                    {
-                        case 1:
-                            return CurrentBarDateTime.AddHours(1);
-                        //break;
-                        case 5:
-                            return CurrentBarDateTime.AddHours(4);
-                        //break;
-                    }
-                    break;
+        //public DateTime GetTargetBar(DateTime CurrentBarDateTime)
+        //{
+        //    switch (TimeFrame.Periodicity)
+        //    {
+        //        case DatafeedHistoryPeriodicity.Minute:
+        //            switch (TimeFrame.PeriodicityValue)
+        //            {
+        //                case 1:
+        //                    return CurrentBarDateTime.AddMinutes(1);
+        //                //break;
+        //                case 5:
+        //                    return CurrentBarDateTime.AddMinutes(5);
+        //                //break;
+        //                case 15:
+        //                    return CurrentBarDateTime.AddMinutes(15);
+        //                //break;
+        //                case 30:
+        //                    return CurrentBarDateTime.AddMinutes(30);
+        //                //break;
+        //            }
+        //            break;
+        //        case DatafeedHistoryPeriodicity.Hour:
+        //            switch (TimeFrame.PeriodicityValue)
+        //            {
+        //                case 1:
+        //                    return CurrentBarDateTime.AddHours(1);
+        //                //break;
+        //                case 5:
+        //                    return CurrentBarDateTime.AddHours(4);
+        //                //break;
+        //            }
+        //            break;
 
-                case DatafeedHistoryPeriodicity.Day:
-                    return CurrentBarDateTime.AddDays(1);
-                //                  break;
+        //        case DatafeedHistoryPeriodicity.Day:
+        //            return CurrentBarDateTime.AddDays(1);
+        //        //                  break;
 
-                case DatafeedHistoryPeriodicity.Week:
-                    return CurrentBarDateTime.AddDays(7);
-                //                break;
+        //        case DatafeedHistoryPeriodicity.Week:
+        //            return CurrentBarDateTime.AddDays(7);
+        //        //                break;
 
 
 
-                default:
-                    return DateTime.MinValue;
-            }
-            return DateTime.MinValue;
-        }
+        //        default:
+        //            return DateTime.MinValue;
+        //    }
+        //    return DateTime.MinValue;
+        //}
 
         private bool IsReversalLongTrade()
         {
