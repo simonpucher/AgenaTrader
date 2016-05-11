@@ -135,8 +135,8 @@ namespace AgenaTrader.UserCode
             //We need to get ensure that each name is unique.
             name = name + list.First().Time.Ticks;
 
-            DrawRectangle(name, true, list.First().Time, high, list.Last().Time, low, color, color, 70);
-            DrawText(name, true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
+            DrawRectangle("rect" + name, true, list.First().Time, high, list.Last().Time, low, color, color, 70);
+            DrawText("text" + name, true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
         }
 
         #region calculation
