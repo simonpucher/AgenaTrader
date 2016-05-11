@@ -73,6 +73,9 @@ namespace AgenaTrader.UserCode
             {
                  this.TimeFrame = new TimeFrame(DatafeedHistoryPeriodicity.Minute, 1);
             }
+
+            //We need at least one bar.
+            this.BarsRequired = 1;
 		}
 
         protected override void OnStartUp()
@@ -96,6 +99,11 @@ namespace AgenaTrader.UserCode
 		protected override void OnBarUpdate()
 		{
             Print("OnBarUpdate" + Bars[0].Time.ToString());
+
+            IAccount account = this.Core.AccountManager.GetAccount(this.Instrument, true);
+            int quantity = this.Instrument.GetDefaultQuantity(account);
+
+            Print("Order Quantity: " + quantity);
 
             //if one order already set stop execution
             if (_orderenterlong != null || _orderenterlong_stop != null || _orderentershort != null || _orderentershort_stop != null)
@@ -169,8 +177,14 @@ namespace AgenaTrader.UserCode
         /// Create Long Order and Stop.
         /// </summary>
         private void EnterLong() {
-            _orderenterlong = SubmitOrder(0, OrderAction.Buy, OrderType.Market, 1, 0, Close[0], "long_ocoId" + this.Instrument.ISIN, "ORB");
-            _orderenterlong_stop = SubmitOrder(0, OrderAction.Sell, OrderType.Stop, 1, 0, this._orb_indicator.RangeLow, "long_ocoId" + this.Instrument.ISIN, "ORB");
+            string ocoId = "long_ocoId" + this.Instrument.ISIN;
+            //todo positionsgröße bestimmen
+            _orderenterlong = SubmitOrder(0, OrderAction.Buy, OrderType.Market, 1, 0, Close[0], ocoId, "ORB");
+            _orderenterlong_stop = SubmitOrder(0, OrderAction.Sell, OrderType.Stop, 1, 0, this._orb_indicator.RangeLow, ocoId, "ORB");
+
+            //Connect the entry and the stop order and fire it!
+            CreateIfDoneGroup(new List<IOrder> { _orderenterlong, _orderenterlong_stop });
+            _orderenterlong.ConfirmOrder();
 
             //Core.PreferenceManager.DefaultEmailAddress
             if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, this.Core.PreferenceManager.DefaultEmailAddress,
@@ -181,8 +195,14 @@ namespace AgenaTrader.UserCode
         /// Create Short Order and Stop.
         /// </summary>
         private void EnterShort() {
-            _orderentershort = SubmitOrder(0, OrderAction.SellShort, OrderType.Market, 1, 0, Close[0], "short_ocoId" + this.Instrument.ISIN, "ORB");
-            _orderentershort_stop = SubmitOrder(0, OrderAction.BuyToCover, OrderType.Stop, 1, 0, this._orb_indicator.RangeHigh, "short_ocoId" + this.Instrument.ISIN, "ORB");
+            string ocoId = "short_ocoId" + this.Instrument.ISIN;
+            //todo positionsgröße bestimmen
+            _orderentershort = SubmitOrder(0, OrderAction.SellShort, OrderType.Market, 1, 0, Close[0], ocoId, "ORB");
+            _orderentershort_stop = SubmitOrder(0, OrderAction.BuyToCover, OrderType.Stop, 1, 0, this._orb_indicator.RangeHigh, ocoId, "ORB");
+
+            //Connect the entry and the stop order and fire it!
+            CreateIfDoneGroup(new List<IOrder> { _orderentershort, _orderentershort_stop });
+            _orderentershort.ConfirmOrder();
 
             //Core.PreferenceManager.DefaultEmailAddress
             if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, this.Core.PreferenceManager.DefaultEmailAddress,

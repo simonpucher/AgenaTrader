@@ -150,11 +150,11 @@ namespace AgenaTrader.UserCode
             //else {
             //    Log(Const.DefaultStringDatafeedPeriodicity, InfoLogLevel.Warning);
             //}
+
         }
 
 		protected override void OnBarUpdate()
 		{
-
             if (this.DatafeedPeriodicityIsValid(Bars))
             {
 
@@ -941,4 +941,5 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
 
