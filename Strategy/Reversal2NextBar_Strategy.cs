@@ -95,7 +95,8 @@ namespace AgenaTrader.UserCode
         {
             DateTime ts_Ausstieg;
 
-            ts_Ausstieg = Reversal2NextBar_Indicator().GetTargetBar(Bars[-1].Time);
+           // ts_Ausstieg = Reversal2NextBar_Indicator().GetTargetBar(Bars[-1].Time);
+            ts_Ausstieg = GlobalUtilities.GetTargetBar(Bars, Bars[0].Time, TimeFrame, 1);
             Print("Ausstieg: " + ts_Ausstieg + "Bars[-1].Time: " + Bars[-1].Time);
 
 
