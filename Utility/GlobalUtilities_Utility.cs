@@ -751,6 +751,16 @@ public static class StringExtensions
     {
         return str.Split(new char[] { ' ', '.', '?' }, StringSplitOptions.RemoveEmptyEntries).Length;
     }
+
+    /// <summary>
+    /// Removes illegal letters on strings for filenames and folders.
+    /// </summary>
+    /// <param name="str"></param>
+    /// <returns></returns>
+    public static string CleanFileName(this String str)
+    {
+        return CleanFileName(str);
+    }
 }
 #endregion
 
