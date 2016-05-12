@@ -394,6 +394,20 @@ namespace AgenaTrader.UserCode
         }
 
         /// <summary>
+        /// Return the DateTime for the last candle before the last candel in this timeframe.
+        ///You can use this function to close the trade in the end of the trading day.
+        /// </summary>
+        /// <param name="bars"></param>
+        /// <param name="date"></param>
+        /// <param name="timeframe"></param>
+        /// <param name="closexcandlesbeforeendofday"></param>
+        /// <returns></returns>
+        public DateTime getDateTimeForClosingBeforeTradingDayEnds(IBars bars, DateTime date, ITimeFrame timeframe, int closexcandlesbeforeendofday)
+        {
+            return getEndOfTradingDay(bars, date).AddSeconds((timeframe.GetSeconds() * (-1) * closexcandlesbeforeendofday));
+        }
+
+        /// <summary>
         /// True if the Periodicity of the data feed is correct for this indicator.
         /// </summary>
         /// <returns></returns>
