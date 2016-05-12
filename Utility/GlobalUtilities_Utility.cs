@@ -15,7 +15,7 @@ using System.IO;
 using System.Text;
 
 /// <summary>
-/// Version: 1.5
+/// Version: 1.5.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -122,6 +122,36 @@ namespace AgenaTrader.UserCode
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Returns the standard subject for emails on order execution.
+        /// </summary>
+        /// <param name="execution"></param>
+        /// <returns></returns>
+        public static string GetEmailSubject(IExecution execution)
+        {
+            return execution.Instrument.Symbol + " Order " + execution.MarketPosition.ToString() + " executed";
+        }
+
+        /// <summary>
+        /// Returns the standard text for emails on order execution.
+        /// </summary>
+        /// <param name="execution"></param>
+        /// <param name="strategyname"></param>
+        /// <returns></returns>
+        public static string GetEmailText(IExecution execution, string strategyname)
+        {
+            StringBuilder str = new StringBuilder();
+
+            str.AppendLine("Strategy: " + strategyname);
+            str.AppendLine("Order " + execution.Name + " on instrument " + execution.Instrument.Name + " was executed.");
+            str.AppendLine("Position: " + execution.MarketPosition.ToString());
+            str.AppendLine("Quantity: " + (execution.Order.Quantity).ToString("F2"));
+            str.AppendLine("Price: " + (execution.Order.Price).ToString("F2"));
+            str.AppendLine("Investment: " + (execution.Order.Quantity * execution.Order.Price).ToString("F2"));
+
+            return str.ToString();
         }
 
 
