@@ -77,7 +77,7 @@ namespace AgenaTrader.UserCode
 
             //Init our indicator to get code access
             this._orb_indicator = new ORB_Indicator();
-            this._orb_indicator.SetData(this.Instrument, this.Bars);
+            this._orb_indicator.SetData(this.Instrument);
 
             //Initalize Indicator parameters
             _orb_indicator.ORBMinutes = this.ORBMinutes;
@@ -110,7 +110,7 @@ namespace AgenaTrader.UserCode
         private void calculate()
         {
 
-            _orb_indicator.calculate(Bars[0]);
+            _orb_indicator.calculate(this.Bars, this.Bars[0]);
 
             double targetprice = 0.0;
             int occured = 0;

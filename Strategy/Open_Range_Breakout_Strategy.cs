@@ -29,7 +29,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-	[Description("Handelsautomatik für ORB Strategy")]
+    [Description("Automatic trading for ORB strategy")]
     public class ORB_Strategy : UserStrategy, IORB
 	{
         //input
@@ -65,7 +65,6 @@ namespace AgenaTrader.UserCode
             //ClearOutputWindow();
             //TraceOrders = true;
 
-
             this.IsAutomated = false;
 
             //Set the default time frame if you start the strategy via the strategy-escort
@@ -74,6 +73,9 @@ namespace AgenaTrader.UserCode
             {
                  this.TimeFrame = new TimeFrame(DatafeedHistoryPeriodicity.Minute, 1);
             }
+
+            //We need at least one bar.
+            this.BarsRequired = 1;
 		}
 
         protected override void OnStartUp()
@@ -82,7 +84,7 @@ namespace AgenaTrader.UserCode
 
             //Init our indicator to get code access
             this._orb_indicator = new ORB_Indicator();
-            this._orb_indicator.SetData(this.Instrument, this.Bars);
+            this._orb_indicator.SetData(this.Instrument);
 
             //Initalize Indicator parameters
             _orb_indicator.ORBMinutes = this.ORBMinutes;
@@ -96,17 +98,12 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnBarUpdate()
 		{
-          
+            Print("OnBarUpdate" + Bars[0].Time.ToString());
 
-            //if (Bars[0].Time == new DateTime(2016, 4, 20, 15, 00, 0)) {
-              
-            //}
+            IAccount account = this.Core.AccountManager.GetAccount(this.Instrument, true);
+            int quantity = this.Instrument.GetDefaultQuantity(account);
 
-            //Only excecute on last bar
-            if (!IsCurrentBarLast )
-            {
-                return;
-            }
+            Print("Order Quantity: " + quantity);
 
             //if one order already set stop execution
             if (_orderenterlong != null || _orderenterlong_stop != null || _orderentershort != null || _orderentershort_stop != null)
@@ -114,74 +111,42 @@ namespace AgenaTrader.UserCode
                 return;
             }
 
-           
-
-            //EnterLong(3);
-
-
-
-
-            //CreateOCOGroup(new List<IOrder> { oEnterLong, oEnterShort });
-
-            //oEnterLong.ConfirmOrder();
-            //oEnterShort.ConfirmOrder();
-
-            //if (ORB_Indicator()[0] == 1)
-            //{
-
-
-            //    oEnterLong = SubmitOrder(0, OrderAction.Buy, OrderType.Market, 3, 0, Close[0], "ocoId", "signalName");
-            //}
-
-
-
-            //Initalize Indicator parameters
-            _orb_indicator.ORBMinutes = this.ORBMinutes;
-            _orb_indicator.Time_OpenRangeStartDE = this.Time_OpenRangeStartDE;
-            //_orb_indicator.Time_OpenRangeEndDE = this.Time_OpenRangeEndDE;
-            _orb_indicator.Time_OpenRangeStartUS = this.Time_OpenRangeStartUS;
-            //_orb_indicator.Time_OpenRangeEndUS = this.Time_OpenRangeEndUS;
-            _orb_indicator.Time_EndOfDay_DE = this.Time_EndOfDay_DE;
-            _orb_indicator.Time_EndOfDay_US = this.Time_EndOfDay_US;
-
-            switch ((int)_orb_indicator[0])
-            {
-                case 1:
-                    //Long Signal
-                    //Print("Enter Long");
-                    EnterLong();
-                    break;
-                case -1:
-                    //Short Signal
-                    //Print("Enter Short");
-                    EnterShort();
-                    break;
-                default:
-                    //nothing to do
-                    break;
-            }
-
-     
+            this.calculate();
         }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void calculate()
+        {
+
+            _orb_indicator.calculate(this.Bars, this.Bars[0]);
+
+            //If there was a breakout and the current bar is the same bar as the long/short breakout, then trigger signal.
+            if (_orb_indicator.LongBreakout != null && _orb_indicator.LongBreakout.Time == Bars[0].Time)
+            {
+                //Long Signal
+                //Print("Enter Long" + Bars[0].Time.ToString());
+                EnterLong();
+            }
+            else if (_orb_indicator.ShortBreakout != null && _orb_indicator.ShortBreakout.Time == Bars[0].Time)
+            {
+                //Short Signal
+                //Print("Enter Short" + Bars[0].Time.ToString());
+                EnterShort();
+            }
+            else
+            {
+                //nothing to do
+            }
+        }
+
+
 
         
             protected override void OnExecution(IExecution execution)
             {
-                //foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
-                //{
-                //    if (item.EntryOrder.Name == "signalName")
-                //    {
-                //        //Order ord = (Order)this.TradingManager.GetOrder(item.Id);
-
-
-                //        item.Expiration = DateTime.Now.AddMinutes(5);
-
-                //        //Order ord = (Order)this.TradingManager.GetOrder(item.Id);
-                //        //ord.Quantity = ord.Exp - 1;
-                //        //this.TradingManager.EditOrder(ord);
-                //    }
-
-                //}
 
                 if (execution.Order != null && execution.Order.OrderState == OrderState.Filled) { 
                     if (_orderenterlong != null && execution.Name == _orderenterlong.Name)
@@ -212,8 +177,14 @@ namespace AgenaTrader.UserCode
         /// Create Long Order and Stop.
         /// </summary>
         private void EnterLong() {
-            _orderenterlong = SubmitOrder(0, OrderAction.Buy, OrderType.Market, 1, 0, Close[0], "long_ocoId" + this.Instrument.ISIN, "ORB");
-            _orderenterlong_stop = SubmitOrder(0, OrderAction.Sell, OrderType.Stop, 1, 0, this._orb_indicator.RangeLow, "long_ocoId" + this.Instrument.ISIN, "ORB");
+            string ocoId = "long_ocoId" + this.Instrument.ISIN;
+            //todo positionsgröße bestimmen
+            _orderenterlong = SubmitOrder(0, OrderAction.Buy, OrderType.Market, 1, 0, Close[0], ocoId, "ORB");
+            _orderenterlong_stop = SubmitOrder(0, OrderAction.Sell, OrderType.Stop, 1, 0, this._orb_indicator.RangeLow, ocoId, "ORB");
+
+            //Connect the entry and the stop order and fire it!
+            CreateIfDoneGroup(new List<IOrder> { _orderenterlong, _orderenterlong_stop });
+            _orderenterlong.ConfirmOrder();
 
             //Core.PreferenceManager.DefaultEmailAddress
             if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, this.Core.PreferenceManager.DefaultEmailAddress,
@@ -224,8 +195,14 @@ namespace AgenaTrader.UserCode
         /// Create Short Order and Stop.
         /// </summary>
         private void EnterShort() {
-            _orderentershort = SubmitOrder(0, OrderAction.SellShort, OrderType.Market, 1, 0, Close[0], "short_ocoId" + this.Instrument.ISIN, "ORB");
-            _orderentershort_stop = SubmitOrder(0, OrderAction.BuyToCover, OrderType.Stop, 1, 0, this._orb_indicator.RangeHigh, "short_ocoId" + this.Instrument.ISIN, "ORB");
+            string ocoId = "short_ocoId" + this.Instrument.ISIN;
+            //todo positionsgröße bestimmen
+            _orderentershort = SubmitOrder(0, OrderAction.SellShort, OrderType.Market, 1, 0, Close[0], ocoId, "ORB");
+            _orderentershort_stop = SubmitOrder(0, OrderAction.BuyToCover, OrderType.Stop, 1, 0, this._orb_indicator.RangeHigh, ocoId, "ORB");
+
+            //Connect the entry and the stop order and fire it!
+            CreateIfDoneGroup(new List<IOrder> { _orderentershort, _orderentershort_stop });
+            _orderentershort.ConfirmOrder();
 
             //Core.PreferenceManager.DefaultEmailAddress
             if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, this.Core.PreferenceManager.DefaultEmailAddress,

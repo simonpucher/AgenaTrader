@@ -101,7 +101,6 @@ namespace AgenaTrader.UserCode
         private IBar _short_target_reached = null;
         private DateTime _currentdayofupdate = DateTime.MinValue;
         private ITimePeriod _timeperiod = null;
-        private IBars _bardata = null;
         private bool _shoulddrawonchart = true;
 
 
@@ -109,10 +108,9 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// If we use this indicator from another script we need to initalize all important data first.
         /// </summary>
-        public void SetData(IInstrument instrument, IBars bars)
+        public void SetData(IInstrument instrument)
         {
             this.TimePeriod = this.Root.Core.MarketplaceManager.GetExchangeDescription(instrument.Exchange).TradingHours;
-            this.Bardata = bars;
 
             //We do not need to draw any chart
             this.ShouldDrawOnChart = false;
@@ -144,8 +142,6 @@ namespace AgenaTrader.UserCode
 
             this.TimePeriod = this.Root.Core.MarketplaceManager.GetExchangeDescription(this.Instrument.Exchange).TradingHours;
 
-            this.Bardata = Bars;
-
             ////Check if datafeed periodicity is the right one for this indicator
             //if (this.DatafeedPeriodicityIsValid)
             //{
@@ -154,32 +150,35 @@ namespace AgenaTrader.UserCode
             //else {
             //    Log(Const.DefaultStringDatafeedPeriodicity, InfoLogLevel.Warning);
             //}
+
         }
 
 		protected override void OnBarUpdate()
 		{
-
-
-            //IEnumerable<ITradingOrder> orders = this.TradingManager.ActiveOpenedOrders;
-            //IEnumerable<ITradingPosition> positions = this.TradingManager.ActiveOpenedPositions;
-            //IEnumerable<ITradingTrade> trades = this.TradingManager.ActiveOpenedTrades;
-
-
-            //ITradingTrade bubu = trades[0];
-
-            //this.ChartControl.SaveChart("C:\Users\creativo\Desktop\");
-
-            //IChart mumu =   (IChart) this.ChartControl;
-            //mumu.UpdateSnapshot(bubu);
-
-
-
-            if (this.DatafeedPeriodicityIsValid)
+            if (this.DatafeedPeriodicityIsValid(Bars))
             {
-                calculate(Bars[0]);
 
-                //Set Value in indicator
-                //Value.Set(resultvalue);
+                //new day session is beginning so we need to calculate the open range breakout
+                //if we are calculation "older" trading days the whole day will be calculated because to enhance performance.
+                if (this.CurrentdayOfUpdate.Date < Bars[0].Time.Date)
+                {
+
+                    calculate(this.Bars, this.Bars[0]);
+                }
+
+
+                //When finished set the last day variable
+                //If we are online during the day session we do not set this variable so we are redrawing and recalculating the current session again and again
+                if (GlobalUtilities.IsCurrentBarLastDayInBars(this.Bars, this.Bars[0]))
+                {
+                    //the last session has started (current trading session, last day in Bars object, and so on)
+                }
+                else
+                {
+                    this.CurrentdayOfUpdate = this.Bars[0].Time.Date;
+                }
+
+            
 
                 //Set the indicator value on each bar update, if the breakout is on the current bar
                 if (this.LongBreakout != null && this.LongBreakout.Time == Bars[0].Time)
@@ -228,18 +227,12 @@ namespace AgenaTrader.UserCode
         }
 
         /// <summary>
-        /// Calculate Open Range with current IBar 
+        /// Calculate Open Range with all IBar and current IBar 
         /// </summary>
         /// <param name="currentbar"></param>
         /// <returns></returns>
-        public void calculate(IBar currentbar) {
+        public void calculate(IBars bars, IBar currentbar) {
             
-            //int returnvalue = 0;
-
-            //new day session is beginning so we need to calculate the open range breakout
-            //if we are calculation "older" trading days the whole day will be calculated because to enhance performance.
-            if (this.CurrentdayOfUpdate.Date < currentbar.Time.Date)
-            {
                 //reset session day data
                 this.LongBreakout = null;
                 this.ShortBreakout = null;
@@ -247,12 +240,12 @@ namespace AgenaTrader.UserCode
                 this.ShortTargetReached = null;
 
                 //draw the open range
-                DateTime start = this.getOpenRangeStart(currentbar.Time);
+                DateTime start = this.getOpenRangeStart(bars, currentbar.Time);
                 DateTime start_date = start.Date;
                 DateTime end = this.getOpenRangeEnd(start);
 
                 //Select all data and find high & low.
-                IEnumerable<IBar> list = this.Bardata.Where(x => x.Time >= start).Where(x => x.Time <= end);
+                IEnumerable<IBar> list = bars.Where(x => x.Time >= start).Where(x => x.Time <= end);
 
                 //Check if data for open range is valid.
                 //we need to ignore the first day which is normally invalid.
@@ -261,7 +254,12 @@ namespace AgenaTrader.UserCode
                 {
                     isvalidORB = true;
                 }
+                else
+                {
+                    isvalidORB = false;
+                }
 
+            //todo new color for invalid but draw it (usability!!)
                 if (isvalidORB)
                 {
                     //Calculate range
@@ -275,14 +273,14 @@ namespace AgenaTrader.UserCode
                     //Print("Long Target: " + this.TargetLong);
                     //Print("Short Target: " + this.TargetShort);
 
-                    //todo move this to the indicator
+                    //todo move this to the indicator!!
                     if (this.ShouldDrawOnChart)
                     {
                         DrawRectangle("ORBRect" + start_date.Ticks, true, start, this.RangeLow, end, this.RangeHigh, this.Color_ORB, this.Color_ORB, this.Opacity);
                         DrawText("ORBRangeString" + start_date.Ticks, true, Math.Round((this.RangeHeight), 2).ToString(), start, this.RangeHigh, 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, this.Color_ORB, this.Opacity);
 
                         //if we are live on the trading day
-                        if (this.Bardata.Last().Time.Date == start_date)
+                        if (bars.Last().Time.Date == start_date)
                         {
                             DrawHorizontalLine("LowLine" + start_date.Ticks, true, this.RangeLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                             DrawHorizontalLine("HighLine" + start_date.Ticks, true, this.RangeHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
@@ -290,12 +288,12 @@ namespace AgenaTrader.UserCode
                         }
 
                         //Draw the target areas
-                        DrawRectangle("TargetAreaLong" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeHigh, this.getEndOfTradingDay(start_date), this.TargetLong, this.Color_TargetAreaLong, this.Color_TargetAreaLong, this.Opacity);
-                        DrawRectangle("TargetAreaShort" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(start_date)), this.RangeLow, this.getEndOfTradingDay(start_date), this.TargetShort, this.Color_TargetAreaShort, this.Color_TargetAreaShort, this.Opacity);  
+                        DrawRectangle("TargetAreaLong" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(bars, start_date)), this.RangeHigh, this.getEndOfTradingDay(bars, start_date), this.TargetLong, this.Color_TargetAreaLong, this.Color_TargetAreaLong, this.Opacity);
+                        DrawRectangle("TargetAreaShort" + start_date.Ticks, true, this.getOpenRangeEnd(this.getOpenRangeStart(bars, start_date)), this.RangeLow, this.getEndOfTradingDay(bars, start_date), this.TargetShort, this.Color_TargetAreaShort, this.Color_TargetAreaShort, this.Opacity);  
                     }
                     
                     //load the data after the open range
-                    list = this.Bardata.Where(x => x.Time >= end).Where(x => x.Time <= this.getEndOfTradingDay(start));
+                    list = bars.Where(x => x.Time >= end).Where(x => x.Time <= this.getEndOfTradingDay(bars, start));
 
                     //find the first breakout to the long side
                     this.LongBreakout = list.Where(x => x.Close > this.RangeHigh).FirstOrDefault();
@@ -331,20 +329,6 @@ namespace AgenaTrader.UserCode
                     this.ShortTargetReached = list.Where(x => x.Close < this.TargetShort).FirstOrDefault();
 
                 }
-            }
-
-
-            //When finished set the last day variable
-            //If we are online during the day session we do not set this variable so we are redrawing and recalculating the current session again and again
-            if (GlobalUtilities.IsCurrentBarLastDayInBars(this.Bardata, currentbar))
-            {
-                //the last session has started (current trading session, last day in Bars object, and so on)
-            }
-            else { 
-                this.CurrentdayOfUpdate = currentbar.Time.Date;
-            }
-
-            //return returnvalue;
         
         }
 
@@ -358,18 +342,18 @@ namespace AgenaTrader.UserCode
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
-        private DateTime getOpenRangeStart(DateTime date)
+        private DateTime getOpenRangeStart(IBars bars, DateTime date)
         {
             //Use Marketplace-Escort
             DateTime returnvalue = new DateTime(date.Year, date.Month, date.Day, this.TimePeriod.StartTime.Hours, this.TimePeriod.StartTime.Minutes, this.TimePeriod.StartTime.Seconds);
 
             //Use CFD data
-            if (this.Bardata.Instrument.Symbol.Contains("DE.30") || this.Bardata.Instrument.Symbol.Contains("DE-XTB"))
+            if (bars.Instrument.Symbol.Contains("DE.30") || bars.Instrument.Symbol.Contains("DE-XTB"))
             {
                 //return new TimeSpan(9,00,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartDE.Hours, this._tim_OpenRangeStartDE.Minutes, this._tim_OpenRangeStartDE.Seconds);
             }
-            else if (this.Bardata.Instrument.Symbol.Contains("US.30") || this.Bardata.Instrument.Symbol.Contains("US-XTB"))
+            else if (bars.Instrument.Symbol.Contains("US.30") || bars.Instrument.Symbol.Contains("US-XTB"))
             {
                 //return new TimeSpan(15,30,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartUS.Hours, this._tim_OpenRangeStartUS.Minutes, this._tim_OpenRangeStartUS.Seconds);
@@ -392,18 +376,18 @@ namespace AgenaTrader.UserCode
         /// </summary>
         /// <param name="date"></param>
         /// <returns></returns>
-        public DateTime getEndOfTradingDay(DateTime date)
+        public DateTime getEndOfTradingDay(IBars bars, DateTime date)
         {
             //Use Marketplace-Escort
             DateTime returnvalue = new DateTime(date.Year, date.Month, date.Day, this.TimePeriod.EndTime.Hours, this.TimePeriod.EndTime.Minutes, this.TimePeriod.EndTime.Seconds);
 
             //Use CFD data
-            if (this.Bardata.Instrument.Symbol.Contains("DE.30") || this.Bardata.Instrument.Symbol.Contains("DE-XTB"))
+            if (bars.Instrument.Symbol.Contains("DE.30") || bars.Instrument.Symbol.Contains("DE-XTB"))
             {
                 //return new TimeSpan(9,00,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this.Time_EndOfDay_DE.Hours, this.Time_EndOfDay_DE.Minutes, this.Time_EndOfDay_DE.Seconds);
             }
-            else if (this.Bardata.Instrument.Symbol.Contains("US.30") || this.Bardata.Instrument.Symbol.Contains("US-XTB"))
+            else if (bars.Instrument.Symbol.Contains("US.30") || bars.Instrument.Symbol.Contains("US-XTB"))
             {
                 //return new TimeSpan(15,30,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_EndOfDay_US.Hours, this._tim_EndOfDay_US.Minutes, this._tim_EndOfDay_US.Seconds);
@@ -415,9 +399,8 @@ namespace AgenaTrader.UserCode
         /// True if the Periodicity of the data feed is correct for this indicator.
         /// </summary>
         /// <returns></returns>
-        private bool DatafeedPeriodicityIsValid {
-            get {
-                TimeFrame tf = (TimeFrame)this.Bardata.TimeFrame;
+        private bool DatafeedPeriodicityIsValid(IBars bars) {
+                TimeFrame tf = (TimeFrame)bars.TimeFrame;
                 if (tf.Periodicity == DatafeedHistoryPeriodicity.Tick || tf.Periodicity == DatafeedHistoryPeriodicity.Second )
                 {
                     return true;
@@ -434,8 +417,11 @@ namespace AgenaTrader.UserCode
                 {
                     return false;
                 }
-            }
         }
+
+
+
+    
 
 
 
@@ -822,13 +808,6 @@ namespace AgenaTrader.UserCode
                 set { _timeperiod = value; }
             }
 
-            private IBars Bardata
-            {
-                get { return _bardata; }
-                set { _bardata = value; }
-            }
-
-
             private bool ShouldDrawOnChart
             {
                 get { return _shoulddrawonchart; }
@@ -962,4 +941,5 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
 
