@@ -48,6 +48,7 @@ namespace AgenaTrader.UserCode
 
         private bool _send_email = false;
         private bool _automation = false;
+        private bool _closeorderbeforendoftradingday = false;
 
         //output
 
@@ -153,14 +154,17 @@ namespace AgenaTrader.UserCode
             protected override void OnExecution(IExecution execution)
             {
 
-                foreach (AgenaTrader.Helper.TradingManager.Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
+                if (this.CloseOrderBeforeEndOfTradingDay)
                 {
-                    if ((this._orderenterlong != null && item.EntryOrder.Name == this._orderenterlong.Name)
-                     || (this._orderentershort != null && item.EntryOrder.Name == this._orderentershort.Name))
+                     foreach (AgenaTrader.Helper.TradingManager.Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
                     {
-                        item.Expiration = this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay); 
-                        //Print("Expiration: " + item.Expiration.ToString());
-                    }
+                        if ((this._orderenterlong != null && item.EntryOrder.Name == this._orderenterlong.Name)
+                         || (this._orderentershort != null && item.EntryOrder.Name == this._orderentershort.Name))
+                        {
+                            item.Expiration = this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay); 
+                            //Print("Expiration: " + item.Expiration.ToString());
+                        }
+                    }  
                 }
 
                 if (execution.Order != null && execution.Order.OrderState == OrderState.Filled) { 
@@ -367,6 +371,15 @@ namespace AgenaTrader.UserCode
             {
                 get { return _automation; }
                 set { _automation = value; }
+            }
+
+            [Description("If true the strategy will close the order before the end of trading day")]
+            [Category("Safety features")]
+            [DisplayName("Close order today")]
+            public bool CloseOrderBeforeEndOfTradingDay
+            {
+                get { return _closeorderbeforendoftradingday; }
+                set { _closeorderbeforendoftradingday = value; }
             }
 
 
