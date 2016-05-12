@@ -36,6 +36,7 @@ namespace AgenaTrader.UserCode
         //output
         private double _popGunTriggerLong;
         private double _popGunTriggerShort;
+        private DateTime _popGunTargetDateTime;
 
         //internal
         bool IsPopGun;
@@ -112,6 +113,7 @@ namespace AgenaTrader.UserCode
                     PopGunTriggerBar = CurrentBar;
                     this.PopGunTriggerLong = CurrentBar_High;
                     this.PopGunTriggerShort = CurrentBar_Low;
+                    this.PopGunTargetDateTime = GlobalUtilities.GetTargetBar(Bars, Bars[0].Time, TimeFrame, PopGunExpires);
                 }
             }
 
@@ -303,6 +305,16 @@ namespace AgenaTrader.UserCode
             get { return _popGunTriggerShort; }
             set { _popGunTriggerShort = value; }
         }
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public DateTime PopGunTargetDateTime
+        {
+            get { return _popGunTargetDateTime; }
+            set { _popGunTargetDateTime = value; }
+        }
+
+
         #endregion
     }
 }

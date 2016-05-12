@@ -10,6 +10,7 @@ using AgenaTrader.API;
 using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
+using AgenaTrader.Helper.TradingManager;
 
 namespace AgenaTrader.UserCode
 {
@@ -88,7 +89,25 @@ namespace AgenaTrader.UserCode
                 oEnter.ConfirmOrder();
             }
 
-		
+        protected override void OnExecution(IExecution execution)
+        {
+            DateTime ts_Ausstieg = this._popgun_indicator.PopGunTargetDateTime; 
+
+            foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
+            {
+                if (item.EntryOrder.Name == SignalNameEnter
+                 || item.EntryOrder.Name == SignalNameStop)
+                {
+                    item.Expiration = ts_Ausstieg;
+                }
+            }
+
+            if (execution.MarketPosition == PositionType.Flat)
+            {
+                oStop = null;    //den Stop zuerst
+                oEnter = null;
+            }
+        }		
 
         #region Properties
 
