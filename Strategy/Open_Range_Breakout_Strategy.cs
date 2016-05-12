@@ -67,7 +67,7 @@ namespace AgenaTrader.UserCode
             //ClearOutputWindow();
             //TraceOrders = true;
 
-            this.IsAutomated = false;
+            this.IsAutomated = true;
 
             //Set the default time frame if you start the strategy via the strategy-escort
             //if you start the strategy on a chart the TimeFrame is automatically set.
@@ -107,8 +107,29 @@ namespace AgenaTrader.UserCode
 
             //Print("Order Quantity: " + quantity);
 
-            //if one order already set stop execution
-            if (_orderenterlong != null || _orderentershort != null)
+            ////Close if the end of the trading day has come
+            //if (Bars[0].Time.TimeOfDay > new DateTime(2016, 04, 12, 12, 00, 00).TimeOfDay)
+            //{
+            //    if (_orderenterlong != null)
+            //    {
+            //        CancelOrder(this._orderenterlong);
+            //        //ExitLong(this._orderenterlong.Quantity, "ORB_Timeout", this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
+            //        this._orderenterlong = null;
+            //    }
+
+            //    if (_orderentershort != null)
+            //    {
+            //        CancelOrder(this._orderentershort);
+            //        //ExitShort(this._orderentershort.Quantity, "ORB_Timeout", this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
+            //        this._orderentershort = null;
+            //    }
+
+            //    //todo provide a boolean or something that no trades are made later this day.
+            //    return;
+            //}
+
+            //if it to late or one order already set stop execution of calculate
+            if (Bars[0].Time.TimeOfDay > new DateTime(2016, 04, 11, 12, 00, 00).TimeOfDay ||  (_orderenterlong != null || _orderentershort != null))
             {
                 return;
             }
@@ -150,10 +171,22 @@ namespace AgenaTrader.UserCode
             protected override void OnExecution(IExecution execution)
             {
 
+                foreach (AgenaTrader.Helper.TradingManager.Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
+                {
+                    if ((this._orderenterlong != null && item.EntryOrder.Name == this._orderenterlong.Name)
+                     || (this._orderentershort != null && item.EntryOrder.Name == this._orderentershort.Name))
+                    {
+                        item.Expiration = new DateTime(2016, 04, 11, 14, 00, 00);
+                        Print("Expiration: " + item.Expiration.ToString());
+                    }
+                }
+
                 if (execution.Order != null && execution.Order.OrderState == OrderState.Filled) { 
                     if (_orderenterlong != null && execution.Name == _orderenterlong.Name)
                     {
                     // Enter-Order gefüllt
+                        
+                        //
                         if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
                         execution.Instrument.Symbol + " Order " + execution.Name + " ausgeführt.", "Die LONG Order für " + execution.Instrument.Name + " wurde ausgeführt. Invest: " + (Trade.Quantity * Trade.AvgPrice).ToString("F2"));
                     }
@@ -189,6 +222,7 @@ namespace AgenaTrader.UserCode
             //_orderenterlong_stop = ExitShortStop(true, 1, this._orb_indicator.RangeLow, "ORB_Long_Stop", _orderenterlong.Name, this.Instrument, this.TimeFrame);
             SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
             SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
+
 
             //Connect the entry and the stop order and fire it!
             //CreateIfDoneGroup(new List<IOrder> { _orderenterlong, _orderenterlong_stop });

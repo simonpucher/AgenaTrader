@@ -12,6 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 using System.Collections;
 using System.IO;
+using System.Text;
 
 /// <summary>
 /// Version: 1.5
@@ -596,6 +597,34 @@ namespace AgenaTrader.UserCode
 
     #region Global defined classes
 
+    public class StatisticContainer {
+
+        private List<Statistic> List = null;
+
+        public StatisticContainer() {
+
+            List = new List<Statistic>();
+        }
+
+        public void Add(Statistic statistic) {
+            this.List.Add(statistic);
+        }
+
+
+        public string getCSVData()
+        {
+            StringBuilder returnvalue = new StringBuilder();
+            if (List != null && List.Count > 0)
+            {
+                foreach (Statistic item in this.List)
+                {
+                    returnvalue.Append(item.getCSVData());
+                }
+            }
+            return returnvalue.ToString();
+        }
+    }
+
     /// <summary>
     /// Statistic object to compare strategies.
     /// </summary>
@@ -899,5 +928,6 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
 
 
