@@ -57,15 +57,7 @@ namespace AgenaTrader.UserCode
 
             if (!IsCurrentBarLast || oEnter != null)
             {
-                //Print("IsClosed " + oEnter.IsClosed);
-                //if (oEnter.IsClosed)
-                //{
-                //    oEnter = null;
-                //    oStop = null;
-                //    Print("oEnter wurde genullt");
-                //}              
-
-                return;
+              return;
             }
             //Heute 09.15
             else if (Bars[0].Time == ts_Einstieg)

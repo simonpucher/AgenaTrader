@@ -47,6 +47,8 @@ namespace AgenaTrader.UserCode
         public const int DefaultLineWidth_large = 3;
         public static readonly Color DefaultIndicatorColor = Color.Orange;
         public static readonly DashStyle DefaultIndicatorDashStyle = DashStyle.Solid;
+        public static string strLong = "Long";
+        public static string strShort = "Short";
 
 
     }
@@ -249,6 +251,7 @@ namespace AgenaTrader.UserCode
         /// Return the target Bar, meaning a certain Bar in the future based on given timeFrame parameter
         /// eg getting 5 Bars in Future, this could be 5 days, or 75 Minutes in a 15M Chart
         /// </summary>
+        /// <param name="Bars"></param>
         /// <param name="CurrentBarDateTime"></param>
         /// <param name="timeFrame"></param>
         /// <param name="BarsTilTarget"></param>
@@ -348,7 +351,7 @@ namespace AgenaTrader.UserCode
         {
 
             string filepart = GlobalUtilities.CleanFileName(Indicator + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + InstrumentName + "_" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm"));
-            string directory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\" + filepart + "\\";
+            string directory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\SnapShot\\" + filepart + "\\";
             System.IO.Directory.CreateDirectory(directory);
             string fileName = InstrumentName + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + Bars[0].Time.ToString("yyyy_MM_dd_HH_mm") + ".jpg";
             fileName = GlobalUtilities.CleanFileName(fileName);
@@ -363,7 +366,7 @@ namespace AgenaTrader.UserCode
             }
             else
             {
-                ChartEnd = Bars.First().Time;
+                ChartEnd = Bars.Last().Time;
             }
 
             if (Bars.GetByIndex(Bars.GetIndex(Bars[0]) - 20) != null)
@@ -372,7 +375,7 @@ namespace AgenaTrader.UserCode
             }
             else
             {
-                ChartStart = Bars.Last().Time;
+                ChartStart = Bars.First().Time;
             }
 
             //pick the right chart matching the current timeframe
@@ -610,7 +613,38 @@ namespace AgenaTrader.UserCode
         /// <returns></returns>
         public string getCSVData()
         {
-            return string.Format("{0},{1},{2},{3},{4},{5}", this.NameOfTheStrategy, "Long or Short", this.EntryDateTime.ToString(), this.ExitDateTime.ToString(), this.MinutesInMarket, this.Instrument);
+            return string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13},{14}",     
+                                            this.NameOfTheStrategy, 
+                                            this.TradeDirection, 
+                                            this.TimeFrame,
+                                            this.EntryDateTime.ToString(), 
+                                            this.ExitDateTime.ToString(), 
+                                            this.MinutesInMarket, 
+                                            this.Instrument,
+                                            this.EntryPrice,
+                                            this.ExitPrice,
+                                            this.PointsDiff,
+                                            this.ExitReason,
+                                            this.Quantity,
+                                            this.ProfitLoss,
+                                            this.StopPrice,
+                                            this.TargetPrice                                            
+                                            );
+        }
+        public void AppendToFile()
+        {
+            string File = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\" + "Auswertung.csv";
+            FileInfo fi = new FileInfo(File);
+            if (fi.Exists == false)
+            {
+                using (StreamWriter stream = new StreamWriter(File)) {
+                    stream.WriteLine("Strategy;TradeDirection;TimeFrame;EntryDateTime;ExitDateTime;MinutesInMarket;Instrument;EntryPrice;ExitPrice;PointsDiff;ExitReason;Quantity;ProfitLoss;StopPrice;TargetPrice");
+                }
+            }
+            using (StreamWriter stream = new FileInfo(File).AppendText())
+            {
+                stream.WriteLine(getCSVData());
+            }
         }
 
         #region Properties
@@ -621,6 +655,16 @@ namespace AgenaTrader.UserCode
             get { return _nameofthestrategy; }
             set { _nameofthestrategy = value; }
         }
+
+
+        private string _TimeFrame = string.Empty;
+
+        public string TimeFrame
+        {
+            get { return _TimeFrame; }
+            set { _TimeFrame = value; }
+        }
+
 
         private DateTime _entrydatetime = DateTime.MinValue;
 
@@ -646,6 +690,19 @@ namespace AgenaTrader.UserCode
             }
         }
 
+        public double PointsDiff
+        {
+            get {
+                if (TradeDirection == Const.strLong)
+                {
+                    return ExitPrice - EntryPrice;
+                }
+                else
+                {
+                    return EntryPrice - ExitPrice;
+                }
+                 }
+        }
 
         private string _instrument = String.Empty;
 
@@ -655,7 +712,72 @@ namespace AgenaTrader.UserCode
             set { _instrument = value; }
         }
 
+        private string _TradeDirection = String.Empty;
 
+        public string TradeDirection
+        {
+            get { return _TradeDirection; }
+            set { _TradeDirection = value; }
+        }
+
+        private double _EntryPrice = Double.MinValue;
+
+        public double EntryPrice
+        {
+            get { return _EntryPrice; }
+            set { _EntryPrice = value; }
+        }
+
+        private double _ExitPrice = Double.MinValue;
+
+        public double ExitPrice
+        {
+            get { return _ExitPrice; }
+            set { _ExitPrice = value; }
+        }
+
+
+
+
+        private String _ExitReason = String.Empty;
+
+        public String ExitReason
+        {
+            get { return _ExitReason; }
+            set { _ExitReason = value; }
+        }
+
+        private int _Quantity = 0;
+
+        public int Quantity
+        {
+            get { return _Quantity; }
+            set { _Quantity = value; }
+        }
+
+        private double _ProfitLoss = 0;
+
+        public double ProfitLoss
+        {
+            get { return _ProfitLoss; }
+            set { _ProfitLoss = value; }
+        }
+
+        private double _StopPrice = 0;
+
+        public double StopPrice
+        {
+            get { return _StopPrice; }
+            set { _StopPrice = value; }
+        }
+
+        private double _TargetPrice = 0;
+
+        public double TargetPrice
+        {
+            get { return _TargetPrice; }
+            set { _TargetPrice = value; }
+        }
         #endregion
 
 
