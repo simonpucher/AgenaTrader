@@ -53,8 +53,10 @@ namespace AgenaTrader.UserCode
         //internal
         private IOrder _orderenterlong;
         private IOrder _orderentershort;
-        private IOrder _orderenterlong_stop;
-        private IOrder _orderentershort_stop;
+        //private IOrder _orderenterlong_stop;
+        //private IOrder _orderentershort_stop;
+        //private IOrder _orderlong_target;
+        //private IOrder _ordershort_target;
         private ORB_Indicator _orb_indicator = null;
         //protected TimeFrame tf = new TimeFrame(DatafeedHistoryPeriodicity.Minute, 10);
 
@@ -100,13 +102,13 @@ namespace AgenaTrader.UserCode
 		{
             Print("OnBarUpdate" + Bars[0].Time.ToString());
 
-            IAccount account = this.Core.AccountManager.GetAccount(this.Instrument, true);
-            int quantity = this.Instrument.GetDefaultQuantity(account);
+            //IAccount account = this.Core.AccountManager.GetAccount(this.Instrument, true);
+            //int quantity = this.Instrument.GetDefaultQuantity(account);
 
-            Print("Order Quantity: " + quantity);
+            //Print("Order Quantity: " + quantity);
 
             //if one order already set stop execution
-            if (_orderenterlong != null || _orderenterlong_stop != null || _orderentershort != null || _orderentershort_stop != null)
+            if (_orderenterlong != null || _orderentershort != null)
             {
                 return;
             }
@@ -155,21 +157,21 @@ namespace AgenaTrader.UserCode
                         if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
                         execution.Instrument.Symbol + " Order " + execution.Name + " ausgeführt.", "Die LONG Order für " + execution.Instrument.Name + " wurde ausgeführt. Invest: " + (Trade.Quantity * Trade.AvgPrice).ToString("F2"));
                     }
-                    else if (_orderenterlong_stop != null && execution.Name == _orderenterlong_stop.Name)
-                    {
-                        if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
-                       execution.Instrument.Symbol + " Order " + execution.Name + " ausgeführt.", "Die LONG STOP für " + execution.Instrument.Name + " wurde ausgeführt. Invest: " + (Trade.Quantity * Trade.AvgPrice).ToString("F2"));
-                    }
+                    //else if (_orderenterlong_stop != null && execution.Name == _orderenterlong_stop.Name)
+                    //{
+                    //    if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
+                    //   execution.Instrument.Symbol + " Order " + execution.Name + " ausgeführt.", "Die LONG STOP für " + execution.Instrument.Name + " wurde ausgeführt. Invest: " + (Trade.Quantity * Trade.AvgPrice).ToString("F2"));
+                    //}
                     else if (_orderentershort != null && execution.Name == _orderentershort.Name)
                     {
                         if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
                         execution.Instrument.Symbol + " Order " + execution.Name + " ausgeführt.", "Die SHORT Order für " + execution.Instrument.Name + " wurde ausgeführt. Invest: " + (Trade.Quantity * Trade.AvgPrice).ToString("F2"));
                     }
-                    else if (_orderentershort_stop != null && execution.Name == _orderentershort_stop.Name)
-                    {
-                        if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
-                        execution.Instrument.Symbol + " Order " + execution.Name + " ausgeführt.", "Die SHORT STOP Order für " + execution.Instrument.Name + " wurde ausgeführt. Invest: " + (Trade.Quantity * Trade.AvgPrice).ToString("F2"));
-                    }
+                    //else if (_orderentershort_stop != null && execution.Name == _orderentershort_stop.Name)
+                    //{
+                    //    if (IsEmailFunctionActive) this.SendEmail(Core.AccountManager.Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
+                    //    execution.Instrument.Symbol + " Order " + execution.Name + " ausgeführt.", "Die SHORT STOP Order für " + execution.Instrument.Name + " wurde ausgeführt. Invest: " + (Trade.Quantity * Trade.AvgPrice).ToString("F2"));
+                    //}
                 }
             }
 
@@ -177,13 +179,19 @@ namespace AgenaTrader.UserCode
         /// Create Long Order and Stop.
         /// </summary>
         private void EnterLong() {
-            string ocoId = "long_ocoId" + this.Instrument.ISIN;
+            //string ocoId = "long_ocoId" + this.Instrument.ISIN;
+
+            //_orderenterlong = SubmitOrder(0, OrderAction.Buy, OrderType.Market, 1, 0, Close[0], ocoId, "ORB_Long");
+            //_orderenterlong_stop = SubmitOrder(0, OrderAction.Sell, OrderType.Stop, 1, 0, this._orb_indicator.RangeLow, ocoId, "ORB_Long_Stop");
+
             //todo positionsgröße bestimmen
-            _orderenterlong = SubmitOrder(0, OrderAction.Buy, OrderType.Market, 1, 0, Close[0], ocoId, "ORB");
-            _orderenterlong_stop = SubmitOrder(0, OrderAction.Sell, OrderType.Stop, 1, 0, this._orb_indicator.RangeLow, ocoId, "ORB");
+            _orderenterlong = EnterLong(1, "ORB_Long", this.Instrument, this.TimeFrame);
+            //_orderenterlong_stop = ExitShortStop(true, 1, this._orb_indicator.RangeLow, "ORB_Long_Stop", _orderenterlong.Name, this.Instrument, this.TimeFrame);
+            SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
+            SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
 
             //Connect the entry and the stop order and fire it!
-            CreateIfDoneGroup(new List<IOrder> { _orderenterlong, _orderenterlong_stop });
+            //CreateIfDoneGroup(new List<IOrder> { _orderenterlong, _orderenterlong_stop });
             _orderenterlong.ConfirmOrder();
 
             //Core.PreferenceManager.DefaultEmailAddress
@@ -195,13 +203,19 @@ namespace AgenaTrader.UserCode
         /// Create Short Order and Stop.
         /// </summary>
         private void EnterShort() {
-            string ocoId = "short_ocoId" + this.Instrument.ISIN;
+            //string ocoId = "short_ocoId" + this.Instrument.ISIN;
+
+            //_orderentershort = SubmitOrder(0, OrderAction.SellShort, OrderType.Market, 1, 0, Close[0], ocoId, "ORB_Short");
+            //_orderentershort_stop = SubmitOrder(0, OrderAction.BuyToCover, OrderType.Stop, 1, 0, this._orb_indicator.RangeHigh, ocoId, "ORB_Short_Stop");
+
             //todo positionsgröße bestimmen
-            _orderentershort = SubmitOrder(0, OrderAction.SellShort, OrderType.Market, 1, 0, Close[0], ocoId, "ORB");
-            _orderentershort_stop = SubmitOrder(0, OrderAction.BuyToCover, OrderType.Stop, 1, 0, this._orb_indicator.RangeHigh, ocoId, "ORB");
+            _orderentershort = EnterShort(1,"ORB_Short", this.Instrument, this.TimeFrame);
+            //_orderentershort_stop = ExitShortStop(true, 1, this._orb_indicator.RangeHigh, "ORB_Short_Stop", _orderentershort.Name, this.Instrument, this.TimeFrame);
+            SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
+            SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
 
             //Connect the entry and the stop order and fire it!
-            CreateIfDoneGroup(new List<IOrder> { _orderentershort, _orderentershort_stop });
+            //CreateIfDoneGroup(new List<IOrder> { _orderentershort, _orderentershort_stop });
             _orderentershort.ConfirmOrder();
 
             //Core.PreferenceManager.DefaultEmailAddress
