@@ -165,10 +165,22 @@ namespace AgenaTrader.UserCode
         /// </summary>
         /// <param name="instrument"></param>
         /// <returns></returns>
-        public static int AdjustPositionToRiskManagement(ICore core, IInstrument instrument, double lastprice) {
+        public static int AdjustPositionToRiskManagement(IAccountManager accountmanager, IPreferenceManager preferencemanager, IInstrument instrument, double lastprice)
+        {
             //Get Risk Management from Account
-            IAccount account = core.AccountManager.GetAccount(instrument, true);
-            AccountRiskParams accountriskparams = core.PreferenceManager.GetAccountRiskParms(account.AccountConnection.ConnectionName, instrument.InstrumentType);
+            IAccount account = accountmanager.GetAccount(instrument, true);
+            if (account == null)
+            {
+                //If no account is available (simulation) then lookup on instrument
+                //InstrumentRiskParams instrumentriskparams = new InstrumentRiskParams(instrument.InstrumentType);
+                //MaxInvestedAmountPercentage = instrumentriskparams.MaxInvestedAmountPercentage;
+                //throw new NotImplementedException("AdjustPositionToRiskManagement: IAccount was null", null);
+                return instrument.GetDefaultQuantity();
+            }
+
+            //Create AccountRiskParams from account
+            AccountRiskParams accountriskparams = preferencemanager.GetAccountRiskParms(account.AccountConnection.ConnectionName, instrument.InstrumentType);
+            
             //Check the type of instrument
             if (instrument.InstrumentType == InstrumentType.Index)
             {
@@ -181,7 +193,7 @@ namespace AgenaTrader.UserCode
                 Money m1 = new Money(maxpositionsizeincash, account.Currency);
                 Money m2 = m1.ConvertToCurrency(instrument.Currency);
                 //Return the position size
-                return (int)Math.Floor(decimal.ToDouble(m2.RoundedAmount) / lastprice);  
+                return (int)Math.Floor(decimal.ToDouble(m2.RoundedAmount) / lastprice);
             }
             throw new NotImplementedException("AdjustPositionToRiskManagement: InstrumentType " + instrument.InstrumentType.ToString() + " not implemented", null);
         }
