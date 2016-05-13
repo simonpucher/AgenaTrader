@@ -57,12 +57,8 @@ namespace AgenaTrader.UserCode
         //internal
         private IOrder _orderenterlong;
         private IOrder _orderentershort;
-        //private IOrder _orderenterlong_stop;
-        //private IOrder _orderentershort_stop;
-        //private IOrder _orderlong_target;
-        //private IOrder _ordershort_target;
         private ORB_Indicator _orb_indicator = null;
-        //protected TimeFrame tf = new TimeFrame(DatafeedHistoryPeriodicity.Minute, 10);
+        private DateTime _currentdayofupdate = DateTime.MinValue;
 
 
 		protected override void Initialize()
@@ -111,7 +107,14 @@ namespace AgenaTrader.UserCode
 
             //Print("Order Quantity: " + quantity);
 
-            //todo reset strategy for the next/first trading day
+            //Reset Strategy for the next/first trading day
+            //todo Not perfect if we are using GMT+12 and other markets than local markets 
+            if (this.CurrentdayOfUpdate.Date < Bars[0].Time.Date)
+            {
+                this._orderenterlong = null;
+                this._orderentershort = null;
+                this.CurrentdayOfUpdate = Bars[0].Time.Date;
+            }
 
             //if it to late or one order already set stop execution of calculate
             if ((_orderenterlong != null || _orderentershort != null)
@@ -174,7 +177,8 @@ namespace AgenaTrader.UserCode
                 }
 
                 //send email
-                if (IsEmailFunctionActive) {
+                if (IsEmailFunctionActive && this.Send_email)
+                {
                     this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
                             GlobalUtilities.GetEmailSubject(execution), GlobalUtilities.GetEmailText(execution, this.GetType().Name));
                 }
@@ -321,7 +325,7 @@ namespace AgenaTrader.UserCode
 
 
             [Description("If true an email will be send on order execution")]
-            [Category("Safety features")]
+            [Category("Safety first!")]
             [DisplayName("Send email")]
             public bool Send_email
             {
@@ -331,7 +335,7 @@ namespace AgenaTrader.UserCode
 
 
             [Description("If true you can go to the beach, the strategy will handle everything")]
-            [Category("Safety features")]
+            [Category("Safety first!")]
             [DisplayName("Fully automatic operation")]
             public bool Automation
             {
@@ -340,7 +344,7 @@ namespace AgenaTrader.UserCode
             }
 
             [Description("If true the strategy will close the order before the end of trading day")]
-            [Category("Safety features")]
+            [Category("Safety first!")]
             [DisplayName("Close order today")]
             public bool CloseOrderBeforeEndOfTradingDay
             {
@@ -360,7 +364,7 @@ namespace AgenaTrader.UserCode
 
 
         [Browsable(false)]
-        public bool IsEmailFunctionActive
+        private bool IsEmailFunctionActive
         {
             get
             {
@@ -370,6 +374,13 @@ namespace AgenaTrader.UserCode
                 }
                 return false;
             }
+        }
+
+            [Browsable(false)]
+        private DateTime CurrentdayOfUpdate
+        {
+            get { return _currentdayofupdate; }
+            set { _currentdayofupdate = value; }
         }
 
 
