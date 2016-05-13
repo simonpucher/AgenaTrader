@@ -224,7 +224,7 @@ namespace AgenaTrader.UserCode
 
             /// <summary>
             /// </summary>
-            [Description("Period in minutes for ORB")]
+            [Description("Period in minutes for the ORB")]
             [Category("Settings")]
             [DisplayName("Minutes ORB")]
             public int ORBMinutes
@@ -236,9 +236,9 @@ namespace AgenaTrader.UserCode
         
                         /// <summary>
             /// </summary>
-            [Description("Close x candles before end of trading day")]
+            [Description("Close the order x candles before the end of trading day")]
             [Category("Settings")]
-            [DisplayName("Close x candles")]
+            [DisplayName("Close Order X candles")]
             public int CloseXCandlesBeforeEndOfTradingDay
             {
                 get { return _closexcandlesbeforeendoftradingday; }
@@ -249,7 +249,7 @@ namespace AgenaTrader.UserCode
 
             /// <summary>
             /// </summary>
-            [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
+            [Description("Start of the open range in Germany")]
             [Category("Settings")]
             [DisplayName("OpenRange Start DE")]
             public TimeSpan Time_OpenRangeStartDE
@@ -268,7 +268,7 @@ namespace AgenaTrader.UserCode
 
             /// <summary>
             /// </summary>
-            [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
+            [Description("Start of the open range in USA")]
             [Category("Settings")]
             [DisplayName("OpenRange Start US")]
             public TimeSpan Time_OpenRangeStartUS
@@ -287,7 +287,7 @@ namespace AgenaTrader.UserCode
 
             /// <summary>
             /// </summary>
-            [Description("EndOfDay DE: Uhrzeit spätestens verkauft wird")]
+            [Description("End of trading day in Germany")]
             [Category("Settings")]
             [DisplayName("EndOfDay DE")]
             public TimeSpan Time_EndOfDay_DE
@@ -304,7 +304,7 @@ namespace AgenaTrader.UserCode
 
             /// <summary>
             /// </summary>
-            [Description("EndOfDay US: Uhrzeit spätestens verkauft wird")]
+            [Description("End of trading day in USA")]
             [Category("Settings")]
             [DisplayName("EndOfDay US")]
             public TimeSpan Time_EndOfDay_US
@@ -320,9 +320,9 @@ namespace AgenaTrader.UserCode
             }
 
 
-            [Description("If true an email will be send on open range breakout")]
+            [Description("If true an email will be send on order execution")]
             [Category("Safety features")]
-            [DisplayName("Send email on breakout")]
+            [DisplayName("Send email")]
             public bool Send_email
             {
                 get { return _send_email; }
@@ -330,7 +330,7 @@ namespace AgenaTrader.UserCode
             }
 
 
-            [Description("If true you can go to the beach")]
+            [Description("If true you can go to the beach, the strategy will handle everything")]
             [Category("Safety features")]
             [DisplayName("Fully automatic operation")]
             public bool Automation
