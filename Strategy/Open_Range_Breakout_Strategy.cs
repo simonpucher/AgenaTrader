@@ -37,10 +37,7 @@ namespace AgenaTrader.UserCode
         private int _orbminutes = 75;
 
         private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);
-        //private TimeSpan _tim_OpenRangeEndDE = new TimeSpan(10, 15, 0);  
-
-        private TimeSpan _tim_OpenRangeStartUS = new TimeSpan(15, 30, 0);
-        //private TimeSpan _tim_OpenRangeEndUS = new TimeSpan(16, 45, 0);    
+        private TimeSpan _tim_OpenRangeStartUS = new TimeSpan(15, 30, 0);  
 
         private TimeSpan _tim_EndOfDay_DE = new TimeSpan(17, 30, 0);
         private TimeSpan _tim_EndOfDay_US = new TimeSpan(22, 00, 0);
@@ -48,7 +45,7 @@ namespace AgenaTrader.UserCode
         private int _closexcandlesbeforeendoftradingday = 2;
 
         private bool _send_email = false;
-        private bool _automation = false;
+        private bool _autopilot = false;
         private bool _closeorderbeforendoftradingday = false;
 
         //output
@@ -63,9 +60,7 @@ namespace AgenaTrader.UserCode
 
 		protected override void Initialize()
 		{
-
-            //ClearOutputWindow();
-            //TraceOrders = true;
+            //this.IsAutomated = false;
 
             //Set the default time frame if you start the strategy via the strategy-escort
             //if you start the strategy on a chart the TimeFrame is automatically set.
@@ -89,9 +84,7 @@ namespace AgenaTrader.UserCode
             //Initalize Indicator parameters
             _orb_indicator.ORBMinutes = this.ORBMinutes;
             _orb_indicator.Time_OpenRangeStartDE = this.Time_OpenRangeStartDE;
-            //_orb_indicator.Time_OpenRangeEndDE = this.Time_OpenRangeEndDE;
             _orb_indicator.Time_OpenRangeStartUS = this.Time_OpenRangeStartUS;
-            //_orb_indicator.Time_OpenRangeEndUS = this.Time_OpenRangeEndUS;
             _orb_indicator.Time_EndOfDay_DE = this.Time_EndOfDay_DE;
             _orb_indicator.Time_EndOfDay_US = this.Time_EndOfDay_US;
         }
@@ -100,25 +93,27 @@ namespace AgenaTrader.UserCode
 		{
             //Print("OnBarUpdate" + Bars[0].Time.ToString());
 
-            this.IsAutomated = this.Automation;
-
-            //IAccount account = this.Core.AccountManager.GetAccount(this.Instrument, true);
-            //int quantity = this.Instrument.GetDefaultQuantity(account);
-
-            //Print("Order Quantity: " + quantity);
+            this.IsAutomated = this.Autopilot;
 
             //Reset Strategy for the next/first trading day
-            //todo Not perfect if we are using GMT+12 and other markets than local markets 
+            //todo => Not perfect if we are using GMT+12 and other markets than local markets 
             if (this.CurrentdayOfUpdate.Date < Bars[0].Time.Date)
             {
                 this._orderenterlong = null;
                 this._orderentershort = null;
                 this.CurrentdayOfUpdate = Bars[0].Time.Date;
+
+                //send email
+                if (this.Send_email)
+                {
+                    this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
+                        "Reset on Strategy: " +  this.GetType().Name , "Instrument: " + this.Instrument.Name + " - Date: " + Bars[0].Time);
+                }
             }
 
             //if it to late or one order already set stop execution of calculate
-            if ((_orderenterlong != null || _orderentershort != null)
-                || Bars[0].Time.TimeOfDay >= this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay).TimeOfDay)
+            // || Bars[0].Time.TimeOfDay >= this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay).TimeOfDay
+            if (_orderenterlong != null || _orderentershort != null)
             {
                 return;
             }
@@ -162,6 +157,7 @@ namespace AgenaTrader.UserCode
         /// <param name="execution"></param>
             protected override void OnExecution(IExecution execution)
             {
+                //todo => expiration date does not work on simulation mode!
                 //set expiration date to close at the end of the trading day
                 if (this.CloseOrderBeforeEndOfTradingDay)
                 {
@@ -177,7 +173,7 @@ namespace AgenaTrader.UserCode
                 }
 
                 //send email
-                if (IsEmailFunctionActive && this.Send_email)
+                if (this.Send_email)
                 {
                     this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
                             GlobalUtilities.GetEmailSubject(execution), GlobalUtilities.GetEmailText(execution, this.GetType().Name));
@@ -188,34 +184,18 @@ namespace AgenaTrader.UserCode
         /// Create Long Order and Stop.
         /// </summary>
         private void EnterLong() {
-
-            //todo positionsgröße bestimmen
-            _orderenterlong = EnterLong(1, "ORB_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+            _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), "ORB_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
             SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
             SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
-
-            //Connect the entry and the stop order and fire it!
-            if (this.IsAutomated)
-            {
-                _orderenterlong.ConfirmOrder();  
-            }
         }
 
         /// <summary>
         /// Create Short Order and Stop.
         /// </summary>
         private void EnterShort() {
-
-            //todo positionsgröße bestimmen
-            _orderentershort = EnterShort(1, "ORB_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+            _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), "ORB_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
             SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
             SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
-
-            //Connect the entry and the stop order and fire it!
-            if (this.IsAutomated)
-            {
-                _orderenterlong.ConfirmOrder();
-            }
         }
 
 
@@ -336,11 +316,11 @@ namespace AgenaTrader.UserCode
 
             [Description("If true you can go to the beach, the strategy will handle everything")]
             [Category("Safety first!")]
-            [DisplayName("Fully automatic operation")]
-            public bool Automation
+            [DisplayName("Autopilot")]
+            public bool Autopilot
             {
-                get { return _automation; }
-                set { _automation = value; }
+                get { return _autopilot; }
+                set { _autopilot = value; }
             }
 
             [Description("If true the strategy will close the order before the end of trading day")]
@@ -362,19 +342,6 @@ namespace AgenaTrader.UserCode
 
         #region Internals
 
-
-        [Browsable(false)]
-        private bool IsEmailFunctionActive
-        {
-            get
-            {
-                if (this.Send_email) //&& GlobalUtilities.IsValidEmail(this.EmailAdress))
-                {
-                    return true;
-                }
-                return false;
-            }
-        }
 
             [Browsable(false)]
         private DateTime CurrentdayOfUpdate
