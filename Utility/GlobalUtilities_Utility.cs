@@ -13,9 +13,10 @@ using AgenaTrader.Helper;
 using System.Collections;
 using System.IO;
 using System.Text;
+using AgenaTrader.Plugins.MoneyHandler;
 
 /// <summary>
-/// Version: 1.5.1
+/// Version: 1.5.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -158,6 +159,32 @@ namespace AgenaTrader.UserCode
         #endregion
 
         #region Markets
+
+        /// <summary>
+        /// Calculates the position size regarding to risk management.
+        /// </summary>
+        /// <param name="instrument"></param>
+        /// <returns></returns>
+        public static int AdjustPositionToRiskManagement(ICore core, IInstrument instrument, double lastprice) {
+            //Get Risk Management from Account
+            IAccount account = core.AccountManager.GetAccount(instrument, true);
+            AccountRiskParams accountriskparams = core.PreferenceManager.GetAccountRiskParms(account.AccountConnection.ConnectionName, instrument.InstrumentType);
+            //Check the type of instrument
+            if (instrument.InstrumentType == InstrumentType.Index)
+            {
+                return 1;
+            }
+            if (instrument.InstrumentType == InstrumentType.Stock)
+            {
+                double maxpositionsizeincash = account.CashValue / 100 * accountriskparams.MaxInvestedAmountPercentage;
+                //Change Currency if we need to
+                Money m1 = new Money(maxpositionsizeincash, account.Currency);
+                Money m2 = m1.ConvertToCurrency(instrument.Currency);
+                //Return the position size
+                return (int)Math.Floor(decimal.ToDouble(m2.RoundedAmount) / lastprice);  
+            }
+            throw new NotImplementedException("AdjustPositionToRiskManagement: InstrumentType " + instrument.InstrumentType.ToString() + " not implemented", null);
+        }
 
         public static TimeSpan GetOfficialMarketOpeningTime(string Symbol)
         {
@@ -958,6 +985,7 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
 
 
 
