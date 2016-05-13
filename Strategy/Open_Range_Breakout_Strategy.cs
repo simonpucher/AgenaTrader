@@ -71,8 +71,6 @@ namespace AgenaTrader.UserCode
             //ClearOutputWindow();
             //TraceOrders = true;
 
-            this.IsAutomated = this.Automation;
-
             //Set the default time frame if you start the strategy via the strategy-escort
             //if you start the strategy on a chart the TimeFrame is automatically set.
             if (this.TimeFrame == null || this.TimeFrame.PeriodicityValue == 0)
@@ -105,6 +103,8 @@ namespace AgenaTrader.UserCode
 		protected override void OnBarUpdate()
 		{
             //Print("OnBarUpdate" + Bars[0].Time.ToString());
+
+            this.IsAutomated = this.Automation;
 
             //IAccount account = this.Core.AccountManager.GetAccount(this.Instrument, true);
             //int quantity = this.Instrument.GetDefaultQuantity(account);
