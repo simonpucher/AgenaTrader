@@ -52,7 +52,7 @@ namespace AgenaTrader.UserCode
         private bool _statisticbacktesting = false;
 
         //output
-
+        //no output variables yet
 
         //internal
         private IOrder _orderenterlong;
@@ -64,8 +64,6 @@ namespace AgenaTrader.UserCode
 
 		protected override void Initialize()
 		{
-            //this.IsAutomated = false;
-
             //Set the default time frame if you start the strategy via the strategy-escort
             //if you start the strategy on a chart the TimeFrame is automatically set.
             if (this.TimeFrame == null || this.TimeFrame.PeriodicityValue == 0)
@@ -105,26 +103,30 @@ namespace AgenaTrader.UserCode
         protected override void OnTermination()
         {
             base.OnTermination();
+
             //Print("OnTermination" + Bars[0].Time);
 
             //Close statistic data list if this feature is enabled
             if (this.StatisticBacktesting)
             {
+                //get the statistic data
                string csvdata = this._StatisticContainer.getCSVData();
                 
                //Copy the csv data into clipboard
                Thread thread = new Thread(() => Clipboard.SetText(csvdata));
-               thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+               //Set the thread to STA
+               thread.SetApartmentState(ApartmentState.STA);
                thread.Start();
                thread.Join();
-
             }
-
         }
 
+        /// <summary>
+        /// todo this method seam to be broken - get never called.
+        /// </summary>
         protected override void OnBrokerConnect()
         {
-           base.OnBrokerConnect();
+           //base.OnBrokerConnect();
 
            //send email
            if (this.Send_email)
@@ -137,7 +139,7 @@ namespace AgenaTrader.UserCode
 
         protected override void OnBrokerDisconnect(TradingDatafeedChangedEventArgs e)
         {
-            base.OnBrokerDisconnect(e);
+            //base.OnBrokerDisconnect(e);
             
             //send email
             if (this.Send_email)
