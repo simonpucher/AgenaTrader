@@ -111,8 +111,7 @@ namespace AgenaTrader.UserCode
                 }
             }
 
-            //todo => expiration date does not work on simulation mode!
-            //set expiration date to close at the end of the trading day
+            //close manually the trades in the end of the trading day
             if (this.CloseOrderBeforeEndOfTradingDay
                 && (this._orderenterlong != null || this._orderentershort != null)
                 && Bars[0].Time >= this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay))
@@ -125,15 +124,6 @@ namespace AgenaTrader.UserCode
                 {
                     ExitShort(this._orderentershort.Quantity, "EOD", this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
                 }
-                //foreach (AgenaTrader.Helper.TradingManager.Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
-                //{
-                //    if ((this._orderenterlong != null && item.EntryOrder.Name == this._orderenterlong.Name)
-                //     || (this._orderentershort != null && item.EntryOrder.Name == this._orderentershort.Name))
-                //    {
-                //        //item.Expiration = this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay);
-                //        //Print("Expiration: " + item.Expiration.ToString());
-                //    }
-                //}
             }
 
             //if it to late or one order already set stop execution of calculate
@@ -182,7 +172,7 @@ namespace AgenaTrader.UserCode
         /// <param name="execution"></param>
             protected override void OnExecution(IExecution execution)
             {
-                ////todo => expiration date does not work on simulation mode!
+                ////info: was uncommented because exired date is not working in simulation mode or in backtesting mode
                 ////set expiration date to close at the end of the trading day
                 //if (this.CloseOrderBeforeEndOfTradingDay)
                 //{
