@@ -156,7 +156,7 @@ namespace AgenaTrader.UserCode
             this.IsAutomated = this.Autopilot;
 
             //Reset Strategy for the next/first trading day
-            //todo => Not perfect if we are using GMT+12 and other markets than local markets 
+            //todo => Not perfect if we are using GMT+12 and other markets than local markets like DAX 
             if (this.CurrentdayOfUpdate.Date < Bars[0].Time.Date)
             {
                 this._orderenterlong = null;
@@ -288,7 +288,7 @@ namespace AgenaTrader.UserCode
 
             /// <summary>
             /// </summary>
-            [Description("Period in minutes for the ORB")]
+            [Description("Open Range period in minutes (size of the OR)")]
             [Category("Settings")]
             [DisplayName("Minutes ORB")]
             public int ORBMinutes
@@ -313,7 +313,7 @@ namespace AgenaTrader.UserCode
 
             /// <summary>
             /// </summary>
-            [Description("Start of the open range in Germany")]
+            [Description("Start of the strategy on german markets")]
             [Category("CFD")]
             [DisplayName("OpenRange Start DE")]
             public TimeSpan Time_OpenRangeStartDE
@@ -332,7 +332,7 @@ namespace AgenaTrader.UserCode
 
             /// <summary>
             /// </summary>
-            [Description("Start of the open range in USA")]
+            [Description("Start of the strategy on american markets")]
             [Category("CFD")]
             [DisplayName("OpenRange Start US")]
             public TimeSpan Time_OpenRangeStartUS
@@ -368,7 +368,7 @@ namespace AgenaTrader.UserCode
 
             /// <summary>
             /// </summary>
-            [Description("End of trading day in USA")]
+            [Description("End of trading day in America")]
             [Category("CFD")]
             [DisplayName("EndOfDay US")]
             public TimeSpan Time_EndOfDay_US
@@ -384,7 +384,7 @@ namespace AgenaTrader.UserCode
             }
 
 
-            [Description("If true an email will be send on order execution")]
+            [Description("If true an email will be send on order execution and on other important issues")]
             [Category("Safety first!")]
             [DisplayName("Send email")]
             public bool Send_email
@@ -394,7 +394,7 @@ namespace AgenaTrader.UserCode
             }
 
 
-            [Description("If true you can go to the beach, the strategy will handle everything")]
+            [Description("If true the strategy will handle everything. It will create buy orders, sell orders, stop loss orders, targets fully automatically")]
             [Category("Safety first!")]
             [DisplayName("Autopilot")]
             public bool Autopilot
@@ -403,7 +403,7 @@ namespace AgenaTrader.UserCode
                 set { _autopilot = value; }
             }
 
-            [Description("If true the strategy will close the order before the end of trading day")]
+            [Description("If true the strategy will close the orders before the end of trading day")]
             [Category("Safety first!")]
             [DisplayName("Close order EOD")]
             public bool CloseOrderBeforeEndOfTradingDay
