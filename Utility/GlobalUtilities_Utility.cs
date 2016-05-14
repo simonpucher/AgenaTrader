@@ -666,6 +666,9 @@ namespace AgenaTrader.UserCode
 
     #region Global defined classes
 
+    /// <summary>
+    /// Statistic object  to compare strategies.
+    /// </summary>
     public class StatisticContainer {
 
         private List<Statistic> List = null;
@@ -675,8 +678,9 @@ namespace AgenaTrader.UserCode
             List = new List<Statistic>();
         }
 
-        public void Add(Statistic statistic) {
-            this.List.Add(statistic);
+        public void Add(ITradingManager tradingmanager, string nameofthestrategy, IExecution execution)
+        {
+            this.List.Add(new Statistic(tradingmanager ,nameofthestrategy, execution));
         }
 
 
@@ -687,7 +691,7 @@ namespace AgenaTrader.UserCode
             {
                 foreach (Statistic item in this.List)
                 {
-                    returnvalue.Append(item.getCSVData());
+                    returnvalue.AppendLine(item.getCSVData());
                 }
             }
             return returnvalue.ToString();
@@ -695,14 +699,39 @@ namespace AgenaTrader.UserCode
     }
 
     /// <summary>
-    /// Statistic object to compare strategies.
+    /// Statistic object for each order.
     /// </summary>
     public class Statistic
     {
 
+        //todo remove this method
         public Statistic(string nameofthestrategy)
         {
             this.NameOfTheStrategy = nameofthestrategy;
+        }
+
+        public Statistic(ITradingManager tradingmanager, string nameofthestrategy, IExecution execution)
+        {
+            //Logging only on flat transactions then we have all data available
+            if (execution.MarketPosition == PositionType.Flat)
+            {
+                //get the entry order
+                string entrysignalname = execution.Order.FromEntrySignal;
+                //IOrder entryorder = tradingmanager.Get(execution.Instrument).Where(x=>x.); 
+                //todo finish it
+
+                //Log all data
+                this.NameOfTheStrategy = nameofthestrategy;
+                this.Instrument = execution.Instrument.ToString();
+                this.Quantity = execution.Quantity;
+                this.TradeDirection = execution.MarketPosition.ToString();
+                this.ExitReason = "bubu";
+                this.ExitPrice = 60;
+                this.ExitDateTime = DateTime.Now;
+                this.EntryDateTime = DateTime.Now;
+                this.EntryPrice = 50;
+            }
+            
         }
 
         /// <summary>
@@ -711,7 +740,7 @@ namespace AgenaTrader.UserCode
         /// <returns></returns>
         public string getCSVData()
         {
-            return string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13},{14}",     
+            return string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13};{14}",     
                                             this.NameOfTheStrategy, 
                                             this.TradeDirection, 
                                             this.TimeFrame,

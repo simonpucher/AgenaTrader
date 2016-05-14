@@ -11,6 +11,8 @@ using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 using System.Text;
+using System.Windows.Forms;
+using System.Threading;
 
 /// <summary>
 /// Version: in progress
@@ -47,6 +49,7 @@ namespace AgenaTrader.UserCode
         private bool _send_email = false;
         private bool _autopilot = false;
         private bool _closeorderbeforendoftradingday = false;
+        private bool _statisticbacktesting = false;
 
         //output
 
@@ -56,6 +59,7 @@ namespace AgenaTrader.UserCode
         private IOrder _orderentershort;
         private ORB_Indicator _orb_indicator = null;
         private DateTime _currentdayofupdate = DateTime.MinValue;
+        private StatisticContainer _StatisticContainer = null;
 
 
 		protected override void Initialize()
@@ -73,9 +77,12 @@ namespace AgenaTrader.UserCode
             this.BarsRequired = 2;
 		}
 
+
         protected override void OnStartUp()
         {
             base.OnStartUp();
+
+            //Print("OnStartUp" + Bars[0].Time);
 
             //Init our indicator to get code access
             this._orb_indicator = new ORB_Indicator();
@@ -87,6 +94,57 @@ namespace AgenaTrader.UserCode
             _orb_indicator.Time_OpenRangeStartUS = this.Time_OpenRangeStartUS;
             _orb_indicator.Time_EndOfDay_DE = this.Time_EndOfDay_DE;
             _orb_indicator.Time_EndOfDay_US = this.Time_EndOfDay_US;
+
+            //Initalize statistic data list if this feature is enabled
+            if (this.StatisticBacktesting)
+            {
+                this._StatisticContainer = new StatisticContainer();
+            }
+        }
+
+        protected override void OnTermination()
+        {
+            base.OnTermination();
+            //Print("OnTermination" + Bars[0].Time);
+
+            //Close statistic data list if this feature is enabled
+            if (this.StatisticBacktesting)
+            {
+               string csvdata = this._StatisticContainer.getCSVData();
+                
+               //Copy the csv data into clipboard
+               Thread thread = new Thread(() => Clipboard.SetText(csvdata));
+               thread.SetApartmentState(ApartmentState.STA); //Set the thread to STA
+               thread.Start();
+               thread.Join();
+
+            }
+
+        }
+
+        protected override void OnBrokerConnect()
+        {
+           base.OnBrokerConnect();
+
+           //send email
+           if (this.Send_email)
+           {
+               this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
+                   "OnBrokerConnect on Strategy: " + this.GetType().Name, "Broker was connected" + " - Date: " + DateTime.Now.ToString());
+           }
+
+        }
+
+        protected override void OnBrokerDisconnect(TradingDatafeedChangedEventArgs e)
+        {
+            base.OnBrokerDisconnect(e);
+            
+            //send email
+            if (this.Send_email)
+            {
+                this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
+                    "OnBrokerDisconnect on Strategy: " + this.GetType().Name, "Broker was disconnected" + " - Date: " + DateTime.Now.ToString());
+            }
         }
 
 		protected override void OnBarUpdate()
@@ -107,7 +165,7 @@ namespace AgenaTrader.UserCode
                 if (this.Send_email)
                 {
                     this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
-                        "Reset on Strategy: " +  this.GetType().Name , "Instrument: " + this.Instrument.Name + " - Date: " + Bars[0].Time);
+                        "Reset on Strategy: " + this.GetType().Name, "Strategy was restarted because a new trading day has arrived." + Environment.NewLine + "Instrument: " + this.Instrument.Name + " - Date: " + Bars[0].Time);
                 }
             }
 
@@ -186,6 +244,11 @@ namespace AgenaTrader.UserCode
                 //        }
                 //    }
                 //}
+
+                if (this.StatisticBacktesting)
+                {
+                    this._StatisticContainer.Add(this.Root.Core.TradingManager, this.GetType().Name, execution);
+                }
 
                 //send email
                 if (this.Send_email)
@@ -340,11 +403,21 @@ namespace AgenaTrader.UserCode
 
             [Description("If true the strategy will close the order before the end of trading day")]
             [Category("Safety first!")]
-            [DisplayName("Close order today")]
+            [DisplayName("Close order EOD")]
             public bool CloseOrderBeforeEndOfTradingDay
             {
                 get { return _closeorderbeforendoftradingday; }
                 set { _closeorderbeforendoftradingday = value; }
+            }
+
+
+            [Description("If true the strategy will create statistic data during the backtesting process")]
+            [Category("Safety first!")]
+            [DisplayName("Statistic Backtesting")]
+            public bool StatisticBacktesting
+            {
+                get { return _statisticbacktesting; }
+                set { _statisticbacktesting = value; }
             }
 
 
