@@ -139,8 +139,8 @@ namespace AgenaTrader.UserCode
             Overlay = false;
             CalculateOnBarClose = true;
 
-            //We are able to start at the first bar.
-            this.BarsRequired = 0;
+            //Because of Backtesting reasons if we use the afvanced mode we need at least two bars
+            this.BarsRequired = 2;
 		}
 
         protected override void InitRequirements()
@@ -158,6 +158,7 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnBarUpdate()
 		{
+
             if (this.DatafeedPeriodicityIsValid(Bars))
             {
 
@@ -597,8 +598,8 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
-        [Category("TimeSpan")]
+        [Description("Start of the open range in Germany")]
+        [Category("CFD")]
         [DisplayName("OpenRange Start DE")]
         public TimeSpan Time_OpenRangeStartDE
         {
@@ -612,10 +613,12 @@ namespace AgenaTrader.UserCode
             set { _tim_OpenRangeStartDE = new TimeSpan(value); }
         }
 
+
+
         /// <summary>
         /// </summary>
-        [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
-        [Category("TimeSpan")]
+        [Description("Start of the open range in USA")]
+        [Category("CFD")]
         [DisplayName("OpenRange Start US")]
         public TimeSpan Time_OpenRangeStartUS
         {
@@ -630,10 +633,11 @@ namespace AgenaTrader.UserCode
         }
 
 
+
         /// <summary>
         /// </summary>
-        [Description("EndOfDay DE: Uhrzeit spätestens verkauft wird")]
-        [Category("TimeSpan")]
+        [Description("End of trading day in Germany")]
+        [Category("CFD")]
         [DisplayName("EndOfDay DE")]
         public TimeSpan Time_EndOfDay_DE
         {
@@ -649,8 +653,8 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("EndOfDay US: Uhrzeit spätestens verkauft wird")]
-        [Category("TimeSpan")]
+        [Description("End of trading day in USA")]
+        [Category("CFD")]
         [DisplayName("EndOfDay US")]
         public TimeSpan Time_EndOfDay_US
         {

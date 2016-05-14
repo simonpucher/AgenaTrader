@@ -69,8 +69,8 @@ namespace AgenaTrader.UserCode
                  this.TimeFrame = new TimeFrame(DatafeedHistoryPeriodicity.Minute, 1);
             }
 
-            //We need at least one bar.
-            this.BarsRequired = 1;
+            //Because of Backtesting reasons if we use the afvanced mode we need at least two bars
+            this.BarsRequired = 2;
 		}
 
         protected override void OnStartUp()
@@ -109,6 +109,31 @@ namespace AgenaTrader.UserCode
                     this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
                         "Reset on Strategy: " +  this.GetType().Name , "Instrument: " + this.Instrument.Name + " - Date: " + Bars[0].Time);
                 }
+            }
+
+            //todo => expiration date does not work on simulation mode!
+            //set expiration date to close at the end of the trading day
+            if (this.CloseOrderBeforeEndOfTradingDay
+                && (this._orderenterlong != null || this._orderentershort != null)
+                && Bars[0].Time >= this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay))
+            {
+                if (this._orderenterlong != null)
+                {
+                    ExitLong(this._orderenterlong.Quantity, "EOD", this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
+                }
+                if (this._orderentershort != null)
+                {
+                    ExitShort(this._orderentershort.Quantity, "EOD", this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
+                }
+                //foreach (AgenaTrader.Helper.TradingManager.Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
+                //{
+                //    if ((this._orderenterlong != null && item.EntryOrder.Name == this._orderenterlong.Name)
+                //     || (this._orderentershort != null && item.EntryOrder.Name == this._orderentershort.Name))
+                //    {
+                //        //item.Expiration = this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay);
+                //        //Print("Expiration: " + item.Expiration.ToString());
+                //    }
+                //}
             }
 
             //if it to late or one order already set stop execution of calculate
@@ -157,20 +182,20 @@ namespace AgenaTrader.UserCode
         /// <param name="execution"></param>
             protected override void OnExecution(IExecution execution)
             {
-                //todo => expiration date does not work on simulation mode!
-                //set expiration date to close at the end of the trading day
-                if (this.CloseOrderBeforeEndOfTradingDay)
-                {
-                     foreach (AgenaTrader.Helper.TradingManager.Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
-                    {
-                        if ((this._orderenterlong != null && item.EntryOrder.Name == this._orderenterlong.Name)
-                         || (this._orderentershort != null && item.EntryOrder.Name == this._orderentershort.Name))
-                        {
-                            item.Expiration = this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay); 
-                            //Print("Expiration: " + item.Expiration.ToString());
-                        }
-                    }  
-                }
+                ////todo => expiration date does not work on simulation mode!
+                ////set expiration date to close at the end of the trading day
+                //if (this.CloseOrderBeforeEndOfTradingDay)
+                //{
+                //    foreach (AgenaTrader.Helper.TradingManager.Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
+                //    {
+                //        if ((this._orderenterlong != null && item.EntryOrder.Name == this._orderenterlong.Name)
+                //         || (this._orderentershort != null && item.EntryOrder.Name == this._orderentershort.Name))
+                //        {
+                //            item.Expiration = this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay);
+                //            //Print("Expiration: " + item.Expiration.ToString());
+                //        }
+                //    }
+                //}
 
                 //send email
                 if (this.Send_email)
@@ -218,7 +243,7 @@ namespace AgenaTrader.UserCode
             }
 
         
-                        /// <summary>
+            /// <summary>
             /// </summary>
             [Description("Close the order x candles before the end of trading day")]
             [Category("Settings")]
@@ -234,7 +259,7 @@ namespace AgenaTrader.UserCode
             /// <summary>
             /// </summary>
             [Description("Start of the open range in Germany")]
-            [Category("Settings")]
+            [Category("CFD")]
             [DisplayName("OpenRange Start DE")]
             public TimeSpan Time_OpenRangeStartDE
             {
@@ -253,7 +278,7 @@ namespace AgenaTrader.UserCode
             /// <summary>
             /// </summary>
             [Description("Start of the open range in USA")]
-            [Category("Settings")]
+            [Category("CFD")]
             [DisplayName("OpenRange Start US")]
             public TimeSpan Time_OpenRangeStartUS
             {
@@ -272,7 +297,7 @@ namespace AgenaTrader.UserCode
             /// <summary>
             /// </summary>
             [Description("End of trading day in Germany")]
-            [Category("Settings")]
+            [Category("CFD")]
             [DisplayName("EndOfDay DE")]
             public TimeSpan Time_EndOfDay_DE
             {
@@ -289,7 +314,7 @@ namespace AgenaTrader.UserCode
             /// <summary>
             /// </summary>
             [Description("End of trading day in USA")]
-            [Category("Settings")]
+            [Category("CFD")]
             [DisplayName("EndOfDay US")]
             public TimeSpan Time_EndOfDay_US
             {
