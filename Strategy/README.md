@@ -8,3 +8,6 @@ To compile indicators, conditions and other script resources without any error y
 
 ##Open Range
 *** In Progress ***
+he initial version of this strategy was inspired by the work of Birger Schäfermeier: [ORB by Birger Schäfermeier](https://www.whselfinvest.at/de/Store_Birger_Schaefermeier_Trading_Strategie_Open_Range_Break_Out.php)
+
+Further developments are inspired by the work of Mehmet Emre Cekirdekci and Veselin Iliev from the Worcester Polytechnic Institute (2010) [Trading System Development: Trading the Opening Range Breakouts] (https://www.wpi.edu/Pubs/E-project/Available/E-project-042910-142422/unrestricted/Veselin_Iliev_IQP.pdf) 
