@@ -38,19 +38,10 @@ namespace AgenaTrader.UserCode
     {
         //input
         int ORBMinutes { get; set; }
-        //Color Color_ORB { get; set; }
-        //string Color_ORBSerialize { get; set; }
-        //Color Color_TargetAreaShort { get; set; }
-        //string Color_TargetAreaShortSerialize { get; set; }
-        //Color Color_TargetAreaLong { get; set; }
-        //string Color_TargetAreaLongSerialize { get; set; }
         TimeSpan Time_OpenRangeStartDE { get; set; }
-        //TimeSpan Time_OpenRangeEndDE { get; set; }
         TimeSpan Time_OpenRangeStartUS { get; set; }
-        //TimeSpan Time_OpenRangeEndUS { get; set; }
         TimeSpan Time_EndOfDay_DE { get; set; }
         TimeSpan Time_EndOfDay_US { get; set; }
-        //string EmailAdress { get; set; }
         bool Send_email { get; set; }
 
      
@@ -97,16 +88,14 @@ namespace AgenaTrader.UserCode
         private Color _col_target_long = Color.PaleGreen;
 
         private int _orbminutes = Const.DefaultOpenRangeSizeinMinutes;
-        private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);  
-        //private TimeSpan _tim_OpenRangeEndDE = new TimeSpan(10, 15, 0);  
-
+        private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);   
         private TimeSpan _tim_OpenRangeStartUS = new TimeSpan(15, 30, 0);   
-        //private TimeSpan _tim_OpenRangeEndUS = new TimeSpan(16, 45, 0);    
-
         private TimeSpan _tim_EndOfDay_DE = new TimeSpan(17, 30, 0);  
         private TimeSpan _tim_EndOfDay_US = new TimeSpan(22, 00, 0);
 
         private bool _send_email = false;
+        //todo add statistic data
+        //private bool _statisticbacktesting = false;
 
         //output
         private double _rangelow = Double.MinValue;
@@ -122,6 +111,8 @@ namespace AgenaTrader.UserCode
         private IBar _short_target_reached = null;
         private DateTime _currentdayofupdate = DateTime.MinValue;
         private ITimePeriod _timeperiod = null;
+        //todo add statistic data
+        //private StatisticContainer _StatisticContainer = null;
 
 
 
@@ -154,6 +145,12 @@ namespace AgenaTrader.UserCode
             //Print("OnStartUp");
 
             this.TimePeriod = this.Root.Core.MarketplaceManager.GetExchangeDescription(this.Instrument.Exchange).TradingHours;
+
+            ////todo Initalize statistic data list if this feature is enabled
+            //if (this.StatisticBacktesting)
+            //{
+            //    this._StatisticContainer = new StatisticContainer();
+            //}
         }
 
 		protected override void OnBarUpdate()
@@ -218,18 +215,23 @@ namespace AgenaTrader.UserCode
                 }
 
             
-
+                //todo statistic for timeout
+                //todo statistic for stops
 
                 //Draw the Long Target if this is necessary 
                 if (this.LongTargetReached != null)
                 {
                     DrawArrowDown("ArrowTargetLong" + Bars[0].Time.Date.Ticks, true, this.LongTargetReached.Time, this.LongTargetReached.High, Color.Red);
+                    //todo add statistic data
+                    //this._StatisticContainer.Add();
                 }
 
                 //Draw the Short Target if this is necessary
                 if (this.ShortTargetReached != null)
                 {
                     DrawArrowUp("ArrowTargetShort" + Bars[0].Time.Date.Ticks, true, this.ShortTargetReached.Time, this.ShortTargetReached.Low, Color.Green);
+                    //todo add statistic data
+                    //this._StatisticContainer.Add();
                 }
 
                 //Set the color
@@ -677,6 +679,16 @@ namespace AgenaTrader.UserCode
             get { return _send_email; }
             set { _send_email = value; }
         }
+
+        //todo add statistic data
+        //[Description("If true the strategy will create statistic data during the backtesting process")]
+        //[Category("Safety first!")]
+        //[DisplayName("Statistic Backtesting")]
+        //public bool StatisticBacktesting
+        //{
+        //    get { return _statisticbacktesting; }
+        //    set { _statisticbacktesting = value; }
+        //}
 
 
         #region Plotstyle
