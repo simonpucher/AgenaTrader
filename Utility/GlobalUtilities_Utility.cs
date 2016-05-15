@@ -49,15 +49,12 @@ namespace AgenaTrader.UserCode
         public const int DefaultLineWidth_large = 3;
         public static readonly Color DefaultIndicatorColor = Color.Orange;
         public static readonly DashStyle DefaultIndicatorDashStyle = DashStyle.Solid;
-        public static string strLong = "Long";
-        public static string strShort = "Short";
-
 
     }
 
     #endregion
 
-    #region GlobalUtilities with global static Helper with functions and methods.
+    #region Global static Helper with functions and methods.
 
 
     /// <summary>
@@ -667,17 +664,22 @@ namespace AgenaTrader.UserCode
     #region Global defined classes
 
     /// <summary>
-    /// Statistic object  to compare strategies.
+    /// Statistic object  to compare the performance of strategies.
     /// </summary>
     public class StatisticContainer {
 
         private List<Statistic> List = null;
 
         public StatisticContainer() {
-
-            List = new List<Statistic>();
+            this.List = new List<Statistic>();
         }
 
+        /// <summary>
+        /// Add a execution to our statistic.
+        /// </summary>
+        /// <param name="tradingmanager"></param>
+        /// <param name="nameofthestrategy"></param>
+        /// <param name="execution"></param>
         public void Add(ITradingManager tradingmanager, string nameofthestrategy, IExecution execution)
         {
             this.List.Add(new Statistic(tradingmanager ,nameofthestrategy, execution));
@@ -687,7 +689,7 @@ namespace AgenaTrader.UserCode
         public string getCSVData()
         {
             StringBuilder returnvalue = new StringBuilder();
-            if (List != null && List.Count > 0)
+            if (this.List != null && this.List.Count > 0)
             {
                 foreach (Statistic item in this.List)
                 {
@@ -710,29 +712,52 @@ namespace AgenaTrader.UserCode
             this.NameOfTheStrategy = nameofthestrategy;
         }
 
+        /// <summary>
+        /// Standard constructor with finalised executions (all data from trade and order is available).
+        /// You should use this when you create statistic data during a backtest.
+        /// </summary>
+        /// <param name="tradingmanager"></param>
+        /// <param name="nameofthestrategy"></param>
+        /// <param name="execution"></param>
         public Statistic(ITradingManager tradingmanager, string nameofthestrategy, IExecution execution)
         {
-            //Logging only on flat transactions then we have all data available
+            //Logging only on flat transactions then we have all data available (entry & exit)
             if (execution.MarketPosition == PositionType.Flat)
             {
-                //get the entry order
-                string entrysignalname = execution.Order.FromEntrySignal;
-                //IOrder entryorder = tradingmanager.Get(execution.Instrument).Where(x=>x.); 
-                //todo finish it
+                //get the trade with all data
+                int tradeid = tradingmanager.GetTradeIdByExecutionId(execution.ExecutionId);
+                ITradingTrade trade = tradingmanager.GetTrade(tradeid);
 
                 //Log all data
                 this.NameOfTheStrategy = nameofthestrategy;
                 this.Instrument = execution.Instrument.ToString();
-                this.Quantity = execution.Quantity;
-                this.TradeDirection = execution.MarketPosition.ToString();
-                this.ExitReason = "bubu";
-                this.ExitPrice = 60;
-                this.ExitDateTime = DateTime.Now;
-                this.EntryDateTime = DateTime.Now;
-                this.EntryPrice = 50;
+                this.TradeDirection = trade.EntryOrder.IsLong ? PositionType.Long : PositionType.Short;
+                this.TimeFrame = execution.Order.TimeFrame.ToString();
+                this.ProfitLoss = trade.ProfitLoss;
+                this.ProfitLossPercent = trade.ProfitLossPercent;  //NEU
+
+                this.ExitReason = trade.ExitReason;
+                this.ExitPrice = trade.ExitPrice;
+                this.ExitDateTime = execution.Time;
+                this.ExitQuantity = execution.Quantity;  //NEU
+                this.ExitOrderType = execution.Order.OrderType; //NEU
+
+                this.EntryDateTime = trade.EntryOrder.CreationTime;
+                this.EntryPrice = trade.EntryOrder.Price;
+                this.EntryQuantity = trade.EntryOrder.Quantity; //NEU
+                this.EntryOrderType = trade.EntryOrder.Type; //NEU
+
+                //Do we need this?
+                //this.StopPrice,
+                //this.TargetPrice 
+                  
             }
             
         }
+
+ 
+
+
 
         /// <summary>
         /// Returns a string with csv data.
@@ -740,6 +765,7 @@ namespace AgenaTrader.UserCode
         /// <returns></returns>
         public string getCSVData()
         {
+            //todo the new properties are not in the string object
             return string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13};{14}",     
                                             this.NameOfTheStrategy, 
                                             this.TradeDirection, 
@@ -752,20 +778,22 @@ namespace AgenaTrader.UserCode
                                             this.ExitPrice,
                                             this.PointsDiff,
                                             this.ExitReason,
-                                            this.Quantity,
+                                            this.ExitQuantity,
                                             this.ProfitLoss,
                                             this.StopPrice,
                                             this.TargetPrice                                            
                                             );
         }
+
         public void AppendToFile()
         {
+            //todo the new properties are not in the string
             string File = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\" + "Auswertung.csv";
             FileInfo fi = new FileInfo(File);
             if (fi.Exists == false)
             {
                 using (StreamWriter stream = new StreamWriter(File)) {
-                    stream.WriteLine("Strategy;TradeDirection;TimeFrame;EntryDateTime;ExitDateTime;MinutesInMarket;Instrument;EntryPrice;ExitPrice;PointsDiff;ExitReason;Quantity;ProfitLoss;StopPrice;TargetPrice");
+                    stream.WriteLine("Strategy;TradeDirection;TimeFrame;EntryDateTime;ExitDateTime;MinutesInMarket;Instrument;EntryPrice;ExitPrice;PointsDiff;ExitReason;ExitQuantity;ProfitLoss;StopPrice;TargetPrice");
                 }
             }
             using (StreamWriter stream = new FileInfo(File).AppendText())
@@ -809,6 +837,22 @@ namespace AgenaTrader.UserCode
             set { _exitdatetime = value; }
         }
 
+        private OrderType _EntryOrderType = OrderType.Unknown;
+
+        public OrderType EntryOrderType
+        {
+            get { return _EntryOrderType; }
+            set { _EntryOrderType = value; }
+        }
+
+        private OrderType _ExitOrderType = OrderType.Unknown;
+
+        public OrderType ExitOrderType
+        {
+            get { return _ExitOrderType; }
+            set { _ExitOrderType = value; }
+        }
+
         public double MinutesInMarket
         {
             get
@@ -820,15 +864,16 @@ namespace AgenaTrader.UserCode
         public double PointsDiff
         {
             get {
-                if (TradeDirection == Const.strLong)
-                {
-                    return ExitPrice - EntryPrice;
-                }
-                else
-                {
-                    return EntryPrice - ExitPrice;
-                }
-                 }
+                    //if (TradeDirection == Const.strLong)
+                    if (TradeDirection == PositionType.Long)
+                    {
+                        return ExitPrice - EntryPrice;
+                    }
+                    else
+                    {
+                        return EntryPrice - ExitPrice;
+                    }
+              }
         }
 
         private string _instrument = String.Empty;
@@ -839,9 +884,9 @@ namespace AgenaTrader.UserCode
             set { _instrument = value; }
         }
 
-        private string _TradeDirection = String.Empty;
+        private PositionType _TradeDirection = PositionType.Flat;
 
-        public string TradeDirection
+        public PositionType TradeDirection
         {
             get { return _TradeDirection; }
             set { _TradeDirection = value; }
@@ -854,6 +899,16 @@ namespace AgenaTrader.UserCode
             get { return _EntryPrice; }
             set { _EntryPrice = value; }
         }
+
+        private double _EntryQuantity = Double.MinValue;
+
+        public double EntryQuantity
+        {
+            get { return _EntryQuantity; }
+            set { _EntryQuantity = value; }
+        }
+
+        
 
         private double _ExitPrice = Double.MinValue;
 
@@ -874,12 +929,12 @@ namespace AgenaTrader.UserCode
             set { _ExitReason = value; }
         }
 
-        private int _Quantity = 0;
+        private int _ExitQuantity = 0;
 
-        public int Quantity
+        public int ExitQuantity
         {
-            get { return _Quantity; }
-            set { _Quantity = value; }
+            get { return _ExitQuantity; }
+            set { _ExitQuantity = value; }
         }
 
         private double _ProfitLoss = 0;
@@ -889,6 +944,14 @@ namespace AgenaTrader.UserCode
             get { return _ProfitLoss; }
             set { _ProfitLoss = value; }
         }
+
+        private double _ProfitLossPercent = 0;
+         public double ProfitLossPercent
+        {
+            get { return _ProfitLossPercent; }
+            set { _ProfitLossPercent = value; }
+        }
+
 
         private double _StopPrice = 0;
 
