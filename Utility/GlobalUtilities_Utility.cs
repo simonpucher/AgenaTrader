@@ -686,12 +686,12 @@ namespace AgenaTrader.UserCode
         /// <param name="execution"></param>
         public void Add(ITradingManager tradingmanager, string nameofthestrategy, IExecution execution)
         {
-            Statistic stat = new Statistic(tradingmanager, nameofthestrategy, execution);
-            if (stat.IsValid)
-            {
-                this.List.Add(stat);   
-            }
-
+            //Statistic stat = new Statistic(tradingmanager, nameofthestrategy, execution);
+            //if (stat.IsValid)
+            //{
+            //    this.List.Add(stat);   
+            //}
+            this.List.Add(new Statistic(tradingmanager, nameofthestrategy, execution)); 
         }
 
         ///// <summary>

@@ -126,7 +126,7 @@ namespace AgenaTrader.UserCode
 
 		protected override void Initialize()
 		{
-            Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "ORB_IndicatorPlot"));
+            //Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "ORB_IndicatorPlot"));
             Overlay = false;
             CalculateOnBarClose = true;
 
