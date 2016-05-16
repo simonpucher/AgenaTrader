@@ -37,6 +37,8 @@ namespace AgenaTrader.UserCode
     /// </summary>
     public static class Const
     {
+        //Default Files
+        public static readonly string DefaultFileStatistic = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\" + "Auswertung.csv";
 
         //Default Strings
         public const string DefaultStringDatafeedPeriodicity = "Periodicity of your data feed is suboptimal for this indicator!";
@@ -764,29 +766,23 @@ namespace AgenaTrader.UserCode
                 this.TradeDirection = trade.EntryOrder.IsLong ? PositionType.Long : PositionType.Short;
                 this.TimeFrame = execution.Order.TimeFrame.ToString();
                 this.ProfitLoss = trade.ProfitLoss;
-                this.ProfitLossPercent = trade.ProfitLossPercent;  //NEU
-
+                this.ProfitLossPercent = trade.ProfitLossPercent; 
                 this.ExitReason = trade.ExitReason;
                 this.ExitPrice = trade.ExitPrice;
                 this.ExitDateTime = execution.Time;
-                this.ExitQuantity = execution.Quantity;  //NEU
-                this.ExitOrderType = execution.Order.OrderType; //NEU
+                this.ExitQuantity = execution.Quantity;
+                this.ExitOrderType = execution.Order.OrderType;
 
                 this.EntryDateTime = trade.EntryOrder.CreationTime;
                 this.EntryPrice = trade.EntryOrder.Price;
-                this.EntryQuantity = trade.EntryOrder.Quantity; //NEU
-                this.EntryOrderType = trade.EntryOrder.Type; //NEU
+                this.EntryQuantity = trade.EntryOrder.Quantity;
+                this.EntryOrderType = trade.EntryOrder.Type;
 
-                //Do we need this?
+                //todo Do we need this?
                 //this.StopPrice,
-                //this.TargetPrice 
-                  
+                //this.TargetPrice   
             }
-            
         }
-
- 
-
 
 
         /// <summary>
@@ -795,8 +791,7 @@ namespace AgenaTrader.UserCode
         /// <returns></returns>
         public string getCSVData()
         {
-            //todo the new properties are not in the string object
-            return string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13};{14}",     
+            return string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13};{14};{15};{16};{17};{18}",     
                                             this.NameOfTheStrategy, 
                                             this.TradeDirection.ToString(), 
                                             this.TimeFrame,
@@ -805,25 +800,31 @@ namespace AgenaTrader.UserCode
                                             this.MinutesInMarket, 
                                             this.Instrument,
                                             this.EntryPrice,
+                                            this.EntryQuantity,
+                                            this.EntryOrderType,
                                             this.ExitPrice,
                                             this.PointsDiff,
                                             this.ExitReason,
                                             this.ExitQuantity,
+                                            this.ExitOrderType,
                                             this.ProfitLoss,
+                                            this.ProfitLossPercent,
                                             this.StopPrice,
                                             this.TargetPrice                                            
                                             );
         }
 
+        /// <summary>
+        /// Append csv data to a file
+        /// </summary>
         public void AppendToFile()
         {
-            //todo the new properties are not in the string
-            string File = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\" + "Auswertung.csv";
+            string File = Const.DefaultFileStatistic;
             FileInfo fi = new FileInfo(File);
             if (fi.Exists == false)
             {
                 using (StreamWriter stream = new StreamWriter(File)) {
-                    stream.WriteLine("Strategy;TradeDirection;TimeFrame;EntryDateTime;ExitDateTime;MinutesInMarket;Instrument;EntryPrice;ExitPrice;PointsDiff;ExitReason;ExitQuantity;ProfitLoss;StopPrice;TargetPrice");
+                    stream.WriteLine("Strategy;TradeDirection;TimeFrame;EntryDateTime;ExitDateTime;MinutesInMarket;Instrument;EntryPrice;EntryQuantity;EntryOrderType;ExitPrice;PointsDiff;ExitReason;ExitQuantity;ExitOrderType;ProfitLoss;ProfitLossPercent;StopPrice;TargetPrice");
                 }
             }
             using (StreamWriter stream = new FileInfo(File).AppendText())
@@ -1119,6 +1120,7 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
 
 
 
