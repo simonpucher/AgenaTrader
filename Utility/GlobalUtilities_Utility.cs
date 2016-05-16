@@ -14,9 +14,11 @@ using System.Collections;
 using System.IO;
 using System.Text;
 using AgenaTrader.Plugins.MoneyHandler;
+using System.Threading;
+using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.5.2
+/// Version: 1.5.3
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -675,7 +677,7 @@ namespace AgenaTrader.UserCode
         }
 
         /// <summary>
-        /// Add a execution to our statistic.
+        /// Add a execution to our statistic (e.g. for backtesting).
         /// </summary>
         /// <param name="tradingmanager"></param>
         /// <param name="nameofthestrategy"></param>
@@ -685,7 +687,35 @@ namespace AgenaTrader.UserCode
             this.List.Add(new Statistic(tradingmanager ,nameofthestrategy, execution));
         }
 
+        ///// <summary>
+        ///// Add a order to our statistic (e.g. for indicator).
+        ///// </summary>
+        ///// <param name="tradingmanager"></param>
+        ///// <param name="nameofthestrategy"></param>
+        ///// <param name="execution"></param>
+        //public void Add(ITradingManager tradingmanager, string nameofthestrategy, IOrder execution)
+        //{
+        //    this.List.Add(new Statistic(tradingmanager, nameofthestrategy, execution));
+        //}
 
+        /// <summary>
+        /// Copy the statistic csv file into the clipboard
+        /// </summary>
+        public void copyToClipboard()
+        {
+            //Copy the csv data into clipboard
+            Thread thread = new Thread(() => Clipboard.SetText(this.getCSVData()));
+            //Set the thread to STA
+            thread.SetApartmentState(ApartmentState.STA);
+            thread.Start();
+            thread.Join();
+        }
+
+        /// <summary>
+        /// Returns csv Data
+        /// </summary>
+        /// <param name="copytoclipboard"></param>
+        /// <returns></returns>
         public string getCSVData()
         {
             StringBuilder returnvalue = new StringBuilder();
@@ -768,7 +798,7 @@ namespace AgenaTrader.UserCode
             //todo the new properties are not in the string object
             return string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13};{14}",     
                                             this.NameOfTheStrategy, 
-                                            this.TradeDirection, 
+                                            this.TradeDirection.ToString(), 
                                             this.TimeFrame,
                                             this.EntryDateTime.ToString(), 
                                             this.ExitDateTime.ToString(), 
