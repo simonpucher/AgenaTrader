@@ -110,14 +110,7 @@ namespace AgenaTrader.UserCode
             if (this.StatisticBacktesting)
             {
                 //get the statistic data
-               string csvdata = this._StatisticContainer.getCSVData();
-                
-               //Copy the csv data into clipboard
-               Thread thread = new Thread(() => Clipboard.SetText(csvdata));
-               //Set the thread to STA
-               thread.SetApartmentState(ApartmentState.STA);
-               thread.Start();
-               thread.Join();
+                this._StatisticContainer.copyToClipboard();
             }
         }
 
@@ -128,12 +121,12 @@ namespace AgenaTrader.UserCode
         {
            //base.OnBrokerConnect();
 
-           //send email
-           if (this.Send_email)
-           {
-               this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
-                   "OnBrokerConnect on Strategy: " + this.GetType().Name, "Broker was connected" + " - Date: " + DateTime.Now.ToString());
-           }
+           ////send email
+           //if (this.Send_email)
+           //{
+           //    this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
+           //        "OnBrokerConnect on Strategy: " + this.GetType().Name, "Broker was connected" + " - Date: " + DateTime.Now.ToString());
+           //}
 
         }
 
@@ -141,12 +134,12 @@ namespace AgenaTrader.UserCode
         {
             //base.OnBrokerDisconnect(e);
             
-            //send email
-            if (this.Send_email)
-            {
-                this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
-                    "OnBrokerDisconnect on Strategy: " + this.GetType().Name, "Broker was disconnected" + " - Date: " + DateTime.Now.ToString());
-            }
+            ////send email
+            //if (this.Send_email)
+            //{
+            //    this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
+            //        "OnBrokerDisconnect on Strategy: " + this.GetType().Name, "Broker was disconnected" + " - Date: " + DateTime.Now.ToString());
+            //}
         }
 
 		protected override void OnBarUpdate()
@@ -163,12 +156,12 @@ namespace AgenaTrader.UserCode
                 this._orderentershort = null;
                 this.CurrentdayOfUpdate = Bars[0].Time.Date;
 
-                //send email
-                if (this.Send_email)
-                {
-                    this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
-                        "Reset on Strategy: " + this.GetType().Name, "Strategy was restarted because a new trading day has arrived." + Environment.NewLine + "Instrument: " + this.Instrument.Name + " - Date: " + Bars[0].Time);
-                }
+                ////send email
+                //if (this.Send_email)
+                //{
+                //    this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
+                //        "Reset on Strategy: " + this.GetType().Name, "Strategy was restarted because a new trading day has arrived." + Environment.NewLine + "Instrument: " + this.Instrument.Name + " - Date: " + Bars[0].Time);
+                //}
             }
 
             //close manually the trades in the end of the trading day
@@ -210,13 +203,13 @@ namespace AgenaTrader.UserCode
             {
                 //Long Signal
                 //Print("Enter Long" + Bars[0].Time.ToString());
-                EnterLong();
+                DoEnterLong();
             }
             else if (_orb_indicator.ShortBreakout != null && _orb_indicator.ShortBreakout.Time == Bars[0].Time)
             {
                 //Short Signal
                 //Print("Enter Short" + Bars[0].Time.ToString());
-                EnterShort();
+                DoEnterShort();
             }
             else
             {
@@ -247,9 +240,10 @@ namespace AgenaTrader.UserCode
                 //    }
                 //}
 
+                //Create statistic for execution
                 if (this.StatisticBacktesting)
                 {
-                    this._StatisticContainer.Add(this.Root.Core.TradingManager, this.GetType().Name, execution);
+                    this._StatisticContainer.Add(this.Root.Core.TradingManager, this.DisplayName, execution);
                 }
 
                 //send email
@@ -263,19 +257,34 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// Create Long Order and Stop.
         /// </summary>
-        private void EnterLong() {
+        private void DoEnterLong() {
             _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), "ORB_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
             SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
             SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
+           
         }
 
         /// <summary>
         /// Create Short Order and Stop.
         /// </summary>
-        private void EnterShort() {
+        private void DoEnterShort() {
             _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), "ORB_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
             SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
             SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+        }
+
+
+        public override string ToString()
+        {
+            return "ORB";
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "ORB";
+            }
         }
 
 
