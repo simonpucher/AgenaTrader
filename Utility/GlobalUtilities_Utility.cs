@@ -686,7 +686,12 @@ namespace AgenaTrader.UserCode
         /// <param name="execution"></param>
         public void Add(ITradingManager tradingmanager, string nameofthestrategy, IExecution execution)
         {
-            this.List.Add(new Statistic(tradingmanager ,nameofthestrategy, execution));
+            Statistic stat = new Statistic(tradingmanager, nameofthestrategy, execution);
+            if (stat.IsValid)
+            {
+                this.List.Add(stat);   
+            }
+
         }
 
         ///// <summary>
@@ -705,8 +710,9 @@ namespace AgenaTrader.UserCode
         /// </summary>
         public void copyToClipboard()
         {
+            string csvdata = this.getCSVData();
             //Copy the csv data into clipboard
-            Thread thread = new Thread(() => Clipboard.SetText(this.getCSVData()));
+            Thread thread = new Thread(() => Clipboard.SetText(csvdata));
             //Set the thread to STA
             thread.SetApartmentState(ApartmentState.STA);
             thread.Start();
@@ -760,26 +766,31 @@ namespace AgenaTrader.UserCode
                 int tradeid = tradingmanager.GetTradeIdByExecutionId(execution.ExecutionId);
                 ITradingTrade trade = tradingmanager.GetTrade(tradeid);
 
-                //Log all data
-                this.NameOfTheStrategy = nameofthestrategy;
-                this.Instrument = execution.Instrument.ToString();
-                this.TradeDirection = trade.EntryOrder.IsLong ? PositionType.Long : PositionType.Short;
-                this.TimeFrame = execution.Order.TimeFrame.ToString();
-                this.ProfitLoss = trade.ProfitLoss;
-                this.ProfitLossPercent = trade.ProfitLossPercent; 
-                this.ExitReason = trade.ExitReason;
-                this.ExitPrice = trade.ExitPrice;
-                this.ExitDateTime = execution.Time;
-                this.ExitQuantity = execution.Quantity;
-                this.ExitOrderType = execution.Order.OrderType;
+                if (trade != null)
+                {
+                    //Log all data
+                    this.NameOfTheStrategy = nameofthestrategy;
+                    this.Instrument = execution.Instrument.ToString();
+                    this.TradeDirection = trade.EntryOrder.IsLong ? PositionType.Long : PositionType.Short;
+                    this.TimeFrame = execution.Order.TimeFrame.ToString();
+                    this.ProfitLoss = trade.ProfitLoss;
+                    this.ProfitLossPercent = trade.ProfitLossPercent; 
+                    this.ExitReason = trade.ExitReason;
+                    this.ExitPrice = trade.ExitPrice;
+                    this.ExitDateTime = execution.Time;
+                    this.ExitQuantity = execution.Quantity;
+                    this.ExitOrderType = execution.Order.OrderType;
+                    this.EntryDateTime = trade.EntryOrder.CreationTime;
+                    this.EntryPrice = trade.EntryOrder.Price;
+                    this.EntryQuantity = trade.EntryOrder.Quantity;
+                    this.EntryOrderType = trade.EntryOrder.Type;
+                    this.StopPrice = execution.Order.StopPrice;
 
-                this.EntryDateTime = trade.EntryOrder.CreationTime;
-                this.EntryPrice = trade.EntryOrder.Price;
-                this.EntryQuantity = trade.EntryOrder.Quantity;
-                this.EntryOrderType = trade.EntryOrder.Type;
-
-                //todo Do we need this?
-                //this.StopPrice,
+                    //everything is fine
+                    this.IsValid = true;
+                }
+                
+                //we do not have a target.
                 //this.TargetPrice   
             }
         }
@@ -834,6 +845,17 @@ namespace AgenaTrader.UserCode
         }
 
         #region Properties
+
+        #region internal
+
+            private bool _IsValid = false;
+            public bool IsValid
+            {
+                get { return _IsValid; }
+                set { _IsValid = value; }
+            }
+
+        #endregion
 
         private string _nameofthestrategy = null;
         public string NameOfTheStrategy
