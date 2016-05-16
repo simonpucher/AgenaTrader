@@ -25,6 +25,7 @@ namespace AgenaTrader.UserCode
         private int _PopGunExpires = 5;
         private bool _issnapshotactive = false;
         private bool _isevaluationactive = false;
+        private bool _fullIndicatorScan = false;
 
         private IOrder oEnter;
         private IOrder oStop;
@@ -44,6 +45,7 @@ namespace AgenaTrader.UserCode
             //Init our indicator to get code access
             this._popgun_indicator = new PopGun_Indicator();
             this._popgun_indicator.SetData(this.PopGunExpires, this.IsSnapshotActive, this.IsEvaluationActive);
+            this._popgun_indicator.SetTimeFrame(this.TimeFrame);
         }
 
 		protected override void Initialize()
@@ -55,9 +57,11 @@ namespace AgenaTrader.UserCode
 		{
             string ocoId;
             double StopForPopGunTrade;
-            
-            if (!IsCurrentBarLast || oEnter != null) return;
+
+
             double PopGun_Indicator_Value = this._popgun_indicator.calculate(this.Bars, this.CurrentBar);
+            if (!IsCurrentBarLast || oEnter != null) return;
+            
             
 
             if (PopGun_Indicator_Value == 100)
@@ -136,6 +140,7 @@ namespace AgenaTrader.UserCode
             get { return _isevaluationactive; }
             set { _isevaluationactive = value; }
         }
+
         #endregion
     
     }
