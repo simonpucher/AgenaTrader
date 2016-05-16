@@ -189,7 +189,7 @@ namespace AgenaTrader.UserCode
                 {
                     LongTrade = true;
                     statistic.EntryDateTime = bars[i].Time;
-                    statistic.TradeDirection = Const.strLong;
+                    statistic.TradeDirection = PositionType.Long;
                     statistic.EntryPrice = PopGunTriggerLong;
                     statistic.StopPrice = PopGunTriggerShort;
                     break;
@@ -210,7 +210,7 @@ namespace AgenaTrader.UserCode
                     statistic.EntryDateTime = bars[i].Time;
                     statistic.EntryPrice = PopGunTriggerShort;
                     statistic.StopPrice = PopGunTriggerLong;
-                    statistic.TradeDirection = Const.strShort;
+                    statistic.TradeDirection = PositionType.Short;
                     break;
                 }
 
