@@ -34,7 +34,7 @@ namespace AgenaTrader.UserCode
 
         //input
         private bool _send_email = false;
-        private bool _autopilot = false;
+        private bool _autopilot = true;
         private bool _statisticbacktesting = false;
 
         //output
@@ -104,7 +104,7 @@ namespace AgenaTrader.UserCode
                         this.DoEnterLong();
                         break;
                     case OrderAction.SellShort:
-                        this.DoEnterShort();
+                        //this.DoEnterShort();
                         break;
                     case OrderAction.BuyToCover:
                         // && this._orderentershort.IsOpened && !this._orderentershort.IsManuallyConfirmable

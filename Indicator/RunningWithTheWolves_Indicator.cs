@@ -18,7 +18,7 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// 
+/// todo description: http://systemtradersuccess.com/golden-cross-which-is-the-best/
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
@@ -32,10 +32,18 @@ namespace AgenaTrader.UserCode
 	public class RunningWithTheWolves_Indicator : UserIndicator
 	{
 
+        //input 
+        bool _ShouldIGoShort = false;
+        bool _ShouldIGoLong = true;
+
         //internal
         SMA _sma20 = null;
         SMA _sma50 = null;
         SMA _sma200 = null;
+        RSI _rsi143 = null;
+
+        EMA _slow = null;
+        EMA _fast = null;
 
 		protected override void Initialize()
 		{
@@ -54,16 +62,21 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnBarUpdate()
 		{
-
+            //we need more contrast
             this.BarColor = Color.White;
-
+    
             //calculate data
             OrderAction? resultdata = this.calculate(Input);
 
-            //draw lines
+            //draw indicator lines
             Plot_1.Set(this._sma20[0]);
             Plot_2.Set(this._sma50[0]);
             Plot_3.Set(this._sma200[0]);
+
+            //Plot_1.Set(this._slow[0]);
+            //Plot_2.Set(this._fast[0]);
+
+
 
             //draw other things
             if (resultdata.HasValue)
@@ -71,23 +84,18 @@ namespace AgenaTrader.UserCode
                 switch (resultdata)
                 {
                     case OrderAction.Buy:
-                        //Value.Set(1);
-                        DrawArrowUp("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Low, Color.Green);
+                        DrawDot("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
                         break;
                     case OrderAction.SellShort:
-                        //Value.Set(-1);
-                        DrawArrowDown("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].High, Color.Green);
+                        DrawDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
                         break;
                     case OrderAction.BuyToCover:
-                        //Value.Set(0.5);
-                        DrawArrowUp("ArrowShort_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Low, Color.Red);
+                        DrawDiamond("ArrowShort_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
                         break;
                     case OrderAction.Sell:
-                        //Value.Set(-0.5);
-                        DrawArrowDown("ArrowLong_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].High, Color.Red);
+                        DrawDot("ArrowLong_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
                         break;
                     default:
-                        //Value.Set(0);
                         break;
                 }
             }
@@ -95,10 +103,6 @@ namespace AgenaTrader.UserCode
             {
                 //value was null
             }
-           
-
-
-
 		}
 
         /// <summary>
@@ -108,27 +112,70 @@ namespace AgenaTrader.UserCode
         /// <returns></returns>
         public OrderAction? calculate(IDataSeries data)
         {
-
+            //Calculate the MA
              _sma20 = SMA(data, 20);
              _sma50 = SMA(data, 50);
              _sma200 = SMA(data, 200);
 
-            if (CrossAbove(_sma20, _sma200, 1) && _sma200[0] > _sma200[1] && _sma200[1] > _sma200[2])
-            {
-                return OrderAction.Buy;
-            }
-            else if (CrossBelow(_sma20, _sma200, 1) && _sma200[0] < _sma200[1] && _sma200[1] < _sma200[2])
-            {
-                return OrderAction.SellShort;
-            }
-            else if (CrossAbove(_sma20, _sma50, 1))
-            {
-                return OrderAction.BuyToCover;
-            }
-            else if (CrossBelow(_sma20, _sma50, 1))
-            {
-                return OrderAction.Sell;
-            }
+
+            double marketupordown =  MarketPhases(data, 0)[0];
+
+            // _rsi143 = RSI(data, 14, 3);
+
+             //_slow = EMA(data, 48);
+             //_fast = EMA(data, 13);
+
+             //if (CrossAbove(_fast, _slow, 1))
+             //{
+             //    return OrderAction.Buy;
+             //}
+             //else if (CrossBelow(_fast, _slow, 1))
+             //{
+             //    return OrderAction.Sell;
+             //}
+
+
+
+            // 20 und 200 mit zwei tage sma filter
+             //if (CrossAbove(_sma20, _sma200, 1) && _sma200[0] > _sma200[1] && _sma200[1] > _sma200[2])
+             //{
+             //    return OrderAction.Buy;
+             //}
+             //else if (CrossBelow(_sma20, _sma200, 1) && _sma200[0] < _sma200[1] && _sma200[1] < _sma200[2])
+             //{
+             //    return OrderAction.SellShort;
+             //}
+             //else if (CrossAbove(_sma20, _sma50, 1))
+             //{
+             //    return OrderAction.BuyToCover;
+             //}
+             //else if (CrossBelow(_sma20, _sma50, 1))
+             //{
+             //    return OrderAction.Sell;
+
+             //}
+
+            //Print(marketupordown);
+
+            //sma20 und sma200
+            if (ShouldIGoLong && CrossAbove(_sma20, _sma200, 1) && marketupordown > 0)
+             {
+                 return OrderAction.Buy;
+             }
+             else if (ShouldIGoShort && CrossBelow(_sma20, _sma200, 1) )
+             {
+                 return OrderAction.SellShort;
+             }
+             else if (ShouldIGoShort && CrossAbove(_sma20, _sma200, 1))
+             {
+                 return OrderAction.BuyToCover;
+             }
+            else if (ShouldIGoLong && CrossBelow(_sma20, _sma200, 1))
+             {
+                 return OrderAction.Sell;
+             }
+
+
 
             return null;
         }
@@ -150,6 +197,35 @@ namespace AgenaTrader.UserCode
         
 
 		#region Properties
+
+        #region Input
+
+        
+
+              /// <summary>
+        /// </summary>
+        [Description("If true it is allowed to go long")]
+        [Category("Parameters")]
+        [DisplayName("Allow Long")]
+        public bool ShouldIGoLong
+        {
+            get { return _ShouldIGoLong; }
+            set { _ShouldIGoLong = value; }
+        }
+
+
+          /// <summary>
+        /// </summary>
+        [Description("If true it is allowed to go short")]
+        [Category("Parameters")]
+        [DisplayName("Allow Short")]
+        public bool ShouldIGoShort
+        {
+            get { return _ShouldIGoShort; }
+            set { _ShouldIGoShort = value; }
+        }
+
+        #endregion
 
         [Browsable(false)]
         [XmlIgnore()]
@@ -179,17 +255,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator()
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
         {
-			return RunningWithTheWolves_Indicator(Input);
+			return RunningWithTheWolves_Indicator(Input, shouldIGoLong, shouldIGoShort);
 		}
 
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<RunningWithTheWolves_Indicator>(input);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<RunningWithTheWolves_Indicator>(input, i => i.ShouldIGoLong == shouldIGoLong && i.ShouldIGoShort == shouldIGoShort);
 
 			if (indicator != null)
 				return indicator;
@@ -198,7 +274,9 @@ namespace AgenaTrader.UserCode
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							Input = input,
+							ShouldIGoLong = shouldIGoLong,
+							ShouldIGoShort = shouldIGoShort
 						};
 			indicator.SetUp();
 
@@ -217,20 +295,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator()
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(Input);
+			return LeadIndicator.RunningWithTheWolves_Indicator(Input, shouldIGoLong, shouldIGoShort);
 		}
 
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.RunningWithTheWolves_Indicator(input);
+			return LeadIndicator.RunningWithTheWolves_Indicator(input, shouldIGoLong, shouldIGoShort);
 		}
 	}
 
@@ -243,17 +321,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator()
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(Input);
+			return LeadIndicator.RunningWithTheWolves_Indicator(Input, shouldIGoLong, shouldIGoShort);
 		}
 
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(input);
+			return LeadIndicator.RunningWithTheWolves_Indicator(input, shouldIGoLong, shouldIGoShort);
 		}
 	}
 
@@ -266,17 +344,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator()
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(Input);
+			return LeadIndicator.RunningWithTheWolves_Indicator(Input, shouldIGoLong, shouldIGoShort);
 		}
 
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(input);
+			return LeadIndicator.RunningWithTheWolves_Indicator(input, shouldIGoLong, shouldIGoShort);
 		}
 	}
 

@@ -54,8 +54,9 @@ namespace AgenaTrader.UserCode
 			IsTarget = false;
 			Add(new Plot(Const.DefaultIndicatorColor, "Occurred"));
             Add(new Plot(Const.DefaultIndicatorColor, "Entry"));
+
 			Overlay = false;
-			CalculateOnBarClose = false;
+			CalculateOnBarClose = true;
 
             //For SMA200 we need at least 200 Bars.
             this.BarsRequired = 200;
