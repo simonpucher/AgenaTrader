@@ -77,7 +77,6 @@ namespace AgenaTrader.UserCode
             //Plot_2.Set(this._fast[0]);
 
 
-
             //draw other things
             if (resultdata.HasValue)
             {
@@ -158,19 +157,19 @@ namespace AgenaTrader.UserCode
             //Print(marketupordown);
 
             //sma20 und sma200
-            if (ShouldIGoLong && CrossAbove(_sma20, _sma200, 1) && marketupordown > 0)
+            if (ShouldIGoLong && CrossAbove(_sma20, _sma200, 0) && marketupordown >= 0)
              {
                  return OrderAction.Buy;
              }
-             else if (ShouldIGoShort && CrossBelow(_sma20, _sma200, 1) )
+             else if (ShouldIGoShort && CrossBelow(_sma20, _sma200, 0) )
              {
                  return OrderAction.SellShort;
              }
-             else if (ShouldIGoShort && CrossAbove(_sma20, _sma200, 1))
+             else if (ShouldIGoShort && CrossAbove(_sma20, _sma200, 0))
              {
                  return OrderAction.BuyToCover;
              }
-            else if (ShouldIGoLong && CrossBelow(_sma20, _sma200, 1))
+            else if (ShouldIGoLong && CrossBelow(_sma20, _sma200, 0))
              {
                  return OrderAction.Sell;
              }
