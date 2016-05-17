@@ -18,7 +18,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.5.3
+/// Version: 1.5.4
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -162,6 +162,17 @@ namespace AgenaTrader.UserCode
         #region Markets
 
         /// <summary>
+        /// Changes money from one currency into another.
+        /// </summary>
+        /// <param name="cashamount"></param>
+        /// <param name="current"></param>
+        /// <param name="target"></param>
+        /// <returns></returns>
+        public static decimal MoneyExchange(double cashamount, Currencies current, Currencies target) {
+            return new Money(cashamount, current).ConvertToCurrency(target).RoundedAmount;
+        }
+
+        /// <summary>
         /// Calculates the position size regarding to risk management.
         /// </summary>
         /// <param name="instrument"></param>
@@ -172,31 +183,46 @@ namespace AgenaTrader.UserCode
             IAccount account = accountmanager.GetAccount(instrument, true);
             if (account == null)
             {
-                //If no account is available (simulation) then lookup on instrument
-                //InstrumentRiskParams instrumentriskparams = new InstrumentRiskParams(instrument.InstrumentType);
-                //MaxInvestedAmountPercentage = instrumentriskparams.MaxInvestedAmountPercentage;
-                //throw new NotImplementedException("AdjustPositionToRiskManagement: IAccount was null", null);
                 return instrument.GetDefaultQuantity();
             }
 
-            //Create AccountRiskParams from account
-            AccountRiskParams accountriskparams = preferencemanager.GetAccountRiskParms(account.AccountConnection.ConnectionName, instrument.InstrumentType);
-            
-            //Check the type of instrument
+            //get the RiskParams on this account connection
+            ConnectionRiskParams crp = preferencemanager.GetConnectionRiskParams(account.AccountConnection.ConnectionName);
+            InstrumentRiskParams irp = crp.InstrumentRiskParams[instrument.InstrumentType];
+
+            double maxpositionsizeincash = 0.0;
+            if (irp.BasePositionSizing == BasePositionSizing.OnAmountPerPosition)
+            {
+                maxpositionsizeincash = irp.InvestedAmountPerPosition;
+            }
+            else if (irp.BasePositionSizing == BasePositionSizing.OnRiskAmountPerTrade)
+            {
+                maxpositionsizeincash = account.CashValue / 100 * irp.MaxInvestedAmountPercentage;
+            }
+            else
+            {
+                throw new NotImplementedException("AdjustPositionToRiskManagement: BasePositionSizing " + irp.BasePositionSizing.ToString() + " not implemented", null);
+            }
+
+            //Check the type of instrument & return the position size
             if (instrument.InstrumentType == InstrumentType.Index)
             {
-                return 1;
+                //return 1;
+                return instrument.GetDefaultQuantity();
             }
             if (instrument.InstrumentType == InstrumentType.Stock)
             {
-                double maxpositionsizeincash = account.CashValue / 100 * accountriskparams.MaxInvestedAmountPercentage;
-                //Change Currency if we need to
-                Money m1 = new Money(maxpositionsizeincash, account.Currency);
-                Money m2 = m1.ConvertToCurrency(instrument.Currency);
-                //Return the position size
-                return (int)Math.Floor(decimal.ToDouble(m2.RoundedAmount) / lastprice);
+                return (int)Math.Floor(decimal.ToDouble(MoneyExchange(maxpositionsizeincash, account.Currency, instrument.Currency)) / lastprice);
             }
-            throw new NotImplementedException("AdjustPositionToRiskManagement: InstrumentType " + instrument.InstrumentType.ToString() + " not implemented", null);
+            else if (instrument.InstrumentType == InstrumentType.Stock)
+            {
+                return instrument.GetDefaultQuantity();
+            }
+            else
+            {
+                throw new NotImplementedException("AdjustPositionToRiskManagement: InstrumentType " + instrument.InstrumentType.ToString() + " not implemented", null);
+            }
+
         }
 
         public static TimeSpan GetOfficialMarketOpeningTime(string Symbol)
