@@ -42,6 +42,7 @@ namespace AgenaTrader.UserCode
 			Add(new Plot(Color.FromArgb(255, 92, 242, 57), "Entry"));
 			Overlay = true;
 			CalculateOnBarClose = true;
+            BarsRequired = 3;
 		}
 
         protected override void InitRequirements()

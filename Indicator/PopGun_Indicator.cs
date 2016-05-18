@@ -75,6 +75,7 @@ namespace AgenaTrader.UserCode
             Overlay = false; //underneath the price chart in his own subchart
             DrawOnPricePanel = true;
             CalculateOnBarClose = true;
+            BarsRequired = 3;
         }
 
         protected override void OnBarUpdate()
@@ -83,13 +84,14 @@ namespace AgenaTrader.UserCode
             Value.Set(returnvalue);
             if (CurrentBar <= this.PopGunTarget)
             {
-                Values[1].Set(0); //Indicates that there is a PopGun Trigger!         
+                Values[1].Set(0); //Indicates that there is a PopGun Trigger!      
             }
         }
 
         //todo -100 wird noch nicht zurückgegeben oder?
         public int calculate(IBars bars, int curbar)
         {
+            bool noPopGunTrigger = false;
             int returnvalue = 0;
 
             //We need at least three bars
@@ -112,12 +114,25 @@ namespace AgenaTrader.UserCode
                 if (TwoBarsAgo_High < CurrentBar_High
                 && TwoBarsAgo_Low > CurrentBar_Low)
                 {
+
                     // current bar is outside bar -> lets pop the gun
+                    this.PopGunTargetDateTime = GlobalUtilities.GetTargetBar(bars, bars[0].Time, TimeFrame, PopGunExpires);
+
+                    //check, if target bar would be on the following day, and therefor a risks of gap is given
+                    if (Filter_NoTriggerEOD
+                     && PopGunTargetDateTime.Date > bars[0].Time.Date)
+                    {
+                        //reject current PopGun Trigger and reset TargetDateTime
+                        PopGunTargetDateTime = DateTime.MinValue;
+                        noPopGunTrigger = true;
+                    }
+                    
+                    if (noPopGunTrigger){
                     this.PopGunTarget = curbar + this.PopGunExpires;
                     PopGunTriggerBar = CurrentBar;
                     this.PopGunTriggerLong = CurrentBar_High;
                     this.PopGunTriggerShort = CurrentBar_Low;
-                    this.PopGunTargetDateTime = GlobalUtilities.GetTargetBar(bars, bars[0].Time, TimeFrame, PopGunExpires);
+                }
                 }
             }
 
@@ -141,6 +156,11 @@ namespace AgenaTrader.UserCode
 
         public void drawTarget(IBars bars, int curbar)
         {
+
+            if (curbar == PopGunTriggerBar)
+            {
+                DrawText(("PopGunSize" + curbar), (Math.Round((((Bars[0].High - Bars[0].Low) / Bars[0].Close) * 100),2)).ToString(), 0, bars.GetByIndex(PopGunTriggerBar).Low - TickSize*bars[0].Close, Color.Black);
+            }
 
             if (curbar <= PopGunTarget
              && curbar > PopGunTriggerBar
@@ -266,6 +286,19 @@ namespace AgenaTrader.UserCode
             }
         }
 
+        public override string ToString()
+        {
+            return "PopGun";
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "PopGun";
+            }
+        }
+
         #region Properties
         [Description("Wieviel Bars ist PopGunTrigger gültig?")]
         [Category("Parameters")]
@@ -293,6 +326,19 @@ namespace AgenaTrader.UserCode
             get { return _isevaluationactive; }
             set { _isevaluationactive = value; }
         }
+
+        private bool _filter_NoTriggerEOD = false;
+
+        [Description("No Trigger before EOD")]
+        [Category("TradeFilter")]
+        [DisplayName("No PopGun is triggered, if the expire date is targeted for the following day")]
+        public bool Filter_NoTriggerEOD
+        {
+            get { return _filter_NoTriggerEOD; }
+            set { _filter_NoTriggerEOD = value; }
+        }
+
+
         #endregion
 
         #region Output
