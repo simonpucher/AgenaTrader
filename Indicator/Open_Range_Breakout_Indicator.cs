@@ -42,9 +42,8 @@ namespace AgenaTrader.UserCode
         TimeSpan Time_OpenRangeStartUS { get; set; }
         TimeSpan Time_EndOfDay_DE { get; set; }
         TimeSpan Time_EndOfDay_US { get; set; }
-        bool Send_email { get; set; }
 
-     
+
     }
 
     /// <summary>
@@ -93,7 +92,7 @@ namespace AgenaTrader.UserCode
         private TimeSpan _tim_EndOfDay_DE = new TimeSpan(17, 30, 0);  
         private TimeSpan _tim_EndOfDay_US = new TimeSpan(22, 00, 0);
 
-        private bool _send_email = false;
+ 
         //todo add statistic data
         //private bool _statisticbacktesting = false;
 
@@ -311,14 +310,17 @@ namespace AgenaTrader.UserCode
                     this.TargetLong = this.RangeHigh + this.RangeHeight;
                     this.TargetShort = this.RangeLow - this.RangeHeight;
 
+            //tolreanz
+                    double toleranz = 0; // this.RangeHeight / 5;
+
                     //load the data after the open range
                     list = bars.Where(x => x.Time >= resultvalue.End).Where(x => x.Time <= this.getEndOfTradingDay(bars, resultvalue.Start));
 
                     //find the first breakout to the long side
-                    this.LongBreakout = list.Where(x => x.Close > this.RangeHigh).FirstOrDefault();
+                    this.LongBreakout = list.Where(x => x.Close > this.RangeHigh + toleranz).FirstOrDefault();
 
                     //find the first breakout to the short side
-                    this.ShortBreakout = list.Where(x => x.Close < this.RangeLow).FirstOrDefault();
+                    this.ShortBreakout = list.Where(x => x.Close < this.RangeLow - toleranz).FirstOrDefault();
 
                     //find the first target to the long side
                     this.LongTargetReached = list.Where(x => x.Close > this.TargetLong).FirstOrDefault();
@@ -330,7 +332,6 @@ namespace AgenaTrader.UserCode
                     resultvalue.IsCompleted = true;
 
                     return resultvalue;
-        
         }
 
      
@@ -619,7 +620,7 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("Start of the open range in USA")]
+        [Description("Start of the open range in America")]
         [Category("CFD")]
         [DisplayName("OpenRange Start US")]
         public TimeSpan Time_OpenRangeStartUS
@@ -655,7 +656,7 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("End of trading day in USA")]
+        [Description("End of trading day in America")]
         [Category("CFD")]
         [DisplayName("EndOfDay US")]
         public TimeSpan Time_EndOfDay_US
@@ -671,14 +672,7 @@ namespace AgenaTrader.UserCode
         }
 
 
-        [Description("If true an email will be send on open range breakout.")]
-        [Category("Email")]
-        [DisplayName("Send email on breakout")]
-        public bool Send_email
-        {
-            get { return _send_email; }
-            set { _send_email = value; }
-        }
+
 
         //todo add statistic data
         //[Description("If true the strategy will create statistic data during the backtesting process")]
