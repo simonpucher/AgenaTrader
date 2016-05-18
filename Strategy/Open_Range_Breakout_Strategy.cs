@@ -47,8 +47,8 @@ namespace AgenaTrader.UserCode
         private int _closexcandlesbeforeendoftradingday = 2;
 
         private bool _send_email = false;
-        private bool _autopilot = false;
-        private bool _closeorderbeforendoftradingday = false;
+        private bool _autopilot = true;
+        private bool _closeorderbeforendoftradingday = true;
         private bool _statisticbacktesting = false;
 
         //output
@@ -165,9 +165,10 @@ namespace AgenaTrader.UserCode
             }
 
             //close manually the trades in the end of the trading day
+            DateTime eod = this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay);
             if (this.CloseOrderBeforeEndOfTradingDay
                 && (this._orderenterlong != null || this._orderentershort != null)
-                && Bars[0].Time >= this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay))
+                && Bars[0].Time >= eod)
             {
                 if (this._orderenterlong != null)
                 {
@@ -181,21 +182,12 @@ namespace AgenaTrader.UserCode
 
             //if it to late or one order already set stop execution of calculate
             // || Bars[0].Time.TimeOfDay >= this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay).TimeOfDay
-            if (_orderenterlong != null || _orderentershort != null)
+            if (_orderenterlong != null || _orderentershort != null != Bars[0].Time >= eod)
             {
                 return;
             }
 
-            this.calculate();
-        }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void calculate()
-        {
-
+            //Calulate data
             _orb_indicator.calculate(this.Bars, this.Bars[0]);
 
             //If there was a breakout and the current bar is the same bar as the long/short breakout, then trigger signal.
@@ -216,6 +208,8 @@ namespace AgenaTrader.UserCode
                 //nothing to do
             }
         }
+
+
 
 
 
@@ -295,16 +289,27 @@ namespace AgenaTrader.UserCode
 
         #region Input
 
-            /// <summary>
-            /// </summary>
-            [Description("Open Range period in minutes (size of the OR)")]
-            [Category("Settings")]
-            [DisplayName("Minutes ORB")]
-            public int ORBMinutes
+
+        /// <summary>
+        /// </summary>
+        [Description("Period in minutes for ORB")]
+        [Category("Minutes")]
+        [DisplayName("Minutes ORB")]
+        public int ORBMinutes
+        {
+            get { return _orbminutes; }
+            set
             {
-                get { return _orbminutes; }
-                set { _orbminutes = value; }
+                if (value >= 1 && value <= 300)
+                {
+                    _orbminutes = value;
+                }
+                else
+                {
+                    _orbminutes = Const.DefaultOpenRangeSizeinMinutes;
+                }
             }
+        }
 
         
             /// <summary>
@@ -318,11 +323,10 @@ namespace AgenaTrader.UserCode
                 set { _closexcandlesbeforeendoftradingday = value; }
             }
 
-     
 
             /// <summary>
             /// </summary>
-            [Description("Start of the strategy on german markets")]
+            [Description("Start of the open range in Germany")]
             [Category("CFD")]
             [DisplayName("OpenRange Start DE")]
             public TimeSpan Time_OpenRangeStartDE
@@ -337,11 +341,11 @@ namespace AgenaTrader.UserCode
                 set { _tim_OpenRangeStartDE = new TimeSpan(value); }
             }
 
-           
+
 
             /// <summary>
             /// </summary>
-            [Description("Start of the strategy on american markets")]
+            [Description("Start of the open range in America")]
             [Category("CFD")]
             [DisplayName("OpenRange Start US")]
             public TimeSpan Time_OpenRangeStartUS
@@ -356,7 +360,7 @@ namespace AgenaTrader.UserCode
                 set { _tim_OpenRangeStartUS = new TimeSpan(value); }
             }
 
-         
+
 
             /// <summary>
             /// </summary>

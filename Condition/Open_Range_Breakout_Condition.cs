@@ -41,6 +41,9 @@ namespace AgenaTrader.UserCode
 
         //input
         private int _orbminutes = 75;
+        private Color _plot1color = Const.DefaultIndicatorColor;
+        private int _plot1width = Const.DefaultLineWidth;
+        private DashStyle _plot1dashstyle = Const.DefaultIndicatorDashStyle;
 
         private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);
         //private TimeSpan _tim_OpenRangeEndDE = new TimeSpan(10, 15, 0);  
@@ -51,7 +54,7 @@ namespace AgenaTrader.UserCode
         private TimeSpan _tim_EndOfDay_DE = new TimeSpan(17, 30, 0);
         private TimeSpan _tim_EndOfDay_US = new TimeSpan(22, 00, 0);  
 
-        private bool _send_email = false;
+   
 
 
         //output
@@ -68,8 +71,8 @@ namespace AgenaTrader.UserCode
 			IsEntry = true;
 			IsStop = false;
 			IsTarget = false;
-			Add(new Plot(Color.FromKnownColor(KnownColor.Black), "Occurred"));
-			Add(new Plot(Color.FromArgb(255, 187, 128, 238), "Entry"));
+            Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "Occurred"));
+            //Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "Entry"));
 			Overlay = true;
 			CalculateOnBarClose = false;
 
@@ -106,7 +109,6 @@ namespace AgenaTrader.UserCode
 		protected override void OnBarUpdate()
 		{
 
-
             _orb_indicator.calculate(this.Bars, this.Bars[0]);
             //Occurred.Set(returnvalue);
             //Entry.Set(Bars[0].Close);
@@ -116,19 +118,19 @@ namespace AgenaTrader.UserCode
             {
                 //Long Signal
                 Occurred.Set(1);
-                Entry.Set(Close[0]);
+                //Entry.Set(Close[0]);
             }
             else if (_orb_indicator.ShortBreakout != null && _orb_indicator.ShortBreakout.Time == Bars[0].Time)
             {
                 //Short Signal
                 Occurred.Set(-1);
-                Entry.Set(Close[0]);
+                //Entry.Set(Close[0]);
             }
             else
             {
                 //No Signal
                 Occurred.Set(0);
-                Entry.Set(Close[0]);
+                //Entry.Set(Close[0]);
             }
 
 		}
@@ -156,74 +158,144 @@ namespace AgenaTrader.UserCode
         #region Input
 
         /// <summary>
-            /// </summary>
-            [Description("Period in minutes for ORB")]
-            [Category("TimeSpan")]
-            [DisplayName("Minutes ORB")]
-            public int ORBMinutes
+        /// </summary>
+        [Description("Period in minutes for ORB")]
+        [Category("Minutes")]
+        [DisplayName("Minutes ORB")]
+        public int ORBMinutes
+        {
+            get { return _orbminutes; }
+            set
             {
-                get { return _orbminutes; }
-                set { _orbminutes = value; }
+                if (value >= 1 && value <= 300)
+                {
+                    _orbminutes = value;
+                }
+                else
+                {
+                    _orbminutes = Const.DefaultOpenRangeSizeinMinutes;
+                }
             }
+        }
 
-           
+
             /// <summary>
             /// </summary>
-            [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
-            [Category("TimeSpan")]
+            [Description("Start of the open range in Germany")]
+            [Category("CFD")]
             [DisplayName("OpenRange Start DE")]
             public TimeSpan Time_OpenRangeStartDE
             {
                 get { return _tim_OpenRangeStartDE; }
                 set { _tim_OpenRangeStartDE = value; }
             }
+            [Browsable(false)]
+            public long Time_OpenRangeStartDESerialize
+            {
+                get { return _tim_OpenRangeStartDE.Ticks; }
+                set { _tim_OpenRangeStartDE = new TimeSpan(value); }
+            }
+
 
 
             /// <summary>
             /// </summary>
-            [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
-            [Category("TimeSpan")]
+            [Description("Start of the open range in America")]
+            [Category("CFD")]
             [DisplayName("OpenRange Start US")]
             public TimeSpan Time_OpenRangeStartUS
             {
                 get { return _tim_OpenRangeStartUS; }
                 set { _tim_OpenRangeStartUS = value; }
             }
+            [Browsable(false)]
+            public long Time_OpenRangeStartUSSerialize
+            {
+                get { return _tim_OpenRangeStartUS.Ticks; }
+                set { _tim_OpenRangeStartUS = new TimeSpan(value); }
+            }
+
 
 
             /// <summary>
             /// </summary>
-            [Description("EndOfDay DE: Uhrzeit spätestens verkauft wird")]
-            [Category("TimeSpan")]
+            [Description("End of trading day in Germany")]
+            [Category("CFD")]
             [DisplayName("EndOfDay DE")]
             public TimeSpan Time_EndOfDay_DE
             {
                 get { return _tim_EndOfDay_DE; }
                 set { _tim_EndOfDay_DE = value; }
             }
+            [Browsable(false)]
+            public long Time_EndOfDay_DESerialize
+            {
+                get { return _tim_EndOfDay_DE.Ticks; }
+                set { _tim_EndOfDay_DE = new TimeSpan(value); }
+            }
 
             /// <summary>
             /// </summary>
-            [Description("EndOfDay US: Uhrzeit spätestens verkauft wird")]
-            [Category("TimeSpan")]
+            [Description("End of trading day in America")]
+            [Category("CFD")]
             [DisplayName("EndOfDay US")]
             public TimeSpan Time_EndOfDay_US
             {
                 get { return _tim_EndOfDay_US; }
                 set { _tim_EndOfDay_US = value; }
             }
-
-
-
-            [Description("If true an email will be send on open range breakout.")]
-            [Category("Email")]
-            [DisplayName("Send email on breakout")]
-            public bool Send_email
+            [Browsable(false)]
+            public long Time_EndOfDay_USSerialize
             {
-                get { return _send_email; }
-                set { _send_email = value; }
+                get { return _tim_EndOfDay_US.Ticks; }
+                set { _tim_EndOfDay_US = new TimeSpan(value); }
             }
 
+
+
+            #region Plotstyle
+
+            [XmlIgnore()]
+            [Description("Select Color")]
+            [Category("Colors")]
+            [DisplayName("ORB Indicator")]
+            public Color Plot1Color
+            {
+                get { return _plot1color; }
+                set { _plot1color = value; }
+            }
+
+            [Browsable(false)]
+            public string Plot1ColorSerialize
+            {
+                get { return SerializableColor.ToString(_plot1color); }
+                set { _plot1color = SerializableColor.FromString(value); }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("Width for Indicator.")]
+            [Category("Plots")]
+            [DisplayName("Line Width Indicator")]
+            public int Plot0Width
+            {
+                get { return _plot1width; }
+                set { _plot1width = Math.Max(1, value); }
+            }
+
+
+            /// <summary>
+            /// </summary>
+            [Description("DashStyle for Indicator.")]
+            [Category("Plots")]
+            [DisplayName("Dash Style Indicator")]
+            public DashStyle Dash0Style
+            {
+                get { return _plot1dashstyle; }
+                set { _plot1dashstyle = value; }
+            }
+
+            #endregion
 
             #endregion
 
@@ -252,23 +324,6 @@ namespace AgenaTrader.UserCode
               
             #endregion
 
-        #region Internals
-
-
-            [Browsable(false)]
-            public bool IsEmailFunctionActive
-            {
-                get
-                {
-                    if (this.Send_email) // && GlobalUtilities.IsValidEmail(this.EmailAdress))
-                    {
-                        return true;
-                    }
-                    return false;
-                }
-            }
-
-        #endregion
 
 
         #endregion
