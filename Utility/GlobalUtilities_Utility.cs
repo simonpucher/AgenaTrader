@@ -18,7 +18,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.5.4
+/// Version: 1.5.5
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -214,7 +214,7 @@ namespace AgenaTrader.UserCode
             {
                 return (int)Math.Floor(decimal.ToDouble(MoneyExchange(maxpositionsizeincash, account.Currency, instrument.Currency)) / lastprice);
             }
-            else if (instrument.InstrumentType == InstrumentType.Stock)
+            else if (instrument.InstrumentType == InstrumentType.CFD)
             {
                 return instrument.GetDefaultQuantity();
             }
