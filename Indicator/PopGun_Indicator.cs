@@ -56,12 +56,12 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// If we use this indicator from another script we need to initalize all important data first.
         /// </summary>
-        public void SetData(int popgunexpires, bool isSnapShotActive, bool isEvaluationActive)
+        public void SetData(int popgunexpires, bool isSnapShotActive, bool isEvaluationActive, bool filterNoTriggerEOD)
         {
             this.PopGunExpires = popgunexpires;
             this.IsSnapshotActive = isSnapShotActive;
             this.IsEvaluationActive = isEvaluationActive;
-            
+            this.Filter_NoTriggerEOD = filterNoTriggerEOD;            
         }
 
         public void SetTimeFrame(ITimeFrame timeFrame){
@@ -195,8 +195,6 @@ namespace AgenaTrader.UserCode
             double PunkteLongTrade;
             bool ShortTrade = false;
             double PunkteShortTrade;
-            bool stopped = false;
-            bool DoubleBreakOut = false;
             int i;
 
             Statistic statistic = new Statistic("PopGun");
@@ -241,7 +239,7 @@ namespace AgenaTrader.UserCode
 
             if (LongTrade == true && ShortTrade == true)
             {
-                DoubleBreakOut = true;
+           //     DoubleBreakOut = true;
             }
             else if (LongTrade == true)
             {

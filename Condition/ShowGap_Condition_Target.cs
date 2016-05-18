@@ -111,7 +111,7 @@ namespace AgenaTrader.UserCode
                 DateTime LastDayCloseDate = Bars.GetTime(Count - 7);
                 DateTime LastPeriod = Time[1];
 
-                if (LastDayClose != null
+                if (LastDayClose > 0
                 && Math.Abs(LastDayClose - GapOpen) > _PunkteGapMin
                 && Math.Abs(LastDayClose - GapOpen) < _PunkteGapMax)
                 {  //Wenn Gap größer 50 und kleiner 100

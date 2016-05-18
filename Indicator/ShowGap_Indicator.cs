@@ -155,7 +155,7 @@ namespace AgenaTrader.UserCode
                 DateTime LastPeriod = Time[1];
 
 //Prüfen ob es überhaupt ein Gap gab
-                if (LastDayClose != null
+                if (LastDayClose > 0
                 && Math.Abs(GapSize) > 0)
                 {
                     existgap = true;

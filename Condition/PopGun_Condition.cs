@@ -25,6 +25,9 @@ namespace AgenaTrader.UserCode
         private int _PopGunExpires = 5;
         private bool _issnapshotactive = false;
         private bool _isevaluationactive = false;
+        private bool _filter_NoShortRSI = false;
+        private bool _filter_NoLongRSI = false;
+        private bool _filter_NoTriggerEOD = false;
 
         //internal
         private PopGun_Indicator _popgun_indicator = null;
@@ -57,7 +60,7 @@ namespace AgenaTrader.UserCode
 
             //Init our indicator to get code access
             this._popgun_indicator = new PopGun_Indicator();
-            this._popgun_indicator.SetData(this.PopGunExpires, this.IsSnapshotActive, this.IsEvaluationActive);
+            this._popgun_indicator.SetData(this.PopGunExpires, this.IsSnapshotActive, this.IsEvaluationActive, this.Filter_NoTriggerEOD);
         }
 
 		protected override void OnBarUpdate()
@@ -132,6 +135,34 @@ namespace AgenaTrader.UserCode
             get { return _isevaluationactive; }
             set { _isevaluationactive = value; }
         }
+
+        [Description("No Long Trades when RSI > 70")]
+        [Category("TradeFilter")]
+        [DisplayName("No Long Trades when RSI > 70")]
+        public bool Filter_NoLongRSI
+        {
+            get { return _filter_NoLongRSI; }
+            set { _filter_NoLongRSI = value; }
+        }
+
+        [Description("No Short Trades when RSI < 30")]
+        [Category("TradeFilter")]
+        [DisplayName("No Short Trades when RSI < 30")]
+        public bool Filter_NoShortRSI
+        {
+            get { return _filter_NoShortRSI; }
+            set { _filter_NoShortRSI = value; }
+        }
+
+        [Description("No Trigger before EOD")]
+        [Category("TradeFilter")]
+        [DisplayName("No PopGun is triggered, if the expire date is targeted for the following day")]
+        public bool Filter_NoTriggerEOD
+        {
+            get { return _filter_NoTriggerEOD; }
+            set { _filter_NoTriggerEOD = value; }
+        }
+
 		#endregion
 	}
 }
