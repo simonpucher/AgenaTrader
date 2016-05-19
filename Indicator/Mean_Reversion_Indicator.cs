@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: in progress
+/// Version: 1.0
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -28,13 +28,39 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+    public interface IMean_Reversion
+    {
+        //input
+        bool IsShortEnabled { get; set; }
+        bool IsLongEnabled { get; set; }
+         int Bollinger_Period  { get; set; }
+         double Bollinger_Standard_Deviationn  { get; set; }
+        int Momentum_Period  { get; set; }
+        int RSI_Period  { get; set; }
+        int RSI_Smooth { get; set; }
+        int RSI_Level_Low  { get; set; }
+        int RSI_Level_High { get; set; }
+        int Momentum_Level_Low  { get; set; }
+        int Momentum_Level_High { get; set; }
+
+    }
+
 	[Description("The mean reversion is the theory suggesting that prices and returns eventually move back towards the mean or average.")]
-	public class Mean_Reversion_Indicator : UserIndicator
+    public class Mean_Reversion_Indicator : UserIndicator, IMean_Reversion
 	{
 
-        //input 
-        bool _ShouldIGoShort = false;
-        bool _ShouldIGoLong = true;
+        //interface 
+        private bool _IsShortEnabled = false;
+        private bool _IsLongEnabled = true;
+        private int _Bollinger_Period = 20;
+        private double _Bollinger_Standard_Deviationn = 2;
+        private int _Momentum_Period = 100;
+        private int _RSI_Period = 13;
+        private int _RSI_Smooth = 3;
+        private int _RSI_Level_Low = 30;
+        private int _RSI_Level_High = 70;
+        private int _Momentum_Level_Low = -1;
+        private int _Momentum_Level_High = 1;
 
         //internal
         double bb_upper = Double.MinValue;
@@ -63,7 +89,7 @@ namespace AgenaTrader.UserCode
             //this.BarColor = Color.White;
     
             //calculate data
-            OrderAction? resultdata = this.calculate(Input, null, null, 20, 2, 130, 14, 3, 30, 70, -1, 1);
+            OrderAction? resultdata = this.calculate(Input, null, null, this.Bollinger_Period, this.Bollinger_Standard_Deviationn, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
 
             Plot_1.Set(bb_upper);
             Plot_2.Set(bb_middle);
@@ -197,32 +223,120 @@ namespace AgenaTrader.UserCode
 
 		#region Properties
 
-        #region Input
+        #region Interface
 
-        
 
-              /// <summary>
+        /// <summary>
         /// </summary>
         [Description("If true it is allowed to go long")]
         [Category("Parameters")]
         [DisplayName("Allow Long")]
-        public bool ShouldIGoLong
+        public bool IsLongEnabled
         {
-            get { return _ShouldIGoLong; }
-            set { _ShouldIGoLong = value; }
+            get { return _IsLongEnabled; }
+            set { _IsLongEnabled = value; }
         }
 
 
-          /// <summary>
+        /// <summary>
         /// </summary>
         [Description("If true it is allowed to go short")]
         [Category("Parameters")]
         [DisplayName("Allow Short")]
-        public bool ShouldIGoShort
+        public bool IsShortEnabled
         {
-            get { return _ShouldIGoShort; }
-            set { _ShouldIGoShort = value; }
+            get { return _IsShortEnabled; }
+            set { _IsShortEnabled = value; }
         }
+
+
+
+        [Description("Period of the Bollinger Band.")]
+        [Category("Parameters")]
+        [DisplayName("BB Period")]
+        public int Bollinger_Period
+        {
+            get { return _Bollinger_Period; }
+            set { _Bollinger_Period = value; }
+        }
+
+        [Description("Standard Deviation of the Bollinger Band.")]
+        [Category("Parameters")]
+        [DisplayName("BB StdDev")]
+        public double Bollinger_Standard_Deviationn
+        {
+            get { return _Bollinger_Standard_Deviationn; }
+            set { _Bollinger_Standard_Deviationn = value; }
+        }
+
+        [Description("Period of the Momentum.")]
+        [Category("Parameters")]
+        [DisplayName("Momentum Period")]
+        public int Momentum_Period
+        {
+            get { return _Momentum_Period; }
+            set { _Momentum_Period = value; }
+        }
+
+        [Description("Period of the RSI.")]
+        [Category("Parameters")]
+        [DisplayName("RSI Period")]
+        public int RSI_Period
+        {
+            get { return _RSI_Period; }
+            set { _RSI_Period = value; }
+        }
+
+        [Description("Smooth Period of the RSI.")]
+        [Category("Parameters")]
+        [DisplayName("RSI Smooth Period")]
+        public int RSI_Smooth
+        {
+            get { return _RSI_Smooth; }
+            set { _RSI_Smooth = value; }
+        }
+
+        [Description("We trade long below this RSI level.")]
+        [Category("Parameters")]
+        [DisplayName("RSI Level Low")]
+        public int RSI_Level_Low
+        {
+            get { return _RSI_Level_Low; }
+            set { _RSI_Level_Low = value; }
+        }
+
+        [Description("We trade short above this RSI level.")]
+        [Category("Parameters")]
+        [DisplayName("RSI Level High")]
+        public int RSI_Level_High
+        {
+            get { return _RSI_Level_High; }
+            set { _RSI_Level_High = value; }
+        }
+
+        [Description("We trade long if momentum is above this level.")]
+        [Category("Parameters")]
+        [DisplayName("RSI Level Low")]
+        public int Momentum_Level_Low
+        {
+            get { return _Momentum_Level_Low; }
+            set { _Momentum_Level_Low = value; }
+        }
+
+        [Description("We trade short if momentum is below this level.")]
+        [Category("Parameters")]
+        [DisplayName("RSI Level High")]
+        public int Momentum_Level_High
+        {
+            get { return _Momentum_Level_High; }
+            set { _Momentum_Level_High = value; }
+        }
+        #endregion
+
+        #region Input
+
+      
+
 
         #endregion
 
@@ -239,7 +353,9 @@ namespace AgenaTrader.UserCode
         public DataSeries Plot_3 { get { return Values[2]; } }
 
 		#endregion
-	}
+
+      
+    }
 }
 
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
@@ -253,17 +369,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The mean reversion is the theory suggesting that prices and returns eventually move back towards the mean or average.
 		/// </summary>
-		public Mean_Reversion_Indicator Mean_Reversion_Indicator(System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public Mean_Reversion_Indicator Mean_Reversion_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviationn, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
         {
-			return Mean_Reversion_Indicator(Input, shouldIGoLong, shouldIGoShort);
+			return Mean_Reversion_Indicator(Input, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviationn, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
 		}
 
 		/// <summary>
 		/// The mean reversion is the theory suggesting that prices and returns eventually move back towards the mean or average.
 		/// </summary>
-		public Mean_Reversion_Indicator Mean_Reversion_Indicator(IDataSeries input, System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public Mean_Reversion_Indicator Mean_Reversion_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviationn, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Mean_Reversion_Indicator>(input, i => i.ShouldIGoLong == shouldIGoLong && i.ShouldIGoShort == shouldIGoShort);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<Mean_Reversion_Indicator>(input, i => i.IsLongEnabled == isLongEnabled && i.IsShortEnabled == isShortEnabled && i.Bollinger_Period == bollinger_Period && Math.Abs(i.Bollinger_Standard_Deviationn - bollinger_Standard_Deviationn) <= Double.Epsilon && i.Momentum_Period == momentum_Period && i.RSI_Period == rSI_Period && i.RSI_Smooth == rSI_Smooth && i.RSI_Level_Low == rSI_Level_Low && i.RSI_Level_High == rSI_Level_High && i.Momentum_Level_Low == momentum_Level_Low && i.Momentum_Level_High == momentum_Level_High);
 
 			if (indicator != null)
 				return indicator;
@@ -273,8 +389,17 @@ namespace AgenaTrader.UserCode
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
 							Input = input,
-							ShouldIGoLong = shouldIGoLong,
-							ShouldIGoShort = shouldIGoShort
+							IsLongEnabled = isLongEnabled,
+							IsShortEnabled = isShortEnabled,
+							Bollinger_Period = bollinger_Period,
+							Bollinger_Standard_Deviationn = bollinger_Standard_Deviationn,
+							Momentum_Period = momentum_Period,
+							RSI_Period = rSI_Period,
+							RSI_Smooth = rSI_Smooth,
+							RSI_Level_Low = rSI_Level_Low,
+							RSI_Level_High = rSI_Level_High,
+							Momentum_Level_Low = momentum_Level_Low,
+							Momentum_Level_High = momentum_Level_High
 						};
 			indicator.SetUp();
 
@@ -293,20 +418,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The mean reversion is the theory suggesting that prices and returns eventually move back towards the mean or average.
 		/// </summary>
-		public Mean_Reversion_Indicator Mean_Reversion_Indicator(System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public Mean_Reversion_Indicator Mean_Reversion_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviationn, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
 		{
-			return LeadIndicator.Mean_Reversion_Indicator(Input, shouldIGoLong, shouldIGoShort);
+			return LeadIndicator.Mean_Reversion_Indicator(Input, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviationn, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
 		}
 
 		/// <summary>
 		/// The mean reversion is the theory suggesting that prices and returns eventually move back towards the mean or average.
 		/// </summary>
-		public Mean_Reversion_Indicator Mean_Reversion_Indicator(IDataSeries input, System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public Mean_Reversion_Indicator Mean_Reversion_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviationn, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.Mean_Reversion_Indicator(input, shouldIGoLong, shouldIGoShort);
+			return LeadIndicator.Mean_Reversion_Indicator(input, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviationn, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
 		}
 	}
 
@@ -319,17 +444,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The mean reversion is the theory suggesting that prices and returns eventually move back towards the mean or average.
 		/// </summary>
-		public Mean_Reversion_Indicator Mean_Reversion_Indicator(System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public Mean_Reversion_Indicator Mean_Reversion_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviationn, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
 		{
-			return LeadIndicator.Mean_Reversion_Indicator(Input, shouldIGoLong, shouldIGoShort);
+			return LeadIndicator.Mean_Reversion_Indicator(Input, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviationn, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
 		}
 
 		/// <summary>
 		/// The mean reversion is the theory suggesting that prices and returns eventually move back towards the mean or average.
 		/// </summary>
-		public Mean_Reversion_Indicator Mean_Reversion_Indicator(IDataSeries input, System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public Mean_Reversion_Indicator Mean_Reversion_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviationn, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
 		{
-			return LeadIndicator.Mean_Reversion_Indicator(input, shouldIGoLong, shouldIGoShort);
+			return LeadIndicator.Mean_Reversion_Indicator(input, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviationn, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
 		}
 	}
 
@@ -342,17 +467,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The mean reversion is the theory suggesting that prices and returns eventually move back towards the mean or average.
 		/// </summary>
-		public Mean_Reversion_Indicator Mean_Reversion_Indicator(System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public Mean_Reversion_Indicator Mean_Reversion_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviationn, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
 		{
-			return LeadIndicator.Mean_Reversion_Indicator(Input, shouldIGoLong, shouldIGoShort);
+			return LeadIndicator.Mean_Reversion_Indicator(Input, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviationn, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
 		}
 
 		/// <summary>
 		/// The mean reversion is the theory suggesting that prices and returns eventually move back towards the mean or average.
 		/// </summary>
-		public Mean_Reversion_Indicator Mean_Reversion_Indicator(IDataSeries input, System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public Mean_Reversion_Indicator Mean_Reversion_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviationn, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
 		{
-			return LeadIndicator.Mean_Reversion_Indicator(input, shouldIGoLong, shouldIGoShort);
+			return LeadIndicator.Mean_Reversion_Indicator(input, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviationn, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
 		}
 	}
 

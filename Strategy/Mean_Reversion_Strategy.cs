@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: in progress
+/// Version: 1.0
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -29,8 +29,20 @@ using AgenaTrader.Helper;
 namespace AgenaTrader.UserCode
 {
     [Description("The mean reversion is the theory suggesting that prices and returns eventually move back towards the mean or average.")]
-	public class Mean_Reversion_Strategy: UserStrategy
+    public class Mean_Reversion_Strategy : UserStrategy, IMean_Reversion
 	{
+        //interface 
+        private bool _IsShortEnabled = false;
+        private bool _IsLongEnabled = true;
+        private int _Bollinger_Period = 20;
+        private double _Bollinger_Standard_Deviationn = 2;
+        private int _Momentum_Period = 100;
+        private int _RSI_Period = 13;
+        private int _RSI_Smooth = 3;
+        private int _RSI_Level_Low = 30;
+        private int _RSI_Level_High = 70;
+        private int _Momentum_Level_Low = -1;
+        private int _Momentum_Level_High = 1;
 
         //input
         private bool _send_email = false;
@@ -95,7 +107,7 @@ namespace AgenaTrader.UserCode
             this.IsAutomated = this.Autopilot;
 
             //calculate data
-            OrderAction? resultdata = this._Mean_Reversion_Indicator.calculate(Input, _orderenterlong, _orderentershort, 20, 2, 130, 14, 3, 30, 70, -1, 1);
+            OrderAction? resultdata = this._Mean_Reversion_Indicator.calculate(Input, _orderenterlong, _orderentershort, this.Bollinger_Period, this.Bollinger_Standard_Deviationn, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
             if (resultdata.HasValue)
             {
                 switch (resultdata)
@@ -209,7 +221,118 @@ namespace AgenaTrader.UserCode
             //SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
         }
 
+        #region Properties
 
+
+        #region Interface
+
+
+        /// <summary>
+        /// </summary>
+        [Description("If true it is allowed to go long")]
+        [Category("Parameters")]
+        [DisplayName("Allow Long")]
+        public bool IsLongEnabled
+        {
+            get { return _IsLongEnabled; }
+            set { _IsLongEnabled = value; }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("If true it is allowed to go short")]
+        [Category("Parameters")]
+        [DisplayName("Allow Short")]
+        public bool IsShortEnabled
+        {
+            get { return _IsShortEnabled; }
+            set { _IsShortEnabled = value; }
+        }
+
+
+
+        [Description("Period of the Bollinger Band.")]
+        [Category("Parameters")]
+        [DisplayName("BB Period")]
+        public int Bollinger_Period
+        {
+            get { return _Bollinger_Period; }
+            set { _Bollinger_Period = value; }
+        }
+
+        [Description("Standard Deviation of the Bollinger Band.")]
+        [Category("Parameters")]
+        [DisplayName("BB StdDev")]
+        public double Bollinger_Standard_Deviationn
+        {
+            get { return _Bollinger_Standard_Deviationn; }
+            set { _Bollinger_Standard_Deviationn = value; }
+        }
+
+        [Description("Period of the Momentum.")]
+        [Category("Parameters")]
+        [DisplayName("Momentum Period")]
+        public int Momentum_Period
+        {
+            get { return _Momentum_Period; }
+            set { _Momentum_Period = value; }
+        }
+
+        [Description("Period of the RSI.")]
+        [Category("Parameters")]
+        [DisplayName("RSI Period")]
+        public int RSI_Period
+        {
+            get { return _RSI_Period; }
+            set { _RSI_Period = value; }
+        }
+
+        [Description("Smooth Period of the RSI.")]
+        [Category("Parameters")]
+        [DisplayName("RSI Smooth Period")]
+        public int RSI_Smooth
+        {
+            get { return _RSI_Smooth; }
+            set { _RSI_Smooth = value; }
+        }
+
+        [Description("We trade long below this RSI level.")]
+        [Category("Parameters")]
+        [DisplayName("RSI Level Low")]
+        public int RSI_Level_Low
+        {
+            get { return _RSI_Level_Low; }
+            set { _RSI_Level_Low = value; }
+        }
+
+        [Description("We trade short above this RSI level.")]
+        [Category("Parameters")]
+        [DisplayName("RSI Level High")]
+        public int RSI_Level_High
+        {
+            get { return _RSI_Level_High; }
+            set { _RSI_Level_High = value; }
+        }
+
+        [Description("We trade long if momentum is above this level.")]
+        [Category("Parameters")]
+        [DisplayName("RSI Level Low")]
+        public int Momentum_Level_Low
+        {
+            get { return _Momentum_Level_Low; }
+            set { _Momentum_Level_Low = value; }
+        }
+
+        [Description("We trade short if momentum is below this level.")]
+        [Category("Parameters")]
+        [DisplayName("RSI Level High")]
+        public int Momentum_Level_High
+        {
+            get { return _Momentum_Level_High; }
+            set { _Momentum_Level_High = value; }
+        }
+        #endregion
 
         #region Internal
 
@@ -244,5 +367,7 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
+
+        #endregion
     }
 }
