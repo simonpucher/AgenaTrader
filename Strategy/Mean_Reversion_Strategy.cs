@@ -59,7 +59,7 @@ namespace AgenaTrader.UserCode
 
 		protected override void Initialize()
 		{
-            //We need at least
+            //We need at least xy bars
             this.BarsRequired = 130;
 		}
 
@@ -151,26 +151,7 @@ namespace AgenaTrader.UserCode
             // SetTrailStop(CalculationMode.Ticks, 30);
 
 
-            //double returnvalue = this._RunningWithTheWolves_Indicator.calculate(data);
-            //Print(returnvalue);
-            //if (returnvalue == 1)
-            //{
-            //    if (this._orderentershort != null)
-            //    {
-            //        ExitShort();
-            //        this._orderentershort = null;
-            //    }
-            //    this.DoEnterLong();
-            //}
-            //else if (returnvalue == -1)
-            //{
-            //    if (this._orderenterlong != null)
-            //    {
-            //        ExitLong();
-            //        this._orderenterlong = null;
-            //    }
-            //    this.DoEnterShort();
-            //}
+    
 		}
 
 
