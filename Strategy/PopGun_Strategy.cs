@@ -249,9 +249,9 @@ namespace AgenaTrader.UserCode
             set { _filter_NoShortRSI = value; }
         }
 
-        [Description("No Trigger before EOD")]
+        [Description("No PopGun is triggered, if the expire date is targeted for the following day")]
         [Category("TradeFilter")]
-        [DisplayName("No PopGun is triggered, if the expire date is targeted for the following day")]
+        [DisplayName("No Trigger before EOD")]
         public bool Filter_NoTriggerEOD
         {
             get { return _filter_NoTriggerEOD; }

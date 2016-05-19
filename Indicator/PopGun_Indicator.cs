@@ -127,8 +127,8 @@ namespace AgenaTrader.UserCode
                         noPopGunTrigger = true;
                     }
                     
-                    if (noPopGunTrigger){
-                    this.PopGunTarget = curbar + this.PopGunExpires;
+                    if (noPopGunTrigger == false){
+                     this.PopGunTarget = curbar + this.PopGunExpires;
                     PopGunTriggerBar = CurrentBar;
                     this.PopGunTriggerLong = CurrentBar_High;
                     this.PopGunTriggerShort = CurrentBar_Low;
@@ -327,9 +327,9 @@ namespace AgenaTrader.UserCode
 
         private bool _filter_NoTriggerEOD = false;
 
-        [Description("No Trigger before EOD")]
+        [Description("No PopGun is triggered, if the expire date is targeted for the following day")]
         [Category("TradeFilter")]
-        [DisplayName("No PopGun is triggered, if the expire date is targeted for the following day")]
+        [DisplayName("No Trigger before EOD")]
         public bool Filter_NoTriggerEOD
         {
             get { return _filter_NoTriggerEOD; }
