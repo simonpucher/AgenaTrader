@@ -43,7 +43,6 @@ namespace AgenaTrader.UserCode
         TimeSpan Time_EndOfDay_DE { get; set; }
         TimeSpan Time_EndOfDay_US { get; set; }
 
-
     }
 
     /// <summary>
@@ -269,6 +268,9 @@ namespace AgenaTrader.UserCode
         /// <returns></returns>
         public ORB_Result calculate(IBars bars, IBar currentbar)
         {
+            //todo check if all data should be return via Result Object
+            //todo check if it allowed that we are going two times through the limit (two buys per day, could this happen?)
+
                 ORB_Result resultvalue = new ORB_Result();
 
                 //reset session day data
@@ -370,7 +372,7 @@ namespace AgenaTrader.UserCode
         /// <returns></returns>
         private DateTime getOpenRangeEnd(DateTime date)
         {
-            return date.AddMinutes(_orbminutes);
+            return date.AddMinutes(this.ORBMinutes);
         }
 
         /// <summary>
