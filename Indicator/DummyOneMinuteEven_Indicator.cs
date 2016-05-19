@@ -11,18 +11,30 @@ using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
+/// <summary>
+/// Version: 1.0
+/// -------------------------------------------------------------------------
+/// Simon Pucher 2016
+/// Christian Kovar 2016
+/// -------------------------------------------------------------------------
+/// This indicator provides a signal in every even minute.
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
+/// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
 
-  
 
-	[Description("Liefert Signal wenn es eine gerade Minute ist")]
+
+    [Description("Provides a signal in every even minute")]
 	public class DummyOneMinuteEven_Indicator : UserIndicator
 	{
 
-
-        private int _myvalue = 1;
-
+        //private int _myvalue = 1;
 
 
 		protected override void Initialize()
@@ -37,13 +49,16 @@ namespace AgenaTrader.UserCode
             if (Bars != null && Bars.Count > 0
                          && TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Minute
                          && TimeFrame.PeriodicityValue == 1)
-            { }
+            { 
+                //
+            }
             else
             {
                 return;
             }
 
-            if (Bars.GetTime(CurrentBar).Minute % 2 == 0 ) //Es ist eine gerade Minute
+            //Using modulus to check if there is an even minute.
+            if (Bars.GetTime(CurrentBar).Minute % 2 == 0 )
             {
                 Value.Set(100);
             }
@@ -56,14 +71,14 @@ namespace AgenaTrader.UserCode
 
         #region MyRegion
 
-        [Description("Period for RSI")]
-        [Category("Values")]
-        [DisplayName("Period for RSI")]
-            public int Myvalue
-            {
-                get { return _myvalue; }
-                set { _myvalue = value; }
-            }
+        //[Description("Period for RSI")]
+        //[Category("Values")]
+        //[DisplayName("Period for RSI")]
+        //    public int Myvalue
+        //    {
+        //        get { return _myvalue; }
+        //        set { _myvalue = value; }
+        //    }
 
         #endregion
 
@@ -78,7 +93,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator : Indicator
 	{
 		/// <summary>
-		/// Liefert Signal wenn es eine gerade Minute ist
+		/// Provides a signal in every even minute
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator()
         {
@@ -86,7 +101,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Liefert Signal wenn es eine gerade Minute ist
+		/// Provides a signal in every even minute
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(IDataSeries input)
 		{
@@ -116,7 +131,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Liefert Signal wenn es eine gerade Minute ist
+		/// Provides a signal in every even minute
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator()
 		{
@@ -124,7 +139,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Liefert Signal wenn es eine gerade Minute ist
+		/// Provides a signal in every even minute
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(IDataSeries input)
 		{
@@ -142,7 +157,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Liefert Signal wenn es eine gerade Minute ist
+		/// Provides a signal in every even minute
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator()
 		{
@@ -150,7 +165,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Liefert Signal wenn es eine gerade Minute ist
+		/// Provides a signal in every even minute
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(IDataSeries input)
 		{
@@ -165,7 +180,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Liefert Signal wenn es eine gerade Minute ist
+		/// Provides a signal in every even minute
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator()
 		{
@@ -173,7 +188,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Liefert Signal wenn es eine gerade Minute ist
+		/// Provides a signal in every even minute
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(IDataSeries input)
 		{

@@ -17,7 +17,9 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// 
+/// ****** Important ******
+/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
+/// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -36,6 +38,7 @@ namespace AgenaTrader.UserCode
         private Color colFail = Color.Brown;
         bool _print_info= false;
         bool _dev_mode = false;
+        bool _Snapshots = false;
         bool existgap;
         bool GapTradeShort;
         bool GapTradeLong;
@@ -73,14 +76,15 @@ namespace AgenaTrader.UserCode
                 //Print("Total Long Punkte: " + GapTradeResultTotalLong);
                 //Print("Total Short Punkte: " + GapTradeResultTotalShort);
 
-                if (GapTradeResultTotalShort > 0)
-                {
-                    Print("Total Punkte;" +Instrument.Name +";"+ (GapTradeResultTotalLong - GapTradeResultTotalShort));
-                }
-                else
-                {
-                    Print("Total Punkte;" + Instrument.Name + ";" + (GapTradeResultTotalLong + Math.Abs(GapTradeResultTotalShort)));
-                }
+                //if (GapTradeResultTotalShort > 0)
+                //{
+                //    Print("Total Punkte;" +Instrument.Name +";"+ (GapTradeResultTotalLong - GapTradeResultTotalShort));
+                //}
+                //else
+                //{
+                //    Print("Total Punkte;" + Instrument.Name + ";" + (GapTradeResultTotalLong + Math.Abs(GapTradeResultTotalShort)));
+                //}
+
                 //Print("Total Long Trades: " + (GapTradeWinCounterLong + GapTradeFailCounterLong));                
                 //Print("Long Wins: " + GapTradeWinCounterLong);
                 //Print("Long Fails: " + GapTradeFailCounterLong);
@@ -205,10 +209,11 @@ namespace AgenaTrader.UserCode
 
 //09.15. - 09.30 Kerze
 //            else if (Bars.BarsSinceSession == 6 && existgap == true)
-            else if (Bars[0].Time.TimeOfDay == new TimeSpan(9,30,0))
+            else if (Bars[0].Time.TimeOfDay == new TimeSpan(9,15,0))
             {
 //Auswertung nach ShowGap Handelszeit (=09.30)   
                 printAuswertung();
+                GlobalUtilities.SaveSnapShot("ShowGap", Instrument.Name, this.Root.Core.ChartManager.AllCharts, Bars, TimeFrame);
             }
         }
 
@@ -451,6 +456,15 @@ namespace AgenaTrader.UserCode
         {
             get { return _dev_mode; }
             set { _dev_mode = value; }
+        }
+
+        [Description("Snapshots speichern")]
+        [Category("Behaviour")]
+        [DisplayName("Snapshots")]
+        public bool Snapshots
+        {
+            get { return _Snapshots; }
+            set { _Snapshots = value; }
         }
 
 		#endregion
