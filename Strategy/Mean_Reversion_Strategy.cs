@@ -35,9 +35,9 @@ namespace AgenaTrader.UserCode
         private bool _IsShortEnabled = false;
         private bool _IsLongEnabled = true;
         private int _Bollinger_Period = 20;
-        private double _Bollinger_Standard_Deviationn = 2;
+        private double _Bollinger_Standard_Deviation = 2;
         private int _Momentum_Period = 100;
-        private int _RSI_Period = 13;
+        private int _RSI_Period = 14;
         private int _RSI_Smooth = 3;
         private int _RSI_Level_Low = 30;
         private int _RSI_Level_High = 70;
@@ -107,7 +107,7 @@ namespace AgenaTrader.UserCode
             this.IsAutomated = this.Autopilot;
 
             //calculate data
-            OrderAction? resultdata = this._Mean_Reversion_Indicator.calculate(Input, _orderenterlong, _orderentershort, this.Bollinger_Period, this.Bollinger_Standard_Deviationn, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
+            OrderAction? resultdata = this._Mean_Reversion_Indicator.calculate(Input, Open, High, _orderenterlong, _orderentershort, this.Bollinger_Period, this.Bollinger_Standard_Deviation, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
             if (resultdata.HasValue)
             {
                 switch (resultdata)
@@ -205,7 +205,7 @@ namespace AgenaTrader.UserCode
         {
             _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Long + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
             //SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
-            //SetStopLoss(_orderenterlong.Name, CalculationMode.Percent, 5, false);
+            //SetStopLoss(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 0.95, false);
             //SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
             //SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
 
@@ -264,15 +264,15 @@ namespace AgenaTrader.UserCode
         [Description("Standard Deviation of the Bollinger Band.")]
         [Category("Parameters")]
         [DisplayName("BB StdDev")]
-        public double Bollinger_Standard_Deviationn
+        public double Bollinger_Standard_Deviation
         {
-            get { return _Bollinger_Standard_Deviationn; }
-            set { _Bollinger_Standard_Deviationn = value; }
+            get { return _Bollinger_Standard_Deviation; }
+            set { _Bollinger_Standard_Deviation = value; }
         }
 
         [Description("Period of the Momentum.")]
         [Category("Parameters")]
-        [DisplayName("Momentum Period")]
+        [DisplayName("MOM Period")]
         public int Momentum_Period
         {
             get { return _Momentum_Period; }
@@ -317,7 +317,7 @@ namespace AgenaTrader.UserCode
 
         [Description("We trade long if momentum is above this level.")]
         [Category("Parameters")]
-        [DisplayName("RSI Level Low")]
+        [DisplayName("MOM Level Low")]
         public int Momentum_Level_Low
         {
             get { return _Momentum_Level_Low; }
@@ -326,7 +326,7 @@ namespace AgenaTrader.UserCode
 
         [Description("We trade short if momentum is below this level.")]
         [Category("Parameters")]
-        [DisplayName("RSI Level High")]
+        [DisplayName("MOM Level High")]
         public int Momentum_Level_High
         {
             get { return _Momentum_Level_High; }
