@@ -18,7 +18,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.5.5
+/// Version: 1.5.6
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -52,6 +52,7 @@ namespace AgenaTrader.UserCode
         public const int DefaultLineWidth_small = 1;
         public const int DefaultLineWidth_large = 3;
         public static readonly Color DefaultIndicatorColor = Color.Orange;
+        public static readonly Color DefaultIndicatorColor_GreyedOut = Color.Gray;
         public static readonly DashStyle DefaultIndicatorDashStyle = DashStyle.Solid;
 
     }
