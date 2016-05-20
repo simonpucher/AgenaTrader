@@ -1,5 +1,5 @@
 #AgenaTrader Scripts 
-This project contains scripts for the AgenaTrader like indicators, conditions and strategies. If you have feedback please just send us a short message, an email or open an issue on GitHub.
+This project contains scripts for the AgenaTrader like indicators, conditions and strategies. If you have feedback please just send us a short message, an email or [open an issue on GitHub](https://github.com/simonpucher/AgenaTrader/issues).
 
 ##Important
 ###Code access to Utility Indicator
