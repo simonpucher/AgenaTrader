@@ -12,8 +12,8 @@ We use this indicator to share code snippets, so we do not need to copy and past
 You need to copy the Utility Indicator into the indicators directory of your AgenaTrader. You will find the latest version of this Utility Indicator on GitHub: [Global Utilities](https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs)
 
 #Documentation
-A rudimentary documentation exists in form of code comments in each scripts.
-We are working on tutorials with a more detailed documentation and some tutorials covering the basics for AgenaTrader scripts templates. If you want to help, please feel free to fork this project.
+A rudimentary documentation exists in form of code comments in each script.
+We are working on development tutorials with a more detailed documentation and some tutorials covering the basics for AgenaTrader scripts templates. If you want to help, please feel free to fork this project and create a pull request.
 
 ##Links
 - [Agena Trader Software](http://www.tradeescort.com)
