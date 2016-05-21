@@ -1,5 +1,7 @@
-﻿#Best practices to communicate between scripts
+#Template for Indicator, Condition and Strategy
 [Originally posted as a question in the Agenatrader forum](http://www.tradeescort.com/phpbb_de/viewtopic.php?f=18&t=2680&p=11739)
+
+This tutorial will show you our templates for indicators, conditions, strategies and give you the ability to communicate between these scripts. This will lead you to more code transparency and reduces your programming time. 
 
 ##Why do we want this?
 AgenaTrader provides you the ability to create indicators, conditions, alerts and strategies in c# and use them during trading. 
