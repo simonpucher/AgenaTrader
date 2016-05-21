@@ -130,7 +130,7 @@ namespace AgenaTrader.UserCode
 
 
         /// <summary>
-        /// Create Long Order.
+        /// Create LONG order.
         /// </summary>
         private void DoEnterLong()
         {
@@ -140,7 +140,7 @@ namespace AgenaTrader.UserCode
         }
 
         /// <summary>
-        /// Create Short Order.
+        /// Create SHORT order.
         /// </summary>
         private void DoEnterShort()
         {
@@ -150,7 +150,7 @@ namespace AgenaTrader.UserCode
         }
 
         /// <summary>
-        /// Exit the Long position.
+        /// Exit the LONG position.
         /// </summary>
         private void DoExitLong()
         {
@@ -158,7 +158,7 @@ namespace AgenaTrader.UserCode
         }
 
         /// <summary>
-        /// Fill the Short position.
+        /// Fill the SHORT position.
         /// </summary>
         private void DoExitShort()
         {
