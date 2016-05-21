@@ -19,7 +19,7 @@ using AgenaTrader.Helper;
 /// -------------------------------------------------------------------------
 /// This indicator provides entry and exit signals on time.
 /// Long signal in every even minute. Short signal every odd minute.
-/// You can use this indicator also as a template for further development.
+/// You can use this indicator also as a template for further script development.
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use global source code elements.
@@ -63,6 +63,8 @@ namespace AgenaTrader.UserCode
     public class DummyOneMinuteEven_Indicator : UserIndicator, IDummyOneMinuteEven
 	{
         //interface 
+        private bool _IsShortEnabled = true;
+        private bool _IsLongEnabled = true;
 
         //input
         private Color _plot0color = Const.DefaultIndicatorColor;
@@ -71,8 +73,7 @@ namespace AgenaTrader.UserCode
         private Color _plot1color = Const.DefaultIndicatorColor_GreyedOut;
         private int _plot1width = Const.DefaultLineWidth;
         private DashStyle _plot1dashstyle = Const.DefaultIndicatorDashStyle;
-        private bool _IsShortEnabled = true;
-        private bool _IsLongEnabled = true;
+
 
         //output
 
@@ -89,10 +90,18 @@ namespace AgenaTrader.UserCode
             Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "EvenMinutePlot_Indicator"));
             Add(new Plot(new Pen(this.Plot1Color, this.Plot1Width), PlotStyle.Line, "EvenMinutePlot_GreyedOut_Indicator"));
 
-            BarsRequired = 1;
 			CalculateOnBarClose = true;
             Overlay = false;
+
+            //Because of Backtesting reasons if we use the advanced mode we need at least two bars
+            this.BarsRequired = 2;
 		}
+
+        protected override void InitRequirements()
+        {
+            //Print("InitRequirements");
+            base.InitRequirements();
+        }
 
 
         /// <summary>
@@ -101,8 +110,7 @@ namespace AgenaTrader.UserCode
         protected override void OnStartUp()
         {
             //Print("OnStartUp");
-
-            //this._DataSeries_List = new DataSeries(this);
+            base.OnStartUp();
         }
 
         /// <summary>
@@ -112,19 +120,13 @@ namespace AgenaTrader.UserCode
         {
             //Print("OnBarUpdate");
 
-            //todo check peridocity
-
-            //if (Bars != null && Bars.Count > 0
-            //             && TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Minute
-            //             && TimeFrame.PeriodicityValue == 1)
-            //{ 
-            //    //
-            //}
-            //else
-            //{
-            //    return;
-            //}
-
+            //Check if peridocity is valid for this script 
+            if (!DatafeedPeriodicityIsValid(Bars.TimeFrame))
+            {
+                GlobalUtilities.DrawAlertTextOnChart(this, Const.DefaultStringDatafeedPeriodicity);
+                return; 
+            }
+           
             //Lets call the calculate method and save the result with the trade action
             ResultValueDummyOneMinuteEven returnvalue = this.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
 
@@ -176,7 +178,6 @@ namespace AgenaTrader.UserCode
                 //Value was null so nothing to do.
                 this.Indicator_Curve_Exit.Set(0);
             }
-
         }
 
         /// <summary>
@@ -189,13 +190,14 @@ namespace AgenaTrader.UserCode
 
 
         /// <summary>
-        /// In this method we do all the work and return the OrderAction.
-        /// This method can be called from any other script.
+        /// In this method we do all the work and return the object with all data like the OrderActions.
+        /// This method can be called from any other script like strategies, indicators or conditions.
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
         public ResultValueDummyOneMinuteEven calculate(IBar data, bool islongenabled, bool isshortenabled)
         {
+            //Create a return object
             ResultValueDummyOneMinuteEven returnvalue = new ResultValueDummyOneMinuteEven();
 
             //try catch block with all calculations
@@ -256,14 +258,32 @@ namespace AgenaTrader.UserCode
 
         public override string ToString()
         {
-            return "Dummy one minute even (I)";
+            return "Dummy one minute even/odd (I)";
         }
 
         public override string DisplayName
         {
             get
             {
-                return "Dummy one minute even (I)";
+                return "Dummy one minute even/odd (I)";
+            }
+        }
+
+
+        /// <summary>
+        /// True if the periodicity of the data feed is correct for this indicator.
+        /// </summary>
+        /// <returns></returns>
+        public bool DatafeedPeriodicityIsValid(ITimeFrame timeframe)
+        {
+            TimeFrame tf = (TimeFrame)timeframe;
+            if (tf.Periodicity == DatafeedHistoryPeriodicity.Minute && tf.PeriodicityValue == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 

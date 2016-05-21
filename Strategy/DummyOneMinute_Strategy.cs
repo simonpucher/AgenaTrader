@@ -19,7 +19,7 @@ using AgenaTrader.Helper;
 /// -------------------------------------------------------------------------
 /// This indicator provides entry and exit signals on time.
 /// Long signal in every even minute. Short signal every odd minute.
-/// You can use this indicator also as a template for further development.
+/// You can use this indicator also as a template for further script development.
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use global source code elements.
@@ -29,28 +29,41 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-  [Description("This indicator provides a long signal in every even minute and a short signal every odd minute.")]
+    [Description("This indicator provides a long signal in every even minute and a short signal every odd minute.")]
     public class DummyOneMinute_Strategy : UserStrategy, IDummyOneMinuteEven
 	{
-        //input
-        private bool _IsShortEnabled = false;
+        //interface
+        private bool _IsShortEnabled = true;
         private bool _IsLongEnabled = true;
+
+        //input
 
         //output
 
         //internal
         private DummyOneMinuteEven_Indicator _DummyOneMinuteEven_Indicator = null;
-        private IOrder oEnterLong;
-        private IOrder oExitLong;
+        private IOrder _orderenterlong;
+        private IOrder _orderentershort;
 
 		protected override void Initialize()
 		{
+            CalculateOnBarClose = true;
+
+            //Set the default time frame if you start the strategy via the strategy-escort
+            //if you start the strategy on a chart the TimeFrame is automatically set, this will lead to a better usability
+            if (this.TimeFrame == null || this.TimeFrame.PeriodicityValue == 0)
+            {
+                this.TimeFrame = new TimeFrame(DatafeedHistoryPeriodicity.Minute, 1);
+            }
+
+            //Because of Backtesting reasons if we use the advanced mode we need at least two bars
+            this.BarsRequired = 2;
 		}
 
         protected override void InitRequirements()
         {
+            //Print("InitRequirements");
             base.InitRequirements();
-
         }
 
 
@@ -58,13 +71,18 @@ namespace AgenaTrader.UserCode
         {
             base.OnStartUp();
 
-            //Init our indicator to get code access
+            //Init our indicator to get code access to the calculate method
             this._DummyOneMinuteEven_Indicator = new DummyOneMinuteEven_Indicator();
         }
 
 		protected override void OnBarUpdate()
 		{
-            //EnterLong(3);
+            //Check if peridocity is valid for this script 
+            if (!this._DummyOneMinuteEven_Indicator.DatafeedPeriodicityIsValid(Bars.TimeFrame))
+            {
+                Log(this.DisplayName + ": " + Const.DefaultStringDatafeedPeriodicity, InfoLogLevel.AlertLog);
+                return;
+            }
 
 
             //oEnterLong = SubmitOrder(0, OrderAction.Buy, OrderType.Stop, DefaultQuantity, 0, Close[0] * 1.1, "ocoId", "signalName");
@@ -95,6 +113,20 @@ namespace AgenaTrader.UserCode
             //oEnterLong = SubmitOrder(0, OrderAction.Buy, OrderType.Stop, 3, 0, price, "ocoId", "signalName");
            //return oEnterLong;
         //}
+
+
+        public override string ToString()
+        {
+            return "Dummy one minute even/odd (S)";
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "Dummy one minute even/odd (S)";
+            }
+        }
 
 
         #region Properties

@@ -65,13 +65,13 @@ namespace AgenaTrader.UserCode
 		protected override void Initialize()
 		{
             //Set the default time frame if you start the strategy via the strategy-escort
-            //if you start the strategy on a chart the TimeFrame is automatically set.
+            //if you start the strategy on a chart the TimeFrame is automatically set, this will lead to a better usability
             if (this.TimeFrame == null || this.TimeFrame.PeriodicityValue == 0)
             {
                  this.TimeFrame = new TimeFrame(DatafeedHistoryPeriodicity.Minute, 1);
             }
 
-            //Because of Backtesting reasons if we use the afvanced mode we need at least two bars
+            //Because of Backtesting reasons if we use the advanced mode we need at least two bars
             this.BarsRequired = 2;
 		}
 
