@@ -57,9 +57,10 @@ namespace AgenaTrader.UserCode
             IsEntry = true;
             IsStop = false;
             IsTarget = false;
-            Add(new Plot(Color.FromKnownColor(KnownColor.Black), "Occurred"));
-            Add(new Plot(Color.FromArgb(255, 153, 170, 61), "Entry"));
-            Overlay = true;
+            Add(new Plot(Const.DefaultIndicatorColor, "Occurred"));
+            Add(new Plot(Const.DefaultIndicatorColor_GreyedOut, "Entry"));
+
+            Overlay = false;
             CalculateOnBarClose = true;
 
             //Because of Backtesting reasons if we use the advanced mode we need at least two bars
@@ -130,14 +131,14 @@ namespace AgenaTrader.UserCode
 
         public override string ToString()
         {
-            return "Dummy one minute even/odd (S)";
+            return "Dummy one minute even/odd (C)";
         }
 
         public override string DisplayName
         {
             get
             {
-                return "Dummy one minute even/odd (S)";
+                return "Dummy one minute even/odd (C)";
             }
         }
 
