@@ -138,14 +138,14 @@ namespace AgenaTrader.UserCode
 
         public override string ToString()
         {
-            return "ORB";
+            return "ORB (C)";
         }
 
         public override string DisplayName
         {
             get
             {
-                return "ORB";
+                return "ORB (C)";
             }
         }
 

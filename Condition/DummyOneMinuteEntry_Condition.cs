@@ -95,18 +95,36 @@ namespace AgenaTrader.UserCode
             //Lets call the calculate method and save the result with the trade action
             ResultValueDummyOneMinuteEven returnvalue = this._DummyOneMinuteEven_Indicator.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
 
-            //if (DummyOneMinuteEven_Indicator()[0] == 100)
-            //{
-            //    Occurred.Set(-1);
-            //}
-            //else
-            //{
-            //    Occurred.Set(1);
-            //}
+            //If the calculate method was not finished we need to stop and show an alert message to the user.
+            if (!returnvalue.IsCompleted)
+            {
+                Log(this.DisplayName + ": " + Const.DefaultStringErrorDuringCalculation, InfoLogLevel.AlertLog);
+                return;
+            }
 
-            //Entry.Set(iv_Bars.GetOpen(iv_CurrentBar));
-            //Entry.Set(10390);
-            //Entry.Set(GetCurrentBid());
+            //Entry
+            if (returnvalue.Entry.HasValue)
+            {
+                switch (returnvalue.Entry)
+                {
+                    case OrderAction.Buy:
+                        //Long Signal
+                        Occurred.Set(1);
+                        //Entry.Set(Close[0]);
+                        break;
+                    case OrderAction.SellShort:
+                        //Short Signal
+                        Occurred.Set(-1);
+                        //Entry.Set(Close[0]);
+                        break;
+                }
+            }
+            else
+            {
+                //No Signal
+                Occurred.Set(0);
+                //Entry.Set(Close[0]);
+            }
 
         }
 
@@ -125,7 +143,7 @@ namespace AgenaTrader.UserCode
 
         #region Properties
 
-        #region Input
+        #region Interface
         /// <summary>
         /// </summary>
         [Description("If true it is allowed to create long positions.")]

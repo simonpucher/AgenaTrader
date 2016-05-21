@@ -37,6 +37,7 @@ namespace AgenaTrader.UserCode
         private bool _IsLongEnabled = true;
 
         //input
+        private bool _autopilot = true;
 
         //output
 
@@ -77,6 +78,9 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnBarUpdate()
 		{
+            //Set Autopilot
+            this.IsAutomated = this.Autopilot;
+
             //Check if peridocity is valid for this script 
             if (!this._DummyOneMinuteEven_Indicator.DatafeedPeriodicityIsValid(Bars.TimeFrame))
             {
@@ -84,36 +88,82 @@ namespace AgenaTrader.UserCode
                 return;
             }
 
-
-            //oEnterLong = SubmitOrder(0, OrderAction.Buy, OrderType.Stop, DefaultQuantity, 0, Close[0] * 1.1, "ocoId", "signalName");
-            //oEnterShort = SubmitOrder(0, OrderAction.SellShort, OrderType.Stop, DefaultQuantity, 0, Close[0] * -1.1, "ocoId", "signalName");
-
-            //CreateOCOGroup(new List<IOrder> { oEnterLong, oEnterShort });
-
-            //oEnterLong.ConfirmOrder();
-            //oEnterShort.ConfirmOrder();
-
             //Lets call the calculate method and save the result with the trade action
             ResultValueDummyOneMinuteEven returnvalue = this._DummyOneMinuteEven_Indicator.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
 
-            //if (DummyOneMinuteEven_Indicator()[0] == 100)
-            //{
-            //    if (!IsCurrentBarLast || oEnterLong != null)
-            //        return;
+            //If the calculate method was not finished we need to stop and show an alert message to the user.
+            if (!returnvalue.IsCompleted)
+            {
+                Log(this.DisplayName + ": " + Const.DefaultStringErrorDuringCalculation, InfoLogLevel.AlertLog);
+                return;
+            }
 
-            //    oEnterLong = SubmitOrder(0, OrderAction.Buy, OrderType.Market, 3, 0, Close[0], "ocoId", "signalName");
-            //}
+            //Entry
+            if (returnvalue.Entry.HasValue)
+            {
+                switch (returnvalue.Entry)
+                {
+                    case OrderAction.Buy:
+                        this.DoEnterLong();
+                        break;
+                    case OrderAction.SellShort:
+                        this.DoEnterShort();
+                        break;
+                }
+            }
+
+            //Exit
+            if (returnvalue.Exit.HasValue)
+            {
+                switch (returnvalue.Exit)
+                {
+                    case OrderAction.BuyToCover:
+                        this.DoExitShort();
+                        break;
+                    case OrderAction.Sell:
+                        this.DoExitLong();
+                        break;
+                }
+            }
+
 		}
 
-        
 
-      //  public IOrder EnterLong(double price)
-       // {
-            //Print(Close);
-            //oEnterLong = SubmitOrder(0, OrderAction.Buy, OrderType.Stop, 3, 0, price, "ocoId", "signalName");
-           //return oEnterLong;
-        //}
+        /// <summary>
+        /// Create Long Order.
+        /// </summary>
+        private void DoEnterLong()
+        {
+            _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.Buy + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+            //SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
+            //SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
+        }
 
+        /// <summary>
+        /// Create Short Order.
+        /// </summary>
+        private void DoEnterShort()
+        {
+            _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.SellShort + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+            //SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
+            //SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+        }
+
+        /// <summary>
+        /// Exit the Long position.
+        /// </summary>
+        private void DoExitLong()
+        {
+            ExitLong(this._orderenterlong.Name);
+        }
+
+        /// <summary>
+        /// Fill the Short position.
+        /// </summary>
+        private void DoExitShort()
+        {
+            ExitShort(this._orderentershort.Name);
+        }
 
         public override string ToString()
         {
@@ -131,29 +181,46 @@ namespace AgenaTrader.UserCode
 
         #region Properties
 
+        #region Interface
+
+            /// <summary>
+            /// </summary>
+            [Description("If true it is allowed to create long positions.")]
+            [Category("Parameters")]
+            [DisplayName("Allow Long")]
+            public bool IsLongEnabled
+            {
+                get { return _IsLongEnabled; }
+                set { _IsLongEnabled = value; }
+            }
+
+
+            /// <summary>
+            /// </summary>
+            [Description("If true it is allowed to create short positions.")]
+            [Category("Parameters")]
+            [DisplayName("Allow Short")]
+            public bool IsShortEnabled
+            {
+                get { return _IsShortEnabled; }
+                set { _IsShortEnabled = value; }
+            }
+
+        #endregion
+
         #region Input
-        /// <summary>
-        /// </summary>
-        [Description("If true it is allowed to create long positions.")]
-        [Category("Parameters")]
-        [DisplayName("Allow Long")]
-        public bool IsLongEnabled
+
+        [Description("If true the strategy will handle everything. It will create buy orders, sell orders, stop loss orders, targets fully automatically")]
+        [Category("Safety first!")]
+        [DisplayName("Autopilot")]
+        public bool Autopilot
         {
-            get { return _IsLongEnabled; }
-            set { _IsLongEnabled = value; }
+            get { return _autopilot; }
+            set { _autopilot = value; }
         }
 
 
-        /// <summary>
-        /// </summary>
-        [Description("If true it is allowed to create short positions.")]
-        [Category("Parameters")]
-        [DisplayName("Allow Short")]
-        public bool IsShortEnabled
-        {
-            get { return _IsShortEnabled; }
-            set { _IsShortEnabled = value; }
-        }
+       
 
         #endregion
 
