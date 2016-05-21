@@ -59,7 +59,7 @@ namespace AgenaTrader.UserCode
 
 
 
-    [Description("This indicator provides a long signal in every even minute. You can use this indicator also as a template for further development")]
+    [Description("This indicator provides a long signal in every even minute and a short signal every odd minute.")]
     public class DummyOneMinuteEven_Indicator : UserIndicator, IDummyOneMinuteEven
 	{
         //interface 
@@ -413,7 +413,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator : Indicator
 	{
 		/// <summary>
-		/// This indicator provides a long signal in every even minute. You can use this indicator also as a template for further development
+		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
         {
@@ -421,7 +421,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// This indicator provides a long signal in every even minute. You can use this indicator also as a template for further development
+		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
@@ -453,7 +453,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// This indicator provides a long signal in every even minute. You can use this indicator also as a template for further development
+		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
@@ -461,7 +461,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// This indicator provides a long signal in every even minute. You can use this indicator also as a template for further development
+		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
@@ -479,7 +479,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// This indicator provides a long signal in every even minute. You can use this indicator also as a template for further development
+		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
@@ -487,7 +487,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// This indicator provides a long signal in every even minute. You can use this indicator also as a template for further development
+		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
@@ -502,7 +502,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// This indicator provides a long signal in every even minute. You can use this indicator also as a template for further development
+		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
@@ -510,7 +510,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// This indicator provides a long signal in every even minute. You can use this indicator also as a template for further development
+		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
 		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{

@@ -11,9 +11,25 @@ using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
+/// <summary>
+/// Version: 1.1
+/// -------------------------------------------------------------------------
+/// Simon Pucher 2016
+/// Christian Kovar 2016
+/// -------------------------------------------------------------------------
+/// This indicator provides entry and exit signals on time.
+/// Long signal in every even minute. Short signal every odd minute.
+/// You can use this indicator also as a template for further development.
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this script without any error you also need access to the utility indicator to use global source code elements.
+/// You will find this script on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
-	[Description("Enter the description for the new strategy here")]
+  [Description("This indicator provides a long signal in every even minute and a short signal every odd minute.")]
     public class DummyOneMinute_Strategy : UserStrategy, IDummyOneMinuteEven
 	{
         //input
