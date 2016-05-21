@@ -28,7 +28,9 @@ If we get the OrderAction.Buy as a Entry result, we need to start a long order i
 
 #Files
 [Indicator](https://github.com/simonpucher/AgenaTrader/blob/master/Indicator/DummyOneMinuteEven_Indicator.cs)
+
 [Condition](https://github.com/simonpucher/AgenaTrader/blob/master/Condition/DummyOneMinuteEntry_Condition.cs)
+
 [Strategy](https://github.com/simonpucher/AgenaTrader/blob/master/Strategy/DummyOneMinute_Strategy.cs)
 
 To compile these scripts without any error you also need access to the [utility indicator] (https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs) to use global source code elements.
