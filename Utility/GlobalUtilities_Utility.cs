@@ -18,12 +18,12 @@ using System.Threading;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.5.6
+/// Version: 1.5.7
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// Global utilities as a helper in Agena Trader Script.
+/// Global utilities is a helper indicator and holds c# scripts to use in AgenaTrader.
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -42,6 +42,7 @@ namespace AgenaTrader.UserCode
 
         //Default Strings
         public const string DefaultStringDatafeedPeriodicity = "Periodicity of your data feed is suboptimal for this indicator!";
+        public const string DefaultStringErrorDuringCalculation = "A problem occured during the calculation method!";
 
         //Default values for indicators
         public const int DefaultOpenRangeSizeinMinutes = 75;
@@ -436,6 +437,15 @@ namespace AgenaTrader.UserCode
 
         #region Chart
 
+        /// <summary>
+        /// Draws a standard alert text in the chart.
+        /// </summary>
+        /// <param name="indicator"></param>
+        /// <param name="text"></param>
+        public static void DrawAlertTextOnChart(UserIndicator indicator, string text)
+        {
+            indicator.DrawTextFixed("AlertText", text, TextPosition.Center, Color.Red, new Font("Arial", 30), Color.Red, Color.Red, 20);
+        }
 
         /// <summary>
         /// Saves a snapshot of the current chart.
@@ -449,7 +459,7 @@ namespace AgenaTrader.UserCode
         {
 
             string filepart = GlobalUtilities.CleanFileName(Indicator + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + InstrumentName + "_" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm"));
-            string directory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\SnapShot\\" + filepart + "\\";
+            string directory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Evaluation\\SnapShot\\" + filepart + "\\";
             System.IO.Directory.CreateDirectory(directory);
             string fileName = InstrumentName + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + Bars[0].Time.ToString("yyyy_MM_dd_HH_mm") + ".jpg";
             fileName = GlobalUtilities.CleanFileName(fileName);
