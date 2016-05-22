@@ -87,8 +87,8 @@ namespace AgenaTrader.UserCode
 		{
             //Print("Initialize");
 
-            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "EvenMinutePlot_Indicator"));
-            Add(new Plot(new Pen(this.Plot1Color, this.Plot1Width), PlotStyle.Line, "EvenMinutePlot_GreyedOut_Indicator"));
+            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "DummyOneMinuteEvenOdd_Plot_Indicator"));
+            Add(new Plot(new Pen(this.Plot1Color, this.Plot1Width), PlotStyle.Line, "DummyOneMinuteEvenOdd_Plot_GreyedOut_Indicator"));
 
 			CalculateOnBarClose = true;
             Overlay = false;
