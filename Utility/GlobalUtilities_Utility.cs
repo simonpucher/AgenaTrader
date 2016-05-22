@@ -18,7 +18,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.5.7
+/// Version: 1.5.8
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -38,11 +38,11 @@ namespace AgenaTrader.UserCode
     public static class Const
     {
         //Default Files
-        public static readonly string DefaultFileStatistic = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\" + "Auswertung.csv";
+        public static readonly string DefaultFileStatistic = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Evaluation\\" + "Evaluation.csv";
 
         //Default Strings
         public const string DefaultStringDatafeedPeriodicity = "Periodicity of your data feed is suboptimal for this indicator!";
-        public const string DefaultStringErrorDuringCalculation = "A problem occured during the calculation method!";
+        public const string DefaultStringErrorDuringCalculation = "A problem has occured during the calculation method!";
 
         //Default values for indicators
         public const int DefaultOpenRangeSizeinMinutes = 75;
