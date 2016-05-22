@@ -44,6 +44,70 @@ So it is possible that other scripts just need to call the calculate method of t
 In our case the calculate method return an object which holds all important information what has to be done. 
 If we get the OrderAction.Buy as a Entry result, we need to start a long order in a strategy or we set the condition value to 1.
 
+#Condition
+We have finished our indicator so we can start now to work on our condition. 
+Because we have added a calculate method with our trading concept we just need a reference to our indicator and we are almost finished.
+```C#
+//internal
+private DummyOneMinuteEvenOdd_Indicator _DummyOneMinuteEvenOdd_Indicator = null;
+```
+
+We need to initalize this variable in our OnStartUp() method:
+```C#
+        protected override void OnStartUp()
+        {
+            //Print("OnStartUp");
+            base.OnStartUp();
+
+            //Init our indicator to get code access to the calculate method
+            this._DummyOneMinuteEvenOdd_Indicator = new DummyOneMinuteEvenOdd_Indicator();
+        }
+```
+
+Now we are ready to use the calculate method of the indicator in our OnBarUpdate() method of the condition:
+```C#
+//Lets call the calculate method and save the result with the trade action
+ResultValueDummyOneMinuteEvenOdd returnvalue = this._DummyOneMinuteEvenOdd_Indicator.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
+```
+
+In the code snippet above we see that the return value of the calculate method is our result object from the beginning of this tutorial. So we just need to evaluate this object.
+```C#
+ //Entry
+            if (returnvalue.Entry.HasValue)
+            {
+                switch (returnvalue.Entry)
+                {
+                    case OrderAction.Buy:
+                        //Long Signal
+                        Occurred.Set(1);
+                        //Entry.Set(Close[0]);
+                        break;
+                    case OrderAction.SellShort:
+                        //Short Signal
+                        Occurred.Set(-1);
+                        //Entry.Set(Close[0]);
+                        break;
+                }
+            }
+            else
+            {
+                //No Signal
+                Occurred.Set(0);
+                //Entry.Set(Close[0]);
+            }
+```
+
+#Strategy
+Of course we are following the same procedure as in our condition. We create an indicator, we initalize in during the OnStartUp() method and we use the object in our OnBarUpdate() method.
+Please pay attention because of backtesting reasons if we use the advanced mode we need at least two bars!
+```C#
+this.BarsRequired = 2;
+```
+We use IsAutomated = true to decide if the strategy will do all work fully automated. In this case the strategy can be used in the strategy escort and will create entry & exit orders automatically.
+
+In the end of the strategy file there are four methods: DoEnterLong(), DoEnterShort(), DoExitLong() and DoExitShort()
+In these methods we implement all rules for the creation of orders.
+
 #Miscellaneous
 ##Filenames and Class names
 To import all scripts into AgenaTrader without any error we add _indicator, _strategy, _condition or _alert to the filename and also to the c# class name.

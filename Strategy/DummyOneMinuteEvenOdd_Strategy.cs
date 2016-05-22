@@ -125,7 +125,6 @@ namespace AgenaTrader.UserCode
                         break;
                 }
             }
-
 		}
 
 
