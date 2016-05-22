@@ -53,6 +53,7 @@ namespace AgenaTrader.UserCode
         public const int DefaultLineWidth_small = 1;
         public const int DefaultLineWidth_large = 3;
         public static readonly Color DefaultIndicatorColor = Color.Orange;
+        public static readonly Color DefaultIndicatorColor_GreyedOut = Color.Gray;
         public static readonly DashStyle DefaultIndicatorDashStyle = DashStyle.Solid;
 
     }
@@ -436,7 +437,15 @@ namespace AgenaTrader.UserCode
         #endregion
 
         #region Chart
-
+        /// <summary>
+        /// Draws a standard alert text in the chart.
+        /// </summary>
+        /// <param name="indicator"></param>
+        /// <param name="text"></param>
+        public static void DrawAlertTextOnChart(UserIndicator indicator, string text)
+        {
+            indicator.DrawTextFixed("AlertText", text, TextPosition.Center, Color.Red, new Font("Arial", 30), Color.Red, Color.Red, 20);
+        }
 
         /// <summary>
         /// Saves a snapshot of the current chart.
