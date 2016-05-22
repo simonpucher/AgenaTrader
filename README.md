@@ -3,18 +3,17 @@ This project contains scripts for the AgenaTrader like indicators, conditions an
 
 ##Important
 ###Code access to Utility Indicator
-To compile indicators, conditions and other script resources without any error **your AgenaTrader also need access to the Utility Indicator** to use global source code elements! 
-
-###Why we use the Utility Indicator
-We use this indicator to share code snippets, so we do not need to copy and paste again and again. These reduces error sources, minimze the workload, gives us better testing opportunities and a better clarity.
+To compile indicators, conditions and other script resources without any error **your AgenaTrader also need access to the Utility Indicator** to use global source code elements! We use this indicator to share code snippets, so we do not need to copy and paste again and again. These reduces error sources, minimze the workload, gives us better testing opportunities and a better clarity.
 
 ###How can I do this?
 You need to copy the Utility Indicator into the indicators directory of your AgenaTrader. You will find the latest version of this Utility Indicator on GitHub: [Global Utilities](https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs)
 
 #Documentation
 A rudimentary documentation exists in form of code comments in each script.
-We are working on development tutorials with a more detailed documentation and some tutorials covering the basics for AgenaTrader scripts templates. If you want to help, please feel free to fork this project and create a pull request.
+We are working on development [tutorials] with a more detailed documentation (https://github.com/simonpucher/AgenaTrader/tree/master/Tutorial) and some [tutorials] covering the basics for AgenaTrader scripts templates. If you want to help, please feel free to [open an issue on GitHub](https://github.com/simonpucher/AgenaTrader/issues) or fork this project and create a pull request.
 
 ##Links
+- [Twitter Simon](https://twitter.com/SimonPucher)
+- [Twitter Christian](https://twitter.com/ckovar82)
 - [Agena Trader Software](http://www.tradeescort.com)
 - [Agena Trader Support Forum](http://www.tradeescort.com/phpbb_de/)
