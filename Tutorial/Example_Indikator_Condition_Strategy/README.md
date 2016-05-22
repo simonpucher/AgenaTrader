@@ -8,11 +8,10 @@ AgenaTrader provides you the ability to create indicators, conditions, alerts an
 Of course you can start creating an indicator and copy the code afterwards into a condition, a strategy or an alert.
 Programming by using "copy & paste" is easy but on the other hand there are many disadvantages like lack of testing reasons, no single point for bug fixing and low maintainability. 
 
-##Where should we start?
+##Indicator
 In many cases we are starting with indicators because indicators are the best place to start on script development. 
 You will be able to get pretty quick an indication if your trading idea is working and of course you are able to screen instruments visual and verify if your trading idea will be profitable.
 
-##Indicator
 ##Interface
 We use an interface to ensure that all scripts like indicators, conditions, strategies and alerts use the same properties and methods. 
 ```C#
