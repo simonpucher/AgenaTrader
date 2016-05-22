@@ -33,8 +33,8 @@ namespace AgenaTrader.UserCode
 	{
 
         //input 
-        bool _ShouldIGoShort = false;
-        bool _ShouldIGoLong = true;
+        bool _IsShortEnabled = false;
+        bool _IsLongEnabled = true;
 
         //internal
         SMA _sma20 = null;
@@ -157,19 +157,19 @@ namespace AgenaTrader.UserCode
             //Print(marketupordown);
 
             //sma20 und sma200
-            if (ShouldIGoLong && CrossAbove(_sma20, _sma200, 0) && marketupordown >= 0)
+            if (IsLongEnabled && CrossAbove(_sma20, _sma200, 0) && marketupordown >= 0)
              {
                  return OrderAction.Buy;
              }
-             else if (ShouldIGoShort && CrossBelow(_sma20, _sma200, 0) )
+            else if (IsShortEnabled && CrossBelow(_sma20, _sma200, 0))
              {
                  return OrderAction.SellShort;
              }
-             else if (ShouldIGoShort && CrossAbove(_sma20, _sma200, 0))
+            else if (IsShortEnabled && CrossAbove(_sma20, _sma200, 0))
              {
                  return OrderAction.BuyToCover;
              }
-            else if (ShouldIGoLong && CrossBelow(_sma20, _sma200, 0))
+            else if (IsLongEnabled && CrossBelow(_sma20, _sma200, 0))
              {
                  return OrderAction.Sell;
              }
@@ -206,10 +206,10 @@ namespace AgenaTrader.UserCode
         [Description("If true it is allowed to go long")]
         [Category("Parameters")]
         [DisplayName("Allow Long")]
-        public bool ShouldIGoLong
+        public bool IsLongEnabled
         {
-            get { return _ShouldIGoLong; }
-            set { _ShouldIGoLong = value; }
+            get { return _IsLongEnabled; }
+            set { _IsLongEnabled = value; }
         }
 
 
@@ -218,10 +218,10 @@ namespace AgenaTrader.UserCode
         [Description("If true it is allowed to go short")]
         [Category("Parameters")]
         [DisplayName("Allow Short")]
-        public bool ShouldIGoShort
+        public bool IsShortEnabled
         {
-            get { return _ShouldIGoShort; }
-            set { _ShouldIGoShort = value; }
+            get { return _IsShortEnabled; }
+            set { _IsShortEnabled = value; }
         }
 
         #endregion
@@ -254,17 +254,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
         {
-			return RunningWithTheWolves_Indicator(Input, shouldIGoLong, shouldIGoShort);
+			return RunningWithTheWolves_Indicator(Input, isLongEnabled, isShortEnabled);
 		}
 
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<RunningWithTheWolves_Indicator>(input, i => i.ShouldIGoLong == shouldIGoLong && i.ShouldIGoShort == shouldIGoShort);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<RunningWithTheWolves_Indicator>(input, i => i.IsLongEnabled == isLongEnabled && i.IsShortEnabled == isShortEnabled);
 
 			if (indicator != null)
 				return indicator;
@@ -274,8 +274,8 @@ namespace AgenaTrader.UserCode
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
 							Input = input,
-							ShouldIGoLong = shouldIGoLong,
-							ShouldIGoShort = shouldIGoShort
+							IsLongEnabled = isLongEnabled,
+							IsShortEnabled = isShortEnabled
 						};
 			indicator.SetUp();
 
@@ -294,20 +294,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(Input, shouldIGoLong, shouldIGoShort);
+			return LeadIndicator.RunningWithTheWolves_Indicator(Input, isLongEnabled, isShortEnabled);
 		}
 
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.RunningWithTheWolves_Indicator(input, shouldIGoLong, shouldIGoShort);
+			return LeadIndicator.RunningWithTheWolves_Indicator(input, isLongEnabled, isShortEnabled);
 		}
 	}
 
@@ -320,17 +320,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(Input, shouldIGoLong, shouldIGoShort);
+			return LeadIndicator.RunningWithTheWolves_Indicator(Input, isLongEnabled, isShortEnabled);
 		}
 
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(input, shouldIGoLong, shouldIGoShort);
+			return LeadIndicator.RunningWithTheWolves_Indicator(input, isLongEnabled, isShortEnabled);
 		}
 	}
 
@@ -343,17 +343,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(Input, shouldIGoLong, shouldIGoShort);
+			return LeadIndicator.RunningWithTheWolves_Indicator(Input, isLongEnabled, isShortEnabled);
 		}
 
 		/// <summary>
 		/// Enter the description for the new custom indicator here
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, System.Boolean shouldIGoLong, System.Boolean shouldIGoShort)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(input, shouldIGoLong, shouldIGoShort);
+			return LeadIndicator.RunningWithTheWolves_Indicator(input, isLongEnabled, isShortEnabled);
 		}
 	}
 

@@ -13,7 +13,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: in progress
+/// Version: 1.0
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -61,8 +61,10 @@ namespace AgenaTrader.UserCode
 		protected override void Initialize()
 		{
             Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Coppock_Curve"));
+            Add(new Plot(new Pen(Const.DefaultIndicatorColor_GreyedOut, this.Plot0Width), PlotStyle.Line, "Coppock_Curve_GreyedOut"));
 
             CalculateOnBarClose = true;
+            Overlay = false;
 		}
 
 
@@ -85,36 +87,42 @@ namespace AgenaTrader.UserCode
 		protected override void OnBarUpdate()
 		{
 
-            double roc_long_value = ROC(this.ROCLongPeriod)[0];
-            this._ROC_Long.Set(roc_long_value);
 
-            double roc_short_value = ROC(this.ROCShortPeriod)[0];
-            this._ROC_Short.Set(roc_short_value);
+            if (this.DatafeedPeriodicityIsValid(Bars))
+            {
 
-            this._ROC_Combined.Set(roc_long_value + roc_short_value);
+                double roc_long_value = ROC(this.ROCLongPeriod)[0];
+                this._ROC_Long.Set(roc_long_value);
 
-            double wma_value = WMA(this._ROC_Combined, this.WMAPeriod)[0];
-            this.Coppock_Curve.Set(wma_value);
+                double roc_short_value = ROC(this.ROCShortPeriod)[0];
+                this._ROC_Short.Set(roc_short_value);
 
-            
-            //double newvalue = 0;
-            //if (CurrentBar - ROCLongPeriod > 0)
-            //{
-            //    newvalue = ((ROCLONG[CurrentBar] - ROCLONG[CurrentBar - ROCLongPeriod]) / ROCLONG[CurrentBar - ROCLongPeriod]) * 100;
-            //}
+                this._ROC_Combined.Set(roc_long_value + roc_short_value);
 
-            //if (CurrentBar >= ROCLongPeriod)
-            //{
-            //    newvalue = ((Bars[0].Close - Bars[ROCLongPeriod].Close) / Bars[ROCLongPeriod].Close) * 100;
-            //}
+                double wma_value = WMA(this._ROC_Combined, this.WMAPeriod)[0];
+                this.Coppock_Curve.Set(wma_value);
 
-            //newvalue = ROC(ROCLongPeriod)[0];
+                this.Coppock_GreyedOut.Set(0.0);
 
+                PlotColors[0][0] = Plot0Color;
+                Plots[0].PenStyle = this.Dash0Style;
+                Plots[0].Pen.Width = this.Plot0Width;
 
-            PlotColors[0][0] = Plot0Color;
-            Plots[0].PenStyle = this.Dash0Style;
-            Plots[0].Pen.Width = this.Plot0Width;
+                PlotColors[1][0] = Const.DefaultIndicatorColor_GreyedOut;
+                Plots[1].PenStyle = this.Dash0Style;
+                Plots[1].Pen.Width = this.Plot0Width;
 
+            }
+            else
+            {
+                //Data feed perodicity is not valid, print info in chart panel 
+                if (IsCurrentBarLast)
+                {
+                    DrawTextFixed("AlertText", Const.DefaultStringDatafeedPeriodicity, TextPosition.Center, Color.Red, new Font("Arial", 30), Color.Red, Color.Red, 20);
+                }
+            }
+
+ 
 
 		}
 
@@ -136,6 +144,25 @@ namespace AgenaTrader.UserCode
                 return "Coppock";
             }
         }
+
+
+        /// <summary>
+        /// True if the Periodicity of the data feed is correct for this indicator.
+        /// </summary>
+        /// <returns></returns>
+        private bool DatafeedPeriodicityIsValid(IBars bars)
+        {
+            TimeFrame tf = (TimeFrame)bars.TimeFrame;
+            if (tf.Periodicity == DatafeedHistoryPeriodicity.Month || tf.Periodicity == DatafeedHistoryPeriodicity.Week)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
 
 
 
@@ -235,6 +262,13 @@ namespace AgenaTrader.UserCode
                 public DataSeries Coppock_Curve
                 {
                     get { return Values[0]; }
+                }
+
+                [Browsable(false)]
+                [XmlIgnore()]
+                public DataSeries Coppock_GreyedOut
+                {
+                    get { return Values[1]; }
                 }
 
             #endregion

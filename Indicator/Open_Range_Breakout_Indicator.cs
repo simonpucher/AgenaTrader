@@ -192,8 +192,6 @@ namespace AgenaTrader.UserCode
                 }
 
 
-
-
                 //Set the indicator value on each bar update, if the breakout is on the current bar
                 if (this.LongBreakout != null && this.LongBreakout.Time == Bars[0].Time)
                 {
@@ -270,6 +268,7 @@ namespace AgenaTrader.UserCode
         {
             //todo check if all data should be return via Result Object
             //todo check if it allowed that we are going two times through the limit (two buys per day, could this happen?)
+            //todo tolerance level for breakout!
 
                 ORB_Result resultvalue = new ORB_Result();
 

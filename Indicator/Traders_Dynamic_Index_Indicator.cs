@@ -82,6 +82,7 @@ namespace AgenaTrader.UserCode
             Add(new Plot(new Pen(Color.Gray, this.Plot3Width), PlotStyle.Line, "MidLine"));
 
             CalculateOnBarClose = true;
+            Overlay = false;
 		}
 
 
