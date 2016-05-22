@@ -8,7 +8,7 @@ AgenaTrader provides you the ability to create indicators, conditions, alerts an
 Of course you can start creating an indicator and copy the code afterwards into a condition, a strategy or an alert.
 Programming by using "copy & paste" is easy but on the other hand there are many disadvantages like lack of testing reasons, no single point for bug fixing and low maintainability. 
 
-##Indicator
+#Indicator
 In many cases we are starting with indicators because indicators are the best place to start on script development. 
 You will be able to get pretty quick an indication if your trading idea is working and of course you are able to screen instruments visual and verify if your trading idea will be profitable.
 
@@ -20,7 +20,7 @@ public interface IDummyOneMinuteEvenOdd
 }
 ```
 
-##Resultvalue
+##Result value
 The result value object will holds all result data from the calculate method so we know what to do next. In a strategy we create a long or short order, in a condition we set the Occured object, and so on.
 ```C#
 public class ResultValueDummyOneMinuteEvenOdd
