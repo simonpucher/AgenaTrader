@@ -44,6 +44,27 @@ So it is possible that other scripts just need to call the calculate method of t
 In our case the calculate method return an object which holds all important information what has to be done. 
 If we get the OrderAction.Buy as a Entry result, we need to start a long order in a strategy or we set the condition value to 1.
 
+#Miscellaneous
+##Filenames and Class names
+To import all scripts into AgenaTrader without any error we add _indicator, _strategy, _condition or _alert to the filename and also to the c# class name.
+
+##DisplayName and ToString()
+In each script we override the ToString() method and the DisplayName to provide a readable string in AgenaTrader. So we do see a readable string instead of the class name in AgenaTrader.
+```C#
+        public override string ToString()
+        {
+            return "Dummy one minute even/odd (C)";
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "Dummy one minute even/odd (C)";
+            }
+        }
+```
+
 #Files
 [Indicator](https://github.com/simonpucher/AgenaTrader/blob/master/Indicator/DummyOneMinuteEvenOdd_Indicator.cs)
 
