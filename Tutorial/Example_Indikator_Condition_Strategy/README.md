@@ -45,10 +45,10 @@ In our case the calculate method return an object which holds all important info
 If we get the OrderAction.Buy as a Entry result, we need to start a long order in a strategy or we set the condition value to 1.
 
 #Files
-[Indicator](https://github.com/simonpucher/AgenaTrader/blob/master/Indicator/DummyOneMinuteEven_Indicator.cs)
+[Indicator](https://github.com/simonpucher/AgenaTrader/blob/master/Indicator/DummyOneMinuteEvenOdd_Indicator.cs)
 
-[Condition](https://github.com/simonpucher/AgenaTrader/blob/master/Condition/DummyOneMinuteEntry_Condition.cs)
+[Condition](https://github.com/simonpucher/AgenaTrader/blob/master/Condition/DummyOneMinuteEntryOdd_Condition.cs)
 
-[Strategy](https://github.com/simonpucher/AgenaTrader/blob/master/Strategy/DummyOneMinute_Strategy.cs)
+[Strategy](https://github.com/simonpucher/AgenaTrader/blob/master/Strategy/DummyOneMinuteOdd_Strategy.cs)
 
 To compile these scripts without any error you also need access to the [utility indicator] (https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs) to use global source code elements.
