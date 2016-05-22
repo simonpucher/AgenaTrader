@@ -16,7 +16,7 @@ You will be able to get pretty quick an indication if your trading idea is worki
 We use an interface to ensure that all scripts like indicators, conditions, strategies and alerts use the same properties and methods. 
 ```C#
 public interface IDummyOneMinuteEvenOdd {
-/* Here we define all properties we need. */
+   /* Here we define all properties we need. */
 }
 ```
 
@@ -24,7 +24,7 @@ public interface IDummyOneMinuteEvenOdd {
 The result value object will holds all result data from the calculate method so we know what to do next. In a strategy we create a long or short order, in a condition we set the Occured object, and so on.
 ```C#
 public class ResultValueDummyOneMinuteEvenOdd {
-/* Here we define all properties we need as a result of the calculate method. */
+   /* Here we define all properties we need as a result of the calculate method. */
 }
 ```
 
@@ -32,11 +32,11 @@ public class ResultValueDummyOneMinuteEvenOdd {
 We want to capsulate the main logic into one main methods in the indicator. In our case we do this using the following public method in the indicator.
 
 ```C#
- public ResultValueDummyOneMinuteEvenOdd calculate(IBar data, bool islongenabled, bool isshortenabled) {
-/* 
-* Here we do all the smart work and in the end we return our result object
-* So the condition or another scripts knows what to do (e.g. a strategy will create an order in the market)
-*/
+public ResultValueDummyOneMinuteEvenOdd calculate(IBar data, bool islongenabled, bool isshortenabled) {
+   /* 
+   * Here we do all the smart work and in the end we return our result object
+   * So the condition or another scripts knows what to do (e.g. a strategy will create an order in the market)
+   */
 }
 ```
 
@@ -56,10 +56,10 @@ We need to initalize this variable in our OnStartUp() method:
 ```C#
 protected override void OnStartUp()
 {
-//Print("OnStartUp");
-base.OnStartUp();
-//Init our indicator to get code access to the calculate method
-this._DummyOneMinuteEvenOdd_Indicator = new DummyOneMinuteEvenOdd_Indicator();
+   //Print("OnStartUp");
+   base.OnStartUp();
+   //Init our indicator to get code access to the calculate method
+   this._DummyOneMinuteEvenOdd_Indicator = new DummyOneMinuteEvenOdd_Indicator();
 }
 ```
 
@@ -74,25 +74,25 @@ In the code snippet above we see that the return value of the calculate method i
 //Entry
 if (returnvalue.Entry.HasValue)
 {
-switch (returnvalue.Entry)
-{
-case OrderAction.Buy:
-//Long Signal
-Occurred.Set(1);
-//Entry.Set(Close[0]);
-break;
-case OrderAction.SellShort:
-//Short Signal
-Occurred.Set(-1);
-//Entry.Set(Close[0]);
-break;
-}
+   switch (returnvalue.Entry)
+   {
+   case OrderAction.Buy:
+      //Long Signal
+      Occurred.Set(1);
+      //Entry.Set(Close[0]);
+      break;
+   case OrderAction.SellShort:
+      //Short Signal
+      Occurred.Set(-1);
+      //Entry.Set(Close[0]);
+      break;
+   }
 }
 else
 {
-//No Signal
- Occurred.Set(0);
-//Entry.Set(Close[0]);
+   //No Signal
+   Occurred.Set(0);
+   //Entry.Set(Close[0]);
 }
 ```
 
