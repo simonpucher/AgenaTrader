@@ -6,7 +6,7 @@ To compile indicators, conditions and other script resources without any error y
 
 ##Versionnumber vs. in progress
 Each script should have a summary tag in below the using directives. **If there is a version number you can start using the script.** If there is no summary tag or the version number is a text ("in progress"), we are working on this script and it is not recommended to use it.
-'''C#
+```C#
 /// <summary>
 /// Version: 1.0
 /// -------------------------------------------------------------------------
@@ -21,7 +21,7 @@ Each script should have a summary tag in below the using directives. **If there 
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
-'''
+```
 
 #Documentation
 A rudimentary documentation exists in form of code comments in each script.
