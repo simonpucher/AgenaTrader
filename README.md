@@ -6,7 +6,7 @@ To compile indicators, conditions and other script resources without any error y
 
 #Documentation
 A rudimentary documentation exists in form of code comments in each script.
-We are working on development [tutorials](https://github.com/simonpucher/AgenaTrader/tree/master/Tutorial) with a more detailed documentation and some [tutorials](https://github.com/simonpucher/AgenaTrader/tree/master/Tutorial) covering the basics for AgenaTrader scripts templates. If you want to help, please feel free to [open an issue on GitHub](https://github.com/simonpucher/AgenaTrader/issues) or fork this project and create a pull request.
+We are working on development [tutorials](https://github.com/simonpucher/AgenaTrader/tree/master/Tutorial) with a more detailed documentation and covering the basics for AgenaTrader scripts templates. If you want to help, please feel free to [open an issue on GitHub](https://github.com/simonpucher/AgenaTrader/issues) or fork this project and create a pull request.
 
 ##Links
 - [Twitter Simon](https://twitter.com/SimonPucher)
