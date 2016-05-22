@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -33,7 +33,7 @@ namespace AgenaTrader.UserCode
     /// <summary>
     /// We use this interface to ensure that indicator, condition, strategy and alert all use the same properties and methods. 
     /// </summary>
-    public interface IDummyOneMinuteEven
+    public interface IDummyOneMinuteEvenOdd
     {
         //input
         bool IsShortEnabled { get; set; }
@@ -44,14 +44,14 @@ namespace AgenaTrader.UserCode
     /// <summary>
     /// Class which holds all important data like the OrderAction. 
     /// </summary>
-    public class ResultValueDummyOneMinuteEven {
+    public class ResultValueDummyOneMinuteEvenOdd {
 
         //Output
         public bool IsCompleted = false;
         public OrderAction? Entry = null;
         public OrderAction? Exit = null;
 
-        public ResultValueDummyOneMinuteEven()
+        public ResultValueDummyOneMinuteEvenOdd()
         {
 
         }
@@ -60,7 +60,7 @@ namespace AgenaTrader.UserCode
 
 
     [Description("This indicator provides a long signal in every even minute and a short signal every odd minute.")]
-    public class DummyOneMinuteEven_Indicator : UserIndicator, IDummyOneMinuteEven
+    public class DummyOneMinuteEvenOdd_Indicator : UserIndicator, IDummyOneMinuteEvenOdd
 	{
         //interface 
         private bool _IsShortEnabled = true;
@@ -128,7 +128,7 @@ namespace AgenaTrader.UserCode
             }
            
             //Lets call the calculate method and save the result with the trade action
-            ResultValueDummyOneMinuteEven returnvalue = this.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
+            ResultValueDummyOneMinuteEvenOdd returnvalue = this.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
 
             //If the calculate method was not finished we need to stop and show an alert message to the user.
             if (!returnvalue.IsCompleted)
@@ -195,10 +195,10 @@ namespace AgenaTrader.UserCode
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public ResultValueDummyOneMinuteEven calculate(IBar data, bool islongenabled, bool isshortenabled)
+        public ResultValueDummyOneMinuteEvenOdd calculate(IBar data, bool islongenabled, bool isshortenabled)
         {
             //Create a return object
-            ResultValueDummyOneMinuteEven returnvalue = new ResultValueDummyOneMinuteEven();
+            ResultValueDummyOneMinuteEvenOdd returnvalue = new ResultValueDummyOneMinuteEvenOdd();
 
             //try catch block with all calculations
             try
@@ -435,22 +435,22 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
-		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public DummyOneMinuteEvenOdd_Indicator DummyOneMinuteEvenOdd_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
         {
-			return DummyOneMinuteEven_Indicator(Input, isLongEnabled, isShortEnabled);
+			return DummyOneMinuteEvenOdd_Indicator(Input, isLongEnabled, isShortEnabled);
 		}
 
 		/// <summary>
 		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
-		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public DummyOneMinuteEvenOdd_Indicator DummyOneMinuteEvenOdd_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<DummyOneMinuteEven_Indicator>(input, i => i.IsLongEnabled == isLongEnabled && i.IsShortEnabled == isShortEnabled);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<DummyOneMinuteEvenOdd_Indicator>(input, i => i.IsLongEnabled == isLongEnabled && i.IsShortEnabled == isShortEnabled);
 
 			if (indicator != null)
 				return indicator;
 
-			indicator = new DummyOneMinuteEven_Indicator
+			indicator = new DummyOneMinuteEvenOdd_Indicator
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
@@ -475,20 +475,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
-		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public DummyOneMinuteEvenOdd_Indicator DummyOneMinuteEvenOdd_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
-			return LeadIndicator.DummyOneMinuteEven_Indicator(Input, isLongEnabled, isShortEnabled);
+			return LeadIndicator.DummyOneMinuteEvenOdd_Indicator(Input, isLongEnabled, isShortEnabled);
 		}
 
 		/// <summary>
 		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
-		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public DummyOneMinuteEvenOdd_Indicator DummyOneMinuteEvenOdd_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.DummyOneMinuteEven_Indicator(input, isLongEnabled, isShortEnabled);
+			return LeadIndicator.DummyOneMinuteEvenOdd_Indicator(input, isLongEnabled, isShortEnabled);
 		}
 	}
 
@@ -501,17 +501,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
-		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public DummyOneMinuteEvenOdd_Indicator DummyOneMinuteEvenOdd_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
-			return LeadIndicator.DummyOneMinuteEven_Indicator(Input, isLongEnabled, isShortEnabled);
+			return LeadIndicator.DummyOneMinuteEvenOdd_Indicator(Input, isLongEnabled, isShortEnabled);
 		}
 
 		/// <summary>
 		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
-		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public DummyOneMinuteEvenOdd_Indicator DummyOneMinuteEvenOdd_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
-			return LeadIndicator.DummyOneMinuteEven_Indicator(input, isLongEnabled, isShortEnabled);
+			return LeadIndicator.DummyOneMinuteEvenOdd_Indicator(input, isLongEnabled, isShortEnabled);
 		}
 	}
 
@@ -524,17 +524,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
-		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public DummyOneMinuteEvenOdd_Indicator DummyOneMinuteEvenOdd_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
-			return LeadIndicator.DummyOneMinuteEven_Indicator(Input, isLongEnabled, isShortEnabled);
+			return LeadIndicator.DummyOneMinuteEvenOdd_Indicator(Input, isLongEnabled, isShortEnabled);
 		}
 
 		/// <summary>
 		/// This indicator provides a long signal in every even minute and a short signal every odd minute.
 		/// </summary>
-		public DummyOneMinuteEven_Indicator DummyOneMinuteEven_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public DummyOneMinuteEvenOdd_Indicator DummyOneMinuteEvenOdd_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
 		{
-			return LeadIndicator.DummyOneMinuteEven_Indicator(input, isLongEnabled, isShortEnabled);
+			return LeadIndicator.DummyOneMinuteEvenOdd_Indicator(input, isLongEnabled, isShortEnabled);
 		}
 	}
 

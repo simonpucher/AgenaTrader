@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -34,7 +34,7 @@ namespace AgenaTrader.UserCode
     [IsStopAttribute(false)]
     [IsTargetAttribute(false)]
     [OverrulePreviousStopPrice(false)]
-    public class DummyOneMinuteEntry_Condition : UserScriptedCondition, IDummyOneMinuteEven
+    public class DummyOneMinuteEvenOddEntry_Condition : UserScriptedCondition, IDummyOneMinuteEvenOdd
     {
         //interface
         private bool _IsShortEnabled = true;
@@ -45,7 +45,7 @@ namespace AgenaTrader.UserCode
         //output
 
         //internal
-        private DummyOneMinuteEven_Indicator _DummyOneMinuteEven_Indicator = null;
+        private DummyOneMinuteEvenOdd_Indicator _DummyOneMinuteEvenOdd_Indicator = null;
         private IOrder _orderenterlong;
         private IOrder _orderentershort;
 
@@ -80,21 +80,21 @@ namespace AgenaTrader.UserCode
             base.OnStartUp();
 
             //Init our indicator to get code access to the calculate method
-            this._DummyOneMinuteEven_Indicator = new DummyOneMinuteEven_Indicator();
+            this._DummyOneMinuteEvenOdd_Indicator = new DummyOneMinuteEvenOdd_Indicator();
         }
 
 
         protected override void OnBarUpdate()
         {
             //Check if peridocity is valid for this script 
-            if (!this._DummyOneMinuteEven_Indicator.DatafeedPeriodicityIsValid(Bars.TimeFrame))
+            if (!this._DummyOneMinuteEvenOdd_Indicator.DatafeedPeriodicityIsValid(Bars.TimeFrame))
             {
                 Log(this.DisplayName + ": " + Const.DefaultStringDatafeedPeriodicity, InfoLogLevel.AlertLog);
                 return;
             }
 
             //Lets call the calculate method and save the result with the trade action
-            ResultValueDummyOneMinuteEven returnvalue = this._DummyOneMinuteEven_Indicator.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
+            ResultValueDummyOneMinuteEvenOdd returnvalue = this._DummyOneMinuteEvenOdd_Indicator.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
 
             //If the calculate method was not finished we need to stop and show an alert message to the user.
             if (!returnvalue.IsCompleted)

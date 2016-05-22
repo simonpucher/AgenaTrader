@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -30,7 +30,7 @@ using AgenaTrader.Helper;
 namespace AgenaTrader.UserCode
 {
     [Description("This indicator provides a long signal in every even minute and a short signal every odd minute.")]
-    public class DummyOneMinute_Strategy : UserStrategy, IDummyOneMinuteEven
+    public class DummyOneMinuteEvenOdd_Strategy : UserStrategy, IDummyOneMinuteEvenOdd
 	{
         //interface
         private bool _IsShortEnabled = true;
@@ -42,7 +42,7 @@ namespace AgenaTrader.UserCode
         //output
 
         //internal
-        private DummyOneMinuteEven_Indicator _DummyOneMinuteEven_Indicator = null;
+        private DummyOneMinuteEvenOdd_Indicator _DummyOneMinuteEvenOdd_Indicator = null;
         private IOrder _orderenterlong;
         private IOrder _orderentershort;
 
@@ -73,7 +73,7 @@ namespace AgenaTrader.UserCode
             base.OnStartUp();
 
             //Init our indicator to get code access to the calculate method
-            this._DummyOneMinuteEven_Indicator = new DummyOneMinuteEven_Indicator();
+            this._DummyOneMinuteEvenOdd_Indicator = new DummyOneMinuteEvenOdd_Indicator();
         }
 
 		protected override void OnBarUpdate()
@@ -82,14 +82,14 @@ namespace AgenaTrader.UserCode
             this.IsAutomated = this.Autopilot;
 
             //Check if peridocity is valid for this script 
-            if (!this._DummyOneMinuteEven_Indicator.DatafeedPeriodicityIsValid(Bars.TimeFrame))
+            if (!this._DummyOneMinuteEvenOdd_Indicator.DatafeedPeriodicityIsValid(Bars.TimeFrame))
             {
                 Log(this.DisplayName + ": " + Const.DefaultStringDatafeedPeriodicity, InfoLogLevel.AlertLog);
                 return;
             }
 
             //Lets call the calculate method and save the result with the trade action
-            ResultValueDummyOneMinuteEven returnvalue = this._DummyOneMinuteEven_Indicator.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
+            ResultValueDummyOneMinuteEvenOdd returnvalue = this._DummyOneMinuteEvenOdd_Indicator.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
 
             //If the calculate method was not finished we need to stop and show an alert message to the user.
             if (!returnvalue.IsCompleted)
@@ -134,9 +134,12 @@ namespace AgenaTrader.UserCode
         /// </summary>
         private void DoEnterLong()
         {
-            _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.Buy + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-            //SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
-            //SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
+            if (_orderenterlong == null)
+            {
+                _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.Buy + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+                //SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
+                //SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong); 
+            }
         }
 
         /// <summary>
@@ -144,9 +147,12 @@ namespace AgenaTrader.UserCode
         /// </summary>
         private void DoEnterShort()
         {
-            _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.SellShort + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-            //SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
-            //SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+            if (_orderentershort == null)
+            {
+                _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.SellShort + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+                //SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
+                //SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+            }
         }
 
         /// <summary>
@@ -154,7 +160,11 @@ namespace AgenaTrader.UserCode
         /// </summary>
         private void DoExitLong()
         {
-            ExitLong(this._orderenterlong.Name);
+            if (_orderenterlong != null)
+            {
+                 ExitLong(this._orderenterlong.Name);
+                 this._orderenterlong = null;
+            }
         }
 
         /// <summary>
@@ -163,6 +173,7 @@ namespace AgenaTrader.UserCode
         private void DoExitShort()
         {
             ExitShort(this._orderentershort.Name);
+            this._orderentershort = null;
         }
 
         public override string ToString()
