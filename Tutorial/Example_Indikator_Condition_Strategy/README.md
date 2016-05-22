@@ -12,11 +12,28 @@ Programming by using "copy & paste" is easy but on the other hand there are many
 In many cases we are starting with indicators because indicators are the best place to start on script development. 
 You will be able to get pretty quick an indication if your trading idea is working and of course you are able to screen instruments visual and verify if your trading idea will be profitable.
 
-##How can we do this?
+##Indicator
+##Interface
+We use an interface to ensure that all scripts like indicators, conditions, strategies and alerts use the same properties and methods. 
+```C#
+public interface IDummyOneMinuteEvenOdd
+/* Here we define all properties we need. */
+}
+```
+
+##Resultvalue
+The result value object will holds all result data from the calculate method so we know what to do next. In a strategy we create a long or short order, in a condition we set the Occured object, and so on.
+```C#
+public class ResultValueDummyOneMinuteEvenOdd
+/* Here we define all properties we need as a result of the calculate method. */
+}
+```
+
+###Method calculate
 We want to capsulate the main logic into one main methods in the indicator. In our case we do this using the following public method in the indicator.
 
 ```C#
-public ResultValueDummyOneMinuteEven calculate(IBar data, bool islongenabled, bool isshortenabled)
+ public ResultValueDummyOneMinuteEvenOdd calculate(IBar data, bool islongenabled, bool isshortenabled)
 /* 
 * Here we do all the smart work and in the end we return our result object
 * So the condition or another scripts knows what to do (e.g. a strategy will create an order in the market)
