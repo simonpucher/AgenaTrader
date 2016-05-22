@@ -54,14 +54,13 @@ private DummyOneMinuteEvenOdd_Indicator _DummyOneMinuteEvenOdd_Indicator = null;
 
 We need to initalize this variable in our OnStartUp() method:
 ```C#
-        protected override void OnStartUp()
-        {
-            //Print("OnStartUp");
-            base.OnStartUp();
-
-            //Init our indicator to get code access to the calculate method
-            this._DummyOneMinuteEvenOdd_Indicator = new DummyOneMinuteEvenOdd_Indicator();
-        }
+protected override void OnStartUp()
+{
+//Print("OnStartUp");
+base.OnStartUp();
+//Init our indicator to get code access to the calculate method
+this._DummyOneMinuteEvenOdd_Indicator = new DummyOneMinuteEvenOdd_Indicator();
+}
 ```
 
 Now we are ready to use the calculate method of the indicator in our OnBarUpdate() method of the condition:
@@ -72,38 +71,38 @@ ResultValueDummyOneMinuteEvenOdd returnvalue = this._DummyOneMinuteEvenOdd_Indic
 
 In the code snippet above we see that the return value of the calculate method is our result object from the beginning of this tutorial. So we just need to evaluate this object.
 ```C#
- //Entry
-            if (returnvalue.Entry.HasValue)
-            {
-                switch (returnvalue.Entry)
-                {
-                    case OrderAction.Buy:
-                        //Long Signal
-                        Occurred.Set(1);
-                        //Entry.Set(Close[0]);
-                        break;
-                    case OrderAction.SellShort:
-                        //Short Signal
-                        Occurred.Set(-1);
-                        //Entry.Set(Close[0]);
-                        break;
-                }
-            }
-            else
-            {
-                //No Signal
-                Occurred.Set(0);
-                //Entry.Set(Close[0]);
-            }
+//Entry
+if (returnvalue.Entry.HasValue)
+{
+switch (returnvalue.Entry)
+{
+case OrderAction.Buy:
+//Long Signal
+Occurred.Set(1);
+//Entry.Set(Close[0]);
+break;
+case OrderAction.SellShort:
+//Short Signal
+Occurred.Set(-1);
+//Entry.Set(Close[0]);
+break;
+}
+}
+else
+{
+//No Signal
+ Occurred.Set(0);
+//Entry.Set(Close[0]);
+}
 ```
 
 #Strategy
-Of course we are following the same procedure as in our condition. We create an indicator, we initalize in during the OnStartUp() method and we use the object in our OnBarUpdate() method.
+Of course we are following the same procedure as in our condition. We create a variable of the indicator class, we initalize this variable during the OnStartUp() method and we use the object in our OnBarUpdate() method.
 Please pay attention because of backtesting reasons if we use the advanced mode we need at least two bars!
 ```C#
 this.BarsRequired = 2;
 ```
-We use IsAutomated = true to decide if the strategy will do all work fully automated. In this case the strategy can be used in the strategy escort and will create entry & exit orders automatically.
+We use IsAutomated = true to decide if the strategy will do all work fully automated. In this case the strategy can be used in strategy escort and will create entry & exit orders automatically.
 
 In the end of the strategy file there are four methods: DoEnterLong(), DoEnterShort(), DoExitLong() and DoExitShort()
 In these methods we implement all rules for the creation of orders.
@@ -115,18 +114,18 @@ To import all scripts into AgenaTrader without any error we add _indicator, _str
 ##DisplayName and ToString()
 In each script we override the ToString() method and the DisplayName to provide a readable string in AgenaTrader. So we do see a readable string instead of the class name in AgenaTrader.
 ```C#
-        public override string ToString()
-        {
-            return "Dummy one minute even/odd (C)";
-        }
+public override string ToString()
+{
+   return "Dummy one minute even/odd (C)";
+}
 
-        public override string DisplayName
-        {
-            get
-            {
-                return "Dummy one minute even/odd (C)";
-            }
-        }
+public override string DisplayName
+{
+get
+{
+   return "Dummy one minute even/odd (C)";
+}
+}
 ```
 
 #Files
