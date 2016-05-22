@@ -15,7 +15,7 @@ You will be able to get pretty quick an indication if your trading idea is worki
 ##Interface
 We use an interface to ensure that all scripts like indicators, conditions, strategies and alerts use the same properties and methods. 
 ```C#
-public interface IDummyOneMinuteEvenOdd
+public interface IDummyOneMinuteEvenOdd {
 /* Here we define all properties we need. */
 }
 ```
@@ -23,7 +23,7 @@ public interface IDummyOneMinuteEvenOdd
 ##Result value
 The result value object will holds all result data from the calculate method so we know what to do next. In a strategy we create a long or short order, in a condition we set the Occured object, and so on.
 ```C#
-public class ResultValueDummyOneMinuteEvenOdd
+public class ResultValueDummyOneMinuteEvenOdd {
 /* Here we define all properties we need as a result of the calculate method. */
 }
 ```
@@ -32,7 +32,7 @@ public class ResultValueDummyOneMinuteEvenOdd
 We want to capsulate the main logic into one main methods in the indicator. In our case we do this using the following public method in the indicator.
 
 ```C#
- public ResultValueDummyOneMinuteEvenOdd calculate(IBar data, bool islongenabled, bool isshortenabled)
+ public ResultValueDummyOneMinuteEvenOdd calculate(IBar data, bool islongenabled, bool isshortenabled) {
 /* 
 * Here we do all the smart work and in the end we return our result object
 * So the condition or another scripts knows what to do (e.g. a strategy will create an order in the market)
