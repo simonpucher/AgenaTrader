@@ -18,7 +18,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.5.9
+/// Version: 1.5.10
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -713,6 +713,18 @@ namespace AgenaTrader.UserCode
     #endregion
 
     #region Global defined classes
+
+
+    /// <summary>
+    /// Class which holds all important data like the OrderAction. 
+    /// We use this object as a global default return object for the calculate method in indicators.
+    /// </summary>
+    public class ResultValue
+    {
+        public bool IsError = false;
+        public OrderAction? Entry = null;
+        public OrderAction? Exit = null;
+    }
 
     /// <summary>
     /// Statistic object  to compare the performance of strategies.
