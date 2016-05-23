@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -34,6 +34,8 @@ namespace AgenaTrader.UserCode
         //interface 
         private bool _IsShortEnabled = false;
         private bool _IsLongEnabled = true;
+        private bool _WarningOccured = false;
+        private bool _ErrorOccured = false;
         private int _Bollinger_Period = 20;
         private double _Bollinger_Standard_Deviation = 2;
         private int _Momentum_Period = 100;
@@ -47,7 +49,8 @@ namespace AgenaTrader.UserCode
         //input
         private bool _send_email = false;
         private bool _autopilot = true;
-        private bool _statisticbacktesting = false;
+        //todo
+        //private bool _statisticbacktesting = false;
 
         //output
 
@@ -55,7 +58,8 @@ namespace AgenaTrader.UserCode
         private IOrder _orderenterlong;
         private IOrder _orderentershort;
         private Mean_Reversion_Indicator _Mean_Reversion_Indicator = null;
-        private StatisticContainer _StatisticContainer = null;
+        //todo
+        //private StatisticContainer _StatisticContainer = null;
 
 		protected override void Initialize()
 		{
@@ -72,11 +76,14 @@ namespace AgenaTrader.UserCode
             //Init our indicator to get code access
             this._Mean_Reversion_Indicator = new Mean_Reversion_Indicator();
 
-            //Initalize statistic data list if this feature is enabled
-            if (this.StatisticBacktesting)
-            {
-                this._StatisticContainer = new StatisticContainer();
-            }
+            ////todo Initalize statistic data list if this feature is enabled
+            //if (this.StatisticBacktesting)
+            //{
+            //    this._StatisticContainer = new StatisticContainer();
+            //}
+
+            this.ErrorOccured = false;
+            this.WarningOccured = false;
         }
 
         protected override void OnTermination()
@@ -93,12 +100,12 @@ namespace AgenaTrader.UserCode
             //    item.Ex
             //}
             
-            //Close statistic data list if this feature is enabled
-            if (this.StatisticBacktesting)
-            {
-                //get the statistic data
-                this._StatisticContainer.copyToClipboard();
-            }
+            ////todo Close statistic data list if this feature is enabled
+            //if (this.StatisticBacktesting)
+            //{
+            //    //get the statistic data
+            //    this._StatisticContainer.copyToClipboard();
+            //}
         }
 
 		protected override void OnBarUpdate()
@@ -107,50 +114,50 @@ namespace AgenaTrader.UserCode
             this.IsAutomated = this.Autopilot;
 
             //calculate data
-            OrderAction? resultdata = this._Mean_Reversion_Indicator.calculate(Input, Open, High, _orderenterlong, _orderentershort, this.Bollinger_Period, this.Bollinger_Standard_Deviation, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
-            if (resultdata.HasValue)
+            ResultValue returnvalue = this._Mean_Reversion_Indicator.calculate(Input, Open, High, _orderenterlong, _orderentershort, this.Bollinger_Period, this.Bollinger_Standard_Deviation, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
+
+            //If the calculate method was not finished we need to stop and show an alert message to the user.
+            if (returnvalue.ErrorOccured)
             {
-                switch (resultdata)
+                //Display error just one time
+                if (!this.ErrorOccured)
+                {
+                    Log(this.DisplayName + ": " + Const.DefaultStringErrorDuringCalculation, InfoLogLevel.AlertLog);
+                    this.ErrorOccured = true;
+                }
+                return;
+            }
+
+            //Entry
+            if (returnvalue.Entry.HasValue)
+            {
+                switch (returnvalue.Entry)
                 {
                     case OrderAction.Buy:
-                        if (this._orderenterlong == null)
-                        {
-                            this.DoEnterLong();
-                        }
+                        this.DoEnterLong();
                         break;
                     case OrderAction.SellShort:
-                        if (this._orderentershort == null)
-                        {
-                            //this.DoEnterShort();
-                        }
-                        break;
-                    case OrderAction.BuyToCover:
-                        // && this._orderentershort.IsOpened && !this._orderentershort.IsManuallyConfirmable
-                        if (this._orderentershort != null && this.IsAutomated)
-                        {
-                            ExitShort();
-                            this._orderentershort = null;
-                        }
-                        break;
-                    case OrderAction.Sell:
-                        // && this._orderenterlong.IsOpened && !this._orderenterlong.IsManuallyConfirmable
-                        if (this._orderenterlong != null && this.IsAutomated)
-                        {
-                            ExitLong();
-                            this._orderenterlong = null;
-                        }
-                        break;
-                    default:
-                        //nothing to do
+                        this.DoEnterShort();
                         break;
                 }
             }
 
+            //Exit
+            if (returnvalue.Exit.HasValue)
+            {
+                switch (returnvalue.Exit)
+                {
+                    case OrderAction.BuyToCover:
+                        this.DoExitShort();
+                        break;
+                    case OrderAction.Sell:
+                        this.DoExitLong();
+                        break;
+                }
+            }
 
             //todo move stop of long order 
             // SetTrailStop(CalculationMode.Ticks, 30);
-
-
     
 		}
 
@@ -164,11 +171,11 @@ namespace AgenaTrader.UserCode
         /// <param name="execution"></param>
         protected override void OnExecution(IExecution execution)
         {
-            //Create statistic for execution
-            if (this.StatisticBacktesting)
-            {
-                this._StatisticContainer.Add(this.Root.Core.TradingManager, this.DisplayName, execution);
-            }
+            ////todo Create statistic for execution
+            //if (this.StatisticBacktesting)
+            //{
+            //    this._StatisticContainer.Add(this.Root.Core.TradingManager, this.DisplayName, execution);
+            //}
 
             //send email
             if (this.Send_email)
@@ -179,28 +186,57 @@ namespace AgenaTrader.UserCode
         }
 
 
+
         /// <summary>
-        /// Create Long Order and Stop.
+        /// Create LONG order.
         /// </summary>
         private void DoEnterLong()
         {
-            _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Long + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-            //SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
-            //SetStopLoss(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 0.95, false);
-            //SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
-            //SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
-
+            if (_orderenterlong == null)
+            {
+                _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.Buy + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+                SetStopLoss(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 0.97, false);
+                //SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong); 
+            }
         }
 
         /// <summary>
-        /// Create Short Order and Stop.
+        /// Create SHORT order.
         /// </summary>
         private void DoEnterShort()
         {
-            _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-            //SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
-            //SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+            if (_orderentershort == null)
+            {
+                _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.SellShort + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+                //SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
+                //SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+            }
         }
+
+        /// <summary>
+        /// Exit the LONG position.
+        /// </summary>
+        private void DoExitLong()
+        {
+            if (this._orderenterlong != null)
+            {
+                ExitLong(this._orderenterlong.Name);
+                this._orderenterlong = null;
+            }
+        }
+
+        /// <summary>
+        /// Fill the SHORT position.
+        /// </summary>
+        private void DoExitShort()
+        {
+            if (this._orderentershort != null)
+            {
+                ExitShort(this._orderentershort.Name);
+                this._orderentershort = null;
+            }
+        }
+
 
         #region Properties
 
@@ -210,7 +246,7 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("If true it is allowed to go long")]
+        [Description("If true it is allowed to create long positions.")]
         [Category("Parameters")]
         [DisplayName("Allow Long")]
         public bool IsLongEnabled
@@ -222,7 +258,7 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("If true it is allowed to go short")]
+        [Description("If true it is allowed to create short positions.")]
         [Category("Parameters")]
         [DisplayName("Allow Short")]
         public bool IsShortEnabled
@@ -230,6 +266,23 @@ namespace AgenaTrader.UserCode
             get { return _IsShortEnabled; }
             set { _IsShortEnabled = value; }
         }
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public bool ErrorOccured
+        {
+            get { return _ErrorOccured; }
+            set { _ErrorOccured = value; }
+        }
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public bool WarningOccured
+        {
+            get { return _WarningOccured; }
+            set { _WarningOccured = value; }
+        }
+
 
 
 
@@ -336,15 +389,15 @@ namespace AgenaTrader.UserCode
             set { _autopilot = value; }
         }
 
-
-        [Description("If true the strategy will create statistic data during the backtesting process")]
-        [Category("Safety first!")]
-        [DisplayName("Statistic Backtesting")]
-        public bool StatisticBacktesting
-        {
-            get { return _statisticbacktesting; }
-            set { _statisticbacktesting = value; }
-        }
+        //todo
+        //[Description("If true the strategy will create statistic data during the backtesting process")]
+        //[Category("Safety first!")]
+        //[DisplayName("Statistic Backtesting")]
+        //public bool StatisticBacktesting
+        //{
+        //    get { return _statisticbacktesting; }
+        //    set { _statisticbacktesting = value; }
+        //}
 
         #endregion
 

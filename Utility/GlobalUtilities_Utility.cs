@@ -721,7 +721,7 @@ namespace AgenaTrader.UserCode
     /// </summary>
     public class ResultValue
     {
-        public bool IsError = false;
+        public bool ErrorOccured = false;
         public OrderAction? Entry = null;
         public OrderAction? Exit = null;
     }

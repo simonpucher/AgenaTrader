@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -43,6 +43,10 @@ namespace AgenaTrader.UserCode
         int Momentum_Level_Low  { get; set; }
         int Momentum_Level_High { get; set; }
 
+        //internal
+        bool ErrorOccured { get; set; }
+        bool WarningOccured { get; set; }
+
     }
 
 	[Description("The mean reversion is the theory suggesting that prices and returns eventually move back towards the mean or average.")]
@@ -52,6 +56,8 @@ namespace AgenaTrader.UserCode
         //interface 
         private bool _IsShortEnabled = false;
         private bool _IsLongEnabled = true;
+        private bool _WarningOccured = false;
+        private bool _ErrorOccured = false;
         private int _Bollinger_Period = 20;
         private double _Bollinger_Standard_Deviation = 2;
         private int _Momentum_Period = 100;
@@ -80,6 +86,20 @@ namespace AgenaTrader.UserCode
         }
 
 
+
+        /// <summary>
+        /// Is called on startup.
+        /// </summary>
+        protected override void OnStartUp()
+        {
+            //Print("OnStartUp");
+            base.OnStartUp();
+
+            this.ErrorOccured = false;
+            this.WarningOccured = false;
+        }
+
+
    
 
 		protected override void OnBarUpdate()
@@ -89,37 +109,66 @@ namespace AgenaTrader.UserCode
             //this.BarColor = Color.White;
     
             //calculate data
-            OrderAction? resultdata = this.calculate(Input, Open, High, null, null, this.Bollinger_Period, this.Bollinger_Standard_Deviation, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
+            ResultValue returnvalue = this.calculate(Input, Open, High, null, null, this.Bollinger_Period, this.Bollinger_Standard_Deviation, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
+
+            //If the calculate method was not finished we need to stop and show an alert message to the user.
+            if (returnvalue.ErrorOccured)
+            {
+                //Display error just one time
+                if (!this.ErrorOccured)
+                {
+                    GlobalUtilities.DrawAlertTextOnChart(this, Const.DefaultStringErrorDuringCalculation);
+                    this.ErrorOccured = true;
+                }
+                return;
+            }
 
             Plot_1.Set(bb_upper);
             Plot_2.Set(bb_middle);
             Plot_3.Set(bb_lower);
 
-            //draw other things
-            if (resultdata.HasValue)
+            //Entry
+            if (returnvalue.Entry.HasValue)
             {
-                switch (resultdata)
+                switch (returnvalue.Entry)
                 {
                     case OrderAction.Buy:
                         DrawDot("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
+                        //this.Indicator_Curve_Entry.Set(1);
                         break;
                     case OrderAction.SellShort:
                         DrawDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
-                        break;
-                    case OrderAction.BuyToCover:
-                        //DrawDiamond("ArrowShort_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
-                        break;
-                    case OrderAction.Sell:
-                        //DrawDot("ArrowLong_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
-                        break;
-                    default:
+                        //this.Indicator_Curve_Entry.Set(-1);
                         break;
                 }
             }
-            else
+            //else
+            //{
+            //    //Value was null so nothing to do.
+            //    this.Indicator_Curve_Entry.Set(0);
+            //}
+
+            //Exit
+            if (returnvalue.Exit.HasValue)
             {
-                //value was null
+                switch (returnvalue.Exit)
+                {
+                    case OrderAction.BuyToCover:
+                        DrawDiamond("ArrowShort_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
+                        //this.Indicator_Curve_Exit.Set(0.5);
+                        break;
+                    case OrderAction.Sell:
+                        DrawDot("ArrowLong_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
+                        //this.Indicator_Curve_Exit.Set(-0.5);
+                        break;
+                }
             }
+            //else
+            //{
+            //    //Value was null so nothing to do.
+            //    this.Indicator_Curve_Exit.Set(0);
+            //}
+
 		}
 
 
@@ -128,40 +177,50 @@ namespace AgenaTrader.UserCode
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public OrderAction? calculate(IDataSeries data, IDataSeries open, IDataSeries high, IOrder longorder, IOrder shortorder, int bollinger_period, double bollinger_standarddeviation, int momentum_period, int rsi_period, int rsi_smooth, int rsi_level_low, int rsi_level_high, int momentum_level_low, int momentum_level_high)
+        public ResultValue calculate(IDataSeries data, IDataSeries open, IDataSeries high, IOrder longorder, IOrder shortorder, int bollinger_period, double bollinger_standarddeviation, int momentum_period, int rsi_period, int rsi_smooth, int rsi_level_low, int rsi_level_high, int momentum_level_low, int momentum_level_high)
         {
+            //Create a return object
+            ResultValue returnvalue = new ResultValue();
 
-            //Calculate BB
-            Bollinger bb = Bollinger(data, bollinger_standarddeviation, bollinger_period);
-            Momentum mom = Momentum(data, momentum_period);
-            RSI rsi = RSI(data, rsi_period, rsi_smooth);
+            try
+            {
+                
+                //Calculate BB
+                Bollinger bb = Bollinger(data, bollinger_standarddeviation, bollinger_period);
+                Momentum mom = Momentum(data, momentum_period);
+                RSI rsi = RSI(data, rsi_period, rsi_smooth);
 
-            bb_lower = bb.Lower[0];
-            bb_middle = bb.Middle[0];
-            bb_upper = bb.Upper[0];
+                bb_lower = bb.Lower[0];
+                bb_middle = bb.Middle[0];
+                bb_upper = bb.Upper[0];
 
-            //if (high[0] > open[1])
-            //{
+
                 if (mom[0] >= momentum_level_high && rsi[0] <= rsi_level_low && data[0] <= bb.Lower[0] && data[1] <= bb.Lower[1] && data[2] <= bb.Lower[2])
                 {
-                    return OrderAction.Buy;
+                    returnvalue.Entry = OrderAction.Buy;
                 }
                 else if (mom[0] <= momentum_level_low && rsi[0] >= rsi_level_high && data[0] >= bb.Upper[0] && data[1] >= bb.Upper[1] && data[2] >= bb.Upper[2])
                 {
-                    return OrderAction.SellShort;
+                    returnvalue.Entry = OrderAction.SellShort;
                 }
                 else if (data[0] >= bb.Upper[0] && longorder != null)
                 {
                     //currently we left the building on the upper band, is it better if we switch to a stop?
-                    return OrderAction.Sell;
+                    returnvalue.Exit = OrderAction.Sell;
                 }
                 else if (data[0] <= bb.Lower[0] && shortorder != null)
                 {
-                    return OrderAction.BuyToCover;
+                    returnvalue.Exit = OrderAction.BuyToCover;
                 } 
-            //}
+            }
+            catch (Exception)
+            {
+                //If this method is called via a strategy or a condition we need to log the error.
+                returnvalue.ErrorOccured = true;
+            }
 
-            return null;
+            //return the result object
+            return returnvalue;
         }
 
 
@@ -183,12 +242,12 @@ namespace AgenaTrader.UserCode
 
 		#region Properties
 
+      
         #region Interface
-
 
         /// <summary>
         /// </summary>
-        [Description("If true it is allowed to go long")]
+        [Description("If true it is allowed to create long positions.")]
         [Category("Parameters")]
         [DisplayName("Allow Long")]
         public bool IsLongEnabled
@@ -200,13 +259,29 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("If true it is allowed to go short")]
+        [Description("If true it is allowed to create short positions.")]
         [Category("Parameters")]
         [DisplayName("Allow Short")]
         public bool IsShortEnabled
         {
             get { return _IsShortEnabled; }
             set { _IsShortEnabled = value; }
+        }
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public bool ErrorOccured
+        {
+            get { return _ErrorOccured; }
+            set { _ErrorOccured = value; }
+        }
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public bool WarningOccured
+        {
+            get { return _WarningOccured; }
+            set { _WarningOccured = value; }
         }
 
 

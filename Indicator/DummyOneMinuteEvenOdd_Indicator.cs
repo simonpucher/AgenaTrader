@@ -40,8 +40,8 @@ namespace AgenaTrader.UserCode
         bool IsLongEnabled { get; set; }
 
         //internal
-        bool IsError { get; set; }
-        bool IsWarning { get; set; }
+        bool ErrorOccured { get; set; }
+        bool WarningOccured { get; set; }
     }
 
 
@@ -52,8 +52,8 @@ namespace AgenaTrader.UserCode
         //interface 
         private bool _IsShortEnabled = true;
         private bool _IsLongEnabled = true;
-        private bool _IsWarning = false;
-        private bool _IsError = false;
+        private bool _WarningOccured = false;
+        private bool _ErrorOccured = false;
 
         //input
         private Color _plot0color = Const.DefaultIndicatorColor;
@@ -101,8 +101,8 @@ namespace AgenaTrader.UserCode
             //Print("OnStartUp");
             base.OnStartUp();
 
-            this.IsError = false;
-            this.IsWarning = false;
+            this.ErrorOccured = false;
+            this.WarningOccured = false;
         }
 
         /// <summary>
@@ -116,10 +116,10 @@ namespace AgenaTrader.UserCode
             if (!DatafeedPeriodicityIsValid(Bars.TimeFrame))
             {
                 //Display warning just one time
-                if (!this.IsWarning)
+                if (!this.WarningOccured)
                 {
                     GlobalUtilities.DrawWarningTextOnChart(this, Const.DefaultStringDatafeedPeriodicity);
-                    this.IsWarning = true;
+                    this.WarningOccured = true;
                 }
                 return; 
             }
@@ -128,13 +128,13 @@ namespace AgenaTrader.UserCode
             ResultValue returnvalue = this.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
 
             //If the calculate method was not finished we need to stop and show an alert message to the user.
-            if (returnvalue.IsError)
+            if (returnvalue.ErrorOccured)
             {
                 //Display error just one time
-                if (!this.IsError)
+                if (!this.ErrorOccured)
                 {
                     GlobalUtilities.DrawAlertTextOnChart(this, Const.DefaultStringErrorDuringCalculation);
-                    this.IsError = true;
+                    this.ErrorOccured = true;
                 }
                 return;
             }
@@ -244,7 +244,7 @@ namespace AgenaTrader.UserCode
             catch (Exception)
             {
                 //If this method is called via a strategy or a condition we need to log the error.
-                returnvalue.IsError = true;
+                returnvalue.ErrorOccured = true;
             }
 
             //return the result object
@@ -404,20 +404,21 @@ namespace AgenaTrader.UserCode
                 set { _IsShortEnabled = value; }
             }
 
+
             [Browsable(false)]
             [XmlIgnore()]
-            public bool IsError
+            public bool ErrorOccured
             {
-                get { return _IsError; }
-                set { _IsError = value; }
+                get { return _ErrorOccured; }
+                set { _ErrorOccured = value; }
             }
 
             [Browsable(false)]
             [XmlIgnore()]
-            public bool IsWarning
+            public bool WarningOccured
             {
-                get { return _IsWarning; }
-                set { _IsWarning = value; }
+                get { return _WarningOccured; }
+                set { _WarningOccured = value; }
             }
 
             #endregion
