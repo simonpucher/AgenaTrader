@@ -28,7 +28,7 @@ public class ResultValueDummyOneMinuteEvenOdd {
 }
 ```
 
-###Method calculate
+##Method calculate
 We want to capsulate the main logic into one main methods in the indicator. In our case we do this using the following public method in the indicator.
 
 ```C#
