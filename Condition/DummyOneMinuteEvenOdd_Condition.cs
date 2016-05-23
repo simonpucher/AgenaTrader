@@ -91,10 +91,10 @@ namespace AgenaTrader.UserCode
 
         protected override void OnBarUpdate()
         {
-            //Check if peridocity is valid for this script and display warning just one time
+            //Check if peridocity is valid for this script
             if (!this._DummyOneMinuteEvenOdd_Indicator.DatafeedPeriodicityIsValid(Bars.TimeFrame))
             {
-                //Display error just one time
+                //Display warning just one time
                 if (!this.IsWarning)
                 {
                     Log(this.DisplayName + ": " + Const.DefaultStringDatafeedPeriodicity, InfoLogLevel.Warning);

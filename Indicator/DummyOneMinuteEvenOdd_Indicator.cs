@@ -129,10 +129,10 @@ namespace AgenaTrader.UserCode
         {
             //Print("OnBarUpdate");
 
-            //Check if peridocity is valid for this script and display warning just one time
+            //Check if peridocity is valid for this script
             if (!DatafeedPeriodicityIsValid(Bars.TimeFrame))
             {
-                //Display error just one time
+                //Display warning just one time
                 if (!this.IsWarning)
                 {
                     GlobalUtilities.DrawWarningTextOnChart(this, Const.DefaultStringDatafeedPeriodicity);
