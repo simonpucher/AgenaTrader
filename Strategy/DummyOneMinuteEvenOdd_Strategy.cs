@@ -99,7 +99,7 @@ namespace AgenaTrader.UserCode
             }
 
             //Lets call the calculate method and save the result with the trade action
-            ResultValueDummyOneMinuteEvenOdd returnvalue = this._DummyOneMinuteEvenOdd_Indicator.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
+            ResultValue returnvalue = this._DummyOneMinuteEvenOdd_Indicator.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
 
             //If the calculate method was not finished we need to stop and show an alert message to the user.
             if (returnvalue.IsError)

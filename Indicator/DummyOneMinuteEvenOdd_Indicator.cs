@@ -45,23 +45,6 @@ namespace AgenaTrader.UserCode
     }
 
 
-    /// <summary>
-    /// Class which holds all important data like the OrderAction. 
-    /// </summary>
-    public class ResultValueDummyOneMinuteEvenOdd {
-
-        //Output
-        public bool IsError = false;
-        public OrderAction? Entry = null;
-        public OrderAction? Exit = null;
-
-        public ResultValueDummyOneMinuteEvenOdd()
-        {
-
-        }
-    }
-
-
 
     [Description("This indicator provides a long signal in every even minute and a short signal every odd minute.")]
     public class DummyOneMinuteEvenOdd_Indicator : UserIndicator, IDummyOneMinuteEvenOdd
@@ -142,7 +125,7 @@ namespace AgenaTrader.UserCode
             }
            
             //Lets call the calculate method and save the result with the trade action
-            ResultValueDummyOneMinuteEvenOdd returnvalue = this.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
+            ResultValue returnvalue = this.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
 
             //If the calculate method was not finished we need to stop and show an alert message to the user.
             if (returnvalue.IsError)
@@ -214,10 +197,10 @@ namespace AgenaTrader.UserCode
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public ResultValueDummyOneMinuteEvenOdd calculate(IBar data, bool islongenabled, bool isshortenabled)
+        public ResultValue calculate(IBar data, bool islongenabled, bool isshortenabled)
         {
             //Create a return object
-            ResultValueDummyOneMinuteEvenOdd returnvalue = new ResultValueDummyOneMinuteEvenOdd();
+            ResultValue returnvalue = new ResultValue();
 
             //try catch block with all calculations
             try
