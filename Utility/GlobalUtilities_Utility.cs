@@ -18,7 +18,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.5.8
+/// Version: 1.5.9
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -445,6 +445,16 @@ namespace AgenaTrader.UserCode
         public static void DrawAlertTextOnChart(UserIndicator indicator, string text)
         {
             indicator.DrawTextFixed("AlertText", text, TextPosition.Center, Color.Red, new Font("Arial", 30), Color.Red, Color.Red, 20);
+        }
+
+        /// <summary>
+        /// Draws a standard warning text in the chart.
+        /// </summary>
+        /// <param name="indicator"></param>
+        /// <param name="text"></param>
+        public static void DrawWarningTextOnChart(UserIndicator indicator, string text)
+        {
+            indicator.DrawTextFixed("WarningText", text, TextPosition.Center, Color.Goldenrod, new Font("Arial", 30), Color.Goldenrod, Color.Goldenrod, 20);
         }
 
         /// <summary>
