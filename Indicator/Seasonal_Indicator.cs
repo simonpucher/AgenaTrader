@@ -14,14 +14,15 @@ using System.Runtime.CompilerServices;
 
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
 /// The initial version was inspired by this link: http://emini-watch.com/stock-market-seasonal-trades/5701/
 /// -------------------------------------------------------------------------
-/// todo tax time, 4th of july, september effect, Thanksgiving
+/// todo 
+/// tax time, 4th of july, september effect, Thanksgiving
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
@@ -103,10 +104,19 @@ namespace AgenaTrader.UserCode
                 default:
                     break;
             }
+
+            CalculateOnBarClose = true;
+            Overlay = true;
         }
 
 		protected override void OnBarUpdate()
 		{
+            //Check if peridocity is valid for this script
+            if (this.IsCurrentBarLast && !DatafeedPeriodicityIsValid(Bars.TimeFrame))
+            {
+                GlobalUtilities.DrawWarningTextOnChart(this, Const.DefaultStringDatafeedPeriodicity);
+            }
+
             switch (SeasonalType)
             {
                 case SeasonalType.SellInMay:
@@ -135,11 +145,11 @@ namespace AgenaTrader.UserCode
             //We need to get ensure that each name is unique.
             name = name + list.First().Time.Ticks;
 
-            DrawRectangle("rect" + name, true, list.First().Time, high, list.Last().Time, low, color, color, 70);
-            DrawText("text" + name, true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
+            DrawRectangle("Seasonal_rect" + name, true, list.First().Time, high, list.Last().Time, low, color, color, 70);
+            DrawText("Seasonal_text" + name, true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
         }
 
-        #region calculation
+    
 
         /// <summary>
         /// Calculate the seasonal indicator for "Santa Claus Rally".
@@ -201,8 +211,7 @@ namespace AgenaTrader.UserCode
             }
         }
 
-        #endregion
-
+       
 
 
         public override string ToString()
@@ -215,6 +224,24 @@ namespace AgenaTrader.UserCode
             get
             {
                 return "Seasonal";
+            }
+        }
+
+
+        /// <summary>
+        /// True if the periodicity of the data feed is correct for this indicator.
+        /// </summary>
+        /// <returns></returns>
+        public bool DatafeedPeriodicityIsValid(ITimeFrame timeframe)
+        {
+            TimeFrame tf = (TimeFrame)timeframe;
+            if (tf.Periodicity == DatafeedHistoryPeriodicity.Day && tf.PeriodicityValue == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 
