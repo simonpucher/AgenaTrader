@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1.1
+/// Version: 1.1.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -38,6 +38,10 @@ namespace AgenaTrader.UserCode
         //input
         bool IsShortEnabled { get; set; }
         bool IsLongEnabled { get; set; }
+
+        //internal
+        bool IsError { get; set; }
+        bool IsWarning { get; set; }
     }
 
 
@@ -47,7 +51,7 @@ namespace AgenaTrader.UserCode
     public class ResultValueDummyOneMinuteEvenOdd {
 
         //Output
-        public bool IsCompleted = false;
+        public bool IsError = false;
         public OrderAction? Entry = null;
         public OrderAction? Exit = null;
 
@@ -65,6 +69,8 @@ namespace AgenaTrader.UserCode
         //interface 
         private bool _IsShortEnabled = true;
         private bool _IsLongEnabled = true;
+        private bool _IsWarning = false;
+        private bool _IsError = false;
 
         //input
         private Color _plot0color = Const.DefaultIndicatorColor;
@@ -111,6 +117,9 @@ namespace AgenaTrader.UserCode
         {
             //Print("OnStartUp");
             base.OnStartUp();
+
+            this.IsError = false;
+            this.IsWarning = false;
         }
 
         /// <summary>
@@ -120,10 +129,15 @@ namespace AgenaTrader.UserCode
         {
             //Print("OnBarUpdate");
 
-            //Check if peridocity is valid for this script 
+            //Check if peridocity is valid for this script and display warning just one time
             if (!DatafeedPeriodicityIsValid(Bars.TimeFrame))
             {
-                GlobalUtilities.DrawAlertTextOnChart(this, Const.DefaultStringDatafeedPeriodicity);
+                //Display error just one time
+                if (!this.IsWarning)
+                {
+                    GlobalUtilities.DrawWarningTextOnChart(this, Const.DefaultStringDatafeedPeriodicity);
+                    this.IsWarning = true;
+                }
                 return; 
             }
            
@@ -131,10 +145,15 @@ namespace AgenaTrader.UserCode
             ResultValueDummyOneMinuteEvenOdd returnvalue = this.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
 
             //If the calculate method was not finished we need to stop and show an alert message to the user.
-            if (!returnvalue.IsCompleted)
+            if (returnvalue.IsError)
             {
-                GlobalUtilities.DrawAlertTextOnChart(this, Const.DefaultStringErrorDuringCalculation);
-                return; 
+                //Display error just one time
+                if (!this.IsError)
+                {
+                    GlobalUtilities.DrawAlertTextOnChart(this, Const.DefaultStringErrorDuringCalculation);
+                    this.IsError = true;
+                }
+                return;
             }
 
             //Entry
@@ -238,15 +257,11 @@ namespace AgenaTrader.UserCode
                     }
                 }
 
-                //Everything is fine
-                returnvalue.IsCompleted = true;
-
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //If this method is called via a strategy or a condition we need to log the error.
-                Log(this.DisplayName + ": " + Const.DefaultStringErrorDuringCalculation + " - " + ex.ToString(), InfoLogLevel.AlertLog);
-                returnvalue.IsCompleted = false;
+                returnvalue.IsError = true;
             }
 
             //return the result object
@@ -377,6 +392,12 @@ namespace AgenaTrader.UserCode
             }
 
 
+         
+
+        #endregion
+
+            #region Interface
+
             /// <summary>
             /// </summary>
             [Description("If true it is allowed to create long positions.")]
@@ -400,7 +421,23 @@ namespace AgenaTrader.UserCode
                 set { _IsShortEnabled = value; }
             }
 
-        #endregion
+            [Browsable(false)]
+            [XmlIgnore()]
+            public bool IsError
+            {
+                get { return _IsError; }
+                set { _IsError = value; }
+            }
+
+            [Browsable(false)]
+            [XmlIgnore()]
+            public bool IsWarning
+            {
+                get { return _IsWarning; }
+                set { _IsWarning = value; }
+            }
+
+            #endregion
 
             #region Output
 
@@ -419,6 +456,9 @@ namespace AgenaTrader.UserCode
             }
 
             #endregion
+
+
+
 
         #endregion
 
