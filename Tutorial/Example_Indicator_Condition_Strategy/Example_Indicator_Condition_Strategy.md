@@ -3,6 +3,30 @@
 
 This tutorial will show you our basic template for indicators, conditions and strategies.
 
+#Indicator
+In many cases we are starting with indicators because indicators are the best place to start on script development. 
+You will be able to get pretty quick an indication if your trading idea is working and of course you are able to screen instruments visual and verify if your trading idea will be profitable.
+
+##Method OnBarUpdate()
+Our main logic will be inside of the OnBarUpdate() method. In our example we are using moduls operation to check if there is currently an even or an odd minute. We want to show a long signal wenn it is even and we show a short signal on odd minutes: 
+
+```C#
+        protected override void OnBarUpdate()
+        {
+            if (Bars[0].Time.Minute % 2 == 0)
+            {
+                this.Indicator_Curve_Entry.Set(1);
+            }
+            else if (Bars[0].Time.Minute % 2 != 0)
+            {
+                this.Indicator_Curve_Entry.Set(-1);
+            }
+            else
+            {
+                this.Indicator_Curve_Entry.Set(0);
+            }
+        }
+```
 
 #Miscellaneous
 ##Filenames and Class names
