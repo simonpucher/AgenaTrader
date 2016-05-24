@@ -30,23 +30,13 @@ using AgenaTrader.Helper;
 namespace AgenaTrader.UserCode
 {
     [Description("This indicator provides a long signal in every even minute and a short signal every odd minute.")]
-    public class DummyOneMinuteEvenOdd_Strategy : UserStrategy, IDummyOneMinuteEvenOdd
+    public class DummyOneMinuteEvenOdd_Strategy : UserStrategy
 	{
-        //interface
-        private bool _IsShortEnabled = true;
-        private bool _IsLongEnabled = true;
-        private bool _WarningOccured = false;
-        private bool _ErrorOccured = false;
-
         //input
         private bool _autopilot = true;
 
         //output
 
-        //internal
-        private DummyOneMinuteEvenOdd_Indicator _DummyOneMinuteEvenOdd_Indicator = null;
-        private IOrder _orderenterlong;
-        private IOrder _orderentershort;
 
 		protected override void Initialize()
 		{
@@ -73,12 +63,6 @@ namespace AgenaTrader.UserCode
         protected override void OnStartUp()
         {
             base.OnStartUp();
-
-            //Init our indicator to get code access to the calculate method
-            this._DummyOneMinuteEvenOdd_Indicator = new DummyOneMinuteEvenOdd_Indicator();
-
-            this.ErrorOccured = false;
-            this.WarningOccured = false;
         }
 
 		protected override void OnBarUpdate()
@@ -86,60 +70,29 @@ namespace AgenaTrader.UserCode
             //Set Autopilot
             this.IsAutomated = this.Autopilot;
 
-            //Check if peridocity is valid for this script
-            if (!this._DummyOneMinuteEvenOdd_Indicator.DatafeedPeriodicityIsValid(Bars.TimeFrame))
+            //exit on error
+            if (IsError)
             {
-                //Display warning just one time
-                if (!this.WarningOccured)
-                {
-                    Log(this.DisplayName + ": " + Const.DefaultStringDatafeedPeriodicity, InfoLogLevel.Warning);
-                    this.WarningOccured = true;
-                }
                 return;
             }
 
-            //Lets call the calculate method and save the result with the trade action
-            ResultValue returnvalue = this._DummyOneMinuteEvenOdd_Indicator.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
+            //get the indicator
+            DummyOneMinuteEvenOdd_Indicator _DummyOneMinuteEvenOdd_Indicator = LeadIndicator.DummyOneMinuteEvenOdd_Indicator();
 
-            //If the calculate method was not finished we need to stop and show an alert message to the user.
-            if (returnvalue.ErrorOccured)
-            {
-                //Display error just one time
-                if (!this.ErrorOccured)
-                {
-                    Log(this.DisplayName + ": " + Const.DefaultStringErrorDuringCalculation, InfoLogLevel.AlertLog);
-                    this.ErrorOccured = true;
-                }
-                return;
-            }
+            //get the value
+            double returnvalue = _DummyOneMinuteEvenOdd_Indicator[0];
 
             //Entry
-            if (returnvalue.Entry.HasValue)
+            if (returnvalue == 1)
             {
-                switch (returnvalue.Entry)
-                {
-                    case OrderAction.Buy:
-                        this.DoEnterLong();
-                        break;
-                    case OrderAction.SellShort:
-                        this.DoEnterShort();
-                        break;
-                }
+                this.DoEnterLong();
+            }
+            else if (returnvalue == -1)
+            {
+                this.DoEnterShort();
             }
 
-            //Exit
-            if (returnvalue.Exit.HasValue)
-            {
-                switch (returnvalue.Exit)
-                {
-                    case OrderAction.BuyToCover:
-                        this.DoExitShort();
-                        break;
-                    case OrderAction.Sell:
-                        this.DoExitLong();
-                        break;
-                }
-            }
+
 		}
 
 
@@ -148,12 +101,9 @@ namespace AgenaTrader.UserCode
         /// </summary>
         private void DoEnterLong()
         {
-            if (_orderenterlong == null)
-            {
-                _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.Buy + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-                //SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
-                //SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong); 
-            }
+           IOrder _orderenterlong = EnterLong(1, this.DisplayName + "_" + OrderAction.Buy + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+            SetStopLoss(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 0.99, false);
+            SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 1.01); 
         }
 
         /// <summary>
@@ -161,94 +111,29 @@ namespace AgenaTrader.UserCode
         /// </summary>
         private void DoEnterShort()
         {
-            if (_orderentershort == null)
-            {
-                _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.SellShort + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-                //SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
-                //SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
-            }
+            IOrder _orderentershort = EnterShort(1, this.DisplayName + "_" + OrderAction.SellShort + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+            SetStopLoss(_orderentershort.Name, CalculationMode.Price, Bars[0].Close * 1.01, false);
+            SetProfitTarget(_orderentershort.Name, CalculationMode.Price, Bars[0].Close * 0.99);
         }
 
-        /// <summary>
-        /// Exit the LONG position.
-        /// </summary>
-        private void DoExitLong()
-        {
-            if (_orderenterlong != null)
-            {
-                 ExitLong(this._orderenterlong.Name);
-                 this._orderenterlong = null;
-            }
-        }
-
-        /// <summary>
-        /// Fill the SHORT position.
-        /// </summary>
-        private void DoExitShort()
-        {
-            ExitShort(this._orderentershort.Name);
-            this._orderentershort = null;
-        }
+     
 
         public override string ToString()
         {
-            return "Dummy one minute even/odd (S)";
+            return "Dummy even/odd (S)";
         }
 
         public override string DisplayName
         {
             get
             {
-                return "Dummy one minute even/odd (S)";
+                return "Dummy even/odd (S)";
             }
         }
 
 
         #region Properties
 
-        #region Interface
-
-        /// <summary>
-        /// </summary>
-        [Description("If true it is allowed to create long positions.")]
-        [Category("Parameters")]
-        [DisplayName("Allow Long")]
-        public bool IsLongEnabled
-        {
-            get { return _IsLongEnabled; }
-            set { _IsLongEnabled = value; }
-        }
-
-
-        /// <summary>
-        /// </summary>
-        [Description("If true it is allowed to create short positions.")]
-        [Category("Parameters")]
-        [DisplayName("Allow Short")]
-        public bool IsShortEnabled
-        {
-            get { return _IsShortEnabled; }
-            set { _IsShortEnabled = value; }
-        }
-
-
-        [Browsable(false)]
-        [XmlIgnore()]
-        public bool ErrorOccured
-        {
-            get { return _ErrorOccured; }
-            set { _ErrorOccured = value; }
-        }
-
-        [Browsable(false)]
-        [XmlIgnore()]
-        public bool WarningOccured
-        {
-            get { return _WarningOccured; }
-            set { _WarningOccured = value; }
-        }
-
-        #endregion
 
         #region Input
 
@@ -261,8 +146,6 @@ namespace AgenaTrader.UserCode
             set { _autopilot = value; }
         }
 
-
-       
 
         #endregion
 
