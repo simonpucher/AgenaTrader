@@ -45,6 +45,28 @@ In our case we need a one minute time frame to work with the indicator. Please p
         }
 ```
 
+#Condition
+##Bars required
+Because of Backtesting reasons if we use the advanced mode we need at least two bars.
+```C#
+this.BarsRequired = 2;
+```
+
+##OnBarUpdate
+Also in this case the main logic is inside of the onbarupdate method. Because our main logic is inside of the indicator itself we need to create an instance of this indicator. So we are able to get the data from the indicator and set our Occured object.
+```C#
+            //get the indicator
+            DummyOneMinuteEvenOdd_Indicator _DummyOneMinuteEvenOdd_Indicator = LeadIndicator.DummyOneMinuteEvenOdd_Indicator();
+
+            //get the value
+            double returnvalue = _DummyOneMinuteEvenOdd_Indicator[0];
+            
+            //set the value
+            Occurred.Set(returnvalue);
+```
+
+
+
 #Miscellaneous
 ##Filenames and Class names
 To import all scripts into AgenaTrader without any error we add _indicator, _strategy, _condition or _alert to the filename and also to the c# class name.
