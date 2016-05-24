@@ -1188,6 +1188,7 @@ public static class StringExtensions
 }
 #endregion
 
+[Category("Utility")]
 [Description("We use this indicator to share global code in agena trader.")]
 public class GlobalUtility : AgenaTrader.UserCode.UserIndicator
 {
