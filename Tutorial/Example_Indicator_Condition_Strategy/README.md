@@ -4,4 +4,5 @@
 These two tutorials will show you our templates for indicators, conditions, strategies and give you the ability to have a quick start into AgenaTrader scripting.
 
 [Basic](https://github.com/simonpucher/AgenaTrader/blob/master/Tutorial/Example_Indicator_Condition_Strategy/Example_Indicator_Condition_Strategy.md)
+
 [Advanced](https://github.com/simonpucher/AgenaTrader/blob/master/Tutorial/Example_Indicator_Condition_Strategy/Example_Indicator_Condition_Strategy_Advanced.md)
