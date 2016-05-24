@@ -18,7 +18,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.5.8
+/// Version: 1.5.10
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -448,6 +448,16 @@ namespace AgenaTrader.UserCode
         }
 
         /// <summary>
+        /// Draws a standard warning text in the chart.
+        /// </summary>
+        /// <param name="indicator"></param>
+        /// <param name="text"></param>
+        public static void DrawWarningTextOnChart(UserIndicator indicator, string text)
+        {
+            indicator.DrawTextFixed("WarningText", text, TextPosition.Center, Color.Goldenrod, new Font("Arial", 30), Color.Goldenrod, Color.Goldenrod, 20);
+        }
+
+        /// <summary>
         /// Saves a snapshot of the current chart.
         /// </summary>
         /// <param name="Indicator"></param>
@@ -704,6 +714,18 @@ namespace AgenaTrader.UserCode
     #endregion
 
     #region Global defined classes
+
+
+    /// <summary>
+    /// Class which holds all important data like the OrderAction. 
+    /// We use this object as a global default return object for the calculate method in indicators.
+    /// </summary>
+    public class ResultValue
+    {
+        public bool ErrorOccured = false;
+        public OrderAction? Entry = null;
+        public OrderAction? Exit = null;
+    }
 
     /// <summary>
     /// Statistic object  to compare the performance of strategies.
@@ -1183,6 +1205,7 @@ public static class StringExtensions
 }
 #endregion
 
+[Category("Utility")]
 [Description("We use this indicator to share global code in agena trader.")]
 public class GlobalUtility : AgenaTrader.UserCode.UserIndicator
 {

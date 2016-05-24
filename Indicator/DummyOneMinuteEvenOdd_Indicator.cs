@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1.1
+/// Version: 1.1.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -38,23 +38,10 @@ namespace AgenaTrader.UserCode
         //input
         bool IsShortEnabled { get; set; }
         bool IsLongEnabled { get; set; }
-    }
 
-
-    /// <summary>
-    /// Class which holds all important data like the OrderAction. 
-    /// </summary>
-    public class ResultValueDummyOneMinuteEvenOdd {
-
-        //Output
-        public bool IsCompleted = false;
-        public OrderAction? Entry = null;
-        public OrderAction? Exit = null;
-
-        public ResultValueDummyOneMinuteEvenOdd()
-        {
-
-        }
+        //internal
+        bool ErrorOccured { get; set; }
+        bool WarningOccured { get; set; }
     }
 
 
@@ -65,6 +52,8 @@ namespace AgenaTrader.UserCode
         //interface 
         private bool _IsShortEnabled = true;
         private bool _IsLongEnabled = true;
+        private bool _WarningOccured = false;
+        private bool _ErrorOccured = false;
 
         //input
         private Color _plot0color = Const.DefaultIndicatorColor;
@@ -111,6 +100,9 @@ namespace AgenaTrader.UserCode
         {
             //Print("OnStartUp");
             base.OnStartUp();
+
+            this.ErrorOccured = false;
+            this.WarningOccured = false;
         }
 
         /// <summary>
@@ -120,21 +112,31 @@ namespace AgenaTrader.UserCode
         {
             //Print("OnBarUpdate");
 
-            //Check if peridocity is valid for this script 
+            //Check if peridocity is valid for this script
             if (!DatafeedPeriodicityIsValid(Bars.TimeFrame))
             {
-                GlobalUtilities.DrawAlertTextOnChart(this, Const.DefaultStringDatafeedPeriodicity);
+                //Display warning just one time
+                if (!this.WarningOccured)
+                {
+                    GlobalUtilities.DrawWarningTextOnChart(this, Const.DefaultStringDatafeedPeriodicity);
+                    this.WarningOccured = true;
+                }
                 return; 
             }
            
             //Lets call the calculate method and save the result with the trade action
-            ResultValueDummyOneMinuteEvenOdd returnvalue = this.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
+            ResultValue returnvalue = this.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
 
             //If the calculate method was not finished we need to stop and show an alert message to the user.
-            if (!returnvalue.IsCompleted)
+            if (returnvalue.ErrorOccured)
             {
-                GlobalUtilities.DrawAlertTextOnChart(this, Const.DefaultStringErrorDuringCalculation);
-                return; 
+                //Display error just one time
+                if (!this.ErrorOccured)
+                {
+                    GlobalUtilities.DrawAlertTextOnChart(this, Const.DefaultStringErrorDuringCalculation);
+                    this.ErrorOccured = true;
+                }
+                return;
             }
 
             //Entry
@@ -195,10 +197,10 @@ namespace AgenaTrader.UserCode
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public ResultValueDummyOneMinuteEvenOdd calculate(IBar data, bool islongenabled, bool isshortenabled)
+        public ResultValue calculate(IBar data, bool islongenabled, bool isshortenabled)
         {
             //Create a return object
-            ResultValueDummyOneMinuteEvenOdd returnvalue = new ResultValueDummyOneMinuteEvenOdd();
+            ResultValue returnvalue = new ResultValue();
 
             //try catch block with all calculations
             try
@@ -238,15 +240,11 @@ namespace AgenaTrader.UserCode
                     }
                 }
 
-                //Everything is fine
-                returnvalue.IsCompleted = true;
-
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 //If this method is called via a strategy or a condition we need to log the error.
-                Log(this.DisplayName + ": " + Const.DefaultStringErrorDuringCalculation + " - " + ex.ToString(), InfoLogLevel.AlertLog);
-                returnvalue.IsCompleted = false;
+                returnvalue.ErrorOccured = true;
             }
 
             //return the result object
@@ -377,6 +375,12 @@ namespace AgenaTrader.UserCode
             }
 
 
+         
+
+        #endregion
+
+            #region Interface
+
             /// <summary>
             /// </summary>
             [Description("If true it is allowed to create long positions.")]
@@ -400,7 +404,24 @@ namespace AgenaTrader.UserCode
                 set { _IsShortEnabled = value; }
             }
 
-        #endregion
+
+            [Browsable(false)]
+            [XmlIgnore()]
+            public bool ErrorOccured
+            {
+                get { return _ErrorOccured; }
+                set { _ErrorOccured = value; }
+            }
+
+            [Browsable(false)]
+            [XmlIgnore()]
+            public bool WarningOccured
+            {
+                get { return _WarningOccured; }
+                set { _WarningOccured = value; }
+            }
+
+            #endregion
 
             #region Output
 
@@ -419,6 +440,9 @@ namespace AgenaTrader.UserCode
             }
 
             #endregion
+
+
+
 
         #endregion
 

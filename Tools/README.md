@@ -1,7 +1,8 @@
 ﻿#Tools
+In this section you will find small tools or helpers.
 
-##TaiPan Data Access CSharp
-Access TaiPan datafeed with csharp code
+##Indicator
+Small tool/helpers. You ned to import them as a indicator into AgenaTrader. 
 
-##TaiPan Data Access Excel
-Access TaiPan datafeed with Excel file
+##TaiPan
+Examples on how to use TaiPan Datafeed Service.

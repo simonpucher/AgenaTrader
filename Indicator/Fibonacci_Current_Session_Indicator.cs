@@ -12,24 +12,24 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.2.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
 /// Plots the Fibonacci Lines of the current session.
 /// -------------------------------------------------------------------------
 /// ****** Important ******
-/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
-/// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// To compile this script without any error you also need access to the utility indicator to use global source code elements.
+/// You will find this script on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+ 
 	[Description("Plots the Fibonacci Lines of the current session.")]
 	public class Fibonacci_Current_Session : UserIndicator
 	{
-
         protected override void InitRequirements()
         {
             //  Print("InitRequirements");
@@ -42,23 +42,26 @@ namespace AgenaTrader.UserCode
 
 		protected override void Initialize()
 		{
-			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
-			Overlay = true;
-			CalculateOnBarClose = true;
+            //Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "Fibonacci_Current_Session_Plot1"));
+
+            CalculateOnBarClose = true;
+            Overlay = true;
 		}
 
 		protected override void OnBarUpdate()
 		{
 			//MyPlot1.Set(Input[0]);
 
-            if (this.Bars.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Hour ||  
-                this.Bars.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Minute  ||
-                    this.Bars.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Second ||
-                this.Bars.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Tick)
+            if (Bars != null && Bars.Count > 0 && IsCurrentBarLast)
             {
-                
-                if (Bars != null && Bars.Count > 0 && IsCurrentBarLast)
-                {
+
+                    //Check if peridocity is valid for this script
+                    if (!DatafeedPeriodicityIsValid(Bars.TimeFrame))
+                    {
+                        GlobalUtilities.DrawWarningTextOnChart(this, Const.DefaultStringDatafeedPeriodicity);
+                        return;
+                    }
+              
                     DateTime start = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
                     DateTime start_date = start.Date;
                     DateTime end = start.AddHours(23).AddMinutes(59).AddSeconds(59);
@@ -71,14 +74,11 @@ namespace AgenaTrader.UserCode
                         double maxvalue = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
 
                         //DrawFibonacciRetracements("Fibonacci_Session", true, start_date, minvalue, end, maxvalue);
-                        DrawFibonacciProjections("Fibonacci_Session", true, start_date, minvalue, Time[0], maxvalue  , start_date, minvalue);
-
-                        DrawHorizontalLine("LowLine", true, minvalue, Color.Red, DashStyle.Solid, 3);
-                        DrawHorizontalLine("HighLine", true, maxvalue, Color.Green, DashStyle.Solid, 3);
-
+                        DrawFibonacciProjections("Fibonacci_Session_Plot", true, start_date, minvalue, Time[0], maxvalue , start_date, minvalue);
+                        DrawHorizontalLine("Fibonacci_Session_LowLine", true, minvalue, Color.Red, DashStyle.Solid, 3);
+                        DrawHorizontalLine("Fibonacci_Session_HighLine", true, maxvalue, Color.Green, DashStyle.Solid, 3);
                     }
                 }
-            }
 		}
 
 
@@ -88,20 +88,50 @@ namespace AgenaTrader.UserCode
 
         }
 
-
         public override string ToString()
         {
-            return "Fibonacci Current Session";
+            return "Fibonacci Current Session (I)";
         }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "Fibonacci Current Session (I)";
+            }
+        }
+
+
+
+        /// <summary>
+        /// True if the periodicity of the data feed is correct for this indicator.
+        /// </summary>
+        /// <returns></returns>
+        public bool DatafeedPeriodicityIsValid(ITimeFrame timeframe)
+        {
+            TimeFrame tf = (TimeFrame)timeframe;
+            if (this.Bars.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Hour || this.Bars.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Minute
+                || this.Bars.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Second || this.Bars.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Tick)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+
 
         #region Properties
 
-        [Browsable(false)]
-		[XmlIgnore()]
-		public DataSeries MyPlot1
-		{
-			get { return Values[0]; }
-		}
+        //[Browsable(false)]
+        //[XmlIgnore()]
+        //public DataSeries MyPlot1
+        //{
+        //    get { return Values[0]; }
+        //}
+
 
 		#endregion
 	}
@@ -115,7 +145,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator : Indicator
 	{
 		/// <summary>
-		/// Plots the Fibonacci Lines of the current session.,
+		/// Plots the Fibonacci Lines of the current session.
 		/// </summary>
 		public Fibonacci_Current_Session Fibonacci_Current_Session()
         {
@@ -123,7 +153,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Plots the Fibonacci Lines of the current session.,
+		/// Plots the Fibonacci Lines of the current session.
 		/// </summary>
 		public Fibonacci_Current_Session Fibonacci_Current_Session(IDataSeries input)
 		{
@@ -153,7 +183,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Plots the Fibonacci Lines of the current session.,
+		/// Plots the Fibonacci Lines of the current session.
 		/// </summary>
 		public Fibonacci_Current_Session Fibonacci_Current_Session()
 		{
@@ -161,7 +191,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Plots the Fibonacci Lines of the current session.,
+		/// Plots the Fibonacci Lines of the current session.
 		/// </summary>
 		public Fibonacci_Current_Session Fibonacci_Current_Session(IDataSeries input)
 		{
@@ -179,7 +209,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Plots the Fibonacci Lines of the current session.,
+		/// Plots the Fibonacci Lines of the current session.
 		/// </summary>
 		public Fibonacci_Current_Session Fibonacci_Current_Session()
 		{
@@ -187,7 +217,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Plots the Fibonacci Lines of the current session.,
+		/// Plots the Fibonacci Lines of the current session.
 		/// </summary>
 		public Fibonacci_Current_Session Fibonacci_Current_Session(IDataSeries input)
 		{
@@ -202,7 +232,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Plots the Fibonacci Lines of the current session.,
+		/// Plots the Fibonacci Lines of the current session.
 		/// </summary>
 		public Fibonacci_Current_Session Fibonacci_Current_Session()
 		{
@@ -210,7 +240,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Plots the Fibonacci Lines of the current session.,
+		/// Plots the Fibonacci Lines of the current session.
 		/// </summary>
 		public Fibonacci_Current_Session Fibonacci_Current_Session(IDataSeries input)
 		{

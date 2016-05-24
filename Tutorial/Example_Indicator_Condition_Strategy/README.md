@@ -21,14 +21,16 @@ public interface IDummyOneMinuteEvenOdd {
 ```
 
 ##Result value
-The result value object will holds all result data from the calculate method so we know what to do next. In a strategy we create a long or short order, in a condition we set the Occured object, and so on.
+The result value object will holds all result data from the calculate method so we know what to do 
+In a strategy we create a long or short order, in a condition we set the Occured object, and so on.
+In our example we use our global result value object, of course you can use your own class if you need more properties.
 ```C#
-public class ResultValueDummyOneMinuteEvenOdd {
+public class ResultValue{
    /* Here we define all properties we need as a result of the calculate method. */
 }
 ```
 
-###Method calculate
+##Method calculate
 We want to capsulate the main logic into one main methods in the indicator. In our case we do this using the following public method in the indicator.
 
 ```C#

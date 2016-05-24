@@ -13,12 +13,15 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
 /// Description: https://en.wikipedia.org/wiki/Algorithmic_trading#Mean_reversion 
+/// -------------------------------------------------------------------------
+/// todo
+/// Statistic
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
@@ -40,6 +43,8 @@ namespace AgenaTrader.UserCode
         //interface 
         private bool _IsShortEnabled = false;
         private bool _IsLongEnabled = true;
+        private bool _WarningOccured = false;
+        private bool _ErrorOccured = false;
         private int _Bollinger_Period = 20;
         private double _Bollinger_Standard_Deviation = 2;
         private int _Momentum_Period = 100;
@@ -88,6 +93,9 @@ namespace AgenaTrader.UserCode
 
             //Init our indicator to get code access
             this._Mean_Reversion_Indicator = new Mean_Reversion_Indicator();
+
+            this.ErrorOccured = false;
+            this.WarningOccured = false;
         }
 
        
@@ -96,34 +104,48 @@ namespace AgenaTrader.UserCode
 		{
 
             //calculate data
-            OrderAction? resultdata = this._Mean_Reversion_Indicator.calculate(Input, Open, High, null, null, this.Bollinger_Period, this.Bollinger_Standard_Deviation, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
-            if (resultdata.HasValue)
+            ResultValue returnvalue = this._Mean_Reversion_Indicator.calculate(Input, Open, High, null, null, this.Bollinger_Period, this.Bollinger_Standard_Deviation, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
+
+            //If the calculate method was not finished we need to stop and show an alert message to the user.
+            if (returnvalue.ErrorOccured)
             {
-                switch (resultdata)
+                //Display error just one time
+                if (!this.ErrorOccured)
+                {
+                    Log(this.DisplayName + ": " + Const.DefaultStringErrorDuringCalculation, InfoLogLevel.AlertLog);
+                    this.ErrorOccured = true;
+                }
+                return;
+            }
+
+            //Entry
+            if (returnvalue.Entry.HasValue)
+            {
+                switch (returnvalue.Entry)
                 {
                     case OrderAction.Buy:
                         Occurred.Set(1);
-                        //Entry.Set(Input[0]);
                         break;
                     case OrderAction.SellShort:
                         Occurred.Set(-1);
-                        //Entry.Set(Input[0]);
-                        break;
-                    //case OrderAction.BuyToCover:
-                    //    break;
-                    //case OrderAction.Sell:
-                    //    break;
-                    default:
-                        //nothing to do
-                        Occurred.Set(0);
-                        //Entry.Set(Input[0]);
                         break;
                 }
             }
-            else
-            {
-                Occurred.Set(0);
-            }
+
+            ////Exit
+            //if (returnvalue.Exit.HasValue)
+            //{
+            //    switch (returnvalue.Exit)
+            //    {
+            //        case OrderAction.BuyToCover:
+            //            this.DoExitShort();
+            //            break;
+            //        case OrderAction.Sell:
+            //            this.DoExitLong();
+            //            break;
+            //    }
+            //}
+
 
 		}
 
@@ -153,7 +175,7 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("If true it is allowed to go long")]
+        [Description("If true it is allowed to create long positions.")]
         [Category("Parameters")]
         [DisplayName("Allow Long")]
         public bool IsLongEnabled
@@ -165,7 +187,7 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("If true it is allowed to go short")]
+        [Description("If true it is allowed to create short positions.")]
         [Category("Parameters")]
         [DisplayName("Allow Short")]
         public bool IsShortEnabled
@@ -173,6 +195,23 @@ namespace AgenaTrader.UserCode
             get { return _IsShortEnabled; }
             set { _IsShortEnabled = value; }
         }
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public bool ErrorOccured
+        {
+            get { return _ErrorOccured; }
+            set { _ErrorOccured = value; }
+        }
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public bool WarningOccured
+        {
+            get { return _WarningOccured; }
+            set { _WarningOccured = value; }
+        }
+
 
 
 

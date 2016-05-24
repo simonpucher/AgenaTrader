@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1.1
+/// Version: 1.1.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -35,6 +35,8 @@ namespace AgenaTrader.UserCode
         //interface
         private bool _IsShortEnabled = true;
         private bool _IsLongEnabled = true;
+        private bool _WarningOccured = false;
+        private bool _ErrorOccured = false;
 
         //input
         private bool _autopilot = true;
@@ -74,6 +76,9 @@ namespace AgenaTrader.UserCode
 
             //Init our indicator to get code access to the calculate method
             this._DummyOneMinuteEvenOdd_Indicator = new DummyOneMinuteEvenOdd_Indicator();
+
+            this.ErrorOccured = false;
+            this.WarningOccured = false;
         }
 
 		protected override void OnBarUpdate()
@@ -81,20 +86,30 @@ namespace AgenaTrader.UserCode
             //Set Autopilot
             this.IsAutomated = this.Autopilot;
 
-            //Check if peridocity is valid for this script 
+            //Check if peridocity is valid for this script
             if (!this._DummyOneMinuteEvenOdd_Indicator.DatafeedPeriodicityIsValid(Bars.TimeFrame))
             {
-                Log(this.DisplayName + ": " + Const.DefaultStringDatafeedPeriodicity, InfoLogLevel.AlertLog);
+                //Display warning just one time
+                if (!this.WarningOccured)
+                {
+                    Log(this.DisplayName + ": " + Const.DefaultStringDatafeedPeriodicity, InfoLogLevel.Warning);
+                    this.WarningOccured = true;
+                }
                 return;
             }
 
             //Lets call the calculate method and save the result with the trade action
-            ResultValueDummyOneMinuteEvenOdd returnvalue = this._DummyOneMinuteEvenOdd_Indicator.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
+            ResultValue returnvalue = this._DummyOneMinuteEvenOdd_Indicator.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
 
             //If the calculate method was not finished we need to stop and show an alert message to the user.
-            if (!returnvalue.IsCompleted)
+            if (returnvalue.ErrorOccured)
             {
-                Log(this.DisplayName + ": " + Const.DefaultStringErrorDuringCalculation, InfoLogLevel.AlertLog);
+                //Display error just one time
+                if (!this.ErrorOccured)
+                {
+                    Log(this.DisplayName + ": " + Const.DefaultStringErrorDuringCalculation, InfoLogLevel.AlertLog);
+                    this.ErrorOccured = true;
+                }
                 return;
             }
 
@@ -193,28 +208,45 @@ namespace AgenaTrader.UserCode
 
         #region Interface
 
-            /// <summary>
-            /// </summary>
-            [Description("If true it is allowed to create long positions.")]
-            [Category("Parameters")]
-            [DisplayName("Allow Long")]
-            public bool IsLongEnabled
-            {
-                get { return _IsLongEnabled; }
-                set { _IsLongEnabled = value; }
-            }
+        /// <summary>
+        /// </summary>
+        [Description("If true it is allowed to create long positions.")]
+        [Category("Parameters")]
+        [DisplayName("Allow Long")]
+        public bool IsLongEnabled
+        {
+            get { return _IsLongEnabled; }
+            set { _IsLongEnabled = value; }
+        }
 
 
-            /// <summary>
-            /// </summary>
-            [Description("If true it is allowed to create short positions.")]
-            [Category("Parameters")]
-            [DisplayName("Allow Short")]
-            public bool IsShortEnabled
-            {
-                get { return _IsShortEnabled; }
-                set { _IsShortEnabled = value; }
-            }
+        /// <summary>
+        /// </summary>
+        [Description("If true it is allowed to create short positions.")]
+        [Category("Parameters")]
+        [DisplayName("Allow Short")]
+        public bool IsShortEnabled
+        {
+            get { return _IsShortEnabled; }
+            set { _IsShortEnabled = value; }
+        }
+
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public bool ErrorOccured
+        {
+            get { return _ErrorOccured; }
+            set { _ErrorOccured = value; }
+        }
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public bool WarningOccured
+        {
+            get { return _WarningOccured; }
+            set { _WarningOccured = value; }
+        }
 
         #endregion
 
