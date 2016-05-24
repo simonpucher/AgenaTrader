@@ -7,7 +7,7 @@ This tutorial will show you our basic template for indicators, conditions and st
 In many cases we are starting with indicators because indicators are the best place to start on script development. 
 You will be able to get pretty quick an indication if your trading idea is working and of course you are able to screen instruments visual and verify if your trading idea will be profitable.
 
-##Method OnBarUpdate()
+##OnBarUpdate
 Our main logic will be inside of the OnBarUpdate() method. In our example we are using moduls operation to check if there is currently an even or an odd minute. We want to show a long signal wenn it is even and we show a short signal on odd minutes: 
 
 ```C#
@@ -24,6 +24,23 @@ Our main logic will be inside of the OnBarUpdate() method. In our example we are
             else
             {
                 this.Indicator_Curve_Entry.Set(0);
+            }
+        }
+```
+
+##TimeFrame
+In our case we need a one minute time frame to work with the indicator. Please pay attention to set this method to public because we need this method also in other scripts like conditions or strategies. 
+```C#
+        public bool DatafeedPeriodicityIsValid(ITimeFrame timeframe)
+        {
+            TimeFrame tf = (TimeFrame)timeframe;
+            if (tf.Periodicity == DatafeedHistoryPeriodicity.Minute && tf.PeriodicityValue == 1)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
         }
 ```
