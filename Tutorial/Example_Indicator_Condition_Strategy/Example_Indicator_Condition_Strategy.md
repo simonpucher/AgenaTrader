@@ -65,7 +65,31 @@ Also in this case the main logic is inside of the onbarupdate method. Because ou
             Occurred.Set(returnvalue);
 ```
 
+#Strategy
+##Default time frame
+If you start the strategy via the strategy-escort you need to set the default time frame. In this case you override the zero default time frame in strategy escort. If you start the strategy on a chart the time frame is automatically set, this will lead to a better usability in both cases.
+```C#
+            if (this.TimeFrame == null || this.TimeFrame.PeriodicityValue == 0)
+            {
+                this.TimeFrame = new TimeFrame(DatafeedHistoryPeriodicity.Minute, 1);
+            }
+```
+##OnBarUpdate
+Same procedure as in the condition. We create a fresh instance of the indicator and save the return value into a variable and we call the methods to create orders.
 
+```C#
+            DummyOneMinuteEvenOdd_Indicator _DummyOneMinuteEvenOdd_Indicator = LeadIndicator.DummyOneMinuteEvenOdd_Indicator();
+            double returnvalue = _DummyOneMinuteEvenOdd_Indicator[0];
+            if (returnvalue == 1)
+            {
+                this.DoEnterLong();
+            }
+            else if (returnvalue == -1)
+            {
+                this.DoEnterShort();
+            }
+	}
+```
 
 #Miscellaneous
 ##Filenames and Class names
