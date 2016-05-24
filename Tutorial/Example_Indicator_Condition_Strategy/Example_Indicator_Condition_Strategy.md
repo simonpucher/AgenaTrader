@@ -70,6 +70,6 @@ In each script we override the ToString() method and the DisplayName to provide 
 #Files
 [Indicator](https://github.com/simonpucher/AgenaTrader/blob/master/Indicator/DummyOneMinuteEvenOdd_Indicator.cs)
 
-[Condition](https://github.com/simonpucher/AgenaTrader/blob/master/Condition/DummyOneMinuteEntryOdd_Condition.cs)
+[Condition](https://github.com/simonpucher/AgenaTrader/blob/master/Condition/DummyOneMinuteEvenOdd_Condition.cs)
 
-[Strategy](https://github.com/simonpucher/AgenaTrader/blob/master/Strategy/DummyOneMinuteOdd_Strategy.cs)
+[Strategy](https://github.com/simonpucher/AgenaTrader/blob/master/Strategy/DummyOneMinuteEvenOdd_Strategy.cs)
