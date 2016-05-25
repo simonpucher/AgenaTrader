@@ -36,7 +36,7 @@ The following examples will show you how to link files into AgenaTrader using mk
 
 Many of our indicators does need the global utility class. Your need to link this folder also into the indicator directory:
 
-'`mklink /d "C:\AgenaTrader\UserCode\Indicators\github_utility" "C:\Github\AgenaTrader\Utility"`
+- `mklink /d "C:\AgenaTrader\UserCode\Indicators\github_utility" "C:\Github\AgenaTrader\Utility"`
 
 
 **Please pay attention to change the directories (source & target) to your local directories!**
