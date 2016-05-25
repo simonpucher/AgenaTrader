@@ -23,7 +23,7 @@ Now we need to link the files from our local GitHub workspace into the local Age
 
 [Have a look at this mklink guide](http://www.howtogeek.com/howto/16226/complete-guide-to-symbolic-links-symlinks-on-windows-or-linux/)
 
-The following three AgenTrader directories are important for us:
+The following three AgenaTrader directories are important for us:
 - indicator => `[... path to your AgenaTrader User directory ...]\AgenaTrader\UserCode\ScriptedConditions\`
 - condition => `[... path to your AgenaTrader User directory ...]\AgenaTrader\UserCode\ScriptedConditions\`
 - strategy => `[... path to your AgenaTrader User directory ...]\AgenaTrader\UserCode\ScriptedConditions\`
