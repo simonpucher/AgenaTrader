@@ -38,7 +38,6 @@ Many of our indicators do need the global utility class. Your need to link this 
 
 - `mklink /d "C:\AgenaTrader\UserCode\Indicators\github_utility" "C:\Github\AgenaTrader\Utility"`
 
-
 **Please pay attention to change the directories (source & target) to your local directories!**
 
 
