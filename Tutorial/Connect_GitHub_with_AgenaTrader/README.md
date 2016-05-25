@@ -30,13 +30,13 @@ The following three AgenTrader directories are important for us:
 
 The following examples will show you how to link files into AgenaTrader using mklink:
 
-- `mklink /d "C:\AgenaTrader\UserCode\Indicators\github_indicator" "C:\workspace\Github\AgenaTrader\Indicator"`
-- `mklink /d "C:\AgenaTrader\UserCode\ScriptedConditions\github_condition" "C:\workspace\Github\AgenaTrader\Condition"`
-- `mklink /d "C:\AgenaTrader\UserCode\Strategies\github_strategy" "C:\workspace\Github\AgenaTrader\Strategy"`
+- `mklink /d "C:\AgenaTrader\UserCode\Indicators\github_indicator" "C:\Github\AgenaTrader\Indicator"`
+- `mklink /d "C:\AgenaTrader\UserCode\ScriptedConditions\github_condition" "C:\Github\AgenaTrader\Condition"`
+- `mklink /d "C:\AgenaTrader\UserCode\Strategies\github_strategy" "C:\Github\AgenaTrader\Strategy"`
 
 Many of our indicators does need the global utility class. Your need to link this folder also into the indicator directory:
 
-'`mklink /d "C:\AgenaTrader\UserCode\Indicators\github_utility" "C:\workspace\Github\AgenaTrader\Utility"`
+'`mklink /d "C:\AgenaTrader\UserCode\Indicators\github_utility" "C:\Github\AgenaTrader\Utility"`
 
 
 **Please pay attention to change the directories (source & target) to your local directories!**
