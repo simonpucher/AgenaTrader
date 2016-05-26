@@ -23,7 +23,7 @@ using System.Windows.Forms;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// Global utilities is a helper indicator and holds c# scripts to use in AgenaTrader.
+/// Global utilities as a helper in Agena Trader Script.
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -212,7 +212,8 @@ namespace AgenaTrader.UserCode
                 //return 1;
                 return instrument.GetDefaultQuantity();
             }
-            if (instrument.InstrumentType == InstrumentType.Stock)
+            if (instrument.InstrumentType == InstrumentType.Stock
+             || instrument.InstrumentType == InstrumentType.CFD)
             {
                 return (int)Math.Floor(decimal.ToDouble(MoneyExchange(maxpositionsizeincash, account.Currency, instrument.Currency)) / lastprice);
             }
@@ -436,7 +437,6 @@ namespace AgenaTrader.UserCode
         #endregion
 
         #region Chart
-
         /// <summary>
         /// Draws a standard alert text in the chart.
         /// </summary>
@@ -469,8 +469,7 @@ namespace AgenaTrader.UserCode
         {
 
             string filepart = GlobalUtilities.CleanFileName(Indicator + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + InstrumentName + "_" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm"));
-            string directory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Evaluation\\SnapShot\\" + filepart + "\\";
-            System.IO.Directory.CreateDirectory(directory);
+            string directory = Environment.GetFolderPath(Environment.SpecialFolder.Desktop) + "\\Auswertung\\SnapShot\\" + filepart + "\\";
             string fileName = InstrumentName + "_" + TimeFrame.PeriodicityValue + TimeFrame.Periodicity + "_" + Bars[0].Time.ToString("yyyy_MM_dd_HH_mm") + ".jpg";
             fileName = GlobalUtilities.CleanFileName(fileName);
 
@@ -500,8 +499,10 @@ namespace AgenaTrader.UserCode
             foreach (IChart chart in AllCharts)
             {
                 if (chart.HistoryRequest.TimeFrame.Periodicity == TimeFrame.Periodicity
-                 && chart.HistoryRequest.TimeFrame.PeriodicityValue == TimeFrame.PeriodicityValue)
+                 && chart.HistoryRequest.TimeFrame.PeriodicityValue == TimeFrame.PeriodicityValue
+                 && chart.Instrument.Name == Bars.Instrument.Name)
                 {
+                    System.IO.Directory.CreateDirectory(directory);
                     chart.SetDateRange(ChartStart, ChartEnd);
                     chart.SaveChart(directory + fileName);
                 }
@@ -861,7 +862,7 @@ namespace AgenaTrader.UserCode
         /// <returns></returns>
         public string getCSVData()
         {
-            return string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13};{14};{15};{16};{17};{18}",     
+            return string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13};{14};{15};{16};{17};{18};{19}",     
                                             this.NameOfTheStrategy, 
                                             this.TradeDirection.ToString(), 
                                             this.TimeFrame,
@@ -874,6 +875,7 @@ namespace AgenaTrader.UserCode
                                             this.EntryOrderType,
                                             this.ExitPrice,
                                             this.PointsDiff,
+                                            this.PointsDiffPercentage,
                                             this.ExitReason,
                                             this.ExitQuantity,
                                             this.ExitOrderType,
@@ -894,7 +896,7 @@ namespace AgenaTrader.UserCode
             if (fi.Exists == false)
             {
                 using (StreamWriter stream = new StreamWriter(File)) {
-                    stream.WriteLine("Strategy;TradeDirection;TimeFrame;EntryDateTime;ExitDateTime;MinutesInMarket;Instrument;EntryPrice;EntryQuantity;EntryOrderType;ExitPrice;PointsDiff;ExitReason;ExitQuantity;ExitOrderType;ProfitLoss;ProfitLossPercent;StopPrice;TargetPrice");
+                    stream.WriteLine("Strategy;TradeDirection;TimeFrame;EntryDateTime;ExitDateTime;MinutesInMarket;Instrument;EntryPrice;EntryQuantity;EntryOrderType;ExitPrice;PointsDiff;PointsDiffPerc;ExitReason;ExitQuantity;ExitOrderType;ProfitLoss;ProfitLossPercent;StopPrice;TargetPrice");
                 }
             }
             using (StreamWriter stream = new FileInfo(File).AppendText())
@@ -986,6 +988,21 @@ namespace AgenaTrader.UserCode
                         return EntryPrice - ExitPrice;
                     }
               }
+        }
+
+        public double PointsDiffPercentage
+        {
+            get
+            {
+                if (TradeDirection == PositionType.Long)
+                {
+                    return 1-(EntryPrice / ExitPrice );
+                }
+                else
+                {
+                    return 1-(ExitPrice/EntryPrice);
+                }
+            }
         }
 
         private string _instrument = String.Empty;

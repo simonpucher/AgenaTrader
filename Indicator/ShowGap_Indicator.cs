@@ -71,27 +71,7 @@ namespace AgenaTrader.UserCode
 
             if (IsCurrentBarLast)
             {
-                //Print("--------------Finale Auswertung Start--------------");
-                //Print("Total Trades: " + (GapTradeCounterLong + GapTradeCounterShort));
-                //Print("Total Long Punkte: " + GapTradeResultTotalLong);
-                //Print("Total Short Punkte: " + GapTradeResultTotalShort);
 
-                //if (GapTradeResultTotalShort > 0)
-                //{
-                //    Print("Total Punkte;" +Instrument.Name +";"+ (GapTradeResultTotalLong - GapTradeResultTotalShort));
-                //}
-                //else
-                //{
-                //    Print("Total Punkte;" + Instrument.Name + ";" + (GapTradeResultTotalLong + Math.Abs(GapTradeResultTotalShort)));
-                //}
-
-                //Print("Total Long Trades: " + (GapTradeWinCounterLong + GapTradeFailCounterLong));                
-                //Print("Long Wins: " + GapTradeWinCounterLong);
-                //Print("Long Fails: " + GapTradeFailCounterLong);
-                //Print("Total Short Trades: " + (GapTradeWinCounterShort + GapTradeFailCounterShort));                
-                //Print("Short Wins: " + GapTradeWinCounterShort);
-                //Print("Short Fails: " + GapTradeFailCounterShort);
-                //Print("--------------Finale Auswertung Ende --------------");
             }
 
         }
@@ -155,7 +135,7 @@ namespace AgenaTrader.UserCode
                 DateTime LastPeriod = Time[1];
 
 //Prüfen ob es überhaupt ein Gap gab
-                if (LastDayClose != null
+                if (LastDayClose > 0
                 && Math.Abs(GapSize) > 0)
                 {
                     existgap = true;
