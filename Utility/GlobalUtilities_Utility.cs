@@ -856,6 +856,49 @@ namespace AgenaTrader.UserCode
         }
 
 
+
+        /// <summary>
+        /// Standard constructor with all statistical trades.
+        /// You should use this when you create statistic data during a backtest with parameter optimization.
+        /// In this case you also need to use the methods SetEntry() and SetExit();
+        /// </summary>
+        /// <param name="tradingmanager"></param>
+        /// <param name="nameofthestrategy"></param>
+        /// <param name="execution"></param>
+        public Statistic(string nameofthestrategy, Instrument instrument, PositionType positiontype, TimeFrame timeframe)
+        {
+           //Log all data
+            //todo talk to christian concerning the unused properties and StopPrice
+            this.NameOfTheStrategy = nameofthestrategy;
+            this.Instrument = instrument.ToString();
+            this.TradeDirection = positiontype;
+            this.TimeFrame = timeframe.ToString();
+            //this.ProfitLoss = trade.ProfitLoss;
+            //this.ProfitLossPercent = trade.ProfitLossPercent;
+            //this.ExitReason = trade.ExitReason;
+           
+            //this.StopPrice = execution.Order.StopPrice;
+
+            //everything is fine
+            this.IsValid = true;
+        }
+
+
+        public void SetEntry(int entry_quantity, double entry_price, DateTime entry_datetime, OrderType entry_ordertype) {
+            this.EntryDateTime = entry_datetime;
+            this.EntryPrice = entry_price;
+            this.EntryQuantity = entry_quantity;
+            this.EntryOrderType = entry_ordertype;
+        }
+
+        public void SetExit(int exit_quantity, double exit_price, DateTime exit_datetime, OrderType exit_ordertype) {
+            this.ExitPrice = exit_price;
+            this.ExitDateTime = exit_datetime;
+            this.ExitQuantity = exit_quantity;
+            this.ExitOrderType = exit_ordertype;
+        }
+
+
         /// <summary>
         /// Returns a string with csv data.
         /// </summary>
@@ -1029,9 +1072,9 @@ namespace AgenaTrader.UserCode
             set { _EntryPrice = value; }
         }
 
-        private double _EntryQuantity = Double.MinValue;
+        private int _EntryQuantity = 0;
 
-        public double EntryQuantity
+        public int EntryQuantity
         {
             get { return _EntryQuantity; }
             set { _EntryQuantity = value; }
@@ -1205,7 +1248,7 @@ public static class StringExtensions
 }
 #endregion
 
-[Category("Utility")]
+//[Category("Utility")]
 [Description("We use this indicator to share global code in agena trader.")]
 public class GlobalUtility : AgenaTrader.UserCode.UserIndicator
 {
