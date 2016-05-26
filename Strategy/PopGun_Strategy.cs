@@ -91,16 +91,17 @@ namespace AgenaTrader.UserCode
 
         protected override void OnExecution(IExecution execution)
         {
-            DateTime ts_Ausstieg = this._popgun_indicator.PopGunTargetDateTime; 
+            DateTime ts_Ausstieg = this._popgun_indicator.PopGunTargetDateTime;
 
-            foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
-            {
-                if (item.EntryOrder.Name == SignalNameEnter
-                 || item.EntryOrder.Name == SignalNameStop)
-                {
-                    item.Expiration = ts_Ausstieg;
-                }
-            }
+            ////todo this is not working in 1.9
+            //foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
+            //{
+            //    if (item.EntryOrder.Name == SignalNameEnter
+            //     || item.EntryOrder.Name == SignalNameStop)
+            //    {
+            //        item.Expiration = ts_Ausstieg;
+            //    }
+            //}
 
             if (execution.MarketPosition == PositionType.Flat)
             {
