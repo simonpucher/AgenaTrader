@@ -12,6 +12,19 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 using AgenaTrader.Helper.TradingManager;
 
+/// <summary>
+/// Version: in progress
+/// -------------------------------------------------------------------------
+/// Christian Kovar 2016
+/// -------------------------------------------------------------------------
+/// todo description
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this script without any error you also need access to the utility indicator to use global source code elements.
+/// You will find this script on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
     [Description("Handelsautomatik für ShowGap")]
@@ -114,7 +127,6 @@ namespace AgenaTrader.UserCode
                 ts_Ausstieg = DateTime.Now.AddMinutes(1);
             }
 
-
             foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
             {
                 if (item.EntryOrder.Name == SignalNameEnter
@@ -123,6 +135,19 @@ namespace AgenaTrader.UserCode
                     item.Expiration = ts_Ausstieg;
                 }
             }
+
+            //todo test for 1.9
+            //if (execution.Order.Name == SignalNameEnter || execution.Order.Name == SignalNameStop)
+            //{
+            //    int tradeid = this.TradingManager.GetTradeIdByExecutionId(execution.ExecutionId);
+            //    ITradingTrade trade = this.TradingManager.GetTrade(tradeid);
+
+            //    trade.EntryOrder.Gtd = ts_Ausstieg;
+
+            //    trade.Expiration = ts_Ausstieg;
+            //}
+
+
 
 
             if (execution.MarketPosition == PositionType.Flat) {

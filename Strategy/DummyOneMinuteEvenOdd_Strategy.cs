@@ -39,7 +39,7 @@ namespace AgenaTrader.UserCode
 
 
 		protected override void Initialize()
-		{
+		{ 
             CalculateOnBarClose = true;
 
             //Set the default time frame if you start the strategy via the strategy-escort
