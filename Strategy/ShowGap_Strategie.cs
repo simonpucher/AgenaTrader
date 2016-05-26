@@ -67,7 +67,7 @@ namespace AgenaTrader.UserCode
                 ts_Einstieg = new DateTime(Bars[0].Time.Year, Bars[0].Time.Month, Bars[0].Time.Day,Bars[0].Time.Hour,Bars[0].Time.Minute, 0);
             }
 
-            ////todo Close before end of trading day - please check it!
+            //todo Close before end of trading day - please check it!
             //if (this.oEnter != null)
             //{
             //    DateTime ts_Ausstieg;
@@ -80,7 +80,8 @@ namespace AgenaTrader.UserCode
             //        ts_Ausstieg = DateTime.Now.AddMinutes(1);
             //    }
 
-            //    if (Bars[0].Time >= ts_Ausstieg) {
+            //    if (Bars[0].Time >= ts_Ausstieg)
+            //    {
             //        if (this.oEnter.Action == OrderAction.Buy)
             //        {
             //            ExitLong(this.oEnter.Quantity, "EOD", this.oEnter.Name, this.oEnter.Instrument, this.oEnter.TimeFrame);
@@ -90,7 +91,6 @@ namespace AgenaTrader.UserCode
             //            ExitShort(this.oEnter.Quantity, "EOD", this.oEnter.Name, this.oEnter.Instrument, this.oEnter.TimeFrame);
             //        }
             //    }
-
             //}
 
 
@@ -144,8 +144,6 @@ namespace AgenaTrader.UserCode
         protected override void OnExecution(IExecution execution)
         {
 
-
-
             ////todo this is not working in 1.9
             //DateTime ts_Ausstieg;
             //if (_testlauf == false)
@@ -164,7 +162,6 @@ namespace AgenaTrader.UserCode
             //        item.Expiration = ts_Ausstieg;
             //    }
             //}
-
 
 
 
