@@ -34,22 +34,15 @@ namespace AgenaTrader.UserCode
     [IsStopAttribute(false)]
     [IsTargetAttribute(false)]
     [OverrulePreviousStopPrice(false)]
-    public class DummyOneMinuteEvenOddEntry_Condition : UserScriptedCondition, IDummyOneMinuteEvenOdd
+    public class DummyOneMinuteEvenOddEntry_Condition : UserScriptedCondition
     {
-        //interface
-        private bool _IsShortEnabled = true;
-        private bool _IsLongEnabled = true;
-        private bool _WarningOccured = false;
-        private bool _ErrorOccured = false;
-
+  
         //input
 
         //output
 
         //internal
-        private DummyOneMinuteEvenOdd_Indicator _DummyOneMinuteEvenOdd_Indicator = null;
-        private IOrder _orderenterlong;
-        private IOrder _orderentershort;
+
 
         private int _myvalue = 1;
 
@@ -80,128 +73,44 @@ namespace AgenaTrader.UserCode
         {
             //Print("OnStartUp");
             base.OnStartUp();
-
-            //Init our indicator to get code access to the calculate method
-            this._DummyOneMinuteEvenOdd_Indicator = new DummyOneMinuteEvenOdd_Indicator();
-
-            this.ErrorOccured = false;
-            this.WarningOccured = false;
         }
 
 
         protected override void OnBarUpdate()
         {
-            //Check if peridocity is valid for this script
-            if (!this._DummyOneMinuteEvenOdd_Indicator.DatafeedPeriodicityIsValid(Bars.TimeFrame))
+           //exit on error
+            if (IsError)
             {
-                //Display warning just one time
-                if (!this.WarningOccured)
-                {
-                    Log(this.DisplayName + ": " + Const.DefaultStringDatafeedPeriodicity, InfoLogLevel.Warning);
-                    this.WarningOccured = true;
-                }
                 return;
             }
 
-            //Lets call the calculate method and save the result with the trade action
-            ResultValue returnvalue = this._DummyOneMinuteEvenOdd_Indicator.calculate(Bars[0], this.IsLongEnabled, this.IsShortEnabled);
+            //get the indicator
+            DummyOneMinuteEvenOdd_Indicator _DummyOneMinuteEvenOdd_Indicator = LeadIndicator.DummyOneMinuteEvenOdd_Indicator();
 
-            //If the calculate method was not finished we need to stop and show an alert message to the user.
-            if (returnvalue.ErrorOccured)
-            {
-                //Display error just one time
-                if (!this.ErrorOccured)
-                {
-                    Log(this.DisplayName + ": " + Const.DefaultStringErrorDuringCalculation, InfoLogLevel.AlertLog);
-                    this.ErrorOccured = true;
-                }
-                return;
-            }
-
-            //Entry
-            if (returnvalue.Entry.HasValue)
-            {
-                switch (returnvalue.Entry)
-                {
-                    case OrderAction.Buy:
-                        //Long Signal
-                        Occurred.Set(1);
-                        //Entry.Set(Close[0]);
-                        break;
-                    case OrderAction.SellShort:
-                        //Short Signal
-                        Occurred.Set(-1);
-                        //Entry.Set(Close[0]);
-                        break;
-                }
-            }
-            else
-            {
-                //No Signal
-                Occurred.Set(0);
-                //Entry.Set(Close[0]);
-            }
-
+            //get the value
+            double returnvalue = _DummyOneMinuteEvenOdd_Indicator[0];
+            
+            //set the value
+            Occurred.Set(returnvalue);
+   
         }
 
         public override string ToString()
         {
-            return "Dummy one minute even/odd (C)";
+            return "Dummy even/odd (S)";
         }
 
         public override string DisplayName
         {
             get
             {
-                return "Dummy one minute even/odd (C)";
+                return "Dummy even/odd (S)";
             }
         }
 
         #region Properties
 
-        #region Interface
-
-        /// <summary>
-        /// </summary>
-        [Description("If true it is allowed to create long positions.")]
-        [Category("Parameters")]
-        [DisplayName("Allow Long")]
-        public bool IsLongEnabled
-        {
-            get { return _IsLongEnabled; }
-            set { _IsLongEnabled = value; }
-        }
-
-
-        /// <summary>
-        /// </summary>
-        [Description("If true it is allowed to create short positions.")]
-        [Category("Parameters")]
-        [DisplayName("Allow Short")]
-        public bool IsShortEnabled
-        {
-            get { return _IsShortEnabled; }
-            set { _IsShortEnabled = value; }
-        }
-
-
-        [Browsable(false)]
-        [XmlIgnore()]
-        public bool ErrorOccured
-        {
-            get { return _ErrorOccured; }
-            set { _ErrorOccured = value; }
-        }
-
-        [Browsable(false)]
-        [XmlIgnore()]
-        public bool WarningOccured
-        {
-            get { return _WarningOccured; }
-            set { _WarningOccured = value; }
-        }
-
-        #endregion
+    
 
         [Browsable(false)]
         [XmlIgnore()]

@@ -12,6 +12,19 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 using AgenaTrader.Helper.TradingManager;
 
+/// <summary>
+/// Version: in progress
+/// -------------------------------------------------------------------------
+/// Christian Kovar 2016
+/// -------------------------------------------------------------------------
+/// todo description
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this script without any error you also need access to the utility indicator to use global source code elements.
+/// You will find this script on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
     [Description("Handelsautomatik für ShowGap")]
@@ -53,6 +66,32 @@ namespace AgenaTrader.UserCode
             {
                 ts_Einstieg = new DateTime(Bars[0].Time.Year, Bars[0].Time.Month, Bars[0].Time.Day,Bars[0].Time.Hour,Bars[0].Time.Minute, 0);
             }
+
+            ////todo Close before end of trading day - please check it!
+            //if (this.oEnter != null)
+            //{
+            //    DateTime ts_Ausstieg;
+            //    if (_testlauf == false)
+            //    {
+            //        ts_Ausstieg = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 30, 0);
+            //    }
+            //    else
+            //    {
+            //        ts_Ausstieg = DateTime.Now.AddMinutes(1);
+            //    }
+
+            //    if (Bars[0].Time >= ts_Ausstieg) {
+            //        if (this.oEnter.Action == OrderAction.Buy)
+            //        {
+            //            ExitLong(this.oEnter.Quantity, "EOD", this.oEnter.Name, this.oEnter.Instrument, this.oEnter.TimeFrame);
+            //        }
+            //        else if (this.oEnter.Action == OrderAction.SellShort)
+            //        {
+            //            ExitShort(this.oEnter.Quantity, "EOD", this.oEnter.Name, this.oEnter.Instrument, this.oEnter.TimeFrame);
+            //        }
+            //    }
+
+            //}
 
 
             if (!IsCurrentBarLast || oEnter != null)
@@ -104,25 +143,29 @@ namespace AgenaTrader.UserCode
 
         protected override void OnExecution(IExecution execution)
         {
-            DateTime ts_Ausstieg;
-            if (_testlauf == false)
-            {
-                ts_Ausstieg = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 30, 0);
-            }
-            else
-            {
-                ts_Ausstieg = DateTime.Now.AddMinutes(1);
-            }
 
 
-            foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
-            {
-                if (item.EntryOrder.Name == SignalNameEnter
-                 || item.EntryOrder.Name == SignalNameStop)
-                {
-                    item.Expiration = ts_Ausstieg;
-                }
-            }
+
+            ////todo this is not working in 1.9
+            //DateTime ts_Ausstieg;
+            //if (_testlauf == false)
+            //{
+            //    ts_Ausstieg = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 30, 0);
+            //}
+            //else
+            //{
+            //    ts_Ausstieg = DateTime.Now.AddMinutes(1);
+            //}
+            //foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
+            //{
+            //    if (item.EntryOrder.Name == SignalNameEnter
+            //     || item.EntryOrder.Name == SignalNameStop)
+            //    {
+            //        item.Expiration = ts_Ausstieg;
+            //    }
+            //}
+
+
 
 
             if (execution.MarketPosition == PositionType.Flat) {

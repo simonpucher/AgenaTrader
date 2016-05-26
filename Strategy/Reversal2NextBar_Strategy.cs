@@ -12,6 +12,19 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 using AgenaTrader.Helper.TradingManager;
 
+/// <summary>
+/// Version: in progress
+/// -------------------------------------------------------------------------
+/// Christian Kovar 2016
+/// -------------------------------------------------------------------------
+/// todo description
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this script without any error you also need access to the utility indicator to use global source code elements.
+/// You will find this script on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
 	[Description("Kauft bei Umkehrstab und hält für eine Periode")]
@@ -99,15 +112,15 @@ namespace AgenaTrader.UserCode
             ts_Ausstieg = GlobalUtilities.GetTargetBar(Bars, Bars[0].Time, TimeFrame, 1);
             Print("Ausstieg: " + ts_Ausstieg + "Bars[-1].Time: " + Bars[-1].Time);
 
-
-            foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
-            {
-                if (item.EntryOrder.Name == SignalNameEnter
-                 || item.EntryOrder.Name == SignalNameStop)
-                {
-                    item.Expiration = ts_Ausstieg;
-                }
-            }
+            ////todo this is not working in 1.9
+            //foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
+            //{
+            //    if (item.EntryOrder.Name == SignalNameEnter
+            //     || item.EntryOrder.Name == SignalNameStop)
+            //    {
+            //        item.Expiration = ts_Ausstieg;
+            //    }
+            //}
 
 
             if (execution.MarketPosition == PositionType.Flat)

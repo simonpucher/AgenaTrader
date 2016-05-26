@@ -12,6 +12,19 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 using AgenaTrader.Helper.TradingManager;
 
+/// <summary>
+/// Version: in progress
+/// -------------------------------------------------------------------------
+/// Christian Kovar 2016
+/// -------------------------------------------------------------------------
+/// todo description
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this script without any error you also need access to the utility indicator to use global source code elements.
+/// You will find this script on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
     [Description("Strategie zu Pop Gun Bar Pattern")]
@@ -132,6 +145,19 @@ namespace AgenaTrader.UserCode
                 //nothing to do
             }
         }
+
+
+            ////todo this is not working in 1.9
+            //  DateTime ts_Ausstieg = this._popgun_indicator.PopGunTargetDateTime;
+            //foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
+            //{
+            //    if (item.EntryOrder.Name == SignalNameEnter
+            //     || item.EntryOrder.Name == SignalNameStop)
+            //    {
+            //        item.Expiration = ts_Ausstieg;
+            //    }
+            //}
+
 
         private void DoEnterLong()
         {
