@@ -112,15 +112,15 @@ namespace AgenaTrader.UserCode
             ts_Ausstieg = GlobalUtilities.GetTargetBar(Bars, Bars[0].Time, TimeFrame, 1);
             Print("Ausstieg: " + ts_Ausstieg + "Bars[-1].Time: " + Bars[-1].Time);
 
-
-            foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
-            {
-                if (item.EntryOrder.Name == SignalNameEnter
-                 || item.EntryOrder.Name == SignalNameStop)
-                {
-                    item.Expiration = ts_Ausstieg;
-                }
-            }
+            ////todo this is not working in 1.9
+            //foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
+            //{
+            //    if (item.EntryOrder.Name == SignalNameEnter
+            //     || item.EntryOrder.Name == SignalNameStop)
+            //    {
+            //        item.Expiration = ts_Ausstieg;
+            //    }
+            //}
 
 
             if (execution.MarketPosition == PositionType.Flat)

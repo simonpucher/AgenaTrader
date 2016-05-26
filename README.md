@@ -2,6 +2,10 @@
 This project contains scripts for the AgenaTrader like indicators, conditions and strategies. If you have any questions or feedback for us please do not hesitate to contact us via Twitter [Simon](https://twitter.com/SimonPucher), [Christian](https://twitter.com/ckovar82) or [open an issue on GitHub](https://github.com/simonpucher/AgenaTrader/issues).
 
 ##IMPORTANT
+###These scripts are compiled against AT 1.9.0.273
+**If you are using a higer or a beta version DO NOT USE these scripts!**
+
+###Utility Indicator
 To compile indicators, conditions and other script resources without any error your **AgenaTrader also need access to the Utility Indicator** to use global source code elements! We use this indicator to share code snippets, so we do not need to copy and paste again and again. These reduces error sources, minimze the workload, gives us better testing opportunities and a better clarity. **You need to copy the Utility Indicator into the indicators directory of your AgenaTrader.** You will find the latest version of this Utility Indicator on GitHub: [Global Utilities](https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs)
 
 ##Version number vs. in progress

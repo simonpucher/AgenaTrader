@@ -67,6 +67,32 @@ namespace AgenaTrader.UserCode
                 ts_Einstieg = new DateTime(Bars[0].Time.Year, Bars[0].Time.Month, Bars[0].Time.Day,Bars[0].Time.Hour,Bars[0].Time.Minute, 0);
             }
 
+            ////todo Close before end of trading day - please check it!
+            //if (this.oEnter != null)
+            //{
+            //    DateTime ts_Ausstieg;
+            //    if (_testlauf == false)
+            //    {
+            //        ts_Ausstieg = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 30, 0);
+            //    }
+            //    else
+            //    {
+            //        ts_Ausstieg = DateTime.Now.AddMinutes(1);
+            //    }
+
+            //    if (Bars[0].Time >= ts_Ausstieg) {
+            //        if (this.oEnter.Action == OrderAction.Buy)
+            //        {
+            //            ExitLong(this.oEnter.Quantity, "EOD", this.oEnter.Name, this.oEnter.Instrument, this.oEnter.TimeFrame);
+            //        }
+            //        else if (this.oEnter.Action == OrderAction.SellShort)
+            //        {
+            //            ExitShort(this.oEnter.Quantity, "EOD", this.oEnter.Name, this.oEnter.Instrument, this.oEnter.TimeFrame);
+            //        }
+            //    }
+
+            //}
+
 
             if (!IsCurrentBarLast || oEnter != null)
             {
@@ -117,34 +143,26 @@ namespace AgenaTrader.UserCode
 
         protected override void OnExecution(IExecution execution)
         {
-            DateTime ts_Ausstieg;
-            if (_testlauf == false)
-            {
-                ts_Ausstieg = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 30, 0);
-            }
-            else
-            {
-                ts_Ausstieg = DateTime.Now.AddMinutes(1);
-            }
 
-            foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
-            {
-                if (item.EntryOrder.Name == SignalNameEnter
-                 || item.EntryOrder.Name == SignalNameStop)
-                {
-                    item.Expiration = ts_Ausstieg;
-                }
-            }
 
-            //todo test for 1.9
-            //if (execution.Order.Name == SignalNameEnter || execution.Order.Name == SignalNameStop)
+
+            ////todo this is not working in 1.9
+            //DateTime ts_Ausstieg;
+            //if (_testlauf == false)
             //{
-            //    int tradeid = this.TradingManager.GetTradeIdByExecutionId(execution.ExecutionId);
-            //    ITradingTrade trade = this.TradingManager.GetTrade(tradeid);
-
-            //    trade.EntryOrder.Gtd = ts_Ausstieg;
-
-            //    trade.Expiration = ts_Ausstieg;
+            //    ts_Ausstieg = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day, 09, 30, 0);
+            //}
+            //else
+            //{
+            //    ts_Ausstieg = DateTime.Now.AddMinutes(1);
+            //}
+            //foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
+            //{
+            //    if (item.EntryOrder.Name == SignalNameEnter
+            //     || item.EntryOrder.Name == SignalNameStop)
+            //    {
+            //        item.Expiration = ts_Ausstieg;
+            //    }
             //}
 
 
