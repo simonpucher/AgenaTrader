@@ -42,7 +42,6 @@ namespace AgenaTrader.UserCode
         TimeSpan Time_OpenRangeStartUS { get; set; }
         TimeSpan Time_EndOfDay_DE { get; set; }
         TimeSpan Time_EndOfDay_US { get; set; }
-
     }
 
     /// <summary>
@@ -91,9 +90,6 @@ namespace AgenaTrader.UserCode
         private TimeSpan _tim_EndOfDay_DE = new TimeSpan(17, 30, 0);  
         private TimeSpan _tim_EndOfDay_US = new TimeSpan(22, 00, 0);
 
- 
-        //todo add statistic data
-        //private bool _statisticbacktesting = false;
 
         //output
         private double _rangelow = Double.MinValue;
@@ -109,8 +105,6 @@ namespace AgenaTrader.UserCode
         private IBar _short_target_reached = null;
         private DateTime _currentdayofupdate = DateTime.MinValue;
         private ITimePeriod _timeperiod = null;
-        //todo add statistic data
-        //private StatisticContainer _StatisticContainer = null;
 
 
 
@@ -143,12 +137,6 @@ namespace AgenaTrader.UserCode
             //Print("OnStartUp");
 
             this.TimePeriod = this.Root.Core.MarketplaceManager.GetExchangeDescription(this.Instrument.Exchange).TradingHours;
-
-            ////todo Initalize statistic data list if this feature is enabled
-            //if (this.StatisticBacktesting)
-            //{
-            //    this._StatisticContainer = new StatisticContainer();
-            //}
         }
 
 		protected override void OnBarUpdate()
@@ -210,24 +198,16 @@ namespace AgenaTrader.UserCode
                     Value.Set(0);
                 }
 
-            
-                //todo statistic for timeout
-                //todo statistic for stops
-
                 //Draw the Long Target if this is necessary 
                 if (this.LongTargetReached != null)
                 {
                     DrawArrowDown("ArrowTargetLong" + Bars[0].Time.Date.Ticks, true, this.LongTargetReached.Time, this.LongTargetReached.High, Color.Red);
-                    //todo add statistic data
-                    //this._StatisticContainer.Add();
                 }
 
                 //Draw the Short Target if this is necessary
                 if (this.ShortTargetReached != null)
                 {
                     DrawArrowUp("ArrowTargetShort" + Bars[0].Time.Date.Ticks, true, this.ShortTargetReached.Time, this.ShortTargetReached.Low, Color.Green);
-                    //todo add statistic data
-                    //this._StatisticContainer.Add();
                 }
 
                 //Set the color
@@ -444,14 +424,14 @@ namespace AgenaTrader.UserCode
 
         public override string ToString()
         {
-            return "ORB";
+            return "ORB (I)";
         }
 
         public override string DisplayName
         {
             get
             {
-                return "ORB";
+                return "ORB (I)";
             }
         }
 
@@ -673,17 +653,6 @@ namespace AgenaTrader.UserCode
         }
 
 
-
-
-        //todo add statistic data
-        //[Description("If true the strategy will create statistic data during the backtesting process")]
-        //[Category("Safety first!")]
-        //[DisplayName("Statistic Backtesting")]
-        //public bool StatisticBacktesting
-        //{
-        //    get { return _statisticbacktesting; }
-        //    set { _statisticbacktesting = value; }
-        //}
 
 
         #region Plotstyle
