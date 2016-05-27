@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1.2
+/// Version: 1.1.3
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -186,8 +186,11 @@ namespace AgenaTrader.UserCode
         /// </summary>
         private void DoExitShort()
         {
-            ExitShort(this._orderentershort.Name);
-            this._orderentershort = null;
+            if (_orderentershort != null)
+            {
+                ExitShort(this._orderentershort.Name);
+                this._orderentershort = null;
+            }
         }
 
         public override string ToString()
