@@ -18,7 +18,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.5.10
+/// Version: 1.5.12
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -744,39 +744,47 @@ namespace AgenaTrader.UserCode
         /// <param name="tradingmanager"></param>
         /// <param name="nameofthestrategy"></param>
         /// <param name="execution"></param>
-        public void Add(ITradingManager tradingmanager, string nameofthestrategy, IExecution execution)
+        public void Add(ITradingManager tradingmanager, IStrategy strategy, IExecution execution)
         {
-            //Statistic stat = new Statistic(tradingmanager, nameofthestrategy, execution);
-            //if (stat.IsValid)
-            //{
-            //    this.List.Add(stat);   
-            //}
-            this.List.Add(new Statistic(tradingmanager, nameofthestrategy, execution)); 
+            this.List.Add(new Statistic(tradingmanager, strategy, execution)); 
         }
 
-        ///// <summary>
-        ///// Add a order to our statistic (e.g. for indicator).
-        ///// </summary>
-        ///// <param name="tradingmanager"></param>
-        ///// <param name="nameofthestrategy"></param>
-        ///// <param name="execution"></param>
-        //public void Add(ITradingManager tradingmanager, string nameofthestrategy, IOrder execution)
-        //{
-        //    this.List.Add(new Statistic(tradingmanager, nameofthestrategy, execution));
-        //}
+
+        /// <summary>
+        /// Add a statistic obect (e.g. for backtesting).
+        /// </summary>
+        /// <param name="tradingmanager"></param>
+        /// <param name="nameofthestrategy"></param>
+        /// <param name="execution"></param>
+        public void Add(Statistic statistic)
+        {
+            this.List.Add(statistic);
+        }
+
 
         /// <summary>
         /// Copy the statistic csv file into the clipboard
         /// </summary>
         public void copyToClipboard()
         {
-            string csvdata = this.getCSVData();
-            //Copy the csv data into clipboard
-            Thread thread = new Thread(() => Clipboard.SetText(csvdata));
-            //Set the thread to STA
-            thread.SetApartmentState(ApartmentState.STA);
-            thread.Start();
-            thread.Join();
+            try
+            {
+                string csvdata = this.getCSVData();
+                if (!String.IsNullOrEmpty(csvdata))
+                {
+                    //Copy the csv data into clipboard
+                    Thread thread = new Thread(() => Clipboard.SetText(csvdata));
+                    //Set the thread to STA
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
+                    thread.Join();
+                }
+            }
+            catch (Exception)
+            {
+                //todo log it
+               
+            }
         }
 
         /// <summary>
@@ -789,6 +797,7 @@ namespace AgenaTrader.UserCode
             StringBuilder returnvalue = new StringBuilder();
             if (this.List != null && this.List.Count > 0)
             {
+                returnvalue.AppendLine(Statistic.getCSVDataHeader());
                 foreach (Statistic item in this.List)
                 {
                     returnvalue.AppendLine(item.getCSVData());
@@ -805,6 +814,7 @@ namespace AgenaTrader.UserCode
     {
 
         //todo remove this method
+        [Obsolete("Please use another constructor", false)]
         public Statistic(string nameofthestrategy)
         {
             this.NameOfTheStrategy = nameofthestrategy;
@@ -812,12 +822,12 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// Standard constructor with finalised executions (all data from trade and order is available).
-        /// You should use this when you create statistic data during a backtest.
+        /// You should use this when you create statistic data during a backtest when you are using executions.
         /// </summary>
         /// <param name="tradingmanager"></param>
         /// <param name="nameofthestrategy"></param>
         /// <param name="execution"></param>
-        public Statistic(ITradingManager tradingmanager, string nameofthestrategy, IExecution execution)
+        public Statistic(ITradingManager tradingmanager, IStrategy strategy, IExecution execution)
         {
             //Logging only on flat transactions then we have all data available (entry & exit)
             if (execution.MarketPosition == PositionType.Flat)
@@ -829,7 +839,7 @@ namespace AgenaTrader.UserCode
                 if (trade != null)
                 {
                     //Log all data
-                    this.NameOfTheStrategy = nameofthestrategy;
+                    this.NameOfTheStrategy = strategy.DisplayName;
                     this.Instrument = execution.Instrument.ToString();
                     this.TradeDirection = trade.EntryOrder.IsLong ? PositionType.Long : PositionType.Short;
                     this.TimeFrame = execution.Order.TimeFrame.ToString();
@@ -865,14 +875,14 @@ namespace AgenaTrader.UserCode
         /// <param name="tradingmanager"></param>
         /// <param name="nameofthestrategy"></param>
         /// <param name="execution"></param>
-        public Statistic(string nameofthestrategy, Instrument instrument, PositionType positiontype, TimeFrame timeframe)
+        public Statistic(IStrategy strategy, PositionType positiontype)
         {
            //Log all data
             //todo talk to christian concerning the unused properties and StopPrice
-            this.NameOfTheStrategy = nameofthestrategy;
-            this.Instrument = instrument.ToString();
+            this.NameOfTheStrategy = strategy.DisplayName;
+            this.Instrument = strategy.Instrument.ToString();
             this.TradeDirection = positiontype;
-            this.TimeFrame = timeframe.ToString();
+            this.TimeFrame = strategy.TimeFrame.ToString();
             //this.ProfitLoss = trade.ProfitLoss;
             //this.ProfitLossPercent = trade.ProfitLossPercent;
             //this.ExitReason = trade.ExitReason;
@@ -896,6 +906,15 @@ namespace AgenaTrader.UserCode
             this.ExitDateTime = exit_datetime;
             this.ExitQuantity = exit_quantity;
             this.ExitOrderType = exit_ordertype;
+        }
+
+        /// <summary>
+        /// Returns a string with csv header text.
+        /// </summary>
+        /// <returns></returns>
+        public static string getCSVDataHeader()
+        {
+            return "Strategy;TradeDirection;TimeFrame;EntryDateTime;ExitDateTime;MinutesInMarket;Instrument;EntryPrice;EntryQuantity;EntryOrderType;ExitPrice;PointsDiff;PointsDiffPerc;ExitReason;ExitQuantity;ExitOrderType;ProfitLoss;ProfitLossPercent;StopPrice;TargetPrice";
         }
 
 
@@ -939,7 +958,7 @@ namespace AgenaTrader.UserCode
             if (fi.Exists == false)
             {
                 using (StreamWriter stream = new StreamWriter(File)) {
-                    stream.WriteLine("Strategy;TradeDirection;TimeFrame;EntryDateTime;ExitDateTime;MinutesInMarket;Instrument;EntryPrice;EntryQuantity;EntryOrderType;ExitPrice;PointsDiff;PointsDiffPerc;ExitReason;ExitQuantity;ExitOrderType;ProfitLoss;ProfitLossPercent;StopPrice;TargetPrice");
+                    stream.WriteLine(getCSVDataHeader());
                 }
             }
             using (StreamWriter stream = new FileInfo(File).AppendText())
