@@ -414,7 +414,52 @@ namespace AgenaTrader.UserCode
             return Target;
         }
 
+        /// <summary>
+        /// Get the absolute size of the candlestick body. Meaning the size of the 
+        /// body (from Open to Close) without the wicks
+        /// </summary>
+        /// <param name="Bar"></param>
+        /// <returns></returns>
+        public static double getBodySize(IBar Bar)
+        {
+            return Math.Abs(Bar.Open - Bar.Close);
+        }
 
+        /// <summary>
+        /// Checks, if the close is higher than the open (upgoing candle)
+        /// </summary>
+        /// <param name="Bar"></param>
+        /// <returns></returns>
+        public static bool isGreenCandle(IBar Bar)
+        {
+            if (Bar.Open < Bar.Close)
+            {
+                //green candle
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks, if the open is higher than the close (downgoing candle)
+        /// </summary>
+        /// <param name="Bar"></param>
+        /// <returns></returns>
+        public static bool isRedCandle(IBar Bar)
+        {
+            if (Bar.Open > Bar.Close)
+            {
+                //red candle
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
 
         #endregion
 
@@ -507,6 +552,20 @@ namespace AgenaTrader.UserCode
                     chart.SaveChart(directory + fileName);
                 }
             }
+        }
+
+        #endregion
+
+        #region Calculation of Percentage
+
+        static public decimal getPercentage(double whole, double part)
+        {
+            if (whole != 0) {
+            return (decimal)((part / whole) * 100);
+            } else
+	{
+                return 0;
+	}
         }
 
         #endregion
