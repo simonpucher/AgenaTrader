@@ -18,7 +18,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.5.12
+/// Version: 1.5.13
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -746,7 +746,11 @@ namespace AgenaTrader.UserCode
         /// <param name="execution"></param>
         public void Add(ITradingManager tradingmanager, IStrategy strategy, IExecution execution)
         {
-            this.List.Add(new Statistic(tradingmanager, strategy, execution)); 
+            Statistic statistic = new Statistic(tradingmanager, strategy, execution);
+            //Set the counter, we are starting at 0
+            statistic.Counter = this.List.Count;
+            //Add the item to the list
+            this.List.Add(statistic); 
         }
 
 
@@ -758,6 +762,9 @@ namespace AgenaTrader.UserCode
         /// <param name="execution"></param>
         public void Add(Statistic statistic)
         {
+            //Set the counter, we are starting at 0
+            statistic.Counter = this.List.Count;
+            //Add the item to the list
             this.List.Add(statistic);
         }
 
@@ -894,14 +901,16 @@ namespace AgenaTrader.UserCode
         }
 
 
-        public void SetEntry(int entry_quantity, double entry_price, DateTime entry_datetime, OrderType entry_ordertype) {
+        public void SetEntry(string entryreason, int entry_quantity, double entry_price, DateTime entry_datetime, OrderType entry_ordertype) {
+            this.EntryReason = entryreason;
             this.EntryDateTime = entry_datetime;
             this.EntryPrice = entry_price;
             this.EntryQuantity = entry_quantity;
             this.EntryOrderType = entry_ordertype;
         }
 
-        public void SetExit(int exit_quantity, double exit_price, DateTime exit_datetime, OrderType exit_ordertype) {
+        public void SetExit(string exitreason, int exit_quantity, double exit_price, DateTime exit_datetime, OrderType exit_ordertype) {
+            this.ExitReason = exitreason;
             this.ExitPrice = exit_price;
             this.ExitDateTime = exit_datetime;
             this.ExitQuantity = exit_quantity;
@@ -910,37 +919,41 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// Returns a string with csv header text.
+        /// ATTENTION: If you change parameters in this method, please also change it in the getCSVData()
         /// </summary>
         /// <returns></returns>
         public static string getCSVDataHeader()
         {
-            return "Strategy;TradeDirection;TimeFrame;EntryDateTime;ExitDateTime;MinutesInMarket;Instrument;EntryPrice;EntryQuantity;EntryOrderType;ExitPrice;PointsDiff;PointsDiffPerc;ExitReason;ExitQuantity;ExitOrderType;ProfitLoss;ProfitLossPercent;StopPrice;TargetPrice";
+            return "Id;Strategy;Instrument;TimeFrame;TradeDirection;EntryReason;EntryDateTime;EntryPrice;EntryQuantity;EntryOrderType;ExitDateTime;ExitPrice;MinutesInMarket;ExitReason;ExitQuantity;ExitOrderType;PointsDiff;PointsDiffPerc;ProfitLoss;ProfitLossPercent;StopPrice;TargetPrice";
         }
 
 
         /// <summary>
         /// Returns a string with csv data.
+        /// ATTENTION: If you change parameters in this method, please also change it in the getCSVDataHeader()
         /// </summary>
         /// <returns></returns>
         public string getCSVData()
         {
-            return string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13};{14};{15};{16};{17};{18};{19}",     
-                                            this.NameOfTheStrategy, 
-                                            this.TradeDirection.ToString(), 
-                                            this.TimeFrame,
-                                            this.EntryDateTime.ToString(), 
-                                            this.ExitDateTime.ToString(), 
-                                            this.MinutesInMarket, 
+            return string.Format("{0};{1};{2};{3};{4};{5};{6};{7};{8};{9};{10};{11};{12};{13};{14};{15};{16};{17};{18};{19};{20};{21}",
+                                            this.Counter.ToString(),
+                                            this.NameOfTheStrategy,
                                             this.Instrument,
+                                            this.TimeFrame,
+                                            this.TradeDirection.ToString(),
+                                            this.EntryReason,
+                                            this.EntryDateTime.ToString(),
                                             this.EntryPrice,
                                             this.EntryQuantity,
                                             this.EntryOrderType,
+                                            this.ExitDateTime.ToString(),
                                             this.ExitPrice,
-                                            this.PointsDiff,
-                                            this.PointsDiffPercentage,
+                                            this.MinutesInMarket,
                                             this.ExitReason,
                                             this.ExitQuantity,
                                             this.ExitOrderType,
+                                            this.PointsDiff,
+                                            this.PointsDiffPercentage,
                                             this.ProfitLoss,
                                             this.ProfitLossPercent,
                                             this.StopPrice,
@@ -969,8 +982,15 @@ namespace AgenaTrader.UserCode
 
         #region Properties
 
-        #region internal
 
+        private int _counter = 0;
+        public int Counter
+        {
+            get { return _counter; }
+            set { _counter = value; }
+        }
+
+    
             private bool _IsValid = false;
             public bool IsValid
             {
@@ -978,7 +998,7 @@ namespace AgenaTrader.UserCode
                 set { _IsValid = value; }
             }
 
-        #endregion
+    
 
         private string _nameofthestrategy = null;
         public string NameOfTheStrategy
@@ -1109,7 +1129,13 @@ namespace AgenaTrader.UserCode
             set { _ExitPrice = value; }
         }
 
+        private String _EntryReason = String.Empty;
 
+        public String EntryReason
+        {
+            get { return _EntryReason; }
+            set { _EntryReason = value; }
+        }
 
 
         private String _ExitReason = String.Empty;

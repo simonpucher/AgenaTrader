@@ -261,14 +261,15 @@ namespace AgenaTrader.UserCode
         private void DoEnterLong() {
             if (this._orderenterlong == null)
             {
-                _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), "ORB_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+                string entryreason = "ORB_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString();
+                _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
                 SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
                 SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
 
                 if (this.StatisticBacktesting)
                 {
                     _statisticlong = new Statistic(this, PositionType.Long);
-                    this._statisticlong.SetEntry(_orderenterlong.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
+                    this._statisticlong.SetEntry(entryreason, _orderenterlong.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
                 }
             }
         }
@@ -279,14 +280,15 @@ namespace AgenaTrader.UserCode
         private void DoEnterShort() {
             if (this._orderentershort == null)
             {
-                _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), "ORB_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+                string entryreason = "ORB_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString();
+                _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
                 SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
                 SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
 
                 if (this.StatisticBacktesting)
                 {
                     _statisticshort = new Statistic(this, PositionType.Short);
-                    this._statisticshort.SetEntry(_statisticshort.ExitQuantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
+                    this._statisticshort.SetEntry(entryreason, _orderentershort.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
                 }
             }
         }
@@ -299,15 +301,18 @@ namespace AgenaTrader.UserCode
         {
             if (_orderenterlong != null)
             {
-                ExitLong(this._orderenterlong.Quantity, "EOD", this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
-                this._orderenterlong = null;
+                //todo exit reason on target?
+                string exitreason = "EOD";
+                ExitLong(this._orderenterlong.Quantity, exitreason, this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
 
                 if (this.StatisticBacktesting)
                 {
-                    this._statisticlong.SetExit(1, Bars[0].Close, Bars[0].Time, OrderType.Market);
+                    this._statisticlong.SetExit(exitreason, this._orderenterlong.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
                     this._StatisticContainer.Add(this._statisticlong);
                     _statisticlong = null;
                 }
+
+                this._orderenterlong = null;
             }
         }
 
@@ -319,15 +324,18 @@ namespace AgenaTrader.UserCode
 
             if (_orderentershort != null)
             {
-                ExitShort(this._orderentershort.Quantity, "EOD", this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
-                this._orderentershort = null;
+                //todo exit reason on target?
+                string exitreason = "EOD";
+                ExitShort(this._orderentershort.Quantity, exitreason, this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
 
                 if (this.StatisticBacktesting)
                 {
-                    this._statisticshort.SetExit(1, Bars[0].Close, Bars[0].Time, OrderType.Market);
+                    this._statisticshort.SetExit(exitreason, this._orderentershort.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
                     this._StatisticContainer.Add(this._statisticshort);
                     this._statisticshort = null;
                 }
+
+                this._orderentershort = null;
             }
         }
 
