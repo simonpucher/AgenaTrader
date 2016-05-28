@@ -32,7 +32,7 @@ using System.Threading;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-    [Description("Automatic trading for ORB strategy")]
+    [Description("Automatic trading for open range breakout strategy")]
     public class ORB_Strategy : UserStrategy, IORB
 	{
         //input
@@ -50,6 +50,8 @@ namespace AgenaTrader.UserCode
         private bool _autopilot = true;
         private bool _closeorderbeforendoftradingday = true;
         private bool _statisticbacktesting = false;
+        private bool _useprofittarget = true;
+        private bool _usestoploss = true;
 
         //output
         //no output variables yet
@@ -263,8 +265,14 @@ namespace AgenaTrader.UserCode
             {
                 string entryreason = "ORB_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString();
                 _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
-                SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
-                SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
+                if (this.UseStopLoss)
+                {
+                    SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
+                }
+                if (this.UseProfitTarget)
+                {
+                      SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong); 
+                }
 
                 if (this.StatisticBacktesting)
                 {
@@ -282,8 +290,14 @@ namespace AgenaTrader.UserCode
             {
                 string entryreason = "ORB_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString();
                 _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
-                SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
-                SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+                if (this.UseStopLoss)
+                {
+                    SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
+                }
+                if (this.UseProfitTarget)
+                {
+                     SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+                }
 
                 if (this.StatisticBacktesting)
                 {
@@ -506,6 +520,24 @@ namespace AgenaTrader.UserCode
             {
                 get { return _statisticbacktesting; }
                 set { _statisticbacktesting = value; }
+            }
+
+            [Description("If true the strategy will will use profit targets.")]
+            [Category("Safety first!")]
+            [DisplayName("Use profit target")]
+            public bool UseProfitTarget
+            {
+                get { return _useprofittarget; }
+                set { _useprofittarget = value; }
+            }
+
+            [Description("If true the strategy will will use stop loss.")]
+            [Category("Safety first!")]
+            [DisplayName("Use stop loss")]
+            public bool UseStopLoss
+            {
+                get { return _usestoploss; }
+                set { _usestoploss = value; }
             }
 
 
