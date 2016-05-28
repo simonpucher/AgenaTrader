@@ -18,7 +18,7 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// 
+/// todo description
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
@@ -164,7 +164,7 @@ namespace AgenaTrader.UserCode
             //Create statistic for execution
             if (this.StatisticBacktesting)
             {
-                this._StatisticContainer.Add(this.Root.Core.TradingManager, this.DisplayName, execution);
+                this._StatisticContainer.Add(this.Root.Core.TradingManager, this, execution);
             }
 
             //send email

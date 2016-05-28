@@ -60,6 +60,8 @@ namespace AgenaTrader.UserCode
         private ORB_Indicator _orb_indicator = null;
         private DateTime _currentdayofupdate = DateTime.MinValue;
         private StatisticContainer _StatisticContainer = null;
+        private Statistic _statisticlong;
+        private Statistic _statisticshort;
 
 
 		protected override void Initialize()
@@ -110,7 +112,11 @@ namespace AgenaTrader.UserCode
             if (this.StatisticBacktesting)
             {
                 //get the statistic data
+                string data = this._StatisticContainer.getCSVData();
+
+                //get the statistic data
                 this._StatisticContainer.copyToClipboard();
+
             }
         }
 
@@ -172,11 +178,11 @@ namespace AgenaTrader.UserCode
             {
                 if (this._orderenterlong != null)
                 {
-                    ExitLong(this._orderenterlong.Quantity, "EOD", this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
+                    this.DoExitLong();
                 }
                 if (this._orderentershort != null)
                 {
-                    ExitShort(this._orderentershort.Quantity, "EOD", this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
+                    this.DoExitShort();
                 }
             }
 
@@ -219,7 +225,7 @@ namespace AgenaTrader.UserCode
         /// <param name="execution"></param>
             protected override void OnExecution(IExecution execution)
             {
-                ////info: was uncommented because exired date is not working in simulation mode or in backtesting mode
+                ////info: was uncommented because exired date is not working in simulation mode or in backtesting mode AND also not in AT 1.9
                 ////set expiration date to close at the end of the trading day
                 //if (this.CloseOrderBeforeEndOfTradingDay)
                 //{
@@ -234,11 +240,12 @@ namespace AgenaTrader.UserCode
                 //    }
                 //}
 
-                //Create statistic for execution
-                if (this.StatisticBacktesting)
-                {
-                    this._StatisticContainer.Add(this.Root.Core.TradingManager, this.DisplayName, execution);
-                }
+                ////Create statistic for execution
+                ////todo use it or delete it - there is no try!
+                //if (this.StatisticBacktesting)
+                //{
+                //    this._StatisticContainer.Add(this.Root.Core.TradingManager, this, execution);
+                //}
 
                 //send email
                 if (this.Send_email)
@@ -252,32 +259,98 @@ namespace AgenaTrader.UserCode
         /// Create Long Order and Stop.
         /// </summary>
         private void DoEnterLong() {
-            _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), "ORB_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-            SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
-            SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
-           
+            if (this._orderenterlong == null)
+            {
+                string entryreason = "ORB_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString();
+                _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
+                SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
+                SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
+
+                if (this.StatisticBacktesting)
+                {
+                    _statisticlong = new Statistic(this, PositionType.Long);
+                    this._statisticlong.SetEntry(entryreason, _orderenterlong.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
+                }
+            }
         }
 
         /// <summary>
         /// Create Short Order and Stop.
         /// </summary>
         private void DoEnterShort() {
-            _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), "ORB_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-            SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
-            SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+            if (this._orderentershort == null)
+            {
+                string entryreason = "ORB_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString();
+                _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
+                SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
+                SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+
+                if (this.StatisticBacktesting)
+                {
+                    _statisticshort = new Statistic(this, PositionType.Short);
+                    this._statisticshort.SetEntry(entryreason, _orderentershort.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
+                }
+            }
         }
+
+
+        /// <summary>
+        /// Exit the LONG position.
+        /// </summary>
+        private void DoExitLong()
+        {
+            if (_orderenterlong != null)
+            {
+                //todo exit reason on target?
+                string exitreason = "EOD";
+                ExitLong(this._orderenterlong.Quantity, exitreason, this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
+
+                if (this.StatisticBacktesting)
+                {
+                    this._statisticlong.SetExit(exitreason, this._orderenterlong.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
+                    this._StatisticContainer.Add(this._statisticlong);
+                    _statisticlong = null;
+                }
+
+                this._orderenterlong = null;
+            }
+        }
+
+        /// <summary>
+        /// Fill the SHORT position.
+        /// </summary>
+        private void DoExitShort()
+        {
+
+            if (_orderentershort != null)
+            {
+                //todo exit reason on target?
+                string exitreason = "EOD";
+                ExitShort(this._orderentershort.Quantity, exitreason, this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
+
+                if (this.StatisticBacktesting)
+                {
+                    this._statisticshort.SetExit(exitreason, this._orderentershort.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
+                    this._StatisticContainer.Add(this._statisticshort);
+                    this._statisticshort = null;
+                }
+
+                this._orderentershort = null;
+            }
+        }
+
 
 
         public override string ToString()
         {
-            return "ORB";
+            return "ORB (S)";
         }
 
         public override string DisplayName
         {
             get
             {
-                return "ORB";
+                return "ORB (S)";
             }
         }
 

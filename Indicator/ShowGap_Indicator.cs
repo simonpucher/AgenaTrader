@@ -14,12 +14,13 @@ using AgenaTrader.Helper;
 /// <summary>
 /// Version: in progress
 /// -------------------------------------------------------------------------
-/// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
+/// todo description
+/// -------------------------------------------------------------------------
 /// ****** Important ******
-/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
-/// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// To compile this script without any error you also need access to the utility indicator to use global source code elements.
+/// You will find this script on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
