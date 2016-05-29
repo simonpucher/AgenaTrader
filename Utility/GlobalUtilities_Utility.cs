@@ -56,6 +56,19 @@ namespace AgenaTrader.UserCode
         public static readonly Color DefaultIndicatorColor_GreyedOut = Color.Gray;
         public static readonly DashStyle DefaultIndicatorDashStyle = DashStyle.Solid;
 
+        //Fibonacci Retracements
+        public const decimal DefaultFibonacciRetracement23_6 = 23.6m;
+        public const decimal DefaultFibonacciRetracement38_2 = 38.2m;
+        public const decimal DefaultFibonacciRetracement50   = 50;
+        public const decimal DefaultFibonacciRetracement61_8 = 61.8m;
+        public const decimal DefaultFibonacciRetracement100  = 100;
+
+        //Fibonacci Extensions
+        public const decimal DefaultFibonacciExtension161_8  = 161.8m;
+        public const decimal DefaultFibonacciExtension200    = 200;
+        public const decimal DefaultFibonacciExtension261_8  = 261.8m;
+        public const decimal DefaultFibonacciExtension423_6  = 423.6m;
+
     }
 
     #endregion
@@ -412,53 +425,6 @@ namespace AgenaTrader.UserCode
 
             } while (i < BarsTilTarget);
             return Target;
-        }
-
-        /// <summary>
-        /// Get the absolute size of the candlestick body. Meaning the size of the 
-        /// body (from Open to Close) without the wicks
-        /// </summary>
-        /// <param name="Bar"></param>
-        /// <returns></returns>
-        public static double getBodySize(IBar Bar)
-        {
-            return Math.Abs(Bar.Open - Bar.Close);
-        }
-
-        /// <summary>
-        /// Checks, if the close is higher than the open (upgoing candle)
-        /// </summary>
-        /// <param name="Bar"></param>
-        /// <returns></returns>
-        public static bool isGreenCandle(IBar Bar)
-        {
-            if (Bar.Open < Bar.Close)
-            {
-                //green candle
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Checks, if the open is higher than the close (downgoing candle)
-        /// </summary>
-        /// <param name="Bar"></param>
-        /// <returns></returns>
-        public static bool isRedCandle(IBar Bar)
-        {
-            if (Bar.Open > Bar.Close)
-            {
-                //red candle
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
 
         #endregion
