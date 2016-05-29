@@ -178,14 +178,8 @@ namespace AgenaTrader.UserCode
                 && (this._orderenterlong != null || this._orderentershort != null)
                 && Bars[0].Time >= eod)
             {
-                if (this._orderenterlong != null)
-                {
-                    this.DoExitLong();
-                }
-                if (this._orderentershort != null)
-                {
-                    this.DoExitShort();
-                }
+                this.DoExitLong();
+                this.DoExitShort();
             }
 
             //if it to late or one order already set stop execution of calculate
@@ -316,12 +310,11 @@ namespace AgenaTrader.UserCode
             if (_orderenterlong != null)
             {
                 //todo exit reason on target?
-                string exitreason = "EOD";
-                ExitLong(this._orderenterlong.Quantity, exitreason, this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
+                ExitLong(this._orderenterlong.Quantity, Const.DefaultExitReasonEOD, this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
 
                 if (this.StatisticBacktesting)
                 {
-                    this._statisticlong.SetExit(exitreason, this._orderenterlong.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
+                    this._statisticlong.SetExit(Const.DefaultExitReasonEOD, this._orderenterlong.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
                     this._StatisticContainer.Add(this._statisticlong);
                     _statisticlong = null;
                 }
@@ -339,12 +332,11 @@ namespace AgenaTrader.UserCode
             if (_orderentershort != null)
             {
                 //todo exit reason on target?
-                string exitreason = "EOD";
-                ExitShort(this._orderentershort.Quantity, exitreason, this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
+                ExitShort(this._orderentershort.Quantity, Const.DefaultExitReasonEOD, this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
 
                 if (this.StatisticBacktesting)
                 {
-                    this._statisticshort.SetExit(exitreason, this._orderentershort.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
+                    this._statisticshort.SetExit(Const.DefaultExitReasonEOD, this._orderentershort.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
                     this._StatisticContainer.Add(this._statisticshort);
                     this._statisticshort = null;
                 }
