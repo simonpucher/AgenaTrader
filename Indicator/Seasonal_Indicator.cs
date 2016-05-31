@@ -14,7 +14,7 @@ using System.Runtime.CompilerServices;
 
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -22,10 +22,10 @@ using System.Runtime.CompilerServices;
 /// The initial version was inspired by this link: http://emini-watch.com/stock-market-seasonal-trades/5701/
 /// -------------------------------------------------------------------------
 /// todo 
-/// tax time, 4th of july, september effect, Thanksgiving
+/// tax time, september effect, Thanksgiving
 /// -------------------------------------------------------------------------
 /// ****** Important ******
-/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
+/// To compile this script without any error you also need access to the utility indicator to use these global source code elements.
 /// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
@@ -39,7 +39,8 @@ namespace AgenaTrader.UserCode
     public enum SeasonalType
     {
         SellInMay = 1,
-        SantaClausRally = 2
+        SantaClausRally = 2,
+        fourthofjuly = 3
     }
 
     [Description("Show seasonal trends")]
@@ -63,11 +64,12 @@ namespace AgenaTrader.UserCode
         private IEnumerable<IBar> _list_sellinmayandgoaway_sell = null;
         private IBar _last_start_sellinmayandgoway = null;
         private IBar _last_end_sellinmayandgoway = null;
-        //internal santa claus
+        //santa claus
         private IEnumerable<IBar> _list_santaclausrally_buy = null;
         private IBar _last_start_santaclausrally = null;
-
-    
+        //4th of july
+        private IEnumerable<IBar> _list_fourthofjuly_buy = null;
+        private IBar _last_start_fourthofjuly = null;
 
         #endregion
 
@@ -101,6 +103,12 @@ namespace AgenaTrader.UserCode
                                                select b;
                     hashset = new HashSet<DateTime>(_list_santaclausrally_buy.Select(x => x.Time));
                     break;
+                case SeasonalType.fourthofjuly:
+                    _list_fourthofjuly_buy = from b in Bars
+                                                where (b.Time.Month == 7 && b.Time.Day >= 1) || (b.Time.Month == 7 && b.Time.Day <= 8)
+                                                select b;
+                    hashset = new HashSet<DateTime>(_list_fourthofjuly_buy.Select(x => x.Time));
+                    break;
                 default:
                     break;
             }
@@ -124,6 +132,9 @@ namespace AgenaTrader.UserCode
                     break;
                 case SeasonalType.SantaClausRally:
                     this.calculate_Santa_Claus_Rally();
+                    break;
+                case SeasonalType.fourthofjuly:
+                    this.calculate_4th_of_July_Rally();
                     break;
                 default:
                     break;
@@ -149,7 +160,32 @@ namespace AgenaTrader.UserCode
             DrawText("Seasonal_text" + name, true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
         }
 
-    
+
+        #region calculate methods
+       
+        /// <summary>
+        /// Calculate the seasonal indicator for "4th of July".
+        /// </summary>
+        private void calculate_4th_of_July_Rally()
+        {
+            if (hashset.Contains(Bars[0].Time))
+            {
+                if (this._last_start_fourthofjuly == null)
+                {
+                    this._last_start_fourthofjuly = Bars[0];
+                }
+            }
+            else
+            {
+                if (this._last_start_fourthofjuly != null)
+                {
+                    DrawAreaRectangle(this._list_fourthofjuly_buy.Where(x => x.Time >= this._last_start_fourthofjuly.Time).Where(x => x.Time <= Bars[0].Time), Color.Green, "fourthofjuly_buy");
+
+                    this._last_start_fourthofjuly = null;
+                }
+            }
+
+        }
 
         /// <summary>
         /// Calculate the seasonal indicator for "Santa Claus Rally".
@@ -211,7 +247,9 @@ namespace AgenaTrader.UserCode
             }
         }
 
-       
+        #endregion
+
+
 
 
         public override string ToString()
