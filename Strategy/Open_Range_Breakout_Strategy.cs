@@ -32,7 +32,7 @@ using System.Threading;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-    [Description("Automatic trading for ORB strategy")]
+    [Description("Automatic trading for open range breakout strategy")]
     public class ORB_Strategy : UserStrategy, IORB
 	{
         //input
@@ -50,6 +50,8 @@ namespace AgenaTrader.UserCode
         private bool _autopilot = true;
         private bool _closeorderbeforendoftradingday = true;
         private bool _statisticbacktesting = false;
+        private bool _useprofittarget = true;
+        private bool _usestoploss = true;
 
         //output
         //no output variables yet
@@ -176,14 +178,8 @@ namespace AgenaTrader.UserCode
                 && (this._orderenterlong != null || this._orderentershort != null)
                 && Bars[0].Time >= eod)
             {
-                if (this._orderenterlong != null)
-                {
-                    this.DoExitLong();
-                }
-                if (this._orderentershort != null)
-                {
-                    this.DoExitShort();
-                }
+                this.DoExitLong();
+                this.DoExitShort();
             }
 
             //if it to late or one order already set stop execution of calculate
@@ -263,8 +259,14 @@ namespace AgenaTrader.UserCode
             {
                 string entryreason = "ORB_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString();
                 _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
-                SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
-                SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
+                if (this.UseStopLoss)
+                {
+                    SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
+                }
+                if (this.UseProfitTarget)
+                {
+                      SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong); 
+                }
 
                 if (this.StatisticBacktesting)
                 {
@@ -282,8 +284,14 @@ namespace AgenaTrader.UserCode
             {
                 string entryreason = "ORB_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString();
                 _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
-                SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
-                SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+                if (this.UseStopLoss)
+                {
+                    SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
+                }
+                if (this.UseProfitTarget)
+                {
+                     SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+                }
 
                 if (this.StatisticBacktesting)
                 {
@@ -302,12 +310,11 @@ namespace AgenaTrader.UserCode
             if (_orderenterlong != null)
             {
                 //todo exit reason on target?
-                string exitreason = "EOD";
-                ExitLong(this._orderenterlong.Quantity, exitreason, this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
+                ExitLong(this._orderenterlong.Quantity, Const.DefaultExitReasonEOD, this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
 
                 if (this.StatisticBacktesting)
                 {
-                    this._statisticlong.SetExit(exitreason, this._orderenterlong.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
+                    this._statisticlong.SetExit(Const.DefaultExitReasonEOD, this._orderenterlong.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
                     this._StatisticContainer.Add(this._statisticlong);
                     _statisticlong = null;
                 }
@@ -325,12 +332,11 @@ namespace AgenaTrader.UserCode
             if (_orderentershort != null)
             {
                 //todo exit reason on target?
-                string exitreason = "EOD";
-                ExitShort(this._orderentershort.Quantity, exitreason, this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
+                ExitShort(this._orderentershort.Quantity, Const.DefaultExitReasonEOD, this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
 
                 if (this.StatisticBacktesting)
                 {
-                    this._statisticshort.SetExit(exitreason, this._orderentershort.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
+                    this._statisticshort.SetExit(Const.DefaultExitReasonEOD, this._orderentershort.Quantity, Bars[0].Close, Bars[0].Time, OrderType.Market);
                     this._StatisticContainer.Add(this._statisticshort);
                     this._statisticshort = null;
                 }
@@ -506,6 +512,24 @@ namespace AgenaTrader.UserCode
             {
                 get { return _statisticbacktesting; }
                 set { _statisticbacktesting = value; }
+            }
+
+            [Description("If true the strategy will will use profit targets.")]
+            [Category("Safety first!")]
+            [DisplayName("Use profit target")]
+            public bool UseProfitTarget
+            {
+                get { return _useprofittarget; }
+                set { _useprofittarget = value; }
+            }
+
+            [Description("If true the strategy will will use stop loss.")]
+            [Category("Safety first!")]
+            [DisplayName("Use stop loss")]
+            public bool UseStopLoss
+            {
+                get { return _usestoploss; }
+                set { _usestoploss = value; }
             }
 
 

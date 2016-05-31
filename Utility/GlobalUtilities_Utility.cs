@@ -18,7 +18,7 @@ using System.Threading;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.5.13
+/// Version: 1.5.14
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -43,6 +43,7 @@ namespace AgenaTrader.UserCode
         //Default Strings
         public const string DefaultStringDatafeedPeriodicity = "Periodicity of your data feed is suboptimal for this indicator!";
         public const string DefaultStringErrorDuringCalculation = "A problem has occured during the calculation method!";
+        public const string DefaultExitReasonEOD = "End of day";
 
         //Default values for indicators
         public const int DefaultOpenRangeSizeinMinutes = 75;

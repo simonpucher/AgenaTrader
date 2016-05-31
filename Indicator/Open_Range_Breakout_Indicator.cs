@@ -291,7 +291,7 @@ namespace AgenaTrader.UserCode
                     this.TargetLong = this.RangeHigh + this.RangeHeight;
                     this.TargetShort = this.RangeLow - this.RangeHeight;
 
-            //tolreanz
+                    //todo toleranz
                     double toleranz = 0; // this.RangeHeight / 5;
 
                     //load the data after the open range
@@ -304,10 +304,10 @@ namespace AgenaTrader.UserCode
                     this.ShortBreakout = list.Where(x => x.Close < this.RangeLow - toleranz).FirstOrDefault();
 
                     //find the first target to the long side
-                    this.LongTargetReached = list.Where(x => x.Close > this.TargetLong).FirstOrDefault();
+                    this.LongTargetReached = list.Where(x => x.Close > this.TargetLong + toleranz).FirstOrDefault();
 
                     //find the first target to the short side
-                    this.ShortTargetReached = list.Where(x => x.Close < this.TargetShort).FirstOrDefault();
+                    this.ShortTargetReached = list.Where(x => x.Close < this.TargetShort - toleranz).FirstOrDefault();
 
                     //Everything was fine
                     resultvalue.IsCompleted = true;
