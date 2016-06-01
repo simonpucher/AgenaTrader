@@ -50,6 +50,11 @@ namespace AgenaTrader.UserCode
 
         private bool _IsShortEnabled = true;
         private bool _IsLongEnabled = true;
+        private bool _UseWhiteCandles = true;
+
+        //output
+        private DataSeries _Delta_Price_to_xMA_Slow = null;
+        private DataSeries _Delta_xMA_Fast_to_xMA_Slow = null;
 
         //internal
         Indicator _maslow = null;
@@ -67,6 +72,10 @@ namespace AgenaTrader.UserCode
 
 			CalculateOnBarClose = true;
             Overlay = true;
+
+            //init
+            this._Delta_Price_to_xMA_Slow = new DataSeries(this);
+            this._Delta_xMA_Fast_to_xMA_Slow = new DataSeries(this);
         }
 
 
@@ -75,7 +84,10 @@ namespace AgenaTrader.UserCode
 		protected override void OnBarUpdate()
 		{
             //we need more contrast
-            this.BarColor = Color.White;
+            if (this.UseWhiteCandles)
+            {
+                 this.BarColor = Color.White;
+            }
     
             //calculate data
             OrderAction? resultdata = this.calculate(Input, this.MA_Selected, this.MA_Fast, this.MA_Medium, this.MA_Slow);
@@ -84,6 +96,9 @@ namespace AgenaTrader.UserCode
             Plot_1.Set(this._mafast[0]);
             Plot_2.Set(this._mamedium[0]);
             Plot_3.Set(this._maslow[0]);
+
+            //todo set the additional indicator values
+           
 
             //draw other things
             if (resultdata.HasValue)
@@ -120,6 +135,26 @@ namespace AgenaTrader.UserCode
         public OrderAction? calculate(IDataSeries data, Enum_RunningWithTheWolves_Indicator_MA ma, int fast, int medium, int slow)
         {
 
+            //Calculate the SMA or EMA
+            ////DOW
+            //_maslow = EMA(data, 20);
+            // _mamedium = EMA(data, 100);
+            // _mafast = EMA(data, 200);
+
+            ////Dax
+            //_mafast = SMA(data, 20);
+            //_mamedium = SMA(data, 80);
+            //_maslow = SMA(data, 200);
+
+
+            //Bollinger mybollinger = Bollinger(data, 2, 20);
+            //double bb_medium = mybollinger[0];
+            //double bb_low = mybollinger.Lower[0];
+            //double bb_high = mybollinger.Upper[0];
+
+            //double rsi_value = RSI(data, 14, 3)[0];
+
+          
 
             //set the ma and period
             switch (ma)
@@ -138,7 +173,20 @@ namespace AgenaTrader.UserCode
                     break;
             }
 
-            //double marketupordown =  MarketPhases(data, 0)[0];
+            //Calculate Delta from stock price to slow xMA
+            if (this._Delta_Price_to_xMA_Slow != null)
+            {
+                double percent = (data[0] / (_maslow[0] / 100)) - 100;
+                this._Delta_Price_to_xMA_Slow.Set(percent);
+            }
+
+            //Calculate Delta from xMA fast to xMA slow.
+            if (_Delta_xMA_Fast_to_xMA_Slow != null)
+            {
+                double percent = (_mafast[0] / (_maslow[0] / 100)) - 100;
+                this._Delta_xMA_Fast_to_xMA_Slow.Set(percent); 
+            }
+
 
             //2  && Rising(_mafast) && Falling(_mafast)
             if (IsLongEnabled && CrossAbove(_mafast, _maslow, 0) )
@@ -149,16 +197,19 @@ namespace AgenaTrader.UserCode
             {
                 return OrderAction.SellShort;
             }
+            //else if (IsShortEnabled && data[0] < bb_low && rsi_value < 70)
             else if (IsShortEnabled && CrossAbove(_mafast, _mamedium, 0))
             {
                 return OrderAction.BuyToCover;
             }
+            //else if (IsLongEnabled && data[0] > bb_high && rsi_value > 70)
             else if (IsLongEnabled && CrossBelow(_mafast, _mamedium, 0))
             {
                 return OrderAction.Sell;
             }
 
             ////1
+            //double marketupordown =  MarketPhases(data, 0)[0];
             //if (IsLongEnabled && CrossAbove(_maslow, _mafast, 0) && marketupordown >= 0)
             // {
             //     return OrderAction.Buy;
@@ -283,6 +334,17 @@ namespace AgenaTrader.UserCode
             set { _IsShortEnabled = value; }
         }
 
+        /// <summary>
+        /// </summary>
+        [Description("If true candles will be display in white/gray to provide a better contrast")]
+        [Category("Parameters")]
+        [DisplayName("White candle colors")]
+        public bool UseWhiteCandles
+        {
+            get { return _UseWhiteCandles; }
+            set { _UseWhiteCandles = value; }
+        }
+
         #endregion
 
         [Browsable(false)]
@@ -296,6 +358,27 @@ namespace AgenaTrader.UserCode
         [Browsable(false)]
         [XmlIgnore()]
         public DataSeries Plot_3 { get { return Values[2]; } }
+
+        /// <summary>
+        /// This is the delta value from price to slow xMA.
+        /// Will be calculated in percent.
+        /// </summary>
+        [Browsable(false)]
+        [XmlIgnore()]
+        public DataSeries Delta_Price_to_xMA_Slow {
+            get { return _Delta_Price_to_xMA_Slow; }
+        }
+
+        /// <summary>
+        /// This is the delta value from xMA fast to xMA slow.
+        /// Will be calculated in percent.
+        /// </summary>
+        [Browsable(false)]
+        [XmlIgnore()]
+        public DataSeries Delta_xMA_Fast_to_xMA_Slow
+        {
+            get { return _Delta_xMA_Fast_to_xMA_Slow; }
+        }
 
 		#endregion
 	}
@@ -313,17 +396,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// RunningWithTheWolves
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
         {
-			return RunningWithTheWolves_Indicator(Input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled);
+			return RunningWithTheWolves_Indicator(Input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
 		}
 
 		/// <summary>
 		/// RunningWithTheWolves
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<RunningWithTheWolves_Indicator>(input, i => i.MA_Selected == mA_Selected && i.MA_Slow == mA_Slow && i.MA_Medium == mA_Medium && i.MA_Fast == mA_Fast && i.IsLongEnabled == isLongEnabled && i.IsShortEnabled == isShortEnabled);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<RunningWithTheWolves_Indicator>(input, i => i.MA_Selected == mA_Selected && i.MA_Slow == mA_Slow && i.MA_Medium == mA_Medium && i.MA_Fast == mA_Fast && i.IsLongEnabled == isLongEnabled && i.IsShortEnabled == isShortEnabled && i.UseWhiteCandles == useWhiteCandles);
 
 			if (indicator != null)
 				return indicator;
@@ -338,7 +421,8 @@ namespace AgenaTrader.UserCode
 							MA_Medium = mA_Medium,
 							MA_Fast = mA_Fast,
 							IsLongEnabled = isLongEnabled,
-							IsShortEnabled = isShortEnabled
+							IsShortEnabled = isShortEnabled,
+							UseWhiteCandles = useWhiteCandles
 						};
 			indicator.SetUp();
 
@@ -357,20 +441,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// RunningWithTheWolves
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(Input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled);
+			return LeadIndicator.RunningWithTheWolves_Indicator(Input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
 		}
 
 		/// <summary>
 		/// RunningWithTheWolves
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.RunningWithTheWolves_Indicator(input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled);
+			return LeadIndicator.RunningWithTheWolves_Indicator(input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
 		}
 	}
 
@@ -383,17 +467,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// RunningWithTheWolves
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(Input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled);
+			return LeadIndicator.RunningWithTheWolves_Indicator(Input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
 		}
 
 		/// <summary>
 		/// RunningWithTheWolves
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled);
+			return LeadIndicator.RunningWithTheWolves_Indicator(input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
 		}
 	}
 
@@ -406,17 +490,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// RunningWithTheWolves
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(Input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled);
+			return LeadIndicator.RunningWithTheWolves_Indicator(Input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
 		}
 
 		/// <summary>
 		/// RunningWithTheWolves
 		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled)
+		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled);
+			return LeadIndicator.RunningWithTheWolves_Indicator(input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
 		}
 	}
 

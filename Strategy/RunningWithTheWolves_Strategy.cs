@@ -193,7 +193,7 @@ namespace AgenaTrader.UserCode
         {
             _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Long + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
             //SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
-            //SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
+            //SetProfitTarget(_orderenterlong.Name, CalculationMode.Percent, 5);
         }
 
         /// <summary>
@@ -203,7 +203,7 @@ namespace AgenaTrader.UserCode
         {
             _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
             //SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
-            //SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+            //SetProfitTarget(_orderentershort.Name, CalculationMode.Percent, 5);
         }
 
         #region Properties
@@ -291,6 +291,8 @@ namespace AgenaTrader.UserCode
             get { return _IsShortEnabled; }
             set { _IsShortEnabled = value; }
         }
+
+   
 
         [Description("If true an email will be send on order execution and on other important issues")]
         [Category("Safety first!")]

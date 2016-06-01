@@ -227,6 +227,8 @@ namespace AgenaTrader.UserCode
             set { _IsShortEnabled = value; }
         }
 
+   
+
         #endregion
 
 
