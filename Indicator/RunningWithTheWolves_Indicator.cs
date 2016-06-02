@@ -18,7 +18,7 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// todo description: http://systemtradersuccess.com/golden-cross-which-is-the-best/
+/// Golden & Death cross: http://www.investopedia.com/ask/answers/121114/what-difference-between-golden-cross-and-death-cross-pattern.asp
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use these global source code elements.
@@ -37,7 +37,7 @@ namespace AgenaTrader.UserCode
         EMA = 1
     }
 
-    [Description("RunningWithTheWolves")]
+    [Description("Use SMA or EMA crosses to find trends.")]
 	public class RunningWithTheWolves_Indicator : UserIndicator
 	{
 
@@ -394,7 +394,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator : Indicator
 	{
 		/// <summary>
-		/// RunningWithTheWolves
+		/// Use SMA or EMA crosses to find trends.
 		/// </summary>
 		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
         {
@@ -402,7 +402,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// RunningWithTheWolves
+		/// Use SMA or EMA crosses to find trends.
 		/// </summary>
 		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
@@ -439,7 +439,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// RunningWithTheWolves
+		/// Use SMA or EMA crosses to find trends.
 		/// </summary>
 		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
@@ -447,7 +447,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// RunningWithTheWolves
+		/// Use SMA or EMA crosses to find trends.
 		/// </summary>
 		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
@@ -465,7 +465,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// RunningWithTheWolves
+		/// Use SMA or EMA crosses to find trends.
 		/// </summary>
 		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
@@ -473,7 +473,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// RunningWithTheWolves
+		/// Use SMA or EMA crosses to find trends.
 		/// </summary>
 		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
@@ -488,7 +488,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// RunningWithTheWolves
+		/// Use SMA or EMA crosses to find trends.
 		/// </summary>
 		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
@@ -496,7 +496,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// RunningWithTheWolves
+		/// Use SMA or EMA crosses to find trends.
 		/// </summary>
 		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{

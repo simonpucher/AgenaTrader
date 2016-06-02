@@ -142,6 +142,34 @@ namespace AgenaTrader.UserCode
             }
         }
 
+        ///// <summary>
+        ///// Returns the standard subject for Entry Signal Emails
+        ///// </summary>
+        ///// <param name="execution"></param>
+        ///// <returns></returns>
+        //public static string GetEmailSubjectEntrySignal(IInstrument instrument, OrderAction orderaction)
+        //{
+        //    return "Entry Signal " + instrument.Symbol + " " + orderaction.ToString();
+        //}
+
+        ///// <summary>
+        ///// Returns the standard text for Entry Signal Emails
+        ///// </summary>
+        ///// <param name="execution"></param>
+        ///// <param name="strategyname"></param>
+        ///// <returns></returns>
+        //public static string GetEmailBodyEntrySignal(IInstrument instrument, OrderAction orderaction, string strategyname, TimeFrame timeframe)
+        //{
+        //    StringBuilder str = new StringBuilder();
+
+        //    str.AppendLine("Strategy: " + strategyname);
+        //    str.AppendLine("Instrument: " + instrument.Name);
+        //    str.AppendLine("OrderAction: " + orderaction.ToString());
+        //    str.AppendLine("TimeFrame: " + timeframe.ToString());
+
+        //    return str.ToString();
+        //}
+
         /// <summary>
         /// Returns the standard subject for emails on order execution.
         /// </summary>
@@ -1333,6 +1361,7 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
 
 
 

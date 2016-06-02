@@ -18,7 +18,7 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// todo description: http://systemtradersuccess.com/golden-cross-which-is-the-best/
+/// Golden & Death cross: http://www.investopedia.com/ask/answers/121114/what-difference-between-golden-cross-and-death-cross-pattern.asp
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use these global source code elements.
@@ -28,7 +28,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-    [Description("RunningWithTheWolves")]
+    [Description("Use SMA or EMA crosses to find trends.")]
 	public class RunningWithTheWolves_Strategy : UserStrategy
 	{
         
@@ -57,7 +57,16 @@ namespace AgenaTrader.UserCode
 
 		protected override void Initialize()
 		{
-            //For SMA200 we need at least 200 Bars.
+            CalculateOnBarClose = true;
+
+            //Set the default time frame if you start the strategy via the strategy-escort
+            //if you start the strategy on a chart the TimeFrame is automatically set, this will lead to a better usability
+            if (this.TimeFrame == null || this.TimeFrame.PeriodicityValue == 0)
+            {
+                this.TimeFrame = new TimeFrame(DatafeedHistoryPeriodicity.Hour, 1);
+            }
+
+            //For xMA200 we need at least 200 Bars.
             this.BarsRequired = 200;
 		}
 
@@ -204,6 +213,20 @@ namespace AgenaTrader.UserCode
             _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
             //SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
             //SetProfitTarget(_orderentershort.Name, CalculationMode.Percent, 5);
+        }
+
+
+        public override string ToString()
+        {
+            return "Running with the wolves (S)";
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "Running with the wolves (S)";
+            }
         }
 
         #region Properties
