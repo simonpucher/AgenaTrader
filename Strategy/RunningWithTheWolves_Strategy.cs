@@ -10,6 +10,7 @@ using AgenaTrader.API;
 using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
+using System.Linq.Expressions;
 
 
 /// <summary>
@@ -18,7 +19,7 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// todo description: http://systemtradersuccess.com/golden-cross-which-is-the-best/
+/// Golden & Death cross: http://www.investopedia.com/ask/answers/121114/what-difference-between-golden-cross-and-death-cross-pattern.asp
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use these global source code elements.
@@ -28,7 +29,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-    [Description("RunningWithTheWolves")]
+    [Description("Use SMA or EMA crosses to find trends.")]
 	public class RunningWithTheWolves_Strategy : UserStrategy
 	{
         
@@ -53,11 +54,21 @@ namespace AgenaTrader.UserCode
         private IOrder _orderenterlong;
         private IOrder _orderentershort;
         private RunningWithTheWolves_Indicator _RunningWithTheWolves_Indicator = null;
-        private StatisticContainer _StatisticContainer = null;
+        //private StatisticContainer _StatisticContainer = null;
+        private CsvExport _CsvExport = new CsvExport();
 
 		protected override void Initialize()
 		{
-            //For SMA200 we need at least 200 Bars.
+            CalculateOnBarClose = true;
+
+            //Set the default time frame if you start the strategy via the strategy-escort
+            //if you start the strategy on a chart the TimeFrame is automatically set, this will lead to a better usability
+            if (this.TimeFrame == null || this.TimeFrame.PeriodicityValue == 0)
+            {
+                this.TimeFrame = new TimeFrame(DatafeedHistoryPeriodicity.Hour, 1);
+            }
+
+            //For xMA200 we need at least 200 Bars.
             this.BarsRequired = 200;
 		}
 
@@ -73,7 +84,8 @@ namespace AgenaTrader.UserCode
             //Initalize statistic data list if this feature is enabled
             if (this.StatisticBacktesting)
             {
-                this._StatisticContainer = new StatisticContainer();
+                //this._StatisticContainer = new StatisticContainer();
+                this._CsvExport = new CsvExport();
             }
         }
 
@@ -95,7 +107,9 @@ namespace AgenaTrader.UserCode
             if (this.StatisticBacktesting)
             {
                 //get the statistic data
-                this._StatisticContainer.copyToClipboard();
+                //this._StatisticContainer.copyToClipboard();
+                string myCsv = this._CsvExport.Export();
+                this._CsvExport.CopyToClipboard();
             }
         }
 
@@ -138,32 +152,32 @@ namespace AgenaTrader.UserCode
                 }
             }
 
+            //Create statistic
+            //todo create statistic only on bar close and not during the candle session
+            if (this.StatisticBacktesting)
+            {
+               _CsvExport.AddRow();
+               _CsvExport.AddRowBasicData(this, this.Instrument, this.TimeFrame, Bars[0]);
 
-            //double returnvalue = this._RunningWithTheWolves_Indicator.calculate(data);
-            //Print(returnvalue);
-            //if (returnvalue == 1)
-            //{
-            //    if (this._orderentershort != null)
-            //    {
-            //        ExitShort();
-            //        this._orderentershort = null;
-            //    }
-            //    this.DoEnterLong();
-            //}
-            //else if (returnvalue == -1)
-            //{
-            //    if (this._orderenterlong != null)
-            //    {
-            //        ExitLong();
-            //        this._orderenterlong = null;
-            //    }
-            //    this.DoEnterShort();
-            //}
+                //Order &  Trade
+               _CsvExport["OrderAction"] = resultdata;
+
+                //Additional indicators
+               _CsvExport["SMA-20"] = SMA(Input,20)[0];
+               _CsvExport["SMA-50"] = SMA(Input,50)[0];
+               _CsvExport["SMA-200"] = SMA(Input,200)[0];
+
+               _CsvExport["RSI-14-3"] = RSI(Input,14,3)[0];
+
+                // todo columns for trades
+                //TradeDirection;EntryReason;EntryDateTime;EntryPrice;EntryQuantity;EntryOrderType;ExitDateTime;ExitPrice;MinutesInMarket;ExitReason;ExitQuantity;ExitOrderType;PointsDiff;PointsDiffPerc;ProfitLoss;ProfitLossPercent;StopPrice;TargetPrice";
+
+            }
 		}
 
 
 
-
+      
 
         /// <summary>
         /// OnExecution of orders
@@ -174,7 +188,7 @@ namespace AgenaTrader.UserCode
             //Create statistic for execution
             if (this.StatisticBacktesting)
             {
-                this._StatisticContainer.Add(this.Root.Core.TradingManager, this, execution);
+                //this._StatisticContainer.Add(this.Root.Core.TradingManager, this, execution);
             }
 
             //send email
@@ -192,8 +206,8 @@ namespace AgenaTrader.UserCode
         private void DoEnterLong()
         {
             _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Long + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-            //SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
-            //SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong);
+            SetStopLoss(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close / 1.05, false);
+            SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 1.11);
         }
 
         /// <summary>
@@ -202,8 +216,22 @@ namespace AgenaTrader.UserCode
         private void DoEnterShort()
         {
             _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-            //SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
-            //SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+            SetStopLoss(_orderentershort.Name, CalculationMode.Price, Bars[0].Close * 1.05, false);
+            SetProfitTarget(_orderentershort.Name, CalculationMode.Price, Bars[0].Close / 1.11);
+        }
+
+
+        public override string ToString()
+        {
+            return "Running with the wolves (S)";
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "Running with the wolves (S)";
+            }
         }
 
         #region Properties
@@ -291,6 +319,8 @@ namespace AgenaTrader.UserCode
             get { return _IsShortEnabled; }
             set { _IsShortEnabled = value; }
         }
+
+   
 
         [Description("If true an email will be send on order execution and on other important issues")]
         [Category("Safety first!")]

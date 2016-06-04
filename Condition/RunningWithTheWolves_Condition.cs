@@ -18,7 +18,7 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// todo description: http://systemtradersuccess.com/golden-cross-which-is-the-best/
+/// Golden & Death cross: http://www.investopedia.com/ask/answers/121114/what-difference-between-golden-cross-and-death-cross-pattern.asp
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use these global source code elements.
@@ -28,7 +28,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-    [Description("RunningWithTheWolves")]
+    [Description("Use SMA or EMA crosses to find trends.")]
 	[IsEntryAttribute(true)]
 	[IsStopAttribute(false)]
 	[IsTargetAttribute(false)]
@@ -44,10 +44,9 @@ namespace AgenaTrader.UserCode
         private int _ma_medium = 100;
         private int _ma_fast = 20;
 
-
+ 
         private bool _IsShortEnabled = true;
         private bool _IsLongEnabled = true;
-
         //output
 		
         //internal
@@ -226,6 +225,7 @@ namespace AgenaTrader.UserCode
             get { return _IsShortEnabled; }
             set { _IsShortEnabled = value; }
         }
+   
 
         #endregion
 
