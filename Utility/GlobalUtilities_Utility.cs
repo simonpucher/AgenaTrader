@@ -16,9 +16,11 @@ using System.Text;
 using AgenaTrader.Plugins.MoneyHandler;
 using System.Threading;
 using System.Windows.Forms;
+using System.Data.SqlTypes;
+using System.Linq.Expressions;
 
 /// <summary>
-/// Version: 1.5.14
+/// Version: 1.5.15
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -763,6 +765,31 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
+
+        #region code utility
+
+        // <summary>
+        // Get the name of a static or instance property from a property access lambda.
+        // Taken from: http://stackoverflow.com/questions/2820660/get-name-of-property-as-a-string
+        // </summary>
+        // <typeparam name="T">Type of the property</typeparam>
+        // <param name="propertyLambda">lambda expression of the form: '() => Class.Property' or '() => object.Property'</param>
+        // <returns>The name of the property</returns>
+
+        public static string GetPropertyName<T>(Expression<Func<T>> propertyLambda)
+        {
+            var me = propertyLambda.Body as MemberExpression;
+
+            if (me == null)
+            {
+                throw new ArgumentException("You must pass a lambda of the form: '() => Class.Property' or '() => object.Property'");
+            }
+
+            return me.Member.Name;
+        }
+
+        #endregion
+
     }
 
     #endregion
@@ -844,7 +871,6 @@ namespace AgenaTrader.UserCode
             catch (Exception)
             {
                 //todo log it
-               
             }
         }
 
@@ -1242,6 +1268,182 @@ namespace AgenaTrader.UserCode
         #endregion
 
 
+    }
+
+
+
+
+    /// <summary>
+    /// Generic CSVExport (e.g. flat file for MatLab import)
+    /// GitHub Fork https://gist.github.com/simonpucher/80b5ed382432ec14bd13708a7b984564
+    /// </summary>
+    /// <example>
+    ///   CsvExport myExport = new CsvExport();
+    ///
+    ///   myExport.AddRow();
+    ///   myExport["Region"] = "New York, USA";
+    ///   myExport["Sales"] = 100000;
+    ///   myExport["Date Opened"] = new DateTime(2003, 12, 31);
+    ///
+    ///   myExport.AddRow();
+    ///   myExport["Region"] = "Sydney \"in\" Australia";
+    ///   myExport["Sales"] = 50000;
+    ///   myExport["Date Opened"] = new DateTime(2005, 1, 1, 9, 30, 0);
+    ///
+    /// Then you can do any of the following three output options:
+    ///   string myCsv = myExport.Export();
+    ///   myExport.ExportToFile("Somefile.csv");
+    ///   byte[] myCsvData = myExport.ExportToBytes();
+    /// </example>
+    public class CsvExport
+    {
+        /// <summary>
+        /// To keep the ordered list of column names
+        /// </summary>
+        List<string> fields = new List<string>();
+
+        /// <summary>
+        /// The list of rows
+        /// </summary>
+        List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+
+        /// <summary>
+        /// The current row
+        /// </summary>
+        Dictionary<string, object> currentRow { get { return rows[rows.Count - 1]; } }
+
+        /// <summary>
+        /// Set a value on this column
+        /// </summary>
+        public object this[string field]
+        {
+            set
+            {
+                // Keep track of the field names, because the dictionary loses the ordering
+                if (!fields.Contains(field)) fields.Add(field);
+                currentRow[field] = value;
+            }
+        }
+
+        /// <summary>
+        /// Call this before setting any fields on a row
+        /// </summary>
+        public void AddRow()
+        {
+            rows.Add(new Dictionary<string, object>());
+        }
+
+        /// <summary>
+        /// This method add the basic data rows for matlab import.
+        /// </summary>
+        public void AddRowBasicData(IStrategy strategy, IInstrument instrument, ITimeFrame timeframe, IBar bar)
+        {
+            this["Strategy"] = strategy.DisplayName;
+            this["TimeFrame"] = timeframe.ToString();
+            this["Instrument"] = instrument.Name;
+            this[GlobalUtilities.GetPropertyName(() => instrument.MainSector)] = instrument.MainSector;
+            this[GlobalUtilities.GetPropertyName(() => instrument.DetailSector)] = instrument.DetailSector;
+            this[GlobalUtilities.GetPropertyName(() => instrument.Currency)] = instrument.Currency;
+            this[GlobalUtilities.GetPropertyName(() => bar.Time)] = bar.Time;
+   
+            this[GlobalUtilities.GetPropertyName(() => bar.Open)] = bar.Open;
+            this[GlobalUtilities.GetPropertyName(() => bar.High)] = bar.High;
+            this[GlobalUtilities.GetPropertyName(() => bar.Low)] = bar.Low;
+            this[GlobalUtilities.GetPropertyName(() => bar.Close)] = bar.Close;
+
+            this[GlobalUtilities.GetPropertyName(() => bar.Range)] = bar.Range;
+      
+            this[GlobalUtilities.GetPropertyName(() => bar.IsFalling)] = bar.IsFalling;
+            this[GlobalUtilities.GetPropertyName(() => bar.IsGrowing)] = bar.IsGrowing;     
+            this[GlobalUtilities.GetPropertyName(() => bar.Volume)] = bar.Volume;
+        
+        }
+
+        /// <summary>
+        /// Converts a value to how it should output in a csv file
+        /// If it has a comma, it needs surrounding with double quotes
+        /// Eg Sydney, Australia -> "Sydney, Australia"
+        /// Also if it contains any double quotes ("), then they need to be replaced with quad quotes[sic] ("")
+        /// Eg "Dangerous Dan" McGrew -> """Dangerous Dan"" McGrew"
+        /// </summary>
+        string MakeValueCsvFriendly(object value)
+        {
+            if (value == null) return "";
+            if (value is INullable && ((INullable)value).IsNull) return "";
+            if (value is DateTime)
+            {
+                if (((DateTime)value).TimeOfDay.TotalSeconds == 0)
+                    return ((DateTime)value).ToString("yyyy-MM-dd");
+                return ((DateTime)value).ToString("yyyy-MM-dd HH:mm:ss");
+            }
+            string output = value.ToString();
+            if (output.Contains(",") || output.Contains("\""))
+                output = '"' + output.Replace("\"", "\"\"") + '"';
+            return output;
+        }
+
+        /// <summary>
+        /// Output all rows as a CSV returning a string
+        /// </summary>
+        public string Export()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            // The header
+            foreach (string field in fields)
+                sb.Append(field).Append(",");
+            sb.AppendLine();
+
+            // The rows
+            foreach (Dictionary<string, object> row in rows)
+            {
+                foreach (string field in fields)
+                    sb.Append(MakeValueCsvFriendly(row[field])).Append(",");
+                sb.AppendLine();
+            }
+
+            return sb.ToString();
+        }
+
+        /// <summary>
+        /// Copy the csv file into the clipboard
+        /// </summary>
+        public void CopyToClipboard()
+        {
+            try
+            {
+                string csvdata = this.Export();
+                if (!String.IsNullOrEmpty(csvdata))
+                {
+                    //Copy the csv data into clipboard
+                    Thread thread = new Thread(() => Clipboard.SetText(csvdata));
+                    //Set the thread to STA
+                    thread.SetApartmentState(ApartmentState.STA);
+                    thread.Start();
+                    thread.Join();
+                }
+            }
+            catch (Exception)
+            {
+                //todo log it
+            }
+        }
+
+        /// <summary>
+        /// Exports to a file
+        /// </summary>
+        public void ExportToFile(string path)
+        {
+            File.WriteAllText(path, Export());
+        }
+
+        /// <summary>
+        /// Exports as raw UTF8 bytes
+        /// </summary>
+        public byte[] ExportToBytes()
+        {
+            return Encoding.UTF8.GetBytes(Export());
+        }
     }
 
 
