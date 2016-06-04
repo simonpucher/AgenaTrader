@@ -10,6 +10,7 @@ using AgenaTrader.API;
 using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
+using System.Linq.Expressions;
 
 
 /// <summary>
@@ -53,7 +54,8 @@ namespace AgenaTrader.UserCode
         private IOrder _orderenterlong;
         private IOrder _orderentershort;
         private RunningWithTheWolves_Indicator _RunningWithTheWolves_Indicator = null;
-        private StatisticContainer _StatisticContainer = null;
+        //private StatisticContainer _StatisticContainer = null;
+        private CsvExport _CsvExport = new CsvExport();
 
 		protected override void Initialize()
 		{
@@ -82,7 +84,8 @@ namespace AgenaTrader.UserCode
             //Initalize statistic data list if this feature is enabled
             if (this.StatisticBacktesting)
             {
-                this._StatisticContainer = new StatisticContainer();
+                //this._StatisticContainer = new StatisticContainer();
+                this._CsvExport = new CsvExport();
             }
         }
 
@@ -104,7 +107,9 @@ namespace AgenaTrader.UserCode
             if (this.StatisticBacktesting)
             {
                 //get the statistic data
-                this._StatisticContainer.copyToClipboard();
+                //this._StatisticContainer.copyToClipboard();
+                string myCsv = this._CsvExport.Export();
+                this._CsvExport.CopyToClipboard();
             }
         }
 
@@ -147,32 +152,32 @@ namespace AgenaTrader.UserCode
                 }
             }
 
+            //Create statistic
+            //todo create statistic only on bar close and not during the candle session
+            if (this.StatisticBacktesting)
+            {
+               _CsvExport.AddRow();
+               _CsvExport.AddRowBasicData(this, this.Instrument, this.TimeFrame, Bars[0]);
 
-            //double returnvalue = this._RunningWithTheWolves_Indicator.calculate(data);
-            //Print(returnvalue);
-            //if (returnvalue == 1)
-            //{
-            //    if (this._orderentershort != null)
-            //    {
-            //        ExitShort();
-            //        this._orderentershort = null;
-            //    }
-            //    this.DoEnterLong();
-            //}
-            //else if (returnvalue == -1)
-            //{
-            //    if (this._orderenterlong != null)
-            //    {
-            //        ExitLong();
-            //        this._orderenterlong = null;
-            //    }
-            //    this.DoEnterShort();
-            //}
+                //Order &  Trade
+               _CsvExport["OrderAction"] = resultdata;
+
+                //Additional indicators
+               _CsvExport["SMA-20"] = SMA(Input,20)[0];
+               _CsvExport["SMA-50"] = SMA(Input,50)[0];
+               _CsvExport["SMA-200"] = SMA(Input,200)[0];
+
+               _CsvExport["RSI-14-3"] = RSI(Input,14,3)[0];
+
+                // todo columns for trades
+                //TradeDirection;EntryReason;EntryDateTime;EntryPrice;EntryQuantity;EntryOrderType;ExitDateTime;ExitPrice;MinutesInMarket;ExitReason;ExitQuantity;ExitOrderType;PointsDiff;PointsDiffPerc;ProfitLoss;ProfitLossPercent;StopPrice;TargetPrice";
+
+            }
 		}
 
 
 
-
+      
 
         /// <summary>
         /// OnExecution of orders
@@ -183,7 +188,7 @@ namespace AgenaTrader.UserCode
             //Create statistic for execution
             if (this.StatisticBacktesting)
             {
-                this._StatisticContainer.Add(this.Root.Core.TradingManager, this, execution);
+                //this._StatisticContainer.Add(this.Root.Core.TradingManager, this, execution);
             }
 
             //send email
