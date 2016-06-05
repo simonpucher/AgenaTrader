@@ -16,11 +16,10 @@ namespace AgenaTrader.UserCode
     [Description("Indicator which shows deep correction of ongoing trend")]
     public class DeepCorrectionTrend_Indikator : UserIndicator
     {
-        const double MarketPhaseDeepCorrection = 5.3d;
+        //constants
+        const double MarketPhaseDeepCorrectionLong = 5.3d;
+        const double MarketPhaseDeepCorrectionShort = -5.3d;
         int _trendSize = 1;
-
-
-
 
         protected override void Initialize()
         {
@@ -33,24 +32,54 @@ namespace AgenaTrader.UserCode
         protected override void OnBarUpdate()
         {
 
-            if (Math.Abs(MarketPhasesAdv(_trendSize)[0]) == MarketPhaseDeepCorrection)
+            //Lets call the calculate method and save the result with the trade action
+            ResultValue ResultValue = this.calculate(Close, TrendSize);
+
+            if (ResultValue.Entry.HasValue)
             {
-                Value.Set(MarketPhasesAdv(_trendSize)[0]);
+                switch (ResultValue.Entry)
+                {
+                    case OrderAction.Buy:
+                        Value.Set(1);
+                        break;
+                    case OrderAction.SellShort:
+                        //DrawDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
+                        Value.Set(-1);
+                        break;
+                }
             }
             else
             {
+                //Value was null so nothing to do.
                 Value.Set(0);
             }
-
-
-
-            if (Bars.Count - 1 == Count)
-            {
-                int i = 1;
-            }
-
-
         }
+
+
+        public ResultValue_DeepCorrection calculate(IDataSeries Input, int TrendSize)
+        {
+            //Create a return object
+            ResultValue_DeepCorrection ResultValue = new ResultValue_DeepCorrection();
+
+            if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionLong
+            && P123Adv(Input,_trendSize).P2Price[0] < Input[0])
+            {
+                ResultValue.Entry = OrderAction.Buy;
+                ResultValue.StopLoss = P123Adv(Input, _trendSize).TempP3Price[0];
+                ResultValue.Target = P123Adv(Input, _trendSize).P2Price[0];
+            }
+            else if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionShort
+                && P123Adv(Input, _trendSize).P2Price[0] > Input[0])
+            {
+                ResultValue.Entry = OrderAction.SellShort;
+                ResultValue.StopLoss = P123Adv(Input, _trendSize).TempP3Price[0];
+                ResultValue.Target = P123Adv(Input, _trendSize).P2Price[0];
+            }
+            return ResultValue;
+        }
+
+
+
 
         public override string ToString()
         {
@@ -88,6 +117,26 @@ namespace AgenaTrader.UserCode
 
         #endregion
     }
+
+    public class ResultValue_DeepCorrection : ResultValue
+    {
+        private double _stopLoss;
+        private double _Target;
+
+        public double StopLoss
+        {
+            get { return _stopLoss; }
+            set { _stopLoss = value; }
+        }
+
+        public double Target
+        {
+            get { return _Target; }
+            set { _Target = value; }
+        }
+    }
+
+
 }
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 

@@ -27,45 +27,67 @@ namespace AgenaTrader.UserCode
         //internal
         private IOrder _orderenterlong;
         private IOrder _orderentershort;
+        private DeepCorrectionTrend_Indikator _DeepCorrectionTrend_Indikator = new DeepCorrectionTrend_Indikator();
 
         #endregion
 
         protected override void Initialize()
         {
             CalculateOnBarClose = true;
-           // BarsRequired = 20;
+            BarsRequired = 20;
         }
 
         protected override void OnBarUpdate()
         {
-            if (MarketPhasesAdv(_trendSize)[0] == MarketPhaseDeepCorrectionLong)
+              //for debugging reason only, just to get a hook in
+            if (CurrentBar + 1 == 211)
             {
-                DoEnterLong();
+                int a = 1 + 1;
             }
-            else if (MarketPhasesAdv(_trendSize)[0] == MarketPhaseDeepCorrectionShort)
+            
+            //Lets call the calculate method and save the result with the trade action
+            ResultValue_DeepCorrection ResultValue = this._DeepCorrectionTrend_Indikator.calculate(Close, TrendSize);
+
+            //Entry
+            if (ResultValue.Entry.HasValue)
             {
-                DoEnterShort();
+                switch (ResultValue.Entry)
+                {
+                    case OrderAction.Buy:
+                        this.DoEnterLong(ResultValue.StopLoss, ResultValue.Target);
+                        break;
+                    case OrderAction.SellShort:
+                        this.DoEnterShort(ResultValue.StopLoss, ResultValue.Target);
+                        break;
+                }
             }
+
         }
 
         /// <summary>
         /// Create Long Order and Stop.
         /// </summary>
-        private void DoEnterLong()
+        private void DoEnterLong(double StopLoss, double target)
         {
-            _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Long + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-            SetStopLoss(_orderenterlong.Name, CalculationMode.Price, P123(_trendSize).TempP3Price[0], false);
-            SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, P123(_trendSize).P2Price[0]);
+            if (_orderenterlong == null)
+            {
+                _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Long + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+                SetStopLoss(_orderenterlong.Name, CalculationMode.Price, StopLoss, false);
+                SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, target);
+            }
         }
 
         /// <summary>
         /// Create Short Order and Stop.
         /// </summary>
-        private void DoEnterShort()
+        private void DoEnterShort(double StopLoss, double target)
         {
-            _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-            SetStopLoss(_orderentershort.Name, CalculationMode.Price, P123(_trendSize).TempP3Price[0], false);
-            SetProfitTarget(_orderentershort.Name, CalculationMode.Price, P123(_trendSize).P2Price[0]);
+            if (_orderentershort == null)
+            {
+                _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+                SetStopLoss(_orderentershort.Name, CalculationMode.Price, StopLoss, false);
+                SetProfitTarget(_orderentershort.Name, CalculationMode.Price, target);
+            }
         }
 
 
