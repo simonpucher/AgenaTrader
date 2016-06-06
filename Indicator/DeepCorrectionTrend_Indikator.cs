@@ -23,7 +23,8 @@ namespace AgenaTrader.UserCode
 
         protected override void Initialize()
         {
-            Add(new Plot(Color.FromArgb(255, 102, 255, 51), "DeepCorrection"));
+            Add(new Plot(Color.Brown, PlotStyle.Block, "DeepCorrection"));   
+            Add(new Plot(Color.Green, "Entry"));                     
             Overlay = false;
             CalculateOnBarClose = true;
             BarsRequired = 20;
@@ -33,25 +34,30 @@ namespace AgenaTrader.UserCode
         {
 
             //Lets call the calculate method and save the result with the trade action
-            ResultValue ResultValue = this.calculate(Close, TrendSize);
+            ResultValue_DeepCorrection ResultValue = this.calculate(Close, TrendSize);
+
+            if (ResultValue.DeepCorrection == true)
+            {
+             //   Values[0].Set(1);
+            }
 
             if (ResultValue.Entry.HasValue)
             {
                 switch (ResultValue.Entry)
                 {
                     case OrderAction.Buy:
-                        Value.Set(1);
+                        Values[1].Set(1);
                         break;
                     case OrderAction.SellShort:
                         //DrawDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
-                        Value.Set(-1);
+                        Values[1].Set(-1);
                         break;
                 }
             }
             else
             {
                 //Value was null so nothing to do.
-                Value.Set(0);
+            Values[1].Set(0);
             }
         }
 
@@ -61,19 +67,27 @@ namespace AgenaTrader.UserCode
             //Create a return object
             ResultValue_DeepCorrection ResultValue = new ResultValue_DeepCorrection();
 
-            if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionLong
-            && P123(Input,_trendSize).P2Price[0] < Input[0])
+            if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionLong)
             {
-                ResultValue.Entry = OrderAction.Buy;
-                ResultValue.StopLoss = P123(Input, _trendSize).TempP3Price[0];
-                ResultValue.Target = P123(Input, _trendSize).P2Price[0];
+                ResultValue.DeepCorrection = true;
+
+                if (P123(Input, _trendSize).P2Price[0] < Input[0])
+                {
+                    ResultValue.Entry = OrderAction.Buy;
+                    ResultValue.StopLoss = P123(Input, _trendSize).TempP3Price[0];
+                    ResultValue.Target = P123(Input, _trendSize).P2Price[0];
+                }
             }
-            else if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionShort
-                && P123(Input, _trendSize).P2Price[0] > Input[0])
+            else if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionShort)
             {
-                ResultValue.Entry = OrderAction.SellShort;
-                ResultValue.StopLoss = P123(Input, _trendSize).TempP3Price[0];
-                ResultValue.Target = P123(Input, _trendSize).P2Price[0];
+                ResultValue.DeepCorrection = true;
+
+                if (P123(Input, _trendSize).P2Price[0] > Input[0])
+                {
+                    ResultValue.Entry = OrderAction.SellShort;
+                    ResultValue.StopLoss = P123(Input, _trendSize).TempP3Price[0];
+                    ResultValue.Target = P123(Input, _trendSize).P2Price[0];
+                }
             }
             return ResultValue;
         }
@@ -121,7 +135,14 @@ namespace AgenaTrader.UserCode
     public class ResultValue_DeepCorrection : ResultValue
     {
         private double _stopLoss;
-        private double _Target;
+        private double _target;
+        private bool _deepCorrection;
+
+        public bool DeepCorrection
+        {
+            get { return _deepCorrection; }
+            set { _deepCorrection = value; }
+        }
 
         public double StopLoss
         {
@@ -131,8 +152,8 @@ namespace AgenaTrader.UserCode
 
         public double Target
         {
-            get { return _Target; }
-            set { _Target = value; }
+            get { return _target; }
+            set { _target = value; }
         }
     }
 
