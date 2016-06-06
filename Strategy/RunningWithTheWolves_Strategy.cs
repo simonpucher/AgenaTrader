@@ -108,7 +108,7 @@ namespace AgenaTrader.UserCode
             {
                 //get the statistic data
                 //this._StatisticContainer.copyToClipboard();
-                string myCsv = this._CsvExport.Export();
+                //string myCsv = this._CsvExport.Export();
                 this._CsvExport.CopyToClipboard();
             }
         }
@@ -150,28 +150,32 @@ namespace AgenaTrader.UserCode
                         //nothing to do
                         break;
                 }
-            }
+            } 
 
-            //Create statistic
-            //todo create statistic only on bar close and not during the candle session
+            //Create statistic 
             if (this.StatisticBacktesting)
             {
-               _CsvExport.AddRow();
-               _CsvExport.AddRowBasicData(this, this.Instrument, this.TimeFrame, Bars[0]);
+                ////todo Create statistic only on bar close and not during the candle session
+                //if (CalculateOnBarClose == false)
+                //{
+                    _CsvExport.AddRow();
+                    _CsvExport.AddRowBasicData(this, this.Instrument, this.TimeFrame, Bars[0], CurrentBar);
 
-                //Order &  Trade
-               _CsvExport["OrderAction"] = resultdata;
+                    //Order &  Trade
+                    _CsvExport["OrderAction"] = resultdata;
 
-                //Additional indicators
-               _CsvExport["SMA-20"] = SMA(Input,20)[0];
-               _CsvExport["SMA-50"] = SMA(Input,50)[0];
-               _CsvExport["SMA-200"] = SMA(Input,200)[0];
+                    //Additional indicators
+                    _CsvExport["SMA-20"] = SMA(Input, 20)[0];
+                    _CsvExport["SMA-50"] = SMA(Input, 50)[0];
+                    _CsvExport["SMA-200"] = SMA(Input, 200)[0];
 
-               _CsvExport["RSI-14-3"] = RSI(Input,14,3)[0];
+                    _CsvExport["RSI-14-3"] = RSI(Input, 14, 3)[0];
 
-                // todo columns for trades
-                //TradeDirection;EntryReason;EntryDateTime;EntryPrice;EntryQuantity;EntryOrderType;ExitDateTime;ExitPrice;MinutesInMarket;ExitReason;ExitQuantity;ExitOrderType;PointsDiff;PointsDiffPerc;ProfitLoss;ProfitLossPercent;StopPrice;TargetPrice";
-
+                    // todo columns for trades
+                    //TradeDirection;EntryReason;EntryDateTime;EntryPrice;EntryQuantity;EntryOrderType;ExitDateTime;ExitPrice;MinutesInMarket;ExitReason;ExitQuantity;ExitOrderType;PointsDiff;PointsDiffPerc;ProfitLoss;ProfitLossPercent;StopPrice;TargetPrice";
+ 
+                //}
+          
             }
 		}
 
@@ -241,7 +245,7 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("Select the type of MA you would like to use")]
+        [Description("Select the type of MA you would like to use.")]
         [Category("Parameters")]
         [DisplayName("Type of MA")]
         public Enum_RunningWithTheWolves_Indicator_MA MA_Selected
@@ -256,7 +260,7 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("Period for the slow mean average")]
+        [Description("Period for the slow mean average.")]
         [Category("Parameters")]
         [DisplayName("MA Slow")]
         public int MA_Slow
@@ -270,7 +274,7 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("Period for the medium mean average")]
+        [Description("Period for the medium mean average.")]
         [Category("Parameters")]
         [DisplayName("MA Medium")]
         public int MA_Medium
@@ -284,7 +288,7 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("Period for the fast mean average")]
+        [Description("Period for the fast mean average.")]
         [Category("Parameters")]
         [DisplayName("MA Fast")]
         public int MA_Fast
@@ -299,7 +303,7 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("If true it is allowed to go long")]
+        [Description("If true it is allowed to go long.")]
         [Category("Parameters")]
         [DisplayName("Allow Long")]
         public bool IsLongEnabled
@@ -311,7 +315,7 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("If true it is allowed to go short")]
+        [Description("If true it is allowed to go short.")]
         [Category("Parameters")]
         [DisplayName("Allow Short")]
         public bool IsShortEnabled
@@ -322,7 +326,7 @@ namespace AgenaTrader.UserCode
 
    
 
-        [Description("If true an email will be send on order execution and on other important issues")]
+        [Description("If true an email will be send on order execution and on other important issues.")]
         [Category("Safety first!")]
         [DisplayName("Send email")]
         public bool Send_email
@@ -332,7 +336,7 @@ namespace AgenaTrader.UserCode
         }
 
 
-        [Description("If true the strategy will handle everything. It will create buy orders, sell orders, stop loss orders, targets fully automatically")]
+        [Description("If true the strategy will handle everything. It will create buy orders, sell orders, stop loss orders, targets fully automatically.")]
         [Category("Safety first!")]
         [DisplayName("Autopilot")]
         public bool Autopilot
@@ -342,9 +346,9 @@ namespace AgenaTrader.UserCode
         }
 
 
-        [Description("If true the strategy will create statistic data during the backtesting process")]
+        [Description("If true the strategy will create statistic data during the backtesting process.")]
         [Category("Safety first!")]
-        [DisplayName("Statistic Backtesting")]
+        [DisplayName("Create Statistic")]
         public bool StatisticBacktesting
         {
             get { return _statisticbacktesting; }

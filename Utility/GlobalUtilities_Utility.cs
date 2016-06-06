@@ -1360,8 +1360,9 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// This method add the basic data rows for matlab import.
+        /// Please do not change the Keys because we need this structure for matlab.
         /// </summary>
-        public void AddRowBasicData(IStrategy strategy, IInstrument instrument, ITimeFrame timeframe, IBar bar)
+        public void AddRowBasicData(IStrategy strategy, IInstrument instrument, ITimeFrame timeframe, IBar bar, int CurrentBar)
         {
             this["Strategy"] = strategy.DisplayName;
             this["TimeFrame"] = timeframe.ToString();
@@ -1369,6 +1370,7 @@ namespace AgenaTrader.UserCode
             this[GlobalUtilities.GetPropertyName(() => instrument.MainSector)] = instrument.MainSector;
             this[GlobalUtilities.GetPropertyName(() => instrument.DetailSector)] = instrument.DetailSector;
             this[GlobalUtilities.GetPropertyName(() => instrument.Currency)] = instrument.Currency;
+            this["CurrentBar"] = CurrentBar;
             this[GlobalUtilities.GetPropertyName(() => bar.Time)] = bar.Time;
    
             this[GlobalUtilities.GetPropertyName(() => bar.Open)] = bar.Open;
