@@ -62,18 +62,18 @@ namespace AgenaTrader.UserCode
             ResultValue_DeepCorrection ResultValue = new ResultValue_DeepCorrection();
 
             if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionLong
-            && P123Adv(Input,_trendSize).P2Price[0] < Input[0])
+            && P123(Input,_trendSize).P2Price[0] < Input[0])
             {
                 ResultValue.Entry = OrderAction.Buy;
-                ResultValue.StopLoss = P123Adv(Input, _trendSize).TempP3Price[0];
-                ResultValue.Target = P123Adv(Input, _trendSize).P2Price[0];
+                ResultValue.StopLoss = P123(Input, _trendSize).TempP3Price[0];
+                ResultValue.Target = P123(Input, _trendSize).P2Price[0];
             }
             else if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionShort
-                && P123Adv(Input, _trendSize).P2Price[0] > Input[0])
+                && P123(Input, _trendSize).P2Price[0] > Input[0])
             {
                 ResultValue.Entry = OrderAction.SellShort;
-                ResultValue.StopLoss = P123Adv(Input, _trendSize).TempP3Price[0];
-                ResultValue.Target = P123Adv(Input, _trendSize).P2Price[0];
+                ResultValue.StopLoss = P123(Input, _trendSize).TempP3Price[0];
+                ResultValue.Target = P123(Input, _trendSize).P2Price[0];
             }
             return ResultValue;
         }
