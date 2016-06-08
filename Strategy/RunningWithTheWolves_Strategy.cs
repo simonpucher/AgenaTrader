@@ -30,6 +30,7 @@ using System.Linq.Expressions;
 namespace AgenaTrader.UserCode
 {
     [Description("Use SMA or EMA crosses to find trends.")]
+    [TimeFrameRequirements("1 Hour", "1 Day")]
 	public class RunningWithTheWolves_Strategy : UserStrategy
 	{
         
@@ -57,6 +58,9 @@ namespace AgenaTrader.UserCode
         //private StatisticContainer _StatisticContainer = null;
         private CsvExport _CsvExport = new CsvExport();
 
+      
+     
+
 		protected override void Initialize()
 		{
             CalculateOnBarClose = true;
@@ -71,6 +75,15 @@ namespace AgenaTrader.UserCode
             //For xMA200 we need at least 200 Bars.
             this.BarsRequired = 200;
 		}
+
+        /// <summary>
+        /// init data for multi frame
+        /// </summary>
+        protected override void InitRequirements()
+        {
+            Add(this.HigherTimeFrame.Periodicity, this.HigherTimeFrame.PeriodicityValue);
+        }
+
 
         protected override void OnStartUp()
         {
@@ -119,7 +132,7 @@ namespace AgenaTrader.UserCode
             this.IsAutomated = this.Autopilot;
 
             //calculate data
-            OrderAction? resultdata = this._RunningWithTheWolves_Indicator.calculate(Input, this.MA_Selected, this.MA_Fast, this.MA_Medium, this.MA_Slow);
+            OrderAction? resultdata = this._RunningWithTheWolves_Indicator.calculate(Closes[0], this.MA_Selected, this.MA_Fast, this.MA_Medium, this.MA_Slow);
             if (resultdata.HasValue)
             {
                 switch (resultdata)
@@ -165,11 +178,17 @@ namespace AgenaTrader.UserCode
                     _CsvExport["OrderAction"] = resultdata;
 
                     //Additional indicators
-                    _CsvExport["SMA-20"] = SMA(Input, 20)[0];
-                    _CsvExport["SMA-50"] = SMA(Input, 50)[0];
-                    _CsvExport["SMA-200"] = SMA(Input, 200)[0];
+                    _CsvExport["SMA-20"] = SMA(Closes[0], 20)[0];
+                    _CsvExport["SMA-50"] = SMA(Closes[0], 50)[0];
+                    _CsvExport["SMA-200"] = SMA(Closes[0], 200)[0];
 
-                    _CsvExport["RSI-14-3"] = RSI(Input, 14, 3)[0];
+                    _CsvExport["RSI-14-3"] = RSI(Closes[0], 14, 3)[0];
+
+                    //If there is a higher Time Frame configured and we are not on the same time frame.
+                    if (Closes.Count == 2)
+                    {
+                        _CsvExport["RSI-14-3_"+this.HigherTimeFrame.PeriodicityValue.ToString()+this.HigherTimeFrame.Periodicity.ToString()] = RSI(Closes[1], 14, 3)[0];
+                    }
 
                     // todo columns for trades
                     //TradeDirection;EntryReason;EntryDateTime;EntryPrice;EntryQuantity;EntryOrderType;ExitDateTime;ExitPrice;MinutesInMarket;ExitReason;ExitQuantity;ExitOrderType;PointsDiff;PointsDiffPerc;ProfitLoss;ProfitLossPercent;StopPrice;TargetPrice";
@@ -177,6 +196,9 @@ namespace AgenaTrader.UserCode
                 //}
           
             }
+
+
+
 		}
 
 
@@ -241,6 +263,21 @@ namespace AgenaTrader.UserCode
         #region Properties
 
         #region Input
+
+        private TimeFrame _HigherTimeFrame = new TimeFrame(DatafeedHistoryPeriodicity.Day, 1);
+        /// <summary>
+        /// </summary>
+        [Description("Select the higher time frame for this strategy.")]
+        [Category("Parameters")]
+        [DisplayName("Higher TimeFrame")]
+        public TimeFrame HigherTimeFrame
+        {
+            get { return _HigherTimeFrame; }
+            set
+            {
+                _HigherTimeFrame = value;
+            }
+        }
 
 
         /// <summary>
