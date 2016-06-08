@@ -17,29 +17,47 @@ namespace AgenaTrader.UserCode
     public class DeepCorrectionTrend_Indikator : UserIndicator
     {
         //constants
-        const double MarketPhaseDeepCorrectionLong = 5.3d;
-        const double MarketPhaseDeepCorrectionShort = -5.3d;
+        const double MarketPhaseDeepCorrectionWithTrendLong = 5.3d;
+        const double MarketPhaseDeepCorrectionWithTrendShort = -5.3d;
+        const double MarketPhaseDeepCorrectionLong = 5.1d;
+        const double MarketPhaseDeepCorrectionShort = -5.1d;
         int _trendSize = 1;
+
+        bool FirstOnBarUpdate = false;
+        bool FirstCalculate = false;
 
         protected override void Initialize()
         {
-            Add(new Plot(Color.Brown, PlotStyle.Block, "DeepCorrection"));   
-            Add(new Plot(Color.Green, "Entry"));                     
+            Add(new Plot(Color.Brown, PlotStyle.Block, "DeepCorrection"));
+            Add(new Plot(Color.Green, "Entry"));
             Overlay = false;
             CalculateOnBarClose = true;
-            BarsRequired = 20;
+           // BarsRequired = 20;
         }
 
         protected override void OnBarUpdate()
         {
 
-            //Lets call the calculate method and save the result with the trade action
-            ResultValue_DeepCorrection ResultValue = this.calculate(Close, TrendSize);
-
-            if (ResultValue.DeepCorrection == true)
+            //for debugging reason only, just to get a hook in
+            if (CurrentBar + 1 == 1051)
             {
-             //   Values[0].Set(1);
+                int a = 1 + 1;
             }
+
+            if (CurrentBar < BarsRequired)
+            {
+                return;
+            }
+
+
+            if (FirstOnBarUpdate == false)
+            {
+                Print("FirstOnBarUpdate " + Bars[0].Time + " Indi");
+                FirstOnBarUpdate = true;
+            }
+
+            //Lets call the calculate method and save the result with the trade action
+            ResultValue_DeepCorrection ResultValue = this.calculate(Close, TrendSize, Bars[0], "Indi");
 
             if (ResultValue.Entry.HasValue)
             {
@@ -57,43 +75,88 @@ namespace AgenaTrader.UserCode
             else
             {
                 //Value was null so nothing to do.
-            Values[1].Set(0);
+                Values[1].Set(0);
             }
+
+
         }
 
 
-        public ResultValue_DeepCorrection calculate(IDataSeries Input, int TrendSize)
+        public ResultValue_DeepCorrection calculate(IDataSeries Input, int TrendSize, IBar myBar, string caller)
         {
+
+
+            if (FirstCalculate == false)
+            {
+                Print("FirstCalculate " + myBar.Time + caller);
+                FirstCalculate = true;
+            }
+
             //Create a return object
             ResultValue_DeepCorrection ResultValue = new ResultValue_DeepCorrection();
 
-            if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionLong)
+            if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionLong
+             || MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionWithTrendLong)
             {
-                ResultValue.DeepCorrection = true;
+                //Print(Bars[0].Time + " " + MarketPhasesAdv(Input, TrendSize)[0] + " tmp Pkt3 " + P123(Close, _trendSize).TempP3Price[0] + " valid Pkt3 " + P123(Input, _trendSize).ValidP3Price[0]);
 
-                if (P123(Input, _trendSize).P2Price[0] < Input[0])
+                //try to get the temporary P3, if it does not exist, take the already validated P3
+                if (P123(Input, _trendSize).TempP3Price[0] != 0)
                 {
+                    ResultValue.DeepCorrection = true;
                     ResultValue.Entry = OrderAction.Buy;
                     ResultValue.StopLoss = P123(Input, _trendSize).TempP3Price[0];
+                    
+                }
+                else if (P123(Input, _trendSize).ValidP3Price[0] != 0)
+                {
+                    ResultValue.DeepCorrection = true;
+                    ResultValue.Entry = OrderAction.Buy;
+                    ResultValue.StopLoss = P123(Input, _trendSize).ValidP3Price[0];
+                }
+
+                //Check, if current Price is lower than P2 (because we want to go long towards P2)
+                if (Input[0] < P123(Input, _trendSize).P2Price[0])
+                {
                     ResultValue.Target = P123(Input, _trendSize).P2Price[0];
+                    Print("Indikator" + myBar.Time + " Long " + "Close: " + myBar.Close + " StopLoss: " + ResultValue.StopLoss + " Target: " + ResultValue.Target + " Marktphase: " + MarketPhasesAdv(Input, TrendSize)[0] + " BarsCount: " + Input.Count);
+                }
+                else
+                {
+                    ResultValue.Target = Input[0] * 1.005;
+                    Print("Indikator" + myBar.Time + " Long " + "Close: " + myBar.Close + " StopLoss: " + ResultValue.StopLoss + " Target: " + ResultValue.Target + " Marktphase: " + MarketPhasesAdv(Input, TrendSize)[0] + " BarsCount: " + Input.Count);
                 }
             }
-            else if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionShort)
+            else if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionShort
+                  || MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionWithTrendShort)
             {
-                ResultValue.DeepCorrection = true;
 
-                if (P123(Input, _trendSize).P2Price[0] > Input[0])
+                //try to get the temporary P3, if it does not exist, take the already validated P3
+                if (P123(Input, _trendSize).TempP3Price[0] != 0)
                 {
+                    ResultValue.DeepCorrection = true;
                     ResultValue.Entry = OrderAction.SellShort;
                     ResultValue.StopLoss = P123(Input, _trendSize).TempP3Price[0];
                     ResultValue.Target = P123(Input, _trendSize).P2Price[0];
                 }
+                else if (P123(Input, _trendSize).ValidP3Price[0] != 0)
+                {
+                    ResultValue.DeepCorrection = true;
+                    ResultValue.Entry = OrderAction.SellShort;
+                    ResultValue.StopLoss = P123(Input, _trendSize).ValidP3Price[0];
+                }
+                //Check, if current Price is higher than P2 (because we want to go short towards P2)
+                    if (Input[0] > P123(Input, _trendSize).P2Price[0])
+                {
+                    ResultValue.Target = P123(Input, _trendSize).P2Price[0];
+                }
+                else
+                {
+                    ResultValue.Target = Input[0] / 1.005;
+                }
             }
             return ResultValue;
         }
-
-
-
 
         public override string ToString()
         {
