@@ -553,7 +553,7 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-        #region Calculation of Percentage
+        #region Basic Calculation
 
         static public decimal getPercentage(double whole, double part)
         {
@@ -563,6 +563,31 @@ namespace AgenaTrader.UserCode
 	{
                 return 0;
 	}
+        }
+
+        static public double getMinPosNumber(double n1, double n2, double n3)
+        {
+            List<double> numbers = new List<double>();
+
+            numbers.Add(n1);
+            numbers.Add(n2);
+            numbers.Add(n3);
+
+            numbers.Sort();
+            numbers.RemoveAll(x => x <= 0);
+            return numbers.Min();
+
+            
+        }
+
+        static public double getMaxNumber(double n1, double n2, double n3)
+        {
+            List<double> numbers = new List<double>();
+
+            numbers.Add(n1);
+            numbers.Add(n2);
+            numbers.Add(n3);
+            return numbers.Max();
         }
 
         #endregion
