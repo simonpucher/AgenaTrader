@@ -50,8 +50,8 @@ namespace AgenaTrader.UserCode
 		{
 			//Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
 
-            CalculateOnBarClose = true;
-            Overlay = false;
+            CalculateOnBarClose = false;
+            Overlay = true;
 		}
 
 		protected override void OnBarUpdate()
