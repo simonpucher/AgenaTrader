@@ -24,7 +24,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-	[Description("This indicator finds the high, middle and low value in a dedicated timeframe.")]
+	[Description("This indicator finds the high, middle and low value in a dedicated timeframe or the current session.")]
 	public class FindHighLowTimeFrame_Indicator : UserIndicator
 	{
         //input
@@ -33,8 +33,8 @@ namespace AgenaTrader.UserCode
         private Color _col_timeframe = Const.DefaultIndicatorColor;
         private int _currentsessionlinewidth = Const.DefaultLineWidth_small;
         private DashStyle _currentsessionlinestyle = Const.DefaultIndicatorDashStyle;
-        private TimeSpan _tim_start = new TimeSpan(12, 0, 0);
-        private TimeSpan _tim_end = new TimeSpan(13, 0, 0);
+        private TimeSpan _tim_start = new TimeSpan(9, 0, 0);
+        private TimeSpan _tim_end = new TimeSpan(16, 0, 0);
         private bool _UseDedicatedTimeFrame = false;
 
         //output
@@ -349,7 +349,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator : Indicator
 	{
 		/// <summary>
-		/// This indicator finds the high, middle and low value in a dedicated timeframe.
+		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
 		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
         {
@@ -357,7 +357,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// This indicator finds the high, middle and low value in a dedicated timeframe.
+		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
 		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
 		{
@@ -395,7 +395,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// This indicator finds the high, middle and low value in a dedicated timeframe.
+		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
 		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
 		{
@@ -403,7 +403,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// This indicator finds the high, middle and low value in a dedicated timeframe.
+		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
 		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
 		{
@@ -421,7 +421,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// This indicator finds the high, middle and low value in a dedicated timeframe.
+		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
 		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
 		{
@@ -429,7 +429,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// This indicator finds the high, middle and low value in a dedicated timeframe.
+		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
 		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
 		{
@@ -444,7 +444,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// This indicator finds the high, middle and low value in a dedicated timeframe.
+		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
 		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
 		{
@@ -452,7 +452,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// This indicator finds the high, middle and low value in a dedicated timeframe.
+		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
 		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
 		{
