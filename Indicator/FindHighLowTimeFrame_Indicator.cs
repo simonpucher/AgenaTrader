@@ -43,39 +43,22 @@ namespace AgenaTrader.UserCode
         private double _lastmiddle = Double.NaN;
 
         //internal
-        //private DateTime _currentdayofupdate = DateTime.MinValue;
-
+ 
 
 		protected override void Initialize()
 		{
-			//Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
-
+		
             CalculateOnBarClose = false;
             Overlay = true;
 		}
 
 		protected override void OnBarUpdate()
 		{
-			//MyPlot1.Set(Input[0]);
-
+	
             if (this.IsCurrentBarLast)
             {
                 this.calculateanddrawhighlowlines();
             }
-
-            ////new day session is beginning so we need to calculate and redraw the lines
-            //if (_currentdayofupdate.Date < Time[0].Date)
-            //{
-            //    this.calculateanddrawhighlowlines();
-            //}
-
-
-            ////When finished set the last day variable
-            ////If we are online during the day session we do not set this variable so we are redrawing and recalculating the current session
-            //if (Time[0].Date != DateTime.Now.Date)
-            //{
-            //    _currentdayofupdate = Time[0].Date;
-            //}
 
 		}
 
@@ -129,20 +112,20 @@ namespace AgenaTrader.UserCode
                 DrawRectangle("HighLowRect" + start.Ticks, true, start, this.LastLow, end, this.LastHigh, this.Color_TimeFrame, this.Color_TimeFrame, this.Opacity);
             }
 
-            //Print(start.ToString() + " - Low: " + this.LastLow + " - High: " + this.LastHigh);
+            //Print(start.ToString() + " - Low: " + this.LastLow + " - High: " + this.LastHigh + " - Middle: " + this.LastMiddle);
         }
 
 
         public override string ToString()
         {
-            return "FindHighLowTimeFrame";
+            return "FindHighMiddleLowTimeFrame";
         }
 
         public override string DisplayName
         {
             get
             {
-                return "FindHighLowTimeFrame";
+                return "FindHighMiddleLowTimeFrame";
             }
         }
 
