@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2.2
+/// Version: 1.2.3
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -47,19 +47,16 @@ namespace AgenaTrader.UserCode
 
 		protected override void Initialize()
 		{
-		
             CalculateOnBarClose = false;
             Overlay = true;
 		}
 
 		protected override void OnBarUpdate()
 		{
-	
-            if (this.IsCurrentBarLast)
+            if (Bars != null && Bars.Count > 0 && this.IsCurrentBarLast)
             {
                 this.calculateanddrawhighlowlines();
             }
-
 		}
 
 
@@ -83,34 +80,22 @@ namespace AgenaTrader.UserCode
             //Select all data and find high & low.
             IEnumerable<IBar> list = Bars.Where(x => x.Time >= start).Where(x => x.Time <= end);
 
-            //Check if data for timeframe is valid.
-            //we need to get sure that data for the whole time frame is available.
-            bool isvalidtimeframe = false;
-            if (list != null && !list.IsEmpty() && list.First().Time == start)
+            //We save the high and low values in public variables to get access from other scripts
+            this.LastLow = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
+            this.LastHigh = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
+            this.LastMiddle = this.LastLow + ((this.LastHigh - this.LastLow) / 2);
+
+
+            //Draw current lines for this day session
+            if (Time[0].Date == DateTime.Now.Date)
             {
-                isvalidtimeframe = true;
+                DrawHorizontalLine("LowLine" + start.Ticks, true, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                DrawHorizontalLine("HighLine" + start.Ticks, true, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                DrawHorizontalLine("MiddleLine" + start.Ticks, true, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth); 
             }
 
-            if (isvalidtimeframe)
-            {
-                //We save the high and low values in public variables to get access from other scripts
-                this.LastLow = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
-                this.LastHigh = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
-                this.LastMiddle = this.LastLow + ((this.LastHigh - this.LastLow) / 2);
-
-
-                //Draw current lines for this day session
-                if (Time[0].Date == DateTime.Now.Date)
-                {
-                    DrawHorizontalLine("LowLine" + start.Ticks, true, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
-                    DrawHorizontalLine("HighLine" + start.Ticks, true, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
-                    DrawHorizontalLine("MiddleLine" + start.Ticks, true, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
-                
-                }
-
-                //Draw a rectangle at the dedicated time frame
-                DrawRectangle("HighLowRect" + start.Ticks, true, start, this.LastLow, end, this.LastHigh, this.Color_TimeFrame, this.Color_TimeFrame, this.Opacity);
-            }
+            //Draw a rectangle at the dedicated time frame
+            DrawRectangle("HighLowRect" + start.Ticks, true, start, this.LastLow, end, this.LastHigh, this.Color_TimeFrame, this.Color_TimeFrame, this.Opacity);
 
             //Print(start.ToString() + " - Low: " + this.LastLow + " - High: " + this.LastHigh + " - Middle: " + this.LastMiddle);
         }
