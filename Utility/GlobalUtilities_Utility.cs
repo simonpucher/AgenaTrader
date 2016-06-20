@@ -247,6 +247,11 @@ namespace AgenaTrader.UserCode
             {
                 maxpositionsizeincash = account.CashValue / 100 * irp.MaxInvestedAmountPercentage;
             }
+            else if (irp.BasePositionSizing == BasePositionSizing.OnInitialRisk)
+            {
+                //hack: because of backtesting
+                maxpositionsizeincash = account.CashValue / 100 * irp.MaxInvestedAmountPercentage;
+            }
             else
             {
                 throw new NotImplementedException("AdjustPositionToRiskManagement: BasePositionSizing " + irp.BasePositionSizing.ToString() + " not implemented", null);
