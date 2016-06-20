@@ -37,6 +37,11 @@ namespace AgenaTrader.UserCode
         private TimeSpan _tim_end = new TimeSpan(16, 0, 0);
         private bool _UseDedicatedTimeFrame = false;
 
+        private bool _IsDrawHighLineEnabled = true;
+        private bool _IsDrawMiddleLineEnabled = true;
+        private bool _IsDrawLowLineEnabled = true;
+        private bool _IsDrawAreaplotEnabled = true;
+
         //output
         private double _lastlow = Double.NaN;
         private double _lasthigh = Double.NaN;
@@ -89,14 +94,25 @@ namespace AgenaTrader.UserCode
             //Draw current lines for this day session
             if (Time[0].Date == DateTime.Now.Date)
             {
-                DrawHorizontalLine("LowLine" + start.Ticks, true, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
-                DrawHorizontalLine("HighLine" + start.Ticks, true, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
-                DrawHorizontalLine("MiddleLine" + start.Ticks, true, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth); 
+                if (this.IsDrawLowLineEnabled)
+                {
+                    DrawHorizontalLine("LowLine" + start.Ticks, true, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                }
+                if (this.IsDrawHighLineEnabled)
+                {
+                    DrawHorizontalLine("HighLine" + start.Ticks, true, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                }
+                if (this.IsDrawMiddleLineEnabled)
+                {
+                    DrawHorizontalLine("MiddleLine" + start.Ticks, true, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);          
+                }
             }
 
             //Draw a rectangle at the dedicated time frame
-            DrawRectangle("HighLowRect" + start.Ticks, true, start, this.LastLow, end, this.LastHigh, this.Color_TimeFrame, this.Color_TimeFrame, this.Opacity);
-
+            if (this.IsDrawAreaplotEnabled)
+            {
+                DrawRectangle("HighLowRect" + start.Ticks, true, start, this.LastLow, end, this.LastHigh, this.Color_TimeFrame, this.Color_TimeFrame, this.Opacity);
+            }
             //Print(start.ToString() + " - Low: " + this.LastLow + " - High: " + this.LastHigh + " - Middle: " + this.LastMiddle);
         }
 
@@ -122,86 +138,7 @@ namespace AgenaTrader.UserCode
         #region Input
 
 
-        /// <summary>
-        /// </summary>
-        [Description("Opacity for Drawing")]
-        [Category("Parameters")]
-        [DisplayName("Opacity")]
-        public int Opacity
-        {
-            get { return _opacity; }
-            set
-            {
-                if (value >= 1 && value <= 100)
-                {
-                    _opacity = value;
-                }
-                else
-                {
-                    _opacity = Const.DefaultOpacity;
-                }
-            }
-        }
-
-
-        [XmlIgnore()]
-        [Description("Select color for the current session")]
-        [Category("Parameters")]
-        [DisplayName("Current Session")]
-        public Color CurrentSessionLineColor
-        {
-            get { return _currentsessionlinecolor; }
-            set { _currentsessionlinecolor = value; }
-        }
-
-        [Browsable(false)]
-        public string CurrentSessionLineColorSerialize
-        {
-            get { return SerializableColor.ToString(_currentsessionlinecolor); }
-            set { _currentsessionlinecolor = SerializableColor.FromString(value); }
-        }
-
-        /// <summary>
-        /// </summary>
-        [Description("Width for the line of the current session.")]
-        [Category("Parameters")]
-        [DisplayName("Line Width current session")]
-        public int CurrentSessionLineWidth
-        {
-            get { return _currentsessionlinewidth; }
-            set { _currentsessionlinewidth = Math.Max(1, value); }
-        }
-
-
-        /// <summary>
-        /// </summary>
-        [Description("DashStyle for line of the current session.")]
-        [Category("Parameters")]
-        [DisplayName("Dash Style current session")]
-        public DashStyle CurrentSessionLineStyle
-        {
-            get { return _currentsessionlinestyle; }
-            set { _currentsessionlinestyle = value; }
-        }
-
-
-        /// <summary>
-        /// </summary>
-        [Description("Time Frame Color")]
-        [Category("Parameters")]
-        [DisplayName("Time Frame")]
-        public Color Color_TimeFrame
-        {
-            get { return _col_timeframe; }
-            set { _col_timeframe = value; }
-        }
-
-        [Browsable(false)]
-        public string Color_TimeFrameSerialize
-        {
-            get { return SerializableColor.ToString(_col_timeframe); }
-            set { _col_timeframe = SerializableColor.FromString(value); }
-        }
+       
 
         //[Browsable(false)]
         //[XmlIgnore()]
@@ -250,12 +187,140 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("If true the you are able to specify a dedicated timeframe.")]
-        [Category("Parameters")]
+        [Category("Drawing")]
         [DisplayName("Dedicated TimeFrame")]
         public bool UseDedicatedTimeFrame
         {
             get { return _UseDedicatedTimeFrame; }
             set { _UseDedicatedTimeFrame = value; }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("Opacity for Drawing")]
+        [Category("Drawing")]
+        [DisplayName("Opacity")]
+        public int Opacity
+        {
+            get { return _opacity; }
+            set
+            {
+                if (value >= 1 && value <= 100)
+                {
+                    _opacity = value;
+                }
+                else
+                {
+                    _opacity = Const.DefaultOpacity;
+                }
+            }
+        }
+
+
+        [XmlIgnore()]
+        [Description("Select color for the current session")]
+        [Category("Drawing")]
+        [DisplayName("Current Session")]
+        public Color CurrentSessionLineColor
+        {
+            get { return _currentsessionlinecolor; }
+            set { _currentsessionlinecolor = value; }
+        }
+
+        [Browsable(false)]
+        public string CurrentSessionLineColorSerialize
+        {
+            get { return SerializableColor.ToString(_currentsessionlinecolor); }
+            set { _currentsessionlinecolor = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Width for the line of the current session.")]
+        [Category("Drawing")]
+        [DisplayName("Line Width current session")]
+        public int CurrentSessionLineWidth
+        {
+            get { return _currentsessionlinewidth; }
+            set { _currentsessionlinewidth = Math.Max(1, value); }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("DashStyle for line of the current session.")]
+        [Category("Drawing")]
+        [DisplayName("Dash Style current session")]
+        public DashStyle CurrentSessionLineStyle
+        {
+            get { return _currentsessionlinestyle; }
+            set { _currentsessionlinestyle = value; }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("Time Frame Color")]
+        [Category("Drawing")]
+        [DisplayName("Time Frame")]
+        public Color Color_TimeFrame
+        {
+            get { return _col_timeframe; }
+            set { _col_timeframe = value; }
+        }
+
+        [Browsable(false)]
+        public string Color_TimeFrameSerialize
+        {
+            get { return SerializableColor.ToString(_col_timeframe); }
+            set { _col_timeframe = SerializableColor.FromString(value); }
+        }
+
+
+
+        /// <summary>
+        /// </summary>
+        [Description("If true the you will see the high line.")]
+        [Category("Drawing")]
+        [DisplayName("High Line")]
+        public bool IsDrawHighLineEnabled
+        {
+            get { return _IsDrawHighLineEnabled; }
+            set { _IsDrawHighLineEnabled = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("If true the you will see the middle line.")]
+        [Category("Drawing")]
+        [DisplayName("Middle Line")]
+        public bool IsDrawMiddleLineEnabled
+        {
+            get { return _IsDrawMiddleLineEnabled; }
+            set { _IsDrawMiddleLineEnabled = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("If true the you will see the low line.")]
+        [Category("Drawing")]
+        [DisplayName("Low Line")]
+        public bool IsDrawLowLineEnabled
+        {
+            get { return _IsDrawLowLineEnabled; }
+            set { _IsDrawLowLineEnabled = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("If true the you will see an area plot on the chart.")]
+        [Category("Drawing")]
+        [DisplayName("Area Plot")]
+        public bool IsDrawAreaplotEnabled
+        {
+            get { return _IsDrawAreaplotEnabled; }
+            set { _IsDrawAreaplotEnabled = value; }
         }
 
         #endregion
@@ -319,17 +384,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(TimeSpan time_Start, TimeSpan time_End)
         {
-			return FindHighLowTimeFrame_Indicator(Input, opacity, currentSessionLineColor, currentSessionLineWidth, currentSessionLineStyle, color_TimeFrame, time_Start, time_End, useDedicatedTimeFrame);
+			return FindHighLowTimeFrame_Indicator(Input, time_Start, time_End);
 		}
 
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, TimeSpan time_Start, TimeSpan time_End)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<FindHighLowTimeFrame_Indicator>(input, i => i.Opacity == opacity && i.CurrentSessionLineColor == currentSessionLineColor && i.CurrentSessionLineWidth == currentSessionLineWidth && i.CurrentSessionLineStyle == currentSessionLineStyle && i.Color_TimeFrame == color_TimeFrame && i.Time_Start == time_Start && i.Time_End == time_End && i.UseDedicatedTimeFrame == useDedicatedTimeFrame);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<FindHighLowTimeFrame_Indicator>(input, i => i.Time_Start == time_Start && i.Time_End == time_End);
 
 			if (indicator != null)
 				return indicator;
@@ -339,14 +404,8 @@ namespace AgenaTrader.UserCode
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
 							Input = input,
-							Opacity = opacity,
-							CurrentSessionLineColor = currentSessionLineColor,
-							CurrentSessionLineWidth = currentSessionLineWidth,
-							CurrentSessionLineStyle = currentSessionLineStyle,
-							Color_TimeFrame = color_TimeFrame,
 							Time_Start = time_Start,
-							Time_End = time_End,
-							UseDedicatedTimeFrame = useDedicatedTimeFrame
+							Time_End = time_End
 						};
 			indicator.SetUp();
 
@@ -365,20 +424,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(TimeSpan time_Start, TimeSpan time_End)
 		{
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, opacity, currentSessionLineColor, currentSessionLineWidth, currentSessionLineStyle, color_TimeFrame, time_Start, time_End, useDedicatedTimeFrame);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, time_Start, time_End);
 		}
 
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, TimeSpan time_Start, TimeSpan time_End)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(input, opacity, currentSessionLineColor, currentSessionLineWidth, currentSessionLineStyle, color_TimeFrame, time_Start, time_End, useDedicatedTimeFrame);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(input, time_Start, time_End);
 		}
 	}
 
@@ -391,17 +450,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(TimeSpan time_Start, TimeSpan time_End)
 		{
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, opacity, currentSessionLineColor, currentSessionLineWidth, currentSessionLineStyle, color_TimeFrame, time_Start, time_End, useDedicatedTimeFrame);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, time_Start, time_End);
 		}
 
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, TimeSpan time_Start, TimeSpan time_End)
 		{
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(input, opacity, currentSessionLineColor, currentSessionLineWidth, currentSessionLineStyle, color_TimeFrame, time_Start, time_End, useDedicatedTimeFrame);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(input, time_Start, time_End);
 		}
 	}
 
@@ -414,17 +473,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(TimeSpan time_Start, TimeSpan time_End)
 		{
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, opacity, currentSessionLineColor, currentSessionLineWidth, currentSessionLineStyle, color_TimeFrame, time_Start, time_End, useDedicatedTimeFrame);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, time_Start, time_End);
 		}
 
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, System.Int32 opacity, Color currentSessionLineColor, System.Int32 currentSessionLineWidth, DashStyle currentSessionLineStyle, Color color_TimeFrame, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeFrame)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, TimeSpan time_Start, TimeSpan time_End)
 		{
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(input, opacity, currentSessionLineColor, currentSessionLineWidth, currentSessionLineStyle, color_TimeFrame, time_Start, time_End, useDedicatedTimeFrame);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(input, time_Start, time_End);
 		}
 	}
 
