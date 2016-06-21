@@ -8,6 +8,8 @@ This project contains scripts for the AgenaTrader like indicators, conditions an
 ###Utility Indicator
 To compile indicators, conditions and other script resources without any error your **AgenaTrader also need access to the Utility Indicator** to use global source code elements! We use this indicator to share code snippets, so we do not need to copy and paste again and again. These reduces error sources, minimze the workload, gives us better testing opportunities and a better clarity. **You need to copy the Utility Indicator into the indicators directory of your AgenaTrader.** You will find the latest version of this Utility Indicator on GitHub: [Global Utilities](https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs)
 
+When you have copied the Utility Indicator into your indicator directory, you need to click on compile in your AgenaTrader. 
+
 ##Version number vs. in progress
 Each script should have a summary tag below the using directives. **If there is a version number you can start using the script.** If there is no summary tag or the version number is a text ("in progress"), we are working on this script and it is not recommended to use it.
 ```C#
