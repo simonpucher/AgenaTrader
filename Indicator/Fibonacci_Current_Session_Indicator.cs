@@ -55,30 +55,50 @@ namespace AgenaTrader.UserCode
             if (Bars != null && Bars.Count > 0 && IsCurrentBarLast)
             {
 
-                    //Check if peridocity is valid for this script
-                    if (!DatafeedPeriodicityIsValid(Bars.TimeFrame))
-                    {
-                        GlobalUtilities.DrawWarningTextOnChart(this, Const.DefaultStringDatafeedPeriodicity);
-                        return;
-                    }
-              
-                    DateTime start = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
-                    DateTime start_date = start.Date;
-                    DateTime end = start.AddHours(23).AddMinutes(59).AddSeconds(59);
-
-                    //Selektiere alle gültigen Kurse und finde low und high.
-                    IEnumerable<IBar> list = Bars.Where(x => x.Time >= start).Where(x => x.Time <= end);
-                    if (list != null && !list.IsEmpty())
-                    {
-                        double minvalue = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
-                        double maxvalue = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
-
-                        //DrawFibonacciRetracements("Fibonacci_Session", true, start_date, minvalue, end, maxvalue);
-                        DrawFibonacciProjections("Fibonacci_Session_Plot", true, start_date, minvalue, Time[0], maxvalue , start_date, minvalue);
-                        DrawHorizontalLine("Fibonacci_Session_LowLine", true, minvalue, Color.Red, DashStyle.Solid, 3);
-                        DrawHorizontalLine("Fibonacci_Session_HighLine", true, maxvalue, Color.Green, DashStyle.Solid, 3);
-                    }
+                //Check if peridocity is valid for this script
+                if (!DatafeedPeriodicityIsValid(Bars.TimeFrame))
+                {
+                    GlobalUtilities.DrawWarningTextOnChart(this, Const.DefaultStringDatafeedPeriodicity);
+                    return;
                 }
+              
+                DateTime start = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
+                DateTime start_date = start.Date;
+                DateTime end = start.AddHours(23).AddMinutes(59).AddSeconds(59);
+
+                //Selektiere alle gültigen Kurse und finde low und high.
+                IEnumerable<IBar> list = Bars.Where(x => x.Time >= start).Where(x => x.Time <= end);
+                if (list != null && !list.IsEmpty())
+                {
+                    double minvalue = list.Where(x => x.Low == list.Min(y => y.Low)).LastOrDefault().Low;
+                    double maxvalue = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
+                    double range = maxvalue - minvalue;
+
+                    //DrawFibonacciRetracements("Fibonacci_Session", true, start_date, minvalue, end, maxvalue);
+                    //DrawFibonacciProjections("Fibonacci_Session_Plot", true, start_date, minvalue, Time[0], maxvalue , start_date, minvalue);
+                    //DrawHorizontalLine("Fibonacci_Session_LowLine", true, minvalue, Color.Red, DashStyle.Solid, 3);
+                    //DrawHorizontalLine("Fibonacci_Session_HighLine", true, maxvalue, Color.Green, DashStyle.Solid, 3);
+
+                    DrawLine("Fibonacci_Session_LowLine", true, start, minvalue, end, minvalue, Color.Red, DashStyle.Solid, 3);
+                    DrawLine("Fibonacci_Session_HighLine", true, start, maxvalue, end, maxvalue, Color.Green, DashStyle.Solid, 3);
+
+                    double _fibo_lv_236 = maxvalue - ((range / 100) * 23.6);
+                    DrawText("Fibonacci_Session_23.6_String", true, _fibo_lv_236.ToString("N2"), start, _fibo_lv_236, 8, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Transparent, Color.Transparent, 100);
+                    DrawLine("Fibonacci_Session_23.6_Line", true, start, _fibo_lv_236, end, _fibo_lv_236, Color.Blue, DashStyle.Solid, 2);
+
+                    double _fibo_lv_382 = maxvalue - ((range / 100) * 38.2);
+                    DrawLine("Fibonacci_Session_38.2", true, start, _fibo_lv_382, end, _fibo_lv_382, Color.Blue, DashStyle.Solid, 2);
+
+                    double _fibo_lv_500 = maxvalue - ((range / 100) * 50.0);
+                    DrawLine("Fibonacci_Session_50.0", true, start, _fibo_lv_500, end, _fibo_lv_500, Color.Blue, DashStyle.Solid, 2);
+
+                    double _fibo_lv_618 = maxvalue - ((range / 100) * 61.8);
+                    DrawLine("Fibonacci_Session_61.8", true, start, _fibo_lv_618, end, _fibo_lv_618, Color.Blue, DashStyle.Solid, 2);
+
+                    double _fibo_lv_786 = maxvalue - ((range / 100) * 78.6);
+                    DrawLine("Fibonacci_Session_78.6", true, start, _fibo_lv_786, end, _fibo_lv_786, Color.Blue, DashStyle.Solid, 2);
+                }
+            }
 		}
 
 
