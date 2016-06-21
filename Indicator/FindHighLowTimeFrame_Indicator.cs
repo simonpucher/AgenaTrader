@@ -147,11 +147,14 @@ namespace AgenaTrader.UserCode
                     break;
                 case FindHighLowTimeFrame_Type.Candle:
                     //Draw it for the candles
-                    DateTime startcandle = Bars[this._CandlesAgo].Time.Date;
-                    double lastmiddle = Bars[this._CandlesAgo].Low + (Bars[this._CandlesAgo].Range / 2);
-                    if (this.IsDrawMiddleLineEnabled)
+                    if (Bars.Count() - 1 >= this.CandlesAgo)
                     {
-                        DrawHorizontalLine("MiddleLineOnCandle" + startcandle.Ticks, true, lastmiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                        DateTime startcandle = Bars[this.CandlesAgo].Time.Date;
+                        double lastmiddle = Bars[this.CandlesAgo].Low + (Bars[this.CandlesAgo].Range / 2);
+                        if (this.IsDrawMiddleLineEnabled)
+                        {
+                            DrawHorizontalLine("MiddleLineOnCandle" + startcandle.Ticks, true, lastmiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                        } 
                     }
                     break;
                 default:
