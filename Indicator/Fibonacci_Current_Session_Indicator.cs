@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2.1
+/// Version: 1.2.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -30,6 +30,20 @@ namespace AgenaTrader.UserCode
 	[Description("Plots the Fibonacci Lines of the current session.")]
 	public class Fibonacci_Current_Session : UserIndicator
 	{
+        //input
+        private Color _Color_Fibo_Level_100 = Color.Red;
+        private Color _Color_Fibo_Level_0 = Color.Green;
+        private Color _Color_Fibo_Level_0_100 = Color.Gray;
+        private Color _Color_Text = Color.Black;
+        private int _Fibo_0_LineWidth = 3;
+        private int _Fibo_0_100_LineWidth = 2;
+        private int _Fibo_100_LineWidth = 3;
+
+
+        //output
+
+        //internal
+
         protected override void InitRequirements()
         {
             //  Print("InitRequirements");
@@ -64,7 +78,7 @@ namespace AgenaTrader.UserCode
               
                 DateTime start = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
                 DateTime start_date = start.Date;
-                DateTime end = start.AddHours(23).AddMinutes(59).AddSeconds(59);
+                DateTime end = Bars[0].Time;//start.AddHours(23).AddMinutes(59).AddSeconds(59);
 
                 //Selektiere alle gültigen Kurse und finde low und high.
                 IEnumerable<IBar> list = Bars.Where(x => x.Time >= start).Where(x => x.Time <= end);
@@ -79,24 +93,33 @@ namespace AgenaTrader.UserCode
                     //DrawHorizontalLine("Fibonacci_Session_LowLine", true, minvalue, Color.Red, DashStyle.Solid, 3);
                     //DrawHorizontalLine("Fibonacci_Session_HighLine", true, maxvalue, Color.Green, DashStyle.Solid, 3);
 
-                    DrawLine("Fibonacci_Session_LowLine", true, start, minvalue, end, minvalue, Color.Red, DashStyle.Solid, 3);
-                    DrawLine("Fibonacci_Session_HighLine", true, start, maxvalue, end, maxvalue, Color.Green, DashStyle.Solid, 3);
+                    DateTime enddrawing_string = end.AddSeconds(this.TimeFrame.GetSeconds() + this.TimeFrame.GetSeconds() * 0.15);
+                    DateTime enddrawing_line = end.AddSeconds(this.TimeFrame.GetSeconds());
+
+                    DrawText("Fibonacci_Session_LowLine_String", true, minvalue.ToString("N2") + " (100%)", enddrawing_string, minvalue, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                    DrawLine("Fibonacci_Session_LowLine", true, start, minvalue, enddrawing_line , minvalue, this.Color_Fibo_Level_100, DashStyle.Solid, this.Fibo_100_LineWidth);
+                    DrawText("Fibonacci_Session_HighLine_String", true, maxvalue.ToString("N2") + " (0%)", enddrawing_string, maxvalue, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                    DrawLine("Fibonacci_Session_HighLine", true, start, maxvalue, enddrawing_line, maxvalue, this.Color_Fibo_Level_0, DashStyle.Solid, this.Fibo_0_LineWidth);
 
                     double _fibo_lv_236 = maxvalue - ((range / 100) * 23.6);
-                    DrawText("Fibonacci_Session_23.6_String", true, _fibo_lv_236.ToString("N2"), start, _fibo_lv_236, 8, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Transparent, Color.Transparent, 100);
-                    DrawLine("Fibonacci_Session_23.6_Line", true, start, _fibo_lv_236, end, _fibo_lv_236, Color.Blue, DashStyle.Solid, 2);
+                    DrawText("Fibonacci_Session_23.6_String", true, _fibo_lv_236.ToString("N2") + " (23.6%)", enddrawing_string, _fibo_lv_236, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                    DrawLine("Fibonacci_Session_23.6_Line", true, start, _fibo_lv_236, enddrawing_line, _fibo_lv_236, this.Color_Fibo_Level_0_100, DashStyle.Solid, this.Fibo_0_100_LineWidth);
 
                     double _fibo_lv_382 = maxvalue - ((range / 100) * 38.2);
-                    DrawLine("Fibonacci_Session_38.2", true, start, _fibo_lv_382, end, _fibo_lv_382, Color.Blue, DashStyle.Solid, 2);
+                    DrawText("Fibonacci_Session_38.2_String", true, _fibo_lv_382.ToString("N2") + " (38.2%)", enddrawing_string, _fibo_lv_382, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                    DrawLine("Fibonacci_Session_38.2", true, start, _fibo_lv_382, enddrawing_line, _fibo_lv_382, this.Color_Fibo_Level_0_100, DashStyle.Solid, this.Fibo_0_100_LineWidth);
 
                     double _fibo_lv_500 = maxvalue - ((range / 100) * 50.0);
-                    DrawLine("Fibonacci_Session_50.0", true, start, _fibo_lv_500, end, _fibo_lv_500, Color.Blue, DashStyle.Solid, 2);
+                    DrawText("Fibonacci_Session_50.0_String", true, _fibo_lv_500.ToString("N2") + " (50.0%)", enddrawing_string, _fibo_lv_500, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                    DrawLine("Fibonacci_Session_50.0", true, start, _fibo_lv_500, enddrawing_line, _fibo_lv_500, this.Color_Fibo_Level_0_100, DashStyle.Solid, this.Fibo_0_100_LineWidth);
 
                     double _fibo_lv_618 = maxvalue - ((range / 100) * 61.8);
-                    DrawLine("Fibonacci_Session_61.8", true, start, _fibo_lv_618, end, _fibo_lv_618, Color.Blue, DashStyle.Solid, 2);
+                    DrawText("Fibonacci_Session_61.8_String", true, _fibo_lv_618.ToString("N2") + " (61.8%)", enddrawing_string, _fibo_lv_618, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                    DrawLine("Fibonacci_Session_61.8", true, start, _fibo_lv_618, enddrawing_line, _fibo_lv_618, this.Color_Fibo_Level_0_100, DashStyle.Solid, this.Fibo_0_100_LineWidth);
 
                     double _fibo_lv_786 = maxvalue - ((range / 100) * 78.6);
-                    DrawLine("Fibonacci_Session_78.6", true, start, _fibo_lv_786, end, _fibo_lv_786, Color.Blue, DashStyle.Solid, 2);
+                    DrawText("Fibonacci_Session_78.6_String", true, _fibo_lv_786.ToString("N2") + " (78.6%)", enddrawing_string, _fibo_lv_786, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                    DrawLine("Fibonacci_Session_78.6", true, start, _fibo_lv_786, enddrawing_line, _fibo_lv_786, this.Color_Fibo_Level_0_100, DashStyle.Solid, this.Fibo_0_100_LineWidth);
                 }
             }
 		}
@@ -145,12 +168,113 @@ namespace AgenaTrader.UserCode
 
         #region Properties
 
-        //[Browsable(false)]
-        //[XmlIgnore()]
-        //public DataSeries MyPlot1
-        //{
-        //    get { return Values[0]; }
-        //}
+        /// <summary>
+        /// </summary>
+        [Description("Color Fibo Level 100%")]
+        [Category("Drawing")]
+        [DisplayName("Fibo Lvl 100%")]
+        public Color Color_Fibo_Level_100
+        {
+            get { return _Color_Fibo_Level_100; }
+            set { _Color_Fibo_Level_100 = value; }
+        }
+
+        [Browsable(false)]
+        public string _Color_Fibo_Level_100_Serialize
+        {
+            get { return SerializableColor.ToString(_Color_Fibo_Level_100); }
+            set { _Color_Fibo_Level_100 = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Color Fibo Level 0% - 100%")]
+        [Category("Drawing")]
+        [DisplayName("Fibo Lvls 0% - 100%")]
+        public Color Color_Fibo_Level_0_100
+        {
+            get { return _Color_Fibo_Level_0_100; }
+            set { _Color_Fibo_Level_0_100 = value; }
+        }
+
+        [Browsable(false)]
+        public string Color_Fibo_Level_0_100_Serialize
+        {
+            get { return SerializableColor.ToString(_Color_Fibo_Level_0_100); }
+            set { _Color_Fibo_Level_0_100 = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Color Fibo Level 0%")]
+        [Category("Drawing")]
+        [DisplayName("Fibo Lvl 0%")]
+        public Color Color_Fibo_Level_0
+        {
+            get { return _Color_Fibo_Level_0; }
+            set { _Color_Fibo_Level_0 = value; }
+        }
+
+        [Browsable(false)]
+        public string Color_Fibo_Level_0_Serialize
+        {
+            get { return SerializableColor.ToString(_Color_Fibo_Level_0); }
+            set { _Color_Fibo_Level_0 = SerializableColor.FromString(value); }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("Color for the text")]
+        [Category("Drawing")]
+        [DisplayName("Text color")]
+        public Color Color_Text
+        {
+            get { return _Color_Text; }
+            set { _Color_Text = value; }
+        }
+
+        [Browsable(false)]
+        public string Color_Text_Serialize
+        {
+            get { return SerializableColor.ToString(_Color_Text); }
+            set { _Color_Text = SerializableColor.FromString(value); }
+        }
+
+     
+
+        /// <summary>
+        /// </summary>
+        [Description("Width for the Fibo line 0%.")]
+        [Category("Drawing")]
+        [DisplayName("Line Width Fibo lvl 0%")]
+        public int Fibo_0_LineWidth
+        {
+            get { return _Fibo_0_LineWidth; }
+            set { _Fibo_0_LineWidth = Math.Max(1, value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Width for the Fibo line 0% - 100%.")]
+        [Category("Drawing")]
+        [DisplayName("Line Width Fibo lvl 0% - 100%")]
+        public int Fibo_0_100_LineWidth
+        {
+            get { return _Fibo_0_100_LineWidth; }
+            set { _Fibo_0_100_LineWidth = Math.Max(1, value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Width for the Fibo line 100%.")]
+        [Category("Drawing")]
+        [DisplayName("Line Width Fibo lvl 100%")]
+        public int Fibo_100_LineWidth
+        {
+            get { return _Fibo_100_LineWidth; }
+            set { _Fibo_100_LineWidth = Math.Max(1, value); }
+        }
 
 
 		#endregion
