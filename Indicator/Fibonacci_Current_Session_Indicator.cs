@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2.2
+/// Version: 1.2.3
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -56,8 +56,6 @@ namespace AgenaTrader.UserCode
 
 		protected override void Initialize()
 		{
-            //Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "Fibonacci_Current_Session_Plot1"));
-
             CalculateOnBarClose = true;
             Overlay = true;
 		}
@@ -78,7 +76,7 @@ namespace AgenaTrader.UserCode
               
                 DateTime start = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
                 DateTime start_date = start.Date;
-                DateTime end = Bars[0].Time;//start.AddHours(23).AddMinutes(59).AddSeconds(59);
+                DateTime end = Bars[0].Time;
 
                 //Selektiere alle gültigen Kurse und finde low und high.
                 IEnumerable<IBar> list = Bars.Where(x => x.Time >= start).Where(x => x.Time <= end);
@@ -88,22 +86,18 @@ namespace AgenaTrader.UserCode
                     double maxvalue = list.Where(x => x.High == list.Max(y => y.High)).LastOrDefault().High;
                     double range = maxvalue - minvalue;
 
-                    //DrawFibonacciRetracements("Fibonacci_Session", true, start_date, minvalue, end, maxvalue);
-                    //DrawFibonacciProjections("Fibonacci_Session_Plot", true, start_date, minvalue, Time[0], maxvalue , start_date, minvalue);
-                    //DrawHorizontalLine("Fibonacci_Session_LowLine", true, minvalue, Color.Red, DashStyle.Solid, 3);
-                    //DrawHorizontalLine("Fibonacci_Session_HighLine", true, maxvalue, Color.Green, DashStyle.Solid, 3);
-
                     DateTime enddrawing_string = end.AddSeconds(this.TimeFrame.GetSeconds() + this.TimeFrame.GetSeconds() * 0.15);
                     DateTime enddrawing_line = end.AddSeconds(this.TimeFrame.GetSeconds());
 
                     DrawText("Fibonacci_Session_LowLine_String", true, minvalue.ToString("N2") + " (100%)", enddrawing_string, minvalue, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
                     DrawLine("Fibonacci_Session_LowLine", true, start, minvalue, enddrawing_line , minvalue, this.Color_Fibo_Level_100, DashStyle.Solid, this.Fibo_100_LineWidth);
+                    
                     DrawText("Fibonacci_Session_HighLine_String", true, maxvalue.ToString("N2") + " (0%)", enddrawing_string, maxvalue, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
                     DrawLine("Fibonacci_Session_HighLine", true, start, maxvalue, enddrawing_line, maxvalue, this.Color_Fibo_Level_0, DashStyle.Solid, this.Fibo_0_LineWidth);
 
-                    double _fibo_lv_236 = maxvalue - ((range / 100) * 23.6);
-                    DrawText("Fibonacci_Session_23.6_String", true, _fibo_lv_236.ToString("N2") + " (23.6%)", enddrawing_string, _fibo_lv_236, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
-                    DrawLine("Fibonacci_Session_23.6_Line", true, start, _fibo_lv_236, enddrawing_line, _fibo_lv_236, this.Color_Fibo_Level_0_100, DashStyle.Solid, this.Fibo_0_100_LineWidth);
+                    double _fibo_lv_2361 = maxvalue - ((range / 100) * 23.61);
+                    DrawText("Fibonacci_Session_23.61_String", true, _fibo_lv_2361.ToString("N2") + " (23.61%)", enddrawing_string, _fibo_lv_2361, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                    DrawLine("Fibonacci_Session_23.61_Line", true, start, _fibo_lv_2361, enddrawing_line, _fibo_lv_2361, this.Color_Fibo_Level_0_100, DashStyle.Solid, this.Fibo_0_100_LineWidth);
 
                     double _fibo_lv_382 = maxvalue - ((range / 100) * 38.2);
                     DrawText("Fibonacci_Session_38.2_String", true, _fibo_lv_382.ToString("N2") + " (38.2%)", enddrawing_string, _fibo_lv_382, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
@@ -117,9 +111,14 @@ namespace AgenaTrader.UserCode
                     DrawText("Fibonacci_Session_61.8_String", true, _fibo_lv_618.ToString("N2") + " (61.8%)", enddrawing_string, _fibo_lv_618, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
                     DrawLine("Fibonacci_Session_61.8", true, start, _fibo_lv_618, enddrawing_line, _fibo_lv_618, this.Color_Fibo_Level_0_100, DashStyle.Solid, this.Fibo_0_100_LineWidth);
 
-                    double _fibo_lv_786 = maxvalue - ((range / 100) * 78.6);
-                    DrawText("Fibonacci_Session_78.6_String", true, _fibo_lv_786.ToString("N2") + " (78.6%)", enddrawing_string, _fibo_lv_786, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
-                    DrawLine("Fibonacci_Session_78.6", true, start, _fibo_lv_786, enddrawing_line, _fibo_lv_786, this.Color_Fibo_Level_0_100, DashStyle.Solid, this.Fibo_0_100_LineWidth);
+                    double _fibo_lv_7640 = maxvalue - ((range / 100) * 76.4);
+                    DrawText("Fibonacci_Session_76.40_String", true, _fibo_lv_7640.ToString("N2") + " (76.4%)", enddrawing_string, _fibo_lv_7640, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                    DrawLine("Fibonacci_Session_76.40", true, start, _fibo_lv_7640, enddrawing_line, _fibo_lv_7640, this.Color_Fibo_Level_0_100, DashStyle.Solid, this.Fibo_0_100_LineWidth);
+
+                    double _fibo_lv_7862 = maxvalue - ((range / 100) * 78.62);
+                    DrawText("Fibonacci_Session_78.62_String", true, _fibo_lv_7862.ToString("N2") + " (78.62%)", enddrawing_string, _fibo_lv_7862, 0, this.Color_Text, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                    DrawLine("Fibonacci_Session_78.62", true, start, _fibo_lv_7862, enddrawing_line, _fibo_lv_7862, this.Color_Fibo_Level_0_100, DashStyle.Solid, this.Fibo_0_100_LineWidth);
+
                 }
             }
 		}
@@ -167,6 +166,9 @@ namespace AgenaTrader.UserCode
 
 
         #region Properties
+
+    
+
 
         /// <summary>
         /// </summary>
