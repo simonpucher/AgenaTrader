@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2.3
+/// Version: 1.2.4
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -311,7 +311,7 @@ namespace AgenaTrader.UserCode
        
         /// <summary>
         /// </summary>
-        [Description("Here you can activate and deactivate the fibo levels you like to see.")]
+        [Description("Here you can activate and deactivate the fibo levels you like to see. If you want all, please use: 0;23;38;50;61;76;78;100;")]
         [Category("Drawing")]
         [DisplayName("Fibo Lvls to use")]
         public string WhichLinesShouldWeUse
