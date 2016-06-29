@@ -18,6 +18,14 @@ using AgenaTrader.Helper;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
+/// The initial version of this strategy was inspired by the work of Birger Schäfermeier: https://www.whselfinvest.at/de/Store_Birger_Schaefermeier_Trading_Strategie_Open_Range_Break_Out.php
+/// Further developments are inspired by the work of Mehmet Emre Cekirdekci and Veselin Iliev from the Worcester Polytechnic Institute (2010)
+/// Trading System Development: Trading the Opening Range Breakouts https://www.wpi.edu/Pubs/E-project/Available/E-project-042910-142422/unrestricted/Veselin_Iliev_IQP.pdf
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
+/// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode
@@ -27,29 +35,33 @@ namespace AgenaTrader.UserCode
 	[IsStopAttribute(false)]
 	[IsTargetAttribute(false)]
 	[OverrulePreviousStopPrice(false)]
-	public class ORB_Condition : UserScriptedCondition
+    public class ORB_Condition : UserScriptedCondition, IORB
 	{
 		#region Variables
 
         //input
         private int _orbminutes = 75;
-        private Color _col_orb = Color.Brown;
-        private Color _col_target_short = Color.PaleVioletRed;
-        private Color _col_target_long = Color.PaleGreen;
+        private Color _plot1color = Const.DefaultIndicatorColor;
+        private int _plot1width = Const.DefaultLineWidth;
+        private DashStyle _plot1dashstyle = Const.DefaultIndicatorDashStyle;
 
-        private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);    //09:00:00   
-        private TimeSpan _tim_OpenRangeEndDE = new TimeSpan(10, 15, 0);    //09:00:00   
+        private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);
+        //private TimeSpan _tim_OpenRangeEndDE = new TimeSpan(10, 15, 0);  
 
-        private TimeSpan _tim_OpenRangeStartUS = new TimeSpan(15, 30, 0);  //15:30:00   
-        private TimeSpan _tim_OpenRangeEndUS = new TimeSpan(16, 45, 0);  //15:30:00   
+        private TimeSpan _tim_OpenRangeStartUS = new TimeSpan(15, 30, 0);
+        //private TimeSpan _tim_OpenRangeEndUS = new TimeSpan(16, 45, 0);    
 
-        private TimeSpan _tim_EndOfDay_DE = new TimeSpan(16, 30, 0);  //16:30:00   
-        private TimeSpan _tim_EndOfDay_US = new TimeSpan(21, 30, 0);  //21:30:00
+        private TimeSpan _tim_EndOfDay_DE = new TimeSpan(17, 30, 0);
+        private TimeSpan _tim_EndOfDay_US = new TimeSpan(22, 00, 0);  
+
+   
+
 
         //output
 		private int _myCondition1 = 1;
 
         //internal
+        private ORB_Indicator _orb_indicator = null;
 
 
 		#endregion
@@ -59,129 +71,85 @@ namespace AgenaTrader.UserCode
 			IsEntry = true;
 			IsStop = false;
 			IsTarget = false;
-			Add(new Plot(Color.FromKnownColor(KnownColor.Black), "Occurred"));
-			Add(new Plot(Color.FromArgb(255, 187, 128, 238), "Entry"));
+            Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "Occurred"));
+            //Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "Entry"));
 			Overlay = true;
-			CalculateOnBarClose = true;
+			CalculateOnBarClose = false;
+
+            //Because of Backtesting reasons if we use the afvanced mode we need at least two bars
+            this.BarsRequired = 2;
 		}
+
+        protected override void InitRequirements()
+        {
+            base.InitRequirements();
+
+        
+        }
+
+
+        protected override void OnStartUp()
+        {
+            base.OnStartUp();
+
+            //Init our indicator to get code access
+            this._orb_indicator = new ORB_Indicator();
+            this._orb_indicator.SetData(this.Instrument);
+
+            //Initalize Indicator parameters
+            _orb_indicator.ORBMinutes = this.ORBMinutes;
+            _orb_indicator.Time_OpenRangeStartDE = this.Time_OpenRangeStartDE;
+            _orb_indicator.Time_OpenRangeStartUS = this.Time_OpenRangeStartUS;
+            _orb_indicator.Time_EndOfDay_DE = this.Time_EndOfDay_DE;
+            _orb_indicator.Time_EndOfDay_US = this.Time_EndOfDay_US;
+        }
+
+       
 
 		protected override void OnBarUpdate()
 		{
-    
 
-            //Occurred.Set(-1);
-            //Entry.Set(Close[0]);
+            _orb_indicator.calculate(this.Bars, this.Bars[0]);
+            //Occurred.Set(returnvalue);
+            //Entry.Set(Bars[0].Close);
+
+            //If there was a breakout and the current bar is the same bar as the long/short breakout, then trigger signal.
+            if (_orb_indicator.LongBreakout != null && _orb_indicator.LongBreakout.Time == Bars[0].Time)
+            {
+                //Long Signal
+                Occurred.Set(1);
+                //Entry.Set(Close[0]);
+            }
+            else if (_orb_indicator.ShortBreakout != null && _orb_indicator.ShortBreakout.Time == Bars[0].Time)
+            {
+                //Short Signal
+                Occurred.Set(-1);
+                //Entry.Set(Close[0]);
+            }
+            else
+            {
+                //No Signal
+                Occurred.Set(0);
+                //Entry.Set(Close[0]);
+            }
 
 		}
 
 
         public override string ToString()
         {
-            return "ORB";
+            return "ORB (C)";
         }
 
         public override string DisplayName
         {
             get
             {
-                return "ORB";
+                return "ORB (C)";
             }
         }
 
-        #region Public Functions for usage in other ORB Indicators, Targets, Stops, and so on
-
-      /// <summary>
-      /// 
-      /// </summary>
-      /// <param name="time_openrangestartde"></param>
-      /// <param name="time_openrangestartus"></param>
-      /// <returns></returns>
-        public TimeSpan getOpenRangeStart(TimeSpan time_openrangestartde, TimeSpan time_openrangestartus)
-            {
-                if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
-                {
-                    //return new TimeSpan(9,00,00);
-                    return time_openrangestartde;
-                }
-                else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
-                {
-                    //return new TimeSpan(15,30,00);
-                    return time_openrangestartus;
-                }
-                else
-                {
-                    return time_openrangestartde;
-                }
-            }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="time_openrangeendde"></param>
-        /// <param name="time_openrangeendus"></param>
-        /// <returns></returns>
-            public TimeSpan getEODTime(TimeSpan time_openrangeendde, TimeSpan time_openrangeendus)
-            {
-
-                if (Bars.Instrument.Symbol.Contains("DE.30") || Bars.Instrument.Symbol.Contains("DE-XTB"))
-                {
-                    //return new TimeSpan(9,00,00);
-                    return time_openrangeendde;
-                }
-                else if (Bars.Instrument.Symbol.Contains("US.30") || Bars.Instrument.Symbol.Contains("US-XTB"))
-                {
-                    //return new TimeSpan(15,30,00);
-                    return time_openrangeendus;
-                }
-                else
-                {
-                    return time_openrangeendde;
-                }
-            }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="start"></param>
-        /// <returns></returns>
-            public DateTime GetStartTime(DateTime start)
-            {
-                TimeSpan temp_time_OpenRangeStart = this.getOpenRangeStart(this.Time_OpenRangeStartDE, this.Time_OpenRangeStartUS);
-                start = new DateTime(start.Year, start.Month, start.Day, 0, 0, 0);  //Uhrzeit auf 00:00:00 zurücksetzen, ist vorbefüllt aus SessionStart
-                return start.Add(temp_time_OpenRangeStart);
-            }
-
-
-            /// <summary>
-            /// 
-            /// </summary>
-            /// <param name="OpenRangeStart"></param>
-            /// <param name="OpenRangeEnd"></param>
-            public void CalcOpenRange(out DateTime openrangestart, out DateTime openrangeend)
-            {
-                //Print("CalcOpenRange");
-
-                //get the first candle of the day
-                openrangestart = Bars.Where(x => x.Time.Date == Bars[0].Time.Date).FirstOrDefault().Time;
-                //Set open range start
-                openrangestart = GetStartTime(openrangestart);
-                //Set open range end
-                openrangeend = GetEndTime(openrangestart, this.ORBMinutes);
-            }
-
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="start"></param>
-        /// <param name="minutes"></param>
-        /// <returns></returns>
-            public DateTime GetEndTime(DateTime start, int minutes)
-            {
-                return start.AddMinutes(minutes);
-            }
-
-        #endregion
+     
 
 
         #region Properties
@@ -190,114 +158,145 @@ namespace AgenaTrader.UserCode
         #region Input
 
         /// <summary>
-            /// </summary>
-            [Description("Period in minutes for ORB")]
-            [Category("TimeSpan")]
-            [DisplayName("Minutes ORB")]
-            public int ORBMinutes
+        /// </summary>
+        [Description("Period in minutes for ORB")]
+        [Category("Minutes")]
+        [DisplayName("Minutes ORB")]
+        public int ORBMinutes
+        {
+            get { return _orbminutes; }
+            set
             {
-                get { return _orbminutes; }
-                set { _orbminutes = value; }
+                if (value >= 1 && value <= 300)
+                {
+                    _orbminutes = value;
+                }
+                else
+                {
+                    _orbminutes = Const.DefaultOpenRangeSizeinMinutes;
+                }
             }
+        }
+
 
             /// <summary>
             /// </summary>
-            [Description("Select Color")]
-            [Category("Colors")]
-            [DisplayName("ORB")]
-            public Color Color_ORB
-            {
-                get { return _col_orb; }
-                set { _col_orb = value; }
-            }
-
-            /// <summary>
-            /// </summary>
-            [Description("Select Color TargetAreaShort")]
-            [Category("Colors")]
-            [DisplayName("TargetAreaShort")]
-            public Color Color_TargetAreaShort
-            {
-                get { return _col_target_short; }
-                set { _col_target_short = value; }
-            }
-
-            /// <summary>
-            /// </summary>
-            [Description("Select Color TargetAreaLong")]
-            [Category("Colors")]
-            [DisplayName("TargetAreaLong")]
-            public Color Color_TargetAreaLong
-            {
-                get { return _col_target_long; }
-                set { _col_target_long = value; }
-            }
-
-            /// <summary>
-            /// </summary>
-            [Description("OpenRange DE Start: Uhrzeit ab wann Range gemessen wird")]
-            [Category("TimeSpan")]
-            [DisplayName("1. OpenRange Start DE")]
+            [Description("Start of the open range in Germany")]
+            [Category("CFD")]
+            [DisplayName("OpenRange Start DE")]
             public TimeSpan Time_OpenRangeStartDE
             {
                 get { return _tim_OpenRangeStartDE; }
                 set { _tim_OpenRangeStartDE = value; }
             }
-
-            /// <summary>
-            /// </summary>
-            [Description("OpenRange DE End: Uhrzeit wann Range geschlossen wird")]
-            [Category("TimeSpan")]
-            [DisplayName("2. OpenRange End DE")]
-            public TimeSpan Time_OpenRangeEndDE
+            [Browsable(false)]
+            public long Time_OpenRangeStartDESerialize
             {
-                get { return _tim_OpenRangeEndDE; }
-                set { _tim_OpenRangeEndDE = value; }
+                get { return _tim_OpenRangeStartDE.Ticks; }
+                set { _tim_OpenRangeStartDE = new TimeSpan(value); }
             }
 
+
+
             /// <summary>
             /// </summary>
-            [Description("OpenRange US Start: Uhrzeit ab wann Range gemessen wird")]
-            [Category("TimeSpan")]
-            [DisplayName("3. OpenRange Start US")]
+            [Description("Start of the open range in America")]
+            [Category("CFD")]
+            [DisplayName("OpenRange Start US")]
             public TimeSpan Time_OpenRangeStartUS
             {
                 get { return _tim_OpenRangeStartUS; }
                 set { _tim_OpenRangeStartUS = value; }
             }
-
-            /// <summary>
-            /// </summary>
-            [Description("OpenRange US End: Uhrzeit wann Range geschlossen wird")]
-            [Category("TimeSpan")]
-            [DisplayName("4. OpenRange End US")]
-            public TimeSpan Time_OpenRangeEndUS
+            [Browsable(false)]
+            public long Time_OpenRangeStartUSSerialize
             {
-                get { return _tim_OpenRangeEndUS; }
-                set { _tim_OpenRangeEndUS = value; }
+                get { return _tim_OpenRangeStartUS.Ticks; }
+                set { _tim_OpenRangeStartUS = new TimeSpan(value); }
             }
 
+
+
             /// <summary>
             /// </summary>
-            [Description("EndOfDay DE: Uhrzeit spätestens verkauft wird")]
-            [Category("TimeSpan")]
-            [DisplayName("5. EndOfDay DE")]
+            [Description("End of trading day in Germany")]
+            [Category("CFD")]
+            [DisplayName("EndOfDay DE")]
             public TimeSpan Time_EndOfDay_DE
             {
                 get { return _tim_EndOfDay_DE; }
                 set { _tim_EndOfDay_DE = value; }
             }
+            [Browsable(false)]
+            public long Time_EndOfDay_DESerialize
+            {
+                get { return _tim_EndOfDay_DE.Ticks; }
+                set { _tim_EndOfDay_DE = new TimeSpan(value); }
+            }
 
             /// <summary>
             /// </summary>
-            [Description("EndOfDay US: Uhrzeit spätestens verkauft wird")]
-            [Category("TimeSpan")]
-            [DisplayName("5. EndOfDay US")]
+            [Description("End of trading day in America")]
+            [Category("CFD")]
+            [DisplayName("EndOfDay US")]
             public TimeSpan Time_EndOfDay_US
             {
                 get { return _tim_EndOfDay_US; }
                 set { _tim_EndOfDay_US = value; }
             }
+            [Browsable(false)]
+            public long Time_EndOfDay_USSerialize
+            {
+                get { return _tim_EndOfDay_US.Ticks; }
+                set { _tim_EndOfDay_US = new TimeSpan(value); }
+            }
+
+
+
+            #region Plotstyle
+
+            [XmlIgnore()]
+            [Description("Select Color")]
+            [Category("Colors")]
+            [DisplayName("ORB Indicator")]
+            public Color Plot1Color
+            {
+                get { return _plot1color; }
+                set { _plot1color = value; }
+            }
+
+            [Browsable(false)]
+            public string Plot1ColorSerialize
+            {
+                get { return SerializableColor.ToString(_plot1color); }
+                set { _plot1color = SerializableColor.FromString(value); }
+            }
+
+            /// <summary>
+            /// </summary>
+            [Description("Width for Indicator.")]
+            [Category("Plots")]
+            [DisplayName("Line Width Indicator")]
+            public int Plot0Width
+            {
+                get { return _plot1width; }
+                set { _plot1width = Math.Max(1, value); }
+            }
+
+
+            /// <summary>
+            /// </summary>
+            [Description("DashStyle for Indicator.")]
+            [Category("Plots")]
+            [DisplayName("Dash Style Indicator")]
+            public DashStyle Dash0Style
+            {
+                get { return _plot1dashstyle; }
+                set { _plot1dashstyle = value; }
+            }
+
+            #endregion
+
             #endregion
 
 
@@ -322,17 +321,11 @@ namespace AgenaTrader.UserCode
                     return new[] { Entry };
                 }
 
-                [Description("")]
-                [Category("Parameters")]
-                public int MyCondition1
-                {
-                    get { return _myCondition1; }
-                    set { _myCondition1 = Math.Max(1, value); }
-                }
+              
             #endregion
 
 
 
-		#endregion
-	}
+        #endregion
+    }
 }

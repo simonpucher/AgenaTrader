@@ -15,8 +15,13 @@ using AgenaTrader.Helper;
 /// <summary>
 /// Version: in progress
 /// -------------------------------------------------------------------------
-/// Simon Pucher 2016
 /// Christian Kovar 2016
+/// -------------------------------------------------------------------------
+/// todo description
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this script without any error you also need access to the utility indicator to use global source code elements.
+/// You will find this script on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -98,7 +103,7 @@ namespace AgenaTrader.UserCode
                 DateTime LastDayCloseDate = Bars.GetTime(Count - 7);
                 DateTime LastPeriod = Time[1];
 
-                if (LastDayClose != null
+                if (LastDayClose > 0
                 && Math.Abs(LastDayClose - GapOpen) > _PunkteGapMin
                 && Math.Abs(LastDayClose - GapOpen) < _PunkteGapMax)
                 {  //Wenn Gap größer 50 und kleiner 100
