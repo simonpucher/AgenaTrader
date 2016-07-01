@@ -16,6 +16,7 @@ using AgenaTrader.Helper.TradingManager;
 /// Version: in progress
 /// -------------------------------------------------------------------------
 /// Christian Kovar 2016
+/// Simon Pucher 2016
 /// -------------------------------------------------------------------------
 /// todo description
 /// -------------------------------------------------------------------------
@@ -44,6 +45,7 @@ namespace AgenaTrader.UserCode
         private bool _filter_NoShortRSI = false;
         private bool _filter_NoLongRSI = false;
         private bool _filter_NoTriggerEOD = false;
+        private PopGunType _PopGunType = PopGunType.ThreeBarReversal;
 
         private IOrder oEnter;
         private IOrder oStop;
@@ -112,11 +114,11 @@ namespace AgenaTrader.UserCode
 
         private void calculate()
         {
-            double PopGun_Indicator_Value = this._popgun_indicator.calculate(this.Bars, this.CurrentBar);
+            double PopGun_Indicator_Value = this._popgun_indicator.calculate(this.Bars, this.CurrentBar, this.PopGunType);
 
             if (!IsCurrentBarLast || oEnter != null) return;
 
-            this._popgun_indicator.calculate(this.Bars, this.CurrentBar);
+            this._popgun_indicator.calculate(this.Bars, this.CurrentBar, this.PopGunType);
 
             if (PopGun_Indicator_Value == 100)
             {
@@ -212,6 +214,15 @@ namespace AgenaTrader.UserCode
         }
 
         #region Properties
+
+        [Description("Type of PopGun Pattern you would like to use.")]
+        [Category("Parameters")]
+        [DisplayName("Pop Gun Type")]
+        public PopGunType PopGunType
+        {
+            get { return _PopGunType; }
+            set { _PopGunType = value; }
+        }
 
         [Description("Wieviel Bars ist PopGunTrigger gültig?")]
         [Category("Parameters")]
