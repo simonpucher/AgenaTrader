@@ -15,6 +15,7 @@ using AgenaTrader.Helper;
 /// Version: in progress
 /// -------------------------------------------------------------------------
 /// Christian Kovar 2016
+/// Simon Pucher 2016
 /// -------------------------------------------------------------------------
 /// todo description
 /// -------------------------------------------------------------------------
@@ -41,6 +42,7 @@ namespace AgenaTrader.UserCode
         private bool _filter_NoShortRSI = false;
         private bool _filter_NoLongRSI = false;
         private bool _filter_NoTriggerEOD = false;
+        private PopGunType _PopGunType = PopGunType.ThreeBarReversal;
 
         //internal
         private PopGun_Indicator _popgun_indicator = null;
@@ -56,7 +58,7 @@ namespace AgenaTrader.UserCode
 			IsTarget = false;
 			Add(new Plot(Color.FromKnownColor(KnownColor.Black), "Occurred"));
 			Add(new Plot(Color.FromArgb(255, 92, 242, 57), "Entry"));
-			Overlay = true;
+			Overlay = false;
 			CalculateOnBarClose = true;
             BarsRequired = 3;
 		}
@@ -81,7 +83,7 @@ namespace AgenaTrader.UserCode
             if (this.Bars != null && this.Bars.Count > 0)
             {
                 //ShowGap Indikator aufrufen. Dieser liefert 100 für Long Einstieg und -100 für Short Einstieg. Liefert 0 für kein Einstiegssignal
-                double PopGun_Indicator_Value = this._popgun_indicator.calculate(this.Bars, this.CurrentBar);
+                double PopGun_Indicator_Value = this._popgun_indicator.calculate(this.Bars, this.CurrentBar, this.PopGunType);
                 if (PopGun_Indicator_Value == 100)
                 {
                     Occurred.Set(1);
@@ -103,6 +105,7 @@ namespace AgenaTrader.UserCode
 
 		#region Properties
 
+
 		[Browsable(false)]
 		[XmlIgnore()]
 		public DataSeries Occurred
@@ -121,6 +124,16 @@ namespace AgenaTrader.UserCode
 		{
 			return new[]{Entry};
 		}
+
+        [Description("Type of PopGun Pattern you would like to use.")]
+        [Category("Parameters")]
+        [DisplayName("Pop Gun Type")]
+        public PopGunType PopGunType
+        {
+            get { return _PopGunType; }
+            set { _PopGunType = value; }
+        }
+
 
         [Description("Wieviel Bars ist PopGunTrigger gültig?")]
         [Category("Parameters")]
@@ -179,3 +192,124 @@ namespace AgenaTrader.UserCode
 		#endregion
 	}
 }
+#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
+
+namespace AgenaTrader.UserCode
+{
+	#region Indicator
+
+	public partial class UserIndicator
+	{
+		/// <summary>
+		/// Condition für Pop Gun Bar Pattern
+		/// </summary>
+		public PopGun_Condition PopGun_Condition(PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
+        {
+			return PopGun_Condition(Input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+		}
+
+		/// <summary>
+		/// Condition für Pop Gun Bar Pattern
+		/// </summary>
+		public PopGun_Condition PopGun_Condition(IDataSeries input, PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
+		{
+			var indicator = CachedCalculationUnits.GetCachedIndicator<PopGun_Condition>(input, i => i.PopGunType == popGunType && i.PopGunExpires == popGunExpires && i.IsSnapshotActive == isSnapshotActive && i.IsEvaluationActive == isEvaluationActive);
+
+			if (indicator != null)
+				return indicator;
+
+			indicator = new PopGun_Condition
+						{
+							BarsRequired = BarsRequired,
+							CalculateOnBarClose = CalculateOnBarClose,
+							Input = input,
+							PopGunType = popGunType,
+							PopGunExpires = popGunExpires,
+							IsSnapshotActive = isSnapshotActive,
+							IsEvaluationActive = isEvaluationActive
+						};
+			indicator.SetUp();
+
+			CachedCalculationUnits.AddIndicator2Cache(indicator);
+
+			return indicator;
+		}
+	}
+
+	#endregion
+
+	#region Strategy
+
+	public partial class UserStrategy
+	{
+		/// <summary>
+		/// Condition für Pop Gun Bar Pattern
+		/// </summary>
+		public PopGun_Condition PopGun_Condition(PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
+		{
+			return LeadIndicator.PopGun_Condition(Input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+		}
+
+		/// <summary>
+		/// Condition für Pop Gun Bar Pattern
+		/// </summary>
+		public PopGun_Condition PopGun_Condition(IDataSeries input, PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
+		{
+			if (InInitialize && input == null)
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+
+			return LeadIndicator.PopGun_Condition(input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+		}
+	}
+
+	#endregion
+
+	#region Column
+
+	public partial class UserColumn
+	{
+		/// <summary>
+		/// Condition für Pop Gun Bar Pattern
+		/// </summary>
+		public PopGun_Condition PopGun_Condition(PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
+		{
+			return LeadIndicator.PopGun_Condition(Input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+		}
+
+		/// <summary>
+		/// Condition für Pop Gun Bar Pattern
+		/// </summary>
+		public PopGun_Condition PopGun_Condition(IDataSeries input, PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
+		{
+			return LeadIndicator.PopGun_Condition(input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+		}
+	}
+
+	#endregion
+
+	#region Scripted Condition
+
+	public partial class UserScriptedCondition
+	{
+		/// <summary>
+		/// Condition für Pop Gun Bar Pattern
+		/// </summary>
+		public PopGun_Condition PopGun_Condition(PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
+		{
+			return LeadIndicator.PopGun_Condition(Input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+		}
+
+		/// <summary>
+		/// Condition für Pop Gun Bar Pattern
+		/// </summary>
+		public PopGun_Condition PopGun_Condition(IDataSeries input, PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
+		{
+			return LeadIndicator.PopGun_Condition(input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+		}
+	}
+
+	#endregion
+
+}
+
+#endregion

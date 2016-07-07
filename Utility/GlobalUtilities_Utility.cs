@@ -33,6 +33,7 @@ using System.IO;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+  
 
     #region Constants
 
@@ -64,19 +65,20 @@ namespace AgenaTrader.UserCode
         //Fibonacci Retracements
         public const decimal DefaultFibonacciRetracement23_6 = 23.6m;
         public const decimal DefaultFibonacciRetracement38_2 = 38.2m;
-        public const decimal DefaultFibonacciRetracement50   = 50;
+        public const decimal DefaultFibonacciRetracement50 = 50;
         public const decimal DefaultFibonacciRetracement61_8 = 61.8m;
-        public const decimal DefaultFibonacciRetracement100  = 100;
+        public const decimal DefaultFibonacciRetracement100 = 100;
 
         //Fibonacci Extensions
-        public const decimal DefaultFibonacciExtension161_8  = 161.8m;
-        public const decimal DefaultFibonacciExtension200    = 200;
-        public const decimal DefaultFibonacciExtension261_8  = 261.8m;
-        public const decimal DefaultFibonacciExtension423_6  = 423.6m;
+        public const decimal DefaultFibonacciExtension161_8 = 161.8m;
+        public const decimal DefaultFibonacciExtension200 = 200;
+        public const decimal DefaultFibonacciExtension261_8 = 261.8m;
+        public const decimal DefaultFibonacciExtension423_6 = 423.6m;
 
     }
 
     #endregion
+
 
     #region Global static Helper with functions and methods.
 
@@ -245,6 +247,11 @@ namespace AgenaTrader.UserCode
             }
             else if (irp.BasePositionSizing == BasePositionSizing.OnRiskAmountPerTrade)
             {
+                maxpositionsizeincash = account.CashValue / 100 * irp.MaxInvestedAmountPercentage;
+            }
+            else if (irp.BasePositionSizing == BasePositionSizing.OnInitialRisk)
+            {
+                //hack: because of backtesting
                 maxpositionsizeincash = account.CashValue / 100 * irp.MaxInvestedAmountPercentage;
             }
             else

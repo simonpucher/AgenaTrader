@@ -93,7 +93,7 @@ namespace AgenaTrader.UserCode
 
             //Init our indicator to get code access
             this._RunningWithTheWolves_Indicator = new RunningWithTheWolves_Indicator();
-
+            
             //Initalize statistic data list if this feature is enabled
             if (this.StatisticBacktesting)
             {
