@@ -74,7 +74,7 @@ namespace AgenaTrader.UserCode
         /// Called on each bar update event (incoming tick)
         /// </summary>
         protected override void OnBarUpdate()
-        {
+        { 
             // build up cache of recent High and Low values
             // code devised from default Swing Indicator by marqui@BMT, 10-NOV-2010 
             lastHighCache.Add(High[0]);
@@ -182,6 +182,21 @@ namespace AgenaTrader.UserCode
                 }
             }
         }
+
+
+        public override string ToString()
+        {
+            return "SwingRays";
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "SwingRays";
+            }
+        }
+
 
         #region Properties
         [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
