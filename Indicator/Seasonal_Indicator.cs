@@ -322,7 +322,7 @@ namespace AgenaTrader.UserCode
 {
 	#region Indicator
 
-	public partial class UserIndicator : Indicator
+	public partial class UserIndicator
 	{
 		/// <summary>
 		/// Show seasonal trends
