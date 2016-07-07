@@ -18,6 +18,8 @@ using System.Threading;
 using System.Windows.Forms;
 using System.Data.SqlTypes;
 using System.Linq.Expressions;
+using System.Net;
+using System.IO;
 
 /// <summary>
 /// Version: 1.5.15
@@ -309,6 +311,41 @@ namespace AgenaTrader.UserCode
             {
                 return new TimeSpan(17, 30, 00);
             }
+        }
+
+        /// <summary>
+        /// dirty http request for the current VDAX-New value from the onvista website
+        /// parsing is pretty dirty but does the job. anyway, expect some improvements or
+        /// adaption as soon as the onvista site is changing :D
+        /// </summary>
+        /// <returns>vdax-new value</returns>
+        public static decimal GetCurrentVdaxNew()
+        {
+            string url = "http://www.onvista.de/index/VDAX-NEW-Index-12105789";
+
+            //Anfrage an die Übergebene URL starten
+            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
+
+            //Antwort-Objekt erstellen
+            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+
+            //Antwort Stream an Streamreader übergeben
+            StreamReader sr = new StreamReader(response.GetResponseStream());
+
+            //Antwort (HTML Code) auslesen
+            string html = sr.ReadToEnd();
+
+            //Streamreader und Webanfrage schließen
+            sr.Close();
+            response.Close();
+
+
+            int first = html.IndexOf("<div id=\"Index-Header\">");
+
+            int EndOfValue = html.IndexOf("</span>", first);
+
+            return decimal.Parse(html.Substring(EndOfValue - 6, 5));
+
         }
 
 
