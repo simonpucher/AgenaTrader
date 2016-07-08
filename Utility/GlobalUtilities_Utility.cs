@@ -324,7 +324,7 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-        #region web harvesting
+        #region web harvester
 
         private static decimal _vdax_new_value = 0;
         private static DateTime? _vdax_new_lastcheck = null;
