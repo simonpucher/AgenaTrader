@@ -32,15 +32,10 @@ namespace AgenaTrader.UserCode
         //*** input ***
         private TextPosition _TextPosition = TextPosition.BottomRight;
         private int _TextSize = 10;
+        private int _CheckEveryXSeconds = 60;
 
         //*** internal ***
-        static decimal vdax_new = 0;
-        static DateTime? lastcheck = null;
-        static int lastcheck_eachxseconds = 60;
-        //Opening hours of VDAX are between: 08:50 - 17:50
-        TimeSpan openinghours_open = new TimeSpan(8, 50, 0);
-        TimeSpan openinghours_close = new TimeSpan(17, 50, 0);
-        TimeSpan openinghours_marketdelay = new TimeSpan(0, 15, 0);
+
 
 
         protected override void Initialize()
@@ -51,38 +46,14 @@ namespace AgenaTrader.UserCode
 
         protected override void OnStartUp()
         {
-
-
+            decimal vdax_new = GlobalUtilities.GetCurrentVdaxNew(this.CheckEveryXSeconds);
+            DrawTextFixed("VDAX_NEW", "VDAX-NEW: " + vdax_new, this.TextPosition, Color.Black, new Font("Arial", this.TextSize), Color.Transparent, Color.Transparent);
         }
 
 
         protected override void OnBarUpdate()
         {
-            bool checkonline = false;
-            TimeSpan now = DateTime.Now.TimeOfDay;
-            
-            //Check if we have not done this yet.
-            if (lastcheck == null)
-            {
-                checkonline = true;
-            }
-            //Check the online service each x seconds
-            else if (lastcheck.Value.AddSeconds(lastcheck_eachxseconds) <= DateTime.Now)
-            {
-                //If the market is closed we do not need to ask the online service
-                if ((now >= openinghours_open) && (now <= openinghours_close.Add(openinghours_marketdelay)))
-                {
-                    checkonline = true;
-                }
-            }
-            
-            //If true we check online for the data
-            if (checkonline)
-            {
-                vdax_new = GlobalUtilities.GetCurrentVdaxNew();
-                lastcheck = DateTime.Now;
-            }
-            DrawTextFixed("VDAX_NEW", "VDAX-NEW: " + vdax_new, this.TextPosition, Color.Black, new Font("Arial", this.TextSize), Color.Transparent, Color.Transparent);
+
         }
 
         public override string ToString()
@@ -101,6 +72,22 @@ namespace AgenaTrader.UserCode
         #region Properties
 
         #region Input
+
+
+        
+
+
+        /// <summary>
+        /// </summary>
+        [Description("Check online service each x seconds.")]
+        [Category("Drawings")]
+        [DisplayName("Seconds Online Check")]
+        public int CheckEveryXSeconds
+        {
+            get { return _CheckEveryXSeconds; }
+            set { _CheckEveryXSeconds = value; }
+        }
+
 
         /// <summary>
         /// </summary>
