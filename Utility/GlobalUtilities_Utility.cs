@@ -22,7 +22,7 @@ using System.Net;
 using System.Globalization;
 
 /// <summary>
-/// Version: 1.5.16
+/// Version: 1.5.17
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -82,12 +82,65 @@ namespace AgenaTrader.UserCode
 
     #region Global static Helper with functions and methods.
 
+    /// <summary>
+    /// Default Soundfiles by AT 
+    /// </summary>
+    public enum Soundfile
+    {
+        Alert1,
+        Alert2,
+        Alert3,
+        Alert4,
+        Announcement,
+        AutoBreakEven,
+        AutoChase,
+        AutoTrail,
+        Blip,
+        Buzz,
+        Camera,
+        cashreg,
+        Connected,
+        ConnectionLost,
+        Limit_order_filled,
+        New,
+        notify,
+        OffsettedChange,
+        OrderCancelled,
+        OrderFilled,
+        OrderPending,
+        PositionClosed,
+        Reversing,
+        ringin,
+        ringout,
+        SOUND136,
+        StopFilled,
+        Stop_limit_order_filled,
+        Stop_order_filled,
+        TargetFilled,
+        WMonline
+    }
 
     /// <summary>
     /// Global static Helper with functions and methods.
     /// </summary>
     public static class GlobalUtilities
     {
+
+        #region Sounds
+
+        /// <summary>
+        /// Return the filename of the Soundfile.
+        /// </summary>
+        /// <param name="soundfile"></param>
+        /// <returns></returns>
+        public static string GetSoundfile(Soundfile soundfile) {
+            string returnfilename = null;
+            returnfilename = soundfile.ToString().Replace("_", "-");
+            returnfilename = returnfilename + ".wav";
+            return returnfilename;
+        }
+
+        #endregion
 
         #region Colors
 
