@@ -330,7 +330,7 @@ namespace AgenaTrader.UserCode
 {
 	#region Indicator
 
-	public partial class UserIndicator : Indicator
+	public partial class UserIndicator
 	{
 		/// <summary>
 		/// Plots the Fibonacci Lines of the current session.
