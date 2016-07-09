@@ -110,21 +110,21 @@ namespace AgenaTrader.UserCode
                     if (swingHighRays.Count > 0) // just to be safe 
                     {
                         IRay currentRay = (IRay)swingHighRays.Pop(); // pull current ray from stack 
-                        //TODO if (enableAlerts) Alert("SwHiAlert", AlertPriority.Low, "Swing High at " + currentRay.Anchor1Y + " broken", "Alert2.wav", 5, Color.White, Color.Red);
-                        if (enableAlerts) Alert("SwHiAlert", AlertPriority.Low, "Swing High at " + currentRay.Y1 + " broken", "Alert2.wav", 5, Color.White, Color.Red);
+                        //if (enableAlerts) Alert("SwHiAlert", AlertPriority.Low, "Swing High at " + currentRay.Y1 + " broken", "Alert2.wav", 5, Color.White, Color.Red);
+                        if (enableAlerts)
+                        {
+                            Alert("Swing High at " + currentRay.Y1 + " broken", "Alert2.wav");
+                        }
                         if (keepBrokenLines) // draw a line between swing point and break bar 
                         {
-                            //TODO int barsAgo = currentRay.Anchor1BarsAgo;
-                            int barsAgo = currentRay.BarsAgo1;
-                            //TODO ITrendLine newLine = DrawLine("highLine" + (CurrentBar - barsAgo), false, barsAgo, currentRay.Anchor1Y, 0, currentRay.Anchor1Y, swingHighColor, DashStyle.Solid, 2);
+                           int barsAgo = currentRay.BarsAgo1;
                             ITrendLine newLine = DrawLine("highLine" + (CurrentBar - barsAgo), false, barsAgo, currentRay.Y1, 0, currentRay.Y1, swingHighColor, DashStyle.Solid, 2);
                         }
                         RemoveDrawObject(currentRay.Tag);
                         if (swingHighRays.Count > 0)
                         {
                             IRay priorRay = (IRay)swingHighRays.Peek();
-                           //TODO lastSwingHighValue = priorRay.Anchor1Y; // needed when testing the break of the next swing high
-                            lastSwingHighValue = priorRay.Y1; // needed when testing the break of the next swing high
+                           lastSwingHighValue = priorRay.Y1; // needed when testing the break of the next swing high
                         }
                         else
                             lastSwingHighValue = double.MaxValue; // there are no higher swings on the chart; reset to default	
@@ -159,22 +159,21 @@ namespace AgenaTrader.UserCode
                     if (swingLowRays.Count > 0)
                     {
                         IRay currentRay = (IRay)swingLowRays.Pop();
-                        //TODO if (enableAlerts) Alert("SwHiAlert", AlertPriority.Low, "Swing Low at " + currentRay.Anchor1Y + " broken", "Alert2.wav", 5, Color.White, Color.Red);
-                        if (enableAlerts) Alert("SwHiAlert", AlertPriority.Low, "Swing Low at " + currentRay.Y1 + " broken", "Alert2.wav", 5, Color.White, Color.Red);
+                        //if (enableAlerts) Alert("SwHiAlert", AlertPriority.Low, "Swing Low at " + currentRay.Y1 + " broken", "Alert2.wav", 5, Color.White, Color.Red);
+                        if (enableAlerts) {
+                            Alert("Swing Low at " + currentRay.Y1 + " broken", "Alert2.wav");
+                        }
                         if (keepBrokenLines) // draw a line between swing point and break bar 
                         {
-                            //TODO  int barsAgo = currentRay.Anchor1BarsAgo;
                             int barsAgo = currentRay.BarsAgo1;
-                            //TODO ITrendLine newLine = DrawLine("highLine" + (CurrentBar - barsAgo), false, barsAgo, currentRay.Anchor1Y, 0, currentRay.Anchor1Y, swingLowColor, DashStyle.Solid, 2);
-                            ITrendLine newLine = DrawLine("highLine" + (CurrentBar - barsAgo), false, barsAgo, currentRay.Y1, 0, currentRay.Y1, swingLowColor, DashStyle.Solid, 2);
+                           ITrendLine newLine = DrawLine("highLine" + (CurrentBar - barsAgo), false, barsAgo, currentRay.Y1, 0, currentRay.Y1, swingLowColor, DashStyle.Solid, 2);
                         }
                         RemoveDrawObject(currentRay.Tag);
 
                         if (swingLowRays.Count > 0)
                         {
                             IRay priorRay = (IRay)swingLowRays.Peek();
-                            //TODO lastSwingLowValue = priorRay.Anchor1Y; // price level of the prior swing low 
-                            lastSwingLowValue = priorRay.Y1; // price level of the prior swing low 
+                           lastSwingLowValue = priorRay.Y1; // price level of the prior swing low 
                         }
                         else
                             lastSwingLowValue = double.MinValue; // no swing lows present; set this to default value 
