@@ -52,6 +52,8 @@ namespace AgenaTrader.UserCode
         private bool enableAlerts = false;
         private bool keepBrokenLines = true;
 
+        private Soundfile _soundfile = Soundfile.Blip;
+
         #endregion
 
         /// <summary>
@@ -113,7 +115,7 @@ namespace AgenaTrader.UserCode
                         //if (enableAlerts) Alert("SwHiAlert", AlertPriority.Low, "Swing High at " + currentRay.Y1 + " broken", "Alert2.wav", 5, Color.White, Color.Red);
                         if (enableAlerts)
                         {
-                            Alert("Swing High at " + currentRay.Y1 + " broken", "Alert2.wav");
+                            Alert("Swing High at " + currentRay.Y1 + " broken", GlobalUtilities.GetSoundfile(this.Soundfile));
                         }
                         if (keepBrokenLines) // draw a line between swing point and break bar 
                         {
@@ -161,7 +163,7 @@ namespace AgenaTrader.UserCode
                         IRay currentRay = (IRay)swingLowRays.Pop();
                         //if (enableAlerts) Alert("SwHiAlert", AlertPriority.Low, "Swing Low at " + currentRay.Y1 + " broken", "Alert2.wav", 5, Color.White, Color.Red);
                         if (enableAlerts) {
-                            Alert("Swing Low at " + currentRay.Y1 + " broken", "Alert2.wav");
+                            Alert("Swing Low at " + currentRay.Y1 + " broken", GlobalUtilities.GetSoundfile(this.Soundfile));
                         }
                         if (keepBrokenLines) // draw a line between swing point and break bar 
                         {
@@ -285,6 +287,16 @@ namespace AgenaTrader.UserCode
             set { swingLowColor = SerializableColor.FromString(value); }
         }
 
+        [XmlIgnore()]
+        [Description("Select the soundfile for the alert.")]
+        [Category("Parameters")]
+        [DisplayName("Soundfile name")]
+        public Soundfile Soundfile
+        {
+            get { return _soundfile; }
+            set { _soundfile = value; }
+        }
+
         #endregion
     }
 }
@@ -300,17 +312,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Plots horizontal rays at swing highs and lows and removes them once broken.
 		/// </summary>
-		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor)
+		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
         {
-			return SwingRays(Input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor);
+			return SwingRays(Input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
 		}
 
 		/// <summary>
 		/// Plots horizontal rays at swing highs and lows and removes them once broken.
 		/// </summary>
-		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor)
+		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<SwingRays>(input, i => i.Strength == strength && i.EnableAlerts == enableAlerts && i.KeepBrokenLines == keepBrokenLines && i.SwingHighColor == swingHighColor && i.SwingLowColor == swingLowColor);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<SwingRays>(input, i => i.Strength == strength && i.EnableAlerts == enableAlerts && i.KeepBrokenLines == keepBrokenLines && i.SwingHighColor == swingHighColor && i.SwingLowColor == swingLowColor && i.Soundfile == soundfile);
 
 			if (indicator != null)
 				return indicator;
@@ -324,7 +336,8 @@ namespace AgenaTrader.UserCode
 							EnableAlerts = enableAlerts,
 							KeepBrokenLines = keepBrokenLines,
 							SwingHighColor = swingHighColor,
-							SwingLowColor = swingLowColor
+							SwingLowColor = swingLowColor,
+							Soundfile = soundfile
 						};
 			indicator.SetUp();
 
@@ -343,20 +356,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Plots horizontal rays at swing highs and lows and removes them once broken.
 		/// </summary>
-		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor)
+		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
-			return LeadIndicator.SwingRays(Input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor);
+			return LeadIndicator.SwingRays(Input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
 		}
 
 		/// <summary>
 		/// Plots horizontal rays at swing highs and lows and removes them once broken.
 		/// </summary>
-		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor)
+		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.SwingRays(input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor);
+			return LeadIndicator.SwingRays(input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
 		}
 	}
 
@@ -369,17 +382,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Plots horizontal rays at swing highs and lows and removes them once broken.
 		/// </summary>
-		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor)
+		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
-			return LeadIndicator.SwingRays(Input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor);
+			return LeadIndicator.SwingRays(Input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
 		}
 
 		/// <summary>
 		/// Plots horizontal rays at swing highs and lows and removes them once broken.
 		/// </summary>
-		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor)
+		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
-			return LeadIndicator.SwingRays(input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor);
+			return LeadIndicator.SwingRays(input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
 		}
 	}
 
@@ -392,17 +405,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Plots horizontal rays at swing highs and lows and removes them once broken.
 		/// </summary>
-		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor)
+		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
-			return LeadIndicator.SwingRays(Input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor);
+			return LeadIndicator.SwingRays(Input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
 		}
 
 		/// <summary>
 		/// Plots horizontal rays at swing highs and lows and removes them once broken.
 		/// </summary>
-		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor)
+		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
-			return LeadIndicator.SwingRays(input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor);
+			return LeadIndicator.SwingRays(input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
 		}
 	}
 
