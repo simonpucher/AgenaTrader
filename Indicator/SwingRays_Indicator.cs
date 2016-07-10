@@ -198,106 +198,116 @@ namespace AgenaTrader.UserCode
             }
         }
 
-
-        #region Properties
-        [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
-
-        [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
-        public DataSeries HighRay
-        {
-            get { return Values[0]; }
-        }
-
-        [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
-        [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
-        public DataSeries LowRay
-        {
-            get { return Values[1]; }
-        }
-
-        [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
-        [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
-        public DataSeries HighLine
-        {
-            get { return Values[2]; }
-        }
-
-        [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
-        [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
-        public DataSeries LowLine
-        {
-            get { return Values[3]; }
-        }
+        
+        #region Input properties
 
         [Description("Number of bars before/after each pivot bar")]
-        [Category("Parameters")]
-        public int Strength
-        {
-            get { return strength; }
-            set { strength = Math.Max(2, value); }
-        }
+            [Category("Parameters")]
+            [DisplayName("Strength")]
+            public int Strength
+            {
+                get { return strength; }
+                set { strength = Math.Max(2, value); }
+            }
 
-        [Description("Alert when swings are broken")]
-        [Category("Parameters")]
-        public bool EnableAlerts
-        {
-            get { return enableAlerts; }
-            set { enableAlerts = value; }
-        }
+            [Description("Alert when swings are broken")]
+            [Category("Parameters")]
+            [DisplayName("EnableAlerts")]
+            public bool EnableAlerts
+            {
+                get { return enableAlerts; }
+                set { enableAlerts = value; }
+            }
 
-        [Description("Show broken swing points")]
-        [Category("Parameters")]
-        public bool KeepBrokenLines
-        {
-            get { return keepBrokenLines; }
-            set { keepBrokenLines = value; }
-        }
+            [Description("Show broken swing points")]
+            [Category("Parameters")]
+            [DisplayName("Keep broken lines")]
+            public bool KeepBrokenLines
+            {
+                get { return keepBrokenLines; }
+                set { keepBrokenLines = value; }
+            }
 
-        [XmlIgnore()]
-        [Description("Color for swing highs")]
-        [Category("Parameters")]
-        public Color SwingHighColor
-        {
-            get { return swingHighColor; }
-            set { swingHighColor = value; }
-        }
+            [XmlIgnore()]
+            [Description("Color for swing highs")]
+            [Category("Parameters")]
+            [DisplayName("Swing High Color")]
+            public Color SwingHighColor
+            {
+                get { return swingHighColor; }
+                set { swingHighColor = value; }
+            }
 
-        // Serialize our Color object
-        [Browsable(false)]
-        public string SwingHighColorSerialize
-        {
-            get { return SerializableColor.ToString(swingHighColor); }
-            set { swingHighColor = SerializableColor.FromString(value); }
-        }
+            // Serialize our Color object
+            [Browsable(false)]
+            public string SwingHighColorSerialize
+            {
+                get { return SerializableColor.ToString(swingHighColor); }
+                set { swingHighColor = SerializableColor.FromString(value); }
+            }
 
-        [XmlIgnore()]
-        [Description("Color for swing lows")]
-        [Category("Parameters")]
-        public Color SwingLowColor
-        {
-            get { return swingLowColor; }
-            set { swingLowColor = value; }
-        }
+            [XmlIgnore()]
+            [Description("Color for swing lows")]
+            [Category("Parameters")]
+            [DisplayName("Swing Low Color")]
+            public Color SwingLowColor
+            {
+                get { return swingLowColor; }
+                set { swingLowColor = value; }
+            }
 
-        // Serialize our Color object	
-        [Browsable(false)]
-        public string SwingLowColorSerialize
-        {
-            get { return SerializableColor.ToString(swingLowColor); }
-            set { swingLowColor = SerializableColor.FromString(value); }
-        }
+            // Serialize our Color object	
+            [Browsable(false)]
+            public string SwingLowColorSerialize
+            {
+                get { return SerializableColor.ToString(swingLowColor); }
+                set { swingLowColor = SerializableColor.FromString(value); }
+            }
 
-        [XmlIgnore()]
-        [Description("Select the soundfile for the alert.")]
-        [Category("Parameters")]
-        [DisplayName("Soundfile name")]
-        public Soundfile Soundfile
-        {
-            get { return _soundfile; }
-            set { _soundfile = value; }
-        }
+            [XmlIgnore()]
+            [Description("Select the soundfile for the alert.")]
+            [Category("Parameters")]
+            [DisplayName("Soundfile name")]
+            public Soundfile Soundfile
+            {
+                get { return _soundfile; }
+                set { _soundfile = value; }
+            }
 
         #endregion
+
+        #region Output properties
+
+        [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
+            [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
+            public DataSeries HighRay
+            {
+                get { return Values[0]; }
+            }
+
+            [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
+            [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
+            public DataSeries LowRay
+            {
+                get { return Values[1]; }
+            }
+
+            [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
+            [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
+            public DataSeries HighLine
+            {
+                get { return Values[2]; }
+            }
+
+            [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
+            [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
+            public DataSeries LowLine
+            {
+                get { return Values[3]; }
+            }
+
+        #endregion
+
     }
 }
 
