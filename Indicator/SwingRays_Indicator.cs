@@ -212,7 +212,7 @@ namespace AgenaTrader.UserCode
 
             [Description("Alert when swings are broken")]
             [Category("Parameters")]
-            [DisplayName("EnableAlerts")]
+            [DisplayName("Enable alerts")]
             public bool EnableAlerts
             {
                 get { return enableAlerts; }
@@ -231,7 +231,7 @@ namespace AgenaTrader.UserCode
             [XmlIgnore()]
             [Description("Color for swing highs")]
             [Category("Parameters")]
-            [DisplayName("Swing High Color")]
+            [DisplayName("Swing high color")]
             public Color SwingHighColor
             {
                 get { return swingHighColor; }
@@ -249,7 +249,7 @@ namespace AgenaTrader.UserCode
             [XmlIgnore()]
             [Description("Color for swing lows")]
             [Category("Parameters")]
-            [DisplayName("Swing Low Color")]
+            [DisplayName("Swing low color")]
             public Color SwingLowColor
             {
                 get { return swingLowColor; }
