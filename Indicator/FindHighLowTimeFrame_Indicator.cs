@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2.5
+/// Version: 1.2.6
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -27,7 +27,8 @@ namespace AgenaTrader.UserCode
     public enum FindHighLowTimeFrame_Type
     {
         Session = 1,
-        Candle = 2
+        Candle = 2,
+        BarsAvailable = 3
     }
 
 	[Description("This indicator finds the high, middle and low value in a dedicated timeframe or the current session.")]
@@ -155,6 +156,30 @@ namespace AgenaTrader.UserCode
                         {
                             DrawHorizontalLine("MiddleLineOnCandle" + startcandle.Ticks, true, lastmiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         } 
+                    }
+                    break;
+                case FindHighLowTimeFrame_Type.BarsAvailable:
+                    //Draw it for the candles
+                    if (Bars.Count() >= 1)
+                    {
+                        //We save the high and low values in public variables to get access from other scripts
+                        this.LastLow = Bars.Where(x => x.Low == Bars.Min(y => y.Low)).LastOrDefault().Low;
+                        this.LastHigh = Bars.Where(x => x.High == Bars.Max(y => y.High)).LastOrDefault().High;
+                        this.LastMiddle = this.LastLow + ((this.LastHigh - this.LastLow) / 2);
+
+                        string datenow = DateTime.Now.ToString();
+                        if (this.IsDrawLowLineEnabled)
+                        {
+                            DrawHorizontalLine("LowLine" + datenow, true, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                        }
+                        if (this.IsDrawHighLineEnabled)
+                        {
+                            DrawHorizontalLine("HighLine" + datenow, true, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                        }
+                        if (this.IsDrawMiddleLineEnabled)
+                        {
+                            DrawHorizontalLine("MiddleLine" + datenow, true, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                        }
                     }
                     break;
                 default:
@@ -453,7 +478,7 @@ namespace AgenaTrader.UserCode
 {
 	#region Indicator
 
-	public partial class UserIndicator : Indicator
+	public partial class UserIndicator
 	{
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
