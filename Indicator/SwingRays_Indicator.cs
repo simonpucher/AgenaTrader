@@ -36,7 +36,7 @@ namespace AgenaTrader.UserCode
     [Description("Plots horizontal rays at swing highs and lows and removes them once broken.")]
     public class SwingRays : UserIndicator
     {
-        #region Variables
+  
         // Wizard generated variables
         private int strength = 5; // number of bars required to left and right of the pivot high/low
                                   // User defined variables (add any user defined variables below)
@@ -52,9 +52,13 @@ namespace AgenaTrader.UserCode
         private bool enableAlerts = false;
         private bool keepBrokenLines = true;
 
+        //input
+        private Color _signal = Color.Orange;
+        private int _plot0Width = Const.DefaultLineWidth;
+        private DashStyle _dash0Style = Const.DefaultIndicatorDashStyle;
+
         private Soundfile _soundfile = Soundfile.Blip;
 
-        #endregion
 
         /// <summary>
         /// This method is used to configure the indicator and is called once before any bar data is loaded.
@@ -63,20 +67,24 @@ namespace AgenaTrader.UserCode
         {
             DisplayInDataBox = false;
             CalculateOnBarClose = true;
-            Overlay = true;
+            Overlay = false;
             PriceTypeSupported = false;
 
             lastHighCache = new ArrayList(); // used to identify swing points; from default Swing indicator
             lastLowCache = new ArrayList();
             swingHighRays = new Stack(); // LIFO buffer; last entry contains the nearest swing high
             swingLowRays = new Stack();
+
+            Add(new Plot(new Pen(this.Signal, this.Plot0Width), PlotStyle.Line, "Signalline"));
         }
 
         /// <summary>
         /// Called on each bar update event (incoming tick)
         /// </summary>
         protected override void OnBarUpdate()
-        { 
+        {
+            int temp_signal_value = 0;
+
             // build up cache of recent High and Low values
             // code devised from default Swing Indicator by marqui@BMT, 10-NOV-2010 
             lastHighCache.Add(High[0]);
@@ -101,7 +109,7 @@ namespace AgenaTrader.UserCode
 
                 if (isSwingHigh)
                     lastSwingHighValue = swingHighCandidateValue;
-
+                
                 if (isSwingHigh) // if we have a new swing high then we draw a ray line on the chart
                 {
                     IRay newRay = DrawRay("highRay" + (CurrentBar - strength), false, strength, lastSwingHighValue, 0, lastSwingHighValue, swingHighColor, DashStyle.Dot, 2);
@@ -112,11 +120,11 @@ namespace AgenaTrader.UserCode
                     if (swingHighRays.Count > 0) // just to be safe 
                     {
                         IRay currentRay = (IRay)swingHighRays.Pop(); // pull current ray from stack 
-                        //if (enableAlerts) Alert("SwHiAlert", AlertPriority.Low, "Swing High at " + currentRay.Y1 + " broken", "Alert2.wav", 5, Color.White, Color.Red);
                         if (enableAlerts)
                         {
                             Alert("Swing High at " + currentRay.Y1 + " broken", GlobalUtilities.GetSoundfile(this.Soundfile));
                         }
+                        temp_signal_value = 1;
                         if (keepBrokenLines) // draw a line between swing point and break bar 
                         {
                            int barsAgo = currentRay.BarsAgo1;
@@ -161,10 +169,10 @@ namespace AgenaTrader.UserCode
                     if (swingLowRays.Count > 0)
                     {
                         IRay currentRay = (IRay)swingLowRays.Pop();
-                        //if (enableAlerts) Alert("SwHiAlert", AlertPriority.Low, "Swing Low at " + currentRay.Y1 + " broken", "Alert2.wav", 5, Color.White, Color.Red);
                         if (enableAlerts) {
                             Alert("Swing Low at " + currentRay.Y1 + " broken", GlobalUtilities.GetSoundfile(this.Soundfile));
                         }
+                        temp_signal_value = -1;
                         if (keepBrokenLines) // draw a line between swing point and break bar 
                         {
                             int barsAgo = currentRay.BarsAgo1;
@@ -182,24 +190,27 @@ namespace AgenaTrader.UserCode
                     }
                 }
             }
+
+
+            SignalLine.Set(temp_signal_value);
         }
 
 
         public override string ToString()
         {
-            return "SwingRays";
+            return "SwingRays (I)";
         }
 
         public override string DisplayName
         {
             get
             {
-                return "SwingRays";
+                return "SwingRays (I)";
             }
         }
 
-        
-        #region Input properties
+
+        #region Input Parameters
 
         [Description("Number of bars before/after each pivot bar")]
             [Category("Parameters")]
@@ -276,40 +287,94 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
+        #region Input Drawings
+
+        [XmlIgnore()]
+        [Description("Select Color")]
+        [Category("Drawings")]
+        [DisplayName("Signalline")]
+        public Color Signal
+        {
+            get { return _signal; }
+            set { _signal = value; }
+        }
+
+        [Browsable(false)]
+        public string SignalSerialize
+        {
+            get { return SerializableColor.ToString(_signal); }
+            set { _signal = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Width for Priceline.")]
+        [Category("Drawings")]
+        [DisplayName("Line Width Priceline")]
+        public int Plot0Width
+        {
+            get { return _plot0Width; }
+            set { _plot0Width = Math.Max(1, value); }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("DashStyle for Priceline.")]
+        [Category("Drawings")]
+        [DisplayName("Dash Style Priceline")]
+        public DashStyle Dash0Style
+        {
+            get { return _dash0Style; }
+            set { _dash0Style = value; }
+        }
+
+        #endregion
+
         #region Output properties
 
-        [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
-            [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
-            public DataSeries HighRay
-            {
-                get { return Values[0]; }
-            }
+        [Browsable(false)]
+        [XmlIgnore()]
+        public DataSeries SignalLine
+        {
+            get { return Values[0]; }
+        }
 
-            [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
-            [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
-            public DataSeries LowRay
-            {
-                get { return Values[1]; }
-            }
+        //[Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
+        //    [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
+        //    public DataSeries HighRay
+        //    {
+        //        get { return Values[0]; }
+        //    }
 
-            [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
-            [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
-            public DataSeries HighLine
-            {
-                get { return Values[2]; }
-            }
+        //    [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
+        //    [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
+        //    public DataSeries LowRay
+        //    {
+        //        get { return Values[1]; }
+        //    }
 
-            [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
-            [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
-            public DataSeries LowLine
-            {
-                get { return Values[3]; }
-            }
+        //    [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
+        //    [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
+        //    public DataSeries HighLine
+        //    {
+        //        get { return Values[2]; }
+        //    }
+
+        //    [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
+        //    [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
+        //    public DataSeries LowLine
+        //    {
+        //        get { return Values[3]; }
+        //    }
 
         #endregion
 
     }
 }
+
+
+
 
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 

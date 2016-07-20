@@ -391,7 +391,7 @@ namespace AgenaTrader.UserCode
 {
 	#region Indicator
 
-	public partial class UserIndicator : Indicator
+	public partial class UserIndicator
 	{
 		/// <summary>
 		/// Use SMA or EMA crosses to find trends.
