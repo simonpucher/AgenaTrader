@@ -1,3 +1,4 @@
+[![GitHub issues](https://img.shields.io/github/issues/simonpucher/AgenaTrader.svg)](https://github.com/simonpucher/AgenaTrader/issues)
 [![GitHub issues](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/simonpucher/AgenaTrader/blob/master/LICENSE.md)
 
 #AgenaTrader Scripts 
