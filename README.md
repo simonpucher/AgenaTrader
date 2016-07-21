@@ -41,5 +41,6 @@ We are working on development [tutorials](https://github.com/simonpucher/AgenaTr
 - [Twitter Christian](https://twitter.com/ckovar82) [![Twitter](https://img.shields.io/twitter/follow/ckovar82.svg?style=social&label=Follow)](https://twitter.com/ckovar82)
 
 ##Links
-- [Agena Trader Software](http://www.tradeescort.com)
-- [Agena Trader Support Forum](http://www.tradeescort.com/phpbb_de/)
+- [![Twitter AgenaTrader Software](https://img.shields.io/twitter/follow/AgenaTrader.svg?style=social&label=Follow)](https://twitter.com/AgenaTrader)
+- [AgenaTrader Software](http://www.tradeescort.com)
+- [AgenaTrader Support Forum](http://www.tradeescort.com/phpbb_de/)
