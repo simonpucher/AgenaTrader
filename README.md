@@ -37,8 +37,8 @@ A rudimentary documentation exists in form of code comments in each script.
 We are working on development [tutorials](https://github.com/simonpucher/AgenaTrader/tree/master/Tutorial) with a more detailed documentation and covering the basics for AgenaTrader scripts templates. If you want to help, please feel free to [open an issue on GitHub](https://github.com/simonpucher/AgenaTrader/issues) or fork this project and create a pull request.
 
 ##Contact
-- [Twitter Simon](https://twitter.com/SimonPucher) [![Twitter Simon](https://img.shields.io/twitter/follow/shields_io.svg?style=social&label=Follow&maxAge=3600)](https://twitter.com/SimonPucher)
-- [Twitter Christian](https://twitter.com/ckovar82) [![Twitter Christian](https://img.shields.io/twitter/follow/shields_io.svg?style=social&label=Follow&maxAge=3600)](https://twitter.com/ckovar82)
+- [Twitter Simon](https://twitter.com/SimonPucher) [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/simonpucher.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=%5Bobject%20Object%5D)
+- [Twitter Christian](https://twitter.com/ckovar82) [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/ckovar82.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=%5Bobject%20Object%5D)
 
 ##Links
 - [Agena Trader Software](http://www.tradeescort.com)
