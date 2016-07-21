@@ -38,7 +38,7 @@ We are working on development [tutorials](https://github.com/simonpucher/AgenaTr
 
 ##Contact
 - [Twitter Simon](https://twitter.com/SimonPucher) [![Twitter](https://img.shields.io/twitter/follow/simonpucher.svg?style=social&label=Follow)](https://twitter.com/SimonPucher)
-- [Twitter Christian](https://twitter.com/ckovar82) [![Twitter](https://img.shields.io/twitter/url/https/twitter.com/ckovar82.svg?style=social)](https://twitter.com/intent/tweet?text=Wow:&url=%5Bobject%20Object%5D)
+- [Twitter Christian](https://twitter.com/ckovar82) [![Twitter](https://img.shields.io/twitter/follow/ckovar82.svg?style=social&label=Follow)](https://twitter.com/ckovar82)
 
 ##Links
 - [Agena Trader Software](http://www.tradeescort.com)
