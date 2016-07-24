@@ -33,10 +33,32 @@ namespace AgenaTrader.UserCode
     /// <summary>
     /// Plots horizontal rays at swing highs and lows and removes them once broken. 
     /// </summary>
-    [Description("Plots horizontal rays at swing highs and lows and removes them once broken.")]
+    [Description("Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.")]
     public class SwingRays : UserIndicator
     {
-  
+        /// <summary>
+        /// Object is storing ray data
+        /// </summary>
+        private class RayObject
+        {
+            public RayObject(string tag, int anchor1BarsAgo, double anchor1Y, int anchor2BarsAgo, double anchor2Y) {
+                this.Tag = tag;
+                this.BarsAgo1 = anchor1BarsAgo;
+                this.BarsAgo2 = anchor2BarsAgo;
+                this.Y1 = anchor1Y;
+                this.Y2 = anchor2Y;
+            }
+
+            public string Tag { get; set; }
+            public int BarsAgo1 { get; set; }
+            public int BarsAgo2 { get; set; }
+            //Pen Pen { get; set; }
+            //DateTime X1 { get; set; }
+            //DateTime X2 { get; set; }
+            public double Y1 { get; set; }
+            public double Y2 { get; set; }
+        }
+
         // Wizard generated variables
         private int strength = 5; // number of bars required to left and right of the pivot high/low
                                   // User defined variables (add any user defined variables below)
@@ -47,8 +69,8 @@ namespace AgenaTrader.UserCode
         private ArrayList lastLowCache;
         private double lastSwingHighValue = double.MaxValue; // used when testing for price breaks
         private double lastSwingLowValue = double.MinValue;
-        private Stack swingHighRays;    //	last entry contains nearest swing high; removed when swing is broken
-        private Stack swingLowRays; // track swing lows in the same manner
+        private Stack<RayObject> swingHighRays;    //	last entry contains nearest swing high; removed when swing is broken
+        private Stack<RayObject> swingLowRays; // track swing lows in the same manner
         private bool enableAlerts = false;
         private bool keepBrokenLines = true;
 
@@ -72,8 +94,8 @@ namespace AgenaTrader.UserCode
 
             lastHighCache = new ArrayList(); // used to identify swing points; from default Swing indicator
             lastLowCache = new ArrayList();
-            swingHighRays = new Stack(); // LIFO buffer; last entry contains the nearest swing high
-            swingLowRays = new Stack();
+            swingHighRays = new Stack<RayObject>(); // LIFO buffer; last entry contains the nearest swing high
+            swingLowRays = new Stack<RayObject>();
 
             Add(new Plot(new Pen(this.Signal, this.Plot0Width), PlotStyle.Line, "Signalline"));
         }
@@ -112,14 +134,16 @@ namespace AgenaTrader.UserCode
                 
                 if (isSwingHigh) // if we have a new swing high then we draw a ray line on the chart
                 {
-                    IRay newRay = DrawRay("highRay" + (CurrentBar - strength), false, strength, lastSwingHighValue, 0, lastSwingHighValue, swingHighColor, DashStyle.Dot, 2);
-                    swingHighRays.Push(newRay); // store a reference so we can remove it from the chart later
+                    DrawRay("highRay" + (CurrentBar - strength), false, strength, lastSwingHighValue, 0, lastSwingHighValue, swingHighColor, DashStyle.Dot, 2);
+                    RayObject newRayObject = new RayObject("highRay" + (CurrentBar - strength), strength, lastSwingHighValue, 0, lastSwingHighValue);
+                    swingHighRays.Push(newRayObject); // store a reference so we can remove it from the chart later
                 }
                 else if (High[0] > lastSwingHighValue) // otherwise, we test to see if price has broken through prior swing high
                 {
                     if (swingHighRays.Count > 0) // just to be safe 
                     {
-                        IRay currentRay = (IRay)swingHighRays.Pop(); // pull current ray from stack 
+                        //IRay currentRay = (IRay)swingHighRays.Pop(); // pull current ray from stack 
+                        RayObject currentRay = (RayObject)swingHighRays.Pop(); // pull current ray from stack 
                         if (currentRay != null)
                         {
                             if (enableAlerts)
@@ -135,7 +159,8 @@ namespace AgenaTrader.UserCode
                             RemoveDrawObject(currentRay.Tag);
                             if (swingHighRays.Count > 0)
                             {
-                                IRay priorRay = (IRay)swingHighRays.Peek();
+                                //IRay priorRay = (IRay)swingHighRays.Peek();
+                                RayObject priorRay = (RayObject)swingHighRays.Peek();
                                 lastSwingHighValue = priorRay.Y1; // needed when testing the break of the next swing high
                             }
                             else
@@ -166,14 +191,16 @@ namespace AgenaTrader.UserCode
 
                 if (isSwingLow) // found a new swing low; draw it on the chart
                 {
-                    IRay newRay = DrawRay("lowRay" + (CurrentBar - strength), false, strength, lastSwingLowValue, 0, lastSwingLowValue, swingLowColor, DashStyle.Dot, 2);
-                    swingLowRays.Push(newRay);
+                    DrawRay("lowRay" + (CurrentBar - strength), false, strength, lastSwingLowValue, 0, lastSwingLowValue, swingLowColor, DashStyle.Dot, 2);
+                    RayObject newRayObject = new RayObject("lowRay" + (CurrentBar - strength), strength, lastSwingLowValue, 0, lastSwingLowValue);
+                    swingLowRays.Push(newRayObject);
                 }
                 else if (Low[0] < lastSwingLowValue) // otherwise test to see if price has broken through prior swing low
                 {
                     if (swingLowRays.Count > 0)
                     {
-                        IRay currentRay = (IRay)swingLowRays.Pop();
+                        //IRay currentRay = (IRay)swingLowRays.Pop();
+                        RayObject currentRay = (RayObject)swingLowRays.Pop();
                         if (currentRay != null)
                         {
                             if (enableAlerts)
@@ -190,7 +217,8 @@ namespace AgenaTrader.UserCode
 
                             if (swingLowRays.Count > 0)
                             {
-                                IRay priorRay = (IRay)swingLowRays.Peek();
+                                //IRay priorRay = (IRay)swingLowRays.Peek();
+                                RayObject priorRay = (RayObject)swingLowRays.Peek();
                                 lastSwingLowValue = priorRay.Y1; // price level of the prior swing low 
                             }
                             else
@@ -396,7 +424,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator
 	{
 		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken.
+		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
 		/// </summary>
 		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
         {
@@ -404,7 +432,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken.
+		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
 		/// </summary>
 		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
@@ -440,7 +468,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken.
+		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
 		/// </summary>
 		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
@@ -448,7 +476,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken.
+		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
 		/// </summary>
 		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
@@ -466,7 +494,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken.
+		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
 		/// </summary>
 		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
@@ -474,7 +502,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken.
+		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
 		/// </summary>
 		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
@@ -489,7 +517,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken.
+		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
 		/// </summary>
 		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
@@ -497,7 +525,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken.
+		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
 		/// </summary>
 		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
@@ -510,3 +538,5 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
+
