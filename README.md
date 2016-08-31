@@ -38,7 +38,7 @@ We are working on development [tutorials](https://github.com/simonpucher/AgenaTr
 
 #Installation of AgenaTrader scripts
 - Locate your UserCode directory (e.g. C:\Users\yourusername\Documents\AgenaTrader\UserCode)
-- Download the Utility Indicator from this GitHub directory an copy it into the \Indicators directory in your UserCode directory (e.g. C:\Users\yourusername\Documents\AgenaTrader\UserCode\Indicators)
+- Download the [Utility Indicator from this GitHub directory](https://raw.githubusercontent.com/simonpucher/AgenaTrader/master/Utility/GlobalUtilities_Utility.cs) an copy it into the \Indicators directory in your UserCode directory (e.g. C:\Users\yourusername\Documents\AgenaTrader\UserCode\Indicators)
 - Download the script you want to use and copy it into the correct directory (Indicators into \Indicators, Conditions into \ScriptedConditions, Strategies into \Strategies, Alerts into \AlertHandlers)
 
 ##Contact
