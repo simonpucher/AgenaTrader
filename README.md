@@ -36,9 +36,9 @@ Each script should have a summary tag below the using directives. **If there is 
 A rudimentary documentation exists in form of code comments in each script.
 We are working on development [tutorials](https://github.com/simonpucher/AgenaTrader/tree/master/Tutorial) with a more detailed documentation and covering the basics for AgenaTrader scripts templates. If you want to help, please feel free to [open an issue on GitHub](https://github.com/simonpucher/AgenaTrader/issues) or fork this project and create a pull request.
 
-#Installation of these scripts
-- Locate your the UserCode directory (e.g. C:\Users\yourusername\Documents\AgenaTrader\UserCode)
-- Download Utility Indicator an copy it into the Indicators directory in UserCode \Indicators (e.g. C:\Users\yourusername\Documents\AgenaTrader\UserCode\Indicators)
+#Installation of AgenaTrader scripts
+- Locate your UserCode directory (e.g. C:\Users\yourusername\Documents\AgenaTrader\UserCode)
+- Download the Utility Indicator from this GitHub directory an copy it into the \Indicators directory in your UserCode directory (e.g. C:\Users\yourusername\Documents\AgenaTrader\UserCode\Indicators)
 - Download the script you want to use and copy it into the correct directory (Indicators into \Indicators, Conditions into \ScriptedConditions, Strategies into \Strategies, Alerts into \AlertHandlers)
 
 ##Contact
