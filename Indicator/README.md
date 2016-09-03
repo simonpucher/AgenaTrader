@@ -5,6 +5,7 @@ To compile indicators, conditions and other script resources without any error y
 
 ##Coppock Curve
 [Funktionsweise](https://en.wikipedia.org/wiki/Coppock_curve)
+
 *** In Progress ***
 
 ##Fibonacci Current Session
@@ -18,6 +19,7 @@ Compare the current value of an indicator to latest high value of the indicator 
 
 ##Open Range Breakout (ORB)
 [Funktionsweise](https://www.whselfinvest.at/de/Store_Birger_Schaefermeier_Trading_Strategie_Open_Range_Break_Out.php)
+
 *** In Progress ***
 
 ##Reversal2NextBar
