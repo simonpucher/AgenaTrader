@@ -28,6 +28,7 @@ Compare the current value of an indicator to latest high value of the indicator 
 
 ##Quantitative Qualitative Estimation (QQE)
 [Funktionsweise](https://en.wikipedia.org/wiki/Zero_lag_exponential_moving_average)
+
 *** In Progress ***
 
 ##ShowGap
