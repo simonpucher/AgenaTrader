@@ -14,7 +14,7 @@ using System.Runtime.CompilerServices;
 
 
 /// <summary>
-/// Version: 1.1.1
+/// Version: 1.1.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -36,7 +36,7 @@ namespace AgenaTrader.UserCode
     /// <summary>
     /// Differend types of seasonal indictors.
     /// </summary>
-    public enum SeasonalType
+    public enum SeasonalDateType
     {
         SellInMay = 1,
         SantaClausRally = 2,
@@ -44,13 +44,13 @@ namespace AgenaTrader.UserCode
     }
 
     [Description("Show seasonal trends")]
-	public class Seasonal_Indicator : UserIndicator
+	public class SeasonalDate_Indicator : UserIndicator
 	{
 
         #region Variables
 
         //input
-        private SeasonalType _seasonal = SeasonalType.SellInMay;
+        private SeasonalDateType _seasonal = SeasonalDateType.SellInMay;
 
 
         //output
@@ -90,20 +90,20 @@ namespace AgenaTrader.UserCode
         {
             //Print("OnStartUp");
 
-            switch (SeasonalType)
+            switch (SeasonalDateType)
             {
-                case SeasonalType.SellInMay:
+                case SeasonalDateType.SellInMay:
                     _list_sellinmayandgoaway_buy = Bars.Where(x => x.Time.Month <= 4 || x.Time.Month >= 10);
                     _list_sellinmayandgoaway_sell = Bars.Except(_list_sellinmayandgoaway_buy);
                     hashset = new HashSet<DateTime>(_list_sellinmayandgoaway_buy.Select(x => x.Time));
                     break;
-                case SeasonalType.SantaClausRally:
+                case SeasonalDateType.SantaClausRally:
                     _list_santaclausrally_buy = from b in Bars
                                                where (b.Time.Month == 12 && b.Time.Day >= 15) || (b.Time.Month == 1 && b.Time.Day <= 9)
                                                select b;
                     hashset = new HashSet<DateTime>(_list_santaclausrally_buy.Select(x => x.Time));
                     break;
-                case SeasonalType.fourthofjuly:
+                case SeasonalDateType.fourthofjuly:
                     _list_fourthofjuly_buy = from b in Bars
                                                 where (b.Time.Month == 7 && b.Time.Day >= 1) || (b.Time.Month == 7 && b.Time.Day <= 8)
                                                 select b;
@@ -125,15 +125,15 @@ namespace AgenaTrader.UserCode
                 GlobalUtilities.DrawWarningTextOnChart(this, Const.DefaultStringDatafeedPeriodicity);
             }
 
-            switch (SeasonalType)
+            switch (SeasonalDateType)
             {
-                case SeasonalType.SellInMay:
+                case SeasonalDateType.SellInMay:
                     this.calculate_Sell_in_May();
                     break;
-                case SeasonalType.SantaClausRally:
+                case SeasonalDateType.SantaClausRally:
                     this.calculate_Santa_Claus_Rally();
                     break;
-                case SeasonalType.fourthofjuly:
+                case SeasonalDateType.fourthofjuly:
                     this.calculate_4th_of_July_Rally();
                     break;
                 default:
@@ -295,7 +295,7 @@ namespace AgenaTrader.UserCode
             [Description("Seasonal Type")]
             [Category("Parameters")]
             [DisplayName("Seasonal Type")]
-            public SeasonalType SeasonalType
+            public SeasonalDateType SeasonalDateType
             {
                 get { return _seasonal; }
                 set { _seasonal = value; }
@@ -327,27 +327,27 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator(SeasonalType seasonalType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType)
         {
-			return Seasonal_Indicator(Input, seasonalType);
+			return SeasonalDate_Indicator(Input, seasonalDateType);
 		}
 
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator(IDataSeries input, SeasonalType seasonalType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(IDataSeries input, SeasonalDateType seasonalDateType)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Seasonal_Indicator>(input, i => i.SeasonalType == seasonalType);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<SeasonalDate_Indicator>(input, i => i.SeasonalDateType == seasonalDateType);
 
 			if (indicator != null)
 				return indicator;
 
-			indicator = new Seasonal_Indicator
+			indicator = new SeasonalDate_Indicator
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
 							Input = input,
-							SeasonalType = seasonalType
+							SeasonalDateType = seasonalDateType
 						};
 			indicator.SetUp();
 
@@ -366,20 +366,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator(SeasonalType seasonalType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType)
 		{
-			return LeadIndicator.Seasonal_Indicator(Input, seasonalType);
+			return LeadIndicator.SeasonalDate_Indicator(Input, seasonalDateType);
 		}
 
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator(IDataSeries input, SeasonalType seasonalType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(IDataSeries input, SeasonalDateType seasonalDateType)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.Seasonal_Indicator(input, seasonalType);
+			return LeadIndicator.SeasonalDate_Indicator(input, seasonalDateType);
 		}
 	}
 
@@ -392,17 +392,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator(SeasonalType seasonalType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType)
 		{
-			return LeadIndicator.Seasonal_Indicator(Input, seasonalType);
+			return LeadIndicator.SeasonalDate_Indicator(Input, seasonalDateType);
 		}
 
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator(IDataSeries input, SeasonalType seasonalType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(IDataSeries input, SeasonalDateType seasonalDateType)
 		{
-			return LeadIndicator.Seasonal_Indicator(input, seasonalType);
+			return LeadIndicator.SeasonalDate_Indicator(input, seasonalDateType);
 		}
 	}
 
@@ -415,17 +415,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator(SeasonalType seasonalType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType)
 		{
-			return LeadIndicator.Seasonal_Indicator(Input, seasonalType);
+			return LeadIndicator.SeasonalDate_Indicator(Input, seasonalDateType);
 		}
 
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public Seasonal_Indicator Seasonal_Indicator(IDataSeries input, SeasonalType seasonalType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(IDataSeries input, SeasonalDateType seasonalDateType)
 		{
-			return LeadIndicator.Seasonal_Indicator(input, seasonalType);
+			return LeadIndicator.SeasonalDate_Indicator(input, seasonalDateType);
 		}
 	}
 
@@ -434,3 +434,5 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
+
