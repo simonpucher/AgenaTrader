@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2.7
+/// Version: 1.2.8
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -128,22 +128,22 @@ namespace AgenaTrader.UserCode
                     {
                         if (this.IsDrawLowLineEnabled)
                         {
-                            DrawHorizontalLine("LowLine" + start.Ticks, true, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            DrawHorizontalLine("LowLine" + start.Ticks, this.AutoScale, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                         if (this.IsDrawHighLineEnabled)
                         {
-                            DrawHorizontalLine("HighLine" + start.Ticks, true, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            DrawHorizontalLine("HighLine" + start.Ticks, this.AutoScale, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                         if (this.IsDrawMiddleLineEnabled)
                         {
-                            DrawHorizontalLine("MiddleLine" + start.Ticks, true, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            DrawHorizontalLine("MiddleLine" + start.Ticks, this.AutoScale, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                     }
 
                     //Draw a rectangle at the dedicated time frame
                     if (this.IsDrawAreaplotEnabled)
                     {
-                        DrawRectangle("HighLowRect" + start.Ticks, true, start, this.LastLow, end, this.LastHigh, this.Color_TimeSpan, this.Color_TimeSpan, this.Opacity);
+                        DrawRectangle("HighLowRect" + start.Ticks, this.AutoScale, start, this.LastLow, end, this.LastHigh, this.Color_TimeSpan, this.Color_TimeSpan, this.Opacity);
                     }
                     break;
                 case FindHighLowTimeFrame_Type.Candle:
@@ -154,7 +154,7 @@ namespace AgenaTrader.UserCode
                         double lastmiddle = Bars[this.CandlesAgo].Low + (Bars[this.CandlesAgo].Range / 2);
                         if (this.IsDrawMiddleLineEnabled)
                         {
-                            DrawHorizontalLine("MiddleLineOnCandle" + startcandle.Ticks, true, lastmiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            DrawHorizontalLine("MiddleLineOnCandle" + startcandle.Ticks, this.AutoScale, lastmiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         } 
                     }
                     break;
@@ -170,15 +170,15 @@ namespace AgenaTrader.UserCode
                         string datenow = DateTime.Now.ToString();
                         if (this.IsDrawLowLineEnabled)
                         {
-                            DrawHorizontalLine("LowLine" + datenow, true, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            DrawHorizontalLine("LowLine" + datenow, this.AutoScale, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                         if (this.IsDrawHighLineEnabled)
                         {
-                            DrawHorizontalLine("HighLine" + datenow, true, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            DrawHorizontalLine("HighLine" + datenow, this.AutoScale, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                         if (this.IsDrawMiddleLineEnabled)
                         {
-                            DrawHorizontalLine("MiddleLine" + datenow, true, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            DrawHorizontalLine("MiddleLine" + datenow, this.AutoScale, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                     }
                     break;
