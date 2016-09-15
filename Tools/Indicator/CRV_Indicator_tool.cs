@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -22,70 +22,35 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-	[Description("Shows the CRV in the right upper corner of the chart.")]
+	[Description("Shows the CRV of your current trade in the right upper corner of the chart.")]
     [Category("Tools")]
     public class CRV_Indicator_Tool : UserIndicator
 	{
-		protected override void Initialize()
+
+        private TextPosition _TextPositionCRV = TextPosition.TopRight;
+        private int _FontSizeCRV = 20;
+        private IEnumerable<ITradingTrade> openedtrades = null;
+
+
+        protected override void Initialize()
 		{
-			//Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
 			Overlay = true;
             CalculateOnBarClose = false;
         }
 
 
-        protected override void OnStartUp()
-        {
-
-            //// Add event listener
-            //if (ChartControl != null)
-            //    ChartControl.ChartPanelMouseDown += OnChartPanelMouseDown;
-
-
-        }
-
 
         protected override void OnBarUpdate()
 		{
-            //MyPlot1.Set(Input[0]);
-
             calculateannddrawdata();
-
-            if (this.IsCurrentBarLast)
-            {
-
-              
-
-               
-            }
-       
-
-    }
-
-
-      
-
-        protected override void OnTermination()
-        {
-            //// Remove event listener
-            //if (ChartControl != null)
-            //    ChartControl.ChartPanelMouseDown -= OnChartPanelMouseDown;
         }
-
-
-
-        //private void OnChartPanelMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
-        //{
-        //    calculateannddrawdata();
-
-           
-        //}
+        
 
 
         private void calculateannddrawdata() {
 
-            string text = "no calculation";
-            IEnumerable<ITradingTrade> openedtrades = this.Root.Core.TradingManager.GetOpenedTrades();
+            string text = "flat";
+            openedtrades = this.Root.Core.TradingManager.GetOpenedTrades();
             double crv = 0.0;
             double entryprice = 0.0;
             double ordersize = 0.0;
@@ -130,7 +95,7 @@ namespace AgenaTrader.UserCode
                     text = Math.Round(crv, 3).ToString();
                 }
             }
-            DrawTextFixed("ca", text, TextPosition.TopRight, Color.Black, new Font("Arial", 20, FontStyle.Regular), Color.Transparent, Color.Transparent);
+            DrawTextFixed("CRV_string", text, this.TextPositionCRV, Color.Black, new Font("Arial", this.FontSizeCRV, FontStyle.Regular), Color.Transparent, Color.Transparent);
         }
 
 
@@ -151,6 +116,30 @@ namespace AgenaTrader.UserCode
 
 
         #region Properties
+  
+        /// <summary>
+        /// </summary>
+        [Description("Position of the text for your CRV.")]
+        [Category("Parameters")]
+        [DisplayName("TextPosition")]
+        public TextPosition TextPositionCRV
+        {
+            get { return _TextPositionCRV; }
+            set { _TextPositionCRV = value; }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("Font size of the text for your CRV.")]
+        [Category("Parameters")]
+        [DisplayName("Font size")]
+        public int FontSizeCRV
+        {
+            get { return _FontSizeCRV; }
+            set { _FontSizeCRV = value; }
+        }
+
 
         [Browsable(false)]
 		[XmlIgnore()]
@@ -171,19 +160,19 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator
 	{
 		/// <summary>
-		/// Shows the CRV in the right upper corner of the chart.
+		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool()
+		public CRV_Indicator_Tool CRV_Indicator_Tool(TextPosition textPositionCRV, System.Int32 fontSizeCRV)
         {
-			return CRV_Indicator_Tool(Input);
+			return CRV_Indicator_Tool(Input, textPositionCRV, fontSizeCRV);
 		}
 
 		/// <summary>
-		/// Shows the CRV in the right upper corner of the chart.
+		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input)
+		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input, TextPosition textPositionCRV, System.Int32 fontSizeCRV)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<CRV_Indicator_Tool>(input);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<CRV_Indicator_Tool>(input, i => i.TextPositionCRV == textPositionCRV && i.FontSizeCRV == fontSizeCRV);
 
 			if (indicator != null)
 				return indicator;
@@ -192,7 +181,9 @@ namespace AgenaTrader.UserCode
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							Input = input,
+							TextPositionCRV = textPositionCRV,
+							FontSizeCRV = fontSizeCRV
 						};
 			indicator.SetUp();
 
@@ -209,22 +200,22 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Shows the CRV in the right upper corner of the chart.
+		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool()
+		public CRV_Indicator_Tool CRV_Indicator_Tool(TextPosition textPositionCRV, System.Int32 fontSizeCRV)
 		{
-			return LeadIndicator.CRV_Indicator_Tool(Input);
+			return LeadIndicator.CRV_Indicator_Tool(Input, textPositionCRV, fontSizeCRV);
 		}
 
 		/// <summary>
-		/// Shows the CRV in the right upper corner of the chart.
+		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input)
+		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input, TextPosition textPositionCRV, System.Int32 fontSizeCRV)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.CRV_Indicator_Tool(input);
+			return LeadIndicator.CRV_Indicator_Tool(input, textPositionCRV, fontSizeCRV);
 		}
 	}
 
@@ -235,19 +226,19 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Shows the CRV in the right upper corner of the chart.
+		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool()
+		public CRV_Indicator_Tool CRV_Indicator_Tool(TextPosition textPositionCRV, System.Int32 fontSizeCRV)
 		{
-			return LeadIndicator.CRV_Indicator_Tool(Input);
+			return LeadIndicator.CRV_Indicator_Tool(Input, textPositionCRV, fontSizeCRV);
 		}
 
 		/// <summary>
-		/// Shows the CRV in the right upper corner of the chart.
+		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input)
+		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input, TextPosition textPositionCRV, System.Int32 fontSizeCRV)
 		{
-			return LeadIndicator.CRV_Indicator_Tool(input);
+			return LeadIndicator.CRV_Indicator_Tool(input, textPositionCRV, fontSizeCRV);
 		}
 	}
 
@@ -258,19 +249,19 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Shows the CRV in the right upper corner of the chart.
+		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool()
+		public CRV_Indicator_Tool CRV_Indicator_Tool(TextPosition textPositionCRV, System.Int32 fontSizeCRV)
 		{
-			return LeadIndicator.CRV_Indicator_Tool(Input);
+			return LeadIndicator.CRV_Indicator_Tool(Input, textPositionCRV, fontSizeCRV);
 		}
 
 		/// <summary>
-		/// Shows the CRV in the right upper corner of the chart.
+		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input)
+		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input, TextPosition textPositionCRV, System.Int32 fontSizeCRV)
 		{
-			return LeadIndicator.CRV_Indicator_Tool(input);
+			return LeadIndicator.CRV_Indicator_Tool(input, textPositionCRV, fontSizeCRV);
 		}
 	}
 
