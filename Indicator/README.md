@@ -34,6 +34,9 @@ Compare the current value of an indicator to latest high value of the indicator 
 ##ShowGap
 *** In Progress ***
 
+##PopGun
+*** In Progress ***
+
 ##Traders Dynamic Index (TDI)
 [Funktionsweise](http://www.earnforex.com/metatrader-indicators/Traders-Dynamic-Index/)
 
