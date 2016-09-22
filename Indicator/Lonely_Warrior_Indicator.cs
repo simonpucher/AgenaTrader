@@ -16,7 +16,7 @@ using AgenaTrader.Helper;
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
-/// Inspired by https://www.traderfox.de/nachrichten/blog/19-trefferquote-von-97-handelssignal-lonely-warrior
+/// Inspired by https://www.youtube.com/watch?v=Qj_6DFTNfjE
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use global source code elements.
@@ -26,9 +26,9 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-	[Description("Watch out for the lonely warrior behind enemy lines.")]
-	public class Lonely_Warrior_Indicator : UserIndicator
-	{
+    [Description("Watch out for the lonely warrior behind enemy lines.")]
+    public class Lonely_Warrior_Indicator : UserIndicator
+    {
 
         //input
         private Color _plot0color = Const.DefaultIndicatorColor;
@@ -46,12 +46,15 @@ namespace AgenaTrader.UserCode
         {
             //Print("Initialize");
 
-            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_High"));
-            Add(new Plot(new Pen(this.Plot1Color, this.Plot1Width), PlotStyle.Line, "Plot_Middle"));
-            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_Low"));
+            //Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_High"));
+            //Add(new Plot(new Pen(this.Plot1Color, this.Plot1Width), PlotStyle.Line, "Plot_Middle"));
+            //Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_Low"));
+
+            Add(new Plot(new Pen(this.Plot1Color, this.Plot1Width), PlotStyle.Line, "Plot_Line"));
 
             CalculateOnBarClose = true;
-            Overlay = true;
+            Overlay = false;
+            AutoScale = true;
 
             //Because of Backtesting reasons if we use the advanced mode we need at least two bars
             this.BarsRequired = 20;
@@ -64,12 +67,49 @@ namespace AgenaTrader.UserCode
         }
 
         protected override void OnBarUpdate()
-		{
-            Bollinger bb = Bollinger(1, 20);
+        {
+            Bollinger bb = Bollinger(2, 20);
 
-            Plot_High.Set(bb.Upper[0]);
-            Plot_Middle.Set(bb.Middle[0]);
-            Plot_Low.Set(bb.Lower[0]);
+            //Plot_High.Set(bb.Upper[0]);
+            //Plot_Middle.Set(bb.Middle[0]);
+            //Plot_Low.Set(bb.Lower[0]);
+
+            DrawLine("Plot_Middle" + Time[0].ToString(), this.AutoScale, 1, bb.Middle[1], 0, bb.Middle[0], this.Plot1Color, this.Dash1Style, this.Plot1Width);
+            DrawLine("Plot_Low" + Time[0].ToString(), this.AutoScale, 1, bb.Lower[1], 0, bb.Lower[0], this.Plot0Color, this.Dash0Style, this.Plot0Width);
+            DrawLine("Plot_High" + Time[0].ToString(), this.AutoScale, 1, bb.Upper[1], 0, bb.Upper[0], this.Plot0Color, this.Dash0Style, this.Plot0Width);
+
+            if (High[0] < bb.Lower[0] || Low[0] > bb.Upper[0])
+            {
+                //ok
+            }
+            else
+            {
+                this.BarColor = Color.White;
+            }
+
+            //Trigger
+            double signal = 0;
+            if (High[1] < bb.Lower[1])
+            {
+                if (Low[0] > High[1] || High[0] > High[1])
+                {
+                    //DrawDot("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
+                    DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, Color.LightGreen);
+                    signal = 1;
+                }
+            }
+            else if (Low[1] > bb.Upper[1])
+            {
+                if (Low[0] < Low[1] || High[0] < Low[1])
+                {
+                    //DrawDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
+                    DrawArrowDown("ArrowShort_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].High, Color.Red);
+                    signal = -1;
+                }
+            }
+
+
+            PlotLine.Set(signal);
 
 
         }
@@ -91,32 +131,39 @@ namespace AgenaTrader.UserCode
         #region Properties
 
         [Browsable(false)]
-		[XmlIgnore()]
-		public DataSeries Plot_High
-		{
-			get { return Values[0]; }
-		}
-
-        [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries Plot_Middle
+        public DataSeries PlotLine
         {
-            get { return Values[1]; }
+            get { return Values[0]; }
         }
 
+  //      [Browsable(false)]
+		//[XmlIgnore()]
+		//public DataSeries Plot_High
+		//{
+		//	get { return Values[0]; }
+		//}
 
-        [Browsable(false)]
-        [XmlIgnore()]
-        public DataSeries Plot_Low
-        {
-            get { return Values[2]; }
-        }
+  //      [Browsable(false)]
+  //      [XmlIgnore()]
+  //      public DataSeries Plot_Middle
+  //      {
+  //          get { return Values[1]; }
+  //      }
+
+
+  //      [Browsable(false)]
+  //      [XmlIgnore()]
+  //      public DataSeries Plot_Low
+  //      {
+  //          get { return Values[2]; }
+  //      }
 
 
         /// <summary>
         /// </summary>
         [Description("Select Color for the indicator.")]
-        [Category("Parameters")]
+        [Category("Plots")]
         [DisplayName("Color")]
         public Color Plot0Color
         {
@@ -207,17 +254,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(Color plot0Color)
+		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator()
         {
-			return Lonely_Warrior_Indicator(Input, plot0Color);
+			return Lonely_Warrior_Indicator(Input);
 		}
 
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input, Color plot0Color)
+		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Lonely_Warrior_Indicator>(input, i => i.Plot0Color == plot0Color);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<Lonely_Warrior_Indicator>(input);
 
 			if (indicator != null)
 				return indicator;
@@ -226,8 +273,7 @@ namespace AgenaTrader.UserCode
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
-							Plot0Color = plot0Color
+							Input = input
 						};
 			indicator.SetUp();
 
@@ -246,20 +292,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(Color plot0Color)
+		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator()
 		{
-			return LeadIndicator.Lonely_Warrior_Indicator(Input, plot0Color);
+			return LeadIndicator.Lonely_Warrior_Indicator(Input);
 		}
 
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input, Color plot0Color)
+		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.Lonely_Warrior_Indicator(input, plot0Color);
+			return LeadIndicator.Lonely_Warrior_Indicator(input);
 		}
 	}
 
@@ -272,17 +318,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(Color plot0Color)
+		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator()
 		{
-			return LeadIndicator.Lonely_Warrior_Indicator(Input, plot0Color);
+			return LeadIndicator.Lonely_Warrior_Indicator(Input);
 		}
 
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input, Color plot0Color)
+		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input)
 		{
-			return LeadIndicator.Lonely_Warrior_Indicator(input, plot0Color);
+			return LeadIndicator.Lonely_Warrior_Indicator(input);
 		}
 	}
 
@@ -295,17 +341,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(Color plot0Color)
+		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator()
 		{
-			return LeadIndicator.Lonely_Warrior_Indicator(Input, plot0Color);
+			return LeadIndicator.Lonely_Warrior_Indicator(Input);
 		}
 
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input, Color plot0Color)
+		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input)
 		{
-			return LeadIndicator.Lonely_Warrior_Indicator(input, plot0Color);
+			return LeadIndicator.Lonely_Warrior_Indicator(input);
 		}
 	}
 
