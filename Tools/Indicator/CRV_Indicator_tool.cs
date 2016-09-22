@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -57,30 +57,33 @@ namespace AgenaTrader.UserCode
             double pricestop = 0.0;
             double pricetarget = 0.0;
 
-            foreach (ITradingTrade item in openedtrades)
+            if (openedtrades != null)
             {
-                if (openedtrades.Count() > 0)
+                foreach (ITradingTrade item in openedtrades)
                 {
-                    entryprice = openedtrades.First().EntryPrice;
-                    ordersize = openedtrades.First().Quantity;
-                    IIfDoneGroup data = item.EntryOrder.IfDoneGroup;
-                    if (data != null)
+                    if (openedtrades.Count() > 0)
                     {
-                        foreach (ITradingOrder tradord in data)
+                        entryprice = openedtrades.First().EntryPrice;
+                        ordersize = openedtrades.First().Quantity;
+                        IIfDoneGroup data = item.EntryOrder.IfDoneGroup;
+                        if (data != null)
                         {
-                            if (tradord.IsOrderOpened)
+                            foreach (ITradingOrder tradord in data)
                             {
-                                if (tradord.IsStopLoss)
+                                if (tradord.IsOrderOpened)
                                 {
-                                    pricestop = tradord.StopPrice;
-                                }
-                                else
-                                {
-                                    pricetarget = tradord.Price;
+                                    if (tradord.IsStopLoss)
+                                    {
+                                        pricestop = tradord.StopPrice;
+                                    }
+                                    else
+                                    {
+                                        pricetarget = tradord.Price;
+                                    }
                                 }
                             }
+                            crv = Math.Abs(((entryprice - pricetarget) * ordersize) / ((entryprice - pricestop) * ordersize));
                         }
-                        crv = Math.Abs(((entryprice - pricetarget) * ordersize) / ((entryprice - pricestop) * ordersize));
                     }
                 }
             }
