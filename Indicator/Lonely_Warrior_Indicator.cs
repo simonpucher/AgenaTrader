@@ -44,12 +44,6 @@ namespace AgenaTrader.UserCode
         /// </summary>
         protected override void Initialize()
         {
-            //Print("Initialize");
-
-            //Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_High"));
-            //Add(new Plot(new Pen(this.Plot1Color, this.Plot1Width), PlotStyle.Line, "Plot_Middle"));
-            //Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_Low"));
-
             Add(new Plot(new Pen(this.Plot1Color, this.Plot1Width), PlotStyle.Line, "Plot_Line"));
 
             CalculateOnBarClose = true;
@@ -69,10 +63,6 @@ namespace AgenaTrader.UserCode
         protected override void OnBarUpdate()
         {
             Bollinger bb = Bollinger(2, 20);
-
-            //Plot_High.Set(bb.Upper[0]);
-            //Plot_Middle.Set(bb.Middle[0]);
-            //Plot_Low.Set(bb.Lower[0]);
 
             DrawLine("Plot_Middle" + Time[0].ToString(), this.AutoScale, 1, bb.Middle[1], 0, bb.Middle[0], this.Plot1Color, this.Dash1Style, this.Plot1Width);
             DrawLine("Plot_Low" + Time[0].ToString(), this.AutoScale, 1, bb.Lower[1], 0, bb.Lower[0], this.Plot0Color, this.Dash0Style, this.Plot0Width);
@@ -136,28 +126,6 @@ namespace AgenaTrader.UserCode
         {
             get { return Values[0]; }
         }
-
-  //      [Browsable(false)]
-		//[XmlIgnore()]
-		//public DataSeries Plot_High
-		//{
-		//	get { return Values[0]; }
-		//}
-
-  //      [Browsable(false)]
-  //      [XmlIgnore()]
-  //      public DataSeries Plot_Middle
-  //      {
-  //          get { return Values[1]; }
-  //      }
-
-
-  //      [Browsable(false)]
-  //      [XmlIgnore()]
-  //      public DataSeries Plot_Low
-  //      {
-  //          get { return Values[2]; }
-  //      }
 
 
         /// <summary>
