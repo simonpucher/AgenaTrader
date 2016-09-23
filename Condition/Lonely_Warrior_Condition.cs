@@ -11,6 +11,19 @@ using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
+/// <summary>
+/// Version: in progress
+/// -------------------------------------------------------------------------
+/// Simon Pucher 2016
+/// -------------------------------------------------------------------------
+/// Inspired by https://www.youtube.com/watch?v=Qj_6DFTNfjE
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this script without any error you also need access to the utility indicator to use global source code elements.
+/// You will find this script on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
     [Description("Watch out for the lonely warrior behind enemy lines.")]
@@ -44,9 +57,23 @@ namespace AgenaTrader.UserCode
             Occurred.Set(Lonely_Warrior_Indicator()[0]);
         }
 
-		#region Properties
 
-		[Browsable(false)]
+        public override string ToString()
+        {
+            return "Lonely Warrior (C)";
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "Lonely Warrior (C)";
+            }
+        }
+
+        #region Properties
+
+        [Browsable(false)]
 		[XmlIgnore()]
 		public DataSeries Occurred
 		{

@@ -54,11 +54,7 @@ namespace AgenaTrader.UserCode
             this.BarsRequired = 20;
         }
 
-        protected override void InitRequirements()
-        {
-            //Print("InitRequirements");
-            base.InitRequirements();
-        }
+   
 
         protected override void OnBarUpdate()
         {
