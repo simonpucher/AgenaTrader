@@ -52,11 +52,7 @@ namespace AgenaTrader.UserCode
             this.BarsRequired = 20;
         }
 
-        protected override void InitRequirements()
-        {
-            //Print("InitRequirements");
-            base.InitRequirements();
-        }
+      
 
         protected override void OnBarUpdate()
         {
@@ -70,47 +66,7 @@ namespace AgenaTrader.UserCode
             {
                 PlotLine.Set(0);
             }
-
-            //Bollinger bb = Bollinger(2, 20);
-
-            //DrawLine("Plot_Middle" + Time[0].ToString(), this.AutoScale, 1, bb.Middle[1], 0, bb.Middle[0], this.Plot1Color, this.Dash1Style, this.Plot1Width);
-            //DrawLine("Plot_Low" + Time[0].ToString(), this.AutoScale, 1, bb.Lower[1], 0, bb.Lower[0], this.Plot0Color, this.Dash0Style, this.Plot0Width);
-            //DrawLine("Plot_High" + Time[0].ToString(), this.AutoScale, 1, bb.Upper[1], 0, bb.Upper[0], this.Plot0Color, this.Dash0Style, this.Plot0Width);
-
-            //if (High[0] < bb.Lower[0] || Low[0] > bb.Upper[0])
-            //{
-            //    //ok
-            //}
-            //else
-            //{
-            //    this.BarColor = Color.White;
-            //}
-
-            ////Trigger
-            //double signal = 0;
-            //if (High[1] < bb.Lower[1])
-            //{
-            //    if (Low[0] > High[1] || High[0] > High[1])
-            //    {
-            //        //DrawDot("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
-            //        DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, Color.LightGreen);
-            //        signal = 1;
-            //    }
-            //}
-            //else if (Low[1] > bb.Upper[1])
-            //{
-            //    if (Low[0] < Low[1] || High[0] < Low[1])
-            //    {
-            //        //DrawDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
-            //        DrawArrowDown("ArrowShort_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].High, Color.Red);
-            //        signal = -1;
-            //    }
-            //}
-
-
-            //PlotLine.Set(signal);
-
-
+            
         }
 
 
