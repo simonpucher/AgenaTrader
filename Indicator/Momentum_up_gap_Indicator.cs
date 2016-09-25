@@ -95,7 +95,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Percentage for the up gap.")]
-        [Category("Plots")]
+        [Category("Parameters")]
         [DisplayName("Percentage")]
         public int Percentage
         {
@@ -160,17 +160,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator()
+		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(System.Int32 percentage)
         {
-			return Momentum_up_gap_Indicator(Input);
+			return Momentum_up_gap_Indicator(Input, percentage);
 		}
 
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(IDataSeries input)
+		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(IDataSeries input, System.Int32 percentage)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Momentum_up_gap_Indicator>(input);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<Momentum_up_gap_Indicator>(input, i => i.Percentage == percentage);
 
 			if (indicator != null)
 				return indicator;
@@ -179,7 +179,8 @@ namespace AgenaTrader.UserCode
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							Input = input,
+							Percentage = percentage
 						};
 			indicator.SetUp();
 
@@ -198,20 +199,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator()
+		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(System.Int32 percentage)
 		{
-			return LeadIndicator.Momentum_up_gap_Indicator(Input);
+			return LeadIndicator.Momentum_up_gap_Indicator(Input, percentage);
 		}
 
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(IDataSeries input)
+		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(IDataSeries input, System.Int32 percentage)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.Momentum_up_gap_Indicator(input);
+			return LeadIndicator.Momentum_up_gap_Indicator(input, percentage);
 		}
 	}
 
@@ -224,17 +225,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator()
+		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(System.Int32 percentage)
 		{
-			return LeadIndicator.Momentum_up_gap_Indicator(Input);
+			return LeadIndicator.Momentum_up_gap_Indicator(Input, percentage);
 		}
 
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(IDataSeries input)
+		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(IDataSeries input, System.Int32 percentage)
 		{
-			return LeadIndicator.Momentum_up_gap_Indicator(input);
+			return LeadIndicator.Momentum_up_gap_Indicator(input, percentage);
 		}
 	}
 
@@ -247,17 +248,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator()
+		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(System.Int32 percentage)
 		{
-			return LeadIndicator.Momentum_up_gap_Indicator(Input);
+			return LeadIndicator.Momentum_up_gap_Indicator(Input, percentage);
 		}
 
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(IDataSeries input)
+		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(IDataSeries input, System.Int32 percentage)
 		{
-			return LeadIndicator.Momentum_up_gap_Indicator(input);
+			return LeadIndicator.Momentum_up_gap_Indicator(input, percentage);
 		}
 	}
 

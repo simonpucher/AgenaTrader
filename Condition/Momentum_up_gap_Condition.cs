@@ -33,13 +33,13 @@ namespace AgenaTrader.UserCode
 	[OverrulePreviousStopPrice(false)]
 	public class Momentum_up_gap_Condition : UserScriptedCondition
 	{
-		#region Variables
+        #region Variables
 
-		private int _myCondition1 = 1;
+        private int _percentage = 3;
 
-		#endregion
+        #endregion
 
-		protected override void Initialize()
+        protected override void Initialize()
 		{
 			IsEntry = true;
 			IsStop = false;
@@ -54,7 +54,7 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnBarUpdate()
 		{
-            Occurred.Set(Momentum_up_gap_Indicator()[0]);
+            Occurred.Set(Momentum_up_gap_Indicator(this.Percentage)[0]);
         }
 
 
@@ -92,16 +92,19 @@ namespace AgenaTrader.UserCode
 			return new[]{Entry};
 		}
 
-		[Description("")]
-		[Category("Parameters")]
-		public int MyCondition1
-		{
-			get { return _myCondition1; }
-			set { _myCondition1 = Math.Max(1, value); }
-		}
+        /// <summary>
+        /// </summary>
+        [Description("Percentage for the up gap.")]
+        [Category("Parameters")]
+        [DisplayName("Percentage")]
+        public int Percentage
+        {
+            get { return _percentage; }
+            set { _percentage = value; }
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 
@@ -114,17 +117,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Condition Momentum_up_gap_Condition(System.Int32 myCondition1)
+		public Momentum_up_gap_Condition Momentum_up_gap_Condition(System.Int32 percentage)
         {
-			return Momentum_up_gap_Condition(Input, myCondition1);
+			return Momentum_up_gap_Condition(Input, percentage);
 		}
 
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Condition Momentum_up_gap_Condition(IDataSeries input, System.Int32 myCondition1)
+		public Momentum_up_gap_Condition Momentum_up_gap_Condition(IDataSeries input, System.Int32 percentage)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Momentum_up_gap_Condition>(input, i => i.MyCondition1 == myCondition1);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<Momentum_up_gap_Condition>(input, i => i.Percentage == percentage);
 
 			if (indicator != null)
 				return indicator;
@@ -134,7 +137,7 @@ namespace AgenaTrader.UserCode
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
 							Input = input,
-							MyCondition1 = myCondition1
+							Percentage = percentage
 						};
 			indicator.SetUp();
 
@@ -153,20 +156,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Condition Momentum_up_gap_Condition(System.Int32 myCondition1)
+		public Momentum_up_gap_Condition Momentum_up_gap_Condition(System.Int32 percentage)
 		{
-			return LeadIndicator.Momentum_up_gap_Condition(Input, myCondition1);
+			return LeadIndicator.Momentum_up_gap_Condition(Input, percentage);
 		}
 
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Condition Momentum_up_gap_Condition(IDataSeries input, System.Int32 myCondition1)
+		public Momentum_up_gap_Condition Momentum_up_gap_Condition(IDataSeries input, System.Int32 percentage)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.Momentum_up_gap_Condition(input, myCondition1);
+			return LeadIndicator.Momentum_up_gap_Condition(input, percentage);
 		}
 	}
 
@@ -179,17 +182,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Condition Momentum_up_gap_Condition(System.Int32 myCondition1)
+		public Momentum_up_gap_Condition Momentum_up_gap_Condition(System.Int32 percentage)
 		{
-			return LeadIndicator.Momentum_up_gap_Condition(Input, myCondition1);
+			return LeadIndicator.Momentum_up_gap_Condition(Input, percentage);
 		}
 
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Condition Momentum_up_gap_Condition(IDataSeries input, System.Int32 myCondition1)
+		public Momentum_up_gap_Condition Momentum_up_gap_Condition(IDataSeries input, System.Int32 percentage)
 		{
-			return LeadIndicator.Momentum_up_gap_Condition(input, myCondition1);
+			return LeadIndicator.Momentum_up_gap_Condition(input, percentage);
 		}
 	}
 
@@ -202,17 +205,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Condition Momentum_up_gap_Condition(System.Int32 myCondition1)
+		public Momentum_up_gap_Condition Momentum_up_gap_Condition(System.Int32 percentage)
 		{
-			return LeadIndicator.Momentum_up_gap_Condition(Input, myCondition1);
+			return LeadIndicator.Momentum_up_gap_Condition(Input, percentage);
 		}
 
 		/// <summary>
 		/// The force is strong in this instrument.
 		/// </summary>
-		public Momentum_up_gap_Condition Momentum_up_gap_Condition(IDataSeries input, System.Int32 myCondition1)
+		public Momentum_up_gap_Condition Momentum_up_gap_Condition(IDataSeries input, System.Int32 percentage)
 		{
-			return LeadIndicator.Momentum_up_gap_Condition(input, myCondition1);
+			return LeadIndicator.Momentum_up_gap_Condition(input, percentage);
 		}
 	}
 
