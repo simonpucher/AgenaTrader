@@ -32,6 +32,8 @@ namespace AgenaTrader.UserCode
 
         //input
         private int _percentage = 3;
+
+        private bool _showarrows = true;
         private Color _plot0color = Const.DefaultIndicatorColor;
         private int _plot0width = Const.DefaultLineWidth;
         private DashStyle _plot0dashstyle = Const.DefaultIndicatorDashStyle;
@@ -61,6 +63,10 @@ namespace AgenaTrader.UserCode
             if (gapopen >= this.Percentage && gapclose >= this.Percentage)
             {
                 PlotLine.Set(1);
+                if (ShowArrows)
+                {
+                    DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, Color.LightGreen);
+                }
             }
             else
             {
@@ -103,6 +109,17 @@ namespace AgenaTrader.UserCode
             set { _percentage = value; }
         }
 
+
+        /// <summary>
+        /// </summary>
+        [Description("If true then arrows are drawn on the chart.")]
+        [Category("Plots")]
+        [DisplayName("Show arrows")]
+        public bool ShowArrows
+        {
+            get { return _showarrows; }
+            set { _showarrows = value; }
+        }
 
         /// <summary>
         /// </summary>

@@ -31,6 +31,7 @@ namespace AgenaTrader.UserCode
     {
 
         //input
+        private bool _showarrows = true;
         private Color _plot0color = Const.DefaultIndicatorColor;
         private int _plot0width = Const.DefaultLineWidth;
         private DashStyle _plot0dashstyle = Const.DefaultIndicatorDashStyle;
@@ -44,7 +45,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         protected override void Initialize()
         {
-            Add(new Plot(new Pen(this.Plot1Color, this.Plot1Width), PlotStyle.Line, "Plot_Line"));
+            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_Line"));
 
             CalculateOnBarClose = true;
             Overlay = false;
@@ -79,8 +80,11 @@ namespace AgenaTrader.UserCode
             {
                 if (Low[0] > High[1] || High[0] > High[1])
                 {
-                    //DrawDot("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
-                    DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, Color.LightGreen);
+                    if (ShowArrows)
+                    {
+                        //DrawDot("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
+                        DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, Color.LightGreen);
+                    }
                     signal = 1;
                 }
             }
@@ -88,8 +92,11 @@ namespace AgenaTrader.UserCode
             {
                 if (Low[0] < Low[1] || High[0] < Low[1])
                 {
-                    //DrawDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
-                    DrawArrowDown("ArrowShort_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].High, Color.Red);
+                    if (ShowArrows)
+                    {
+                        //DrawDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
+                        DrawArrowDown("ArrowShort_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].High, Color.Red);
+                    }
                     signal = -1;
                 }
             }
@@ -121,6 +128,18 @@ namespace AgenaTrader.UserCode
         public DataSeries PlotLine
         {
             get { return Values[0]; }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("If true then arrows are drawn on the chart.")]
+        [Category("Plots")]
+        [DisplayName("Show arrows")]
+        public bool ShowArrows
+        {
+            get { return _showarrows; }
+            set { _showarrows = value; }
         }
 
 
@@ -203,6 +222,8 @@ namespace AgenaTrader.UserCode
             get { return _plot1dashstyle; }
             set { _plot1dashstyle = value; }
         }
+
+
 
         #endregion
     }
