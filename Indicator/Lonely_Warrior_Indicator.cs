@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: in progress
+/// Version: 1.0
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -82,7 +82,6 @@ namespace AgenaTrader.UserCode
                 {
                     if (ShowArrows)
                     {
-                        //DrawDot("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
                         DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, Color.LightGreen);
                     }
                     signal = 1;
@@ -94,7 +93,6 @@ namespace AgenaTrader.UserCode
                 {
                     if (ShowArrows)
                     {
-                        //DrawDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
                         DrawArrowDown("ArrowShort_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].High, Color.Red);
                     }
                     signal = -1;
@@ -104,6 +102,10 @@ namespace AgenaTrader.UserCode
 
             PlotLine.Set(signal);
 
+
+            PlotColors[0][0] = this.Plot0Color;
+            Plots[0].PenStyle = this.Dash0Style;
+            Plots[0].Pen.Width = this.Plot0Width;
 
         }
 

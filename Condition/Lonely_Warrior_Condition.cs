@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: in progress
+/// Version: 1.0
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -33,20 +33,26 @@ namespace AgenaTrader.UserCode
 	[OverrulePreviousStopPrice(false)]
 	public class Lonely_Warrior_Condition : UserScriptedCondition
 	{
-		#region Variables
+        #region Variables
 
-		private int _myCondition1 = 1;
+        private Color _plot0color = Const.DefaultIndicatorColor;
+        private int _plot0width = Const.DefaultLineWidth;
+        private DashStyle _plot0dashstyle = Const.DefaultIndicatorDashStyle;
+        private Color _plot1color = Const.DefaultIndicatorColor_GreyedOut;
+        private int _plot1width = Const.DefaultLineWidth;
+        private DashStyle _plot1dashstyle = Const.DefaultIndicatorDashStyle;
 
-		#endregion
+        #endregion
 
-		protected override void Initialize()
+        protected override void Initialize()
 		{
 			IsEntry = true;
 			IsStop = false;
 			IsTarget = false;
-			Add(new Plot(Color.FromKnownColor(KnownColor.Black), "Occurred"));
-			Add(new Plot(Color.FromArgb(255, 157, 214, 93), "Entry"));
-			Overlay = true;
+            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Occurred"));
+            Add(new Plot(new Pen(this.Plot0Color, this.Plot1Width), PlotStyle.Line, "Entry"));
+
+            Overlay = false;
 			CalculateOnBarClose = true;
 
             this.BarsRequired = 20;
@@ -54,7 +60,15 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnBarUpdate()
 		{
-            Occurred.Set(Lonely_Warrior_Indicator()[0]);
+            Occurred.Set(LeadIndicator.Lonely_Warrior_Indicator()[0]);
+
+            PlotColors[0][0] = this.Plot0Color;
+            Plots[0].PenStyle = this.Dash0Style;
+            Plots[0].Pen.Width = this.Plot0Width;
+
+            PlotColors[1][0] = this.Plot1Color;
+            Plots[1].PenStyle = this.Dash1Style;
+            Plots[1].Pen.Width = this.Plot1Width;
         }
 
 
@@ -92,16 +106,88 @@ namespace AgenaTrader.UserCode
 			return new[]{Entry};
 		}
 
-		[Description("")]
-		[Category("Parameters")]
-		public int MyCondition1
-		{
-			get { return _myCondition1; }
-			set { _myCondition1 = Math.Max(1, value); }
-		}
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the indicator.")]
+        [Category("Plots")]
+        [DisplayName("Color")]
+        public Color Plot0Color
+        {
+            get { return _plot0color; }
+            set { _plot0color = value; }
+        }
+        // Serialize Color object
+        [Browsable(false)]
+        public string Plot0ColorSerialize
+        {
+            get { return SerializableColor.ToString(_plot0color); }
+            set { _plot0color = SerializableColor.FromString(value); }
+        }
 
-		#endregion
-	}
+        /// <summary>
+        /// </summary>
+        [Description("Line width for indicator.")]
+        [Category("Plots")]
+        [DisplayName("Line width")]
+        public int Plot0Width
+        {
+            get { return _plot0width; }
+            set { _plot0width = Math.Max(1, value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("DashStyle for indicator.")]
+        [Category("Plots")]
+        [DisplayName("DashStyle")]
+        public DashStyle Dash0Style
+        {
+            get { return _plot0dashstyle; }
+            set { _plot0dashstyle = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select color for the indicator.")]
+        [Category("Plots")]
+        [DisplayName("Color")]
+        public Color Plot1Color
+        {
+            get { return _plot1color; }
+            set { _plot1color = value; }
+        }
+        // Serialize Color object
+        [Browsable(false)]
+        public string Plot1ColorSerialize
+        {
+            get { return SerializableColor.ToString(_plot1color); }
+            set { _plot1color = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Line width for indicator.")]
+        [Category("Plots")]
+        [DisplayName("Line width")]
+        public int Plot1Width
+        {
+            get { return _plot1width; }
+            set { _plot1width = Math.Max(1, value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("DashStyle for indicator.")]
+        [Category("Plots")]
+        [DisplayName("DashStyle")]
+        public DashStyle Dash1Style
+        {
+            get { return _plot1dashstyle; }
+            set { _plot1dashstyle = value; }
+        }
+
+        #endregion
+    }
 }
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 
@@ -114,17 +200,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition(System.Int32 myCondition1)
+		public Lonely_Warrior_Condition Lonely_Warrior_Condition()
         {
-			return Lonely_Warrior_Condition(Input, myCondition1);
+			return Lonely_Warrior_Condition(Input);
 		}
 
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition(IDataSeries input, System.Int32 myCondition1)
+		public Lonely_Warrior_Condition Lonely_Warrior_Condition(IDataSeries input)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Lonely_Warrior_Condition>(input, i => i.MyCondition1 == myCondition1);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<Lonely_Warrior_Condition>(input);
 
 			if (indicator != null)
 				return indicator;
@@ -133,8 +219,7 @@ namespace AgenaTrader.UserCode
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
-							MyCondition1 = myCondition1
+							Input = input
 						};
 			indicator.SetUp();
 
@@ -153,20 +238,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition(System.Int32 myCondition1)
+		public Lonely_Warrior_Condition Lonely_Warrior_Condition()
 		{
-			return LeadIndicator.Lonely_Warrior_Condition(Input, myCondition1);
+			return LeadIndicator.Lonely_Warrior_Condition(Input);
 		}
 
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition(IDataSeries input, System.Int32 myCondition1)
+		public Lonely_Warrior_Condition Lonely_Warrior_Condition(IDataSeries input)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.Lonely_Warrior_Condition(input, myCondition1);
+			return LeadIndicator.Lonely_Warrior_Condition(input);
 		}
 	}
 
@@ -179,17 +264,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition(System.Int32 myCondition1)
+		public Lonely_Warrior_Condition Lonely_Warrior_Condition()
 		{
-			return LeadIndicator.Lonely_Warrior_Condition(Input, myCondition1);
+			return LeadIndicator.Lonely_Warrior_Condition(Input);
 		}
 
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition(IDataSeries input, System.Int32 myCondition1)
+		public Lonely_Warrior_Condition Lonely_Warrior_Condition(IDataSeries input)
 		{
-			return LeadIndicator.Lonely_Warrior_Condition(input, myCondition1);
+			return LeadIndicator.Lonely_Warrior_Condition(input);
 		}
 	}
 
@@ -202,17 +287,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition(System.Int32 myCondition1)
+		public Lonely_Warrior_Condition Lonely_Warrior_Condition()
 		{
-			return LeadIndicator.Lonely_Warrior_Condition(Input, myCondition1);
+			return LeadIndicator.Lonely_Warrior_Condition(Input);
 		}
 
 		/// <summary>
 		/// Watch out for the lonely warrior behind enemy lines.
 		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition(IDataSeries input, System.Int32 myCondition1)
+		public Lonely_Warrior_Condition Lonely_Warrior_Condition(IDataSeries input)
 		{
-			return LeadIndicator.Lonely_Warrior_Condition(input, myCondition1);
+			return LeadIndicator.Lonely_Warrior_Condition(input);
 		}
 	}
 
