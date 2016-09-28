@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: in progress
+/// Version: 1.0
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -26,7 +26,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-    [Description("The force is strong in this instrument.")]
+    [Description("Instruments with gaps up tend to go higher.")]
     [IsEntryAttribute(true)]
 	[IsStopAttribute(false)]
 	[IsTargetAttribute(false)]
@@ -37,6 +37,13 @@ namespace AgenaTrader.UserCode
 
         private int _percentage = 3;
 
+        private Color _plot0color = Const.DefaultIndicatorColor;
+        private int _plot0width = Const.DefaultLineWidth;
+        private DashStyle _plot0dashstyle = Const.DefaultIndicatorDashStyle;
+        private Color _plot1color = Const.DefaultIndicatorColor_GreyedOut;
+        private int _plot1width = Const.DefaultLineWidth;
+        private DashStyle _plot1dashstyle = Const.DefaultIndicatorDashStyle;
+
         #endregion
 
         protected override void Initialize()
@@ -44,17 +51,28 @@ namespace AgenaTrader.UserCode
 			IsEntry = true;
 			IsStop = false;
 			IsTarget = false;
-			Add(new Plot(Color.FromKnownColor(KnownColor.Black), "Occurred"));
-			Add(new Plot(Color.FromArgb(255, 157, 214, 93), "Entry"));
-			Overlay = true;
-			CalculateOnBarClose = true;
+
+            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Occurred"));
+            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Entry"));
+
+            Overlay = false;
+			CalculateOnBarClose = false;
+            AutoScale = true;
 
             this.BarsRequired = 20;
         }
 
 		protected override void OnBarUpdate()
 		{
-            Occurred.Set(Momentum_up_gap_Indicator(this.Percentage)[0]);
+            Occurred.Set(LeadIndicator.Momentum_up_gap_Indicator(this.Percentage)[0]);
+
+            PlotColors[0][0] = this.Plot0Color;
+            Plots[0].PenStyle = this.Dash0Style;
+            Plots[0].Pen.Width = this.Plot0Width;
+
+            PlotColors[1][0] = this.Plot1Color;
+            Plots[1].PenStyle = this.Dash1Style;
+            Plots[1].Pen.Width = this.Plot1Width;
         }
 
 
@@ -103,6 +121,88 @@ namespace AgenaTrader.UserCode
             set { _percentage = value; }
         }
 
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the indicator.")]
+        [Category("Plots")]
+        [DisplayName("Color")]
+        public Color Plot0Color
+        {
+            get { return _plot0color; }
+            set { _plot0color = value; }
+        }
+        // Serialize Color object
+        [Browsable(false)]
+        public string Plot0ColorSerialize
+        {
+            get { return SerializableColor.ToString(_plot0color); }
+            set { _plot0color = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Line width for indicator.")]
+        [Category("Plots")]
+        [DisplayName("Line width")]
+        public int Plot0Width
+        {
+            get { return _plot0width; }
+            set { _plot0width = Math.Max(1, value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("DashStyle for indicator.")]
+        [Category("Plots")]
+        [DisplayName("DashStyle")]
+        public DashStyle Dash0Style
+        {
+            get { return _plot0dashstyle; }
+            set { _plot0dashstyle = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the indicator.")]
+        [Category("Plots")]
+        [DisplayName("Color")]
+        public Color Plot1Color
+        {
+            get { return _plot1color; }
+            set { _plot1color = value; }
+        }
+        // Serialize Color object
+        [Browsable(false)]
+        public string Plot1ColorSerialize
+        {
+            get { return SerializableColor.ToString(_plot1color); }
+            set { _plot1color = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Line width for indicator.")]
+        [Category("Plots")]
+        [DisplayName("Line width")]
+        public int Plot1Width
+        {
+            get { return _plot1width; }
+            set { _plot1width = Math.Max(1, value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("DashStyle for indicator.")]
+        [Category("Plots")]
+        [DisplayName("DashStyle")]
+        public DashStyle Dash1Style
+        {
+            get { return _plot1dashstyle; }
+            set { _plot1dashstyle = value; }
+        }
+
+
         #endregion
     }
 }
@@ -115,7 +215,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator
 	{
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Condition Momentum_up_gap_Condition(System.Int32 percentage)
         {
@@ -123,7 +223,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Condition Momentum_up_gap_Condition(IDataSeries input, System.Int32 percentage)
 		{
@@ -154,7 +254,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Condition Momentum_up_gap_Condition(System.Int32 percentage)
 		{
@@ -162,7 +262,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Condition Momentum_up_gap_Condition(IDataSeries input, System.Int32 percentage)
 		{
@@ -180,7 +280,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Condition Momentum_up_gap_Condition(System.Int32 percentage)
 		{
@@ -188,7 +288,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Condition Momentum_up_gap_Condition(IDataSeries input, System.Int32 percentage)
 		{
@@ -203,7 +303,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Condition Momentum_up_gap_Condition(System.Int32 percentage)
 		{
@@ -211,7 +311,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Condition Momentum_up_gap_Condition(IDataSeries input, System.Int32 percentage)
 		{

@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: in progress
+/// Version: 1.0
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -26,7 +26,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-    [Description("The force is strong in this instrument.")]
+    [Description("Instruments with gaps up tend to go higher.")]
     public class Momentum_up_gap_Indicator : UserIndicator
     {
 
@@ -46,7 +46,7 @@ namespace AgenaTrader.UserCode
         {
             Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_Line"));
 
-            CalculateOnBarClose = true;
+            CalculateOnBarClose = false;
             Overlay = false;
             AutoScale = true;
 
@@ -72,7 +72,11 @@ namespace AgenaTrader.UserCode
             {
                 PlotLine.Set(0);
             }
-            
+
+            PlotColors[0][0] = this.Plot0Color;
+            Plots[0].PenStyle = this.Dash0Style;
+            Plots[0].Pen.Width = this.Plot0Width;
+
         }
 
 
@@ -175,7 +179,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator
 	{
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(System.Int32 percentage)
         {
@@ -183,7 +187,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(IDataSeries input, System.Int32 percentage)
 		{
@@ -214,7 +218,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(System.Int32 percentage)
 		{
@@ -222,7 +226,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(IDataSeries input, System.Int32 percentage)
 		{
@@ -240,7 +244,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(System.Int32 percentage)
 		{
@@ -248,7 +252,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(IDataSeries input, System.Int32 percentage)
 		{
@@ -263,7 +267,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(System.Int32 percentage)
 		{
@@ -271,7 +275,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// The force is strong in this instrument.
+		/// Instruments with gaps up tend to go higher.
 		/// </summary>
 		public Momentum_up_gap_Indicator Momentum_up_gap_Indicator(IDataSeries input, System.Int32 percentage)
 		{
