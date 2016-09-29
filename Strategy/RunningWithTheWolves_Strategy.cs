@@ -30,7 +30,7 @@ using System.Linq.Expressions;
 namespace AgenaTrader.UserCode
 {
     [Description("Use SMA or EMA crosses to find trends.")]
-    [TimeFrameRequirements("1 Hour", "1 Day")]
+    //[TimeFrameRequirements("1 Hour", "1 Day")]
 	public class RunningWithTheWolves_Strategy : UserStrategy
 	{
         
@@ -81,7 +81,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         protected override void InitRequirements()
         {
-            Add(this.HigherTimeFrame.Periodicity, this.HigherTimeFrame.PeriodicityValue);
+            //Add(this.HigherTimeFrame.Periodicity, this.HigherTimeFrame.PeriodicityValue);
         }
 
 
@@ -184,11 +184,11 @@ namespace AgenaTrader.UserCode
 
                     _CsvExport["RSI-14-3"] = RSI(Closes[0], 14, 3)[0];
 
-                    //If there is a higher Time Frame configured and we are not on the same time frame.
-                    if (Closes.Count == 2)
-                    {
-                        _CsvExport["RSI-14-3_"+this.HigherTimeFrame.PeriodicityValue.ToString()+this.HigherTimeFrame.Periodicity.ToString()] = RSI(Closes[1], 14, 3)[0];
-                    }
+                    ////If there is a higher Time Frame configured and we are not on the same time frame.
+                    //if (Closes.Count == 2)
+                    //{
+                    //    _CsvExport["RSI-14-3_"+this.HigherTimeFrame.PeriodicityValue.ToString()+this.HigherTimeFrame.Periodicity.ToString()] = RSI(Closes[1], 14, 3)[0];
+                    //}
 
                     // todo columns for trades
                     //TradeDirection;EntryReason;EntryDateTime;EntryPrice;EntryQuantity;EntryOrderType;ExitDateTime;ExitPrice;MinutesInMarket;ExitReason;ExitQuantity;ExitOrderType;PointsDiff;PointsDiffPerc;ProfitLoss;ProfitLossPercent;StopPrice;TargetPrice";
@@ -264,20 +264,20 @@ namespace AgenaTrader.UserCode
 
         #region Input
 
-        private TimeFrame _HigherTimeFrame = new TimeFrame(DatafeedHistoryPeriodicity.Day, 1);
-        /// <summary>
-        /// </summary>
-        [Description("Select the higher time frame for this strategy.")]
-        [Category("Parameters")]
-        [DisplayName("Higher TimeFrame")]
-        public TimeFrame HigherTimeFrame
-        {
-            get { return _HigherTimeFrame; }
-            set
-            {
-                _HigherTimeFrame = value;
-            }
-        }
+        //private TimeFrame _HigherTimeFrame = new TimeFrame(DatafeedHistoryPeriodicity.Day, 1);
+        ///// <summary>
+        ///// </summary>
+        //[Description("Select the higher time frame for this strategy.")]
+        //[Category("Parameters")]
+        //[DisplayName("Higher TimeFrame")]
+        //public TimeFrame HigherTimeFrame
+        //{
+        //    get { return _HigherTimeFrame; }
+        //    set
+        //    {
+        //        _HigherTimeFrame = value;
+        //    }
+        //}
 
 
         /// <summary>
