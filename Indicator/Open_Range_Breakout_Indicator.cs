@@ -331,12 +331,13 @@ namespace AgenaTrader.UserCode
             DateTime returnvalue = new DateTime(date.Year, date.Month, date.Day, this.TimePeriod.StartTime.Hours, this.TimePeriod.StartTime.Minutes, this.TimePeriod.StartTime.Seconds);
 
             //Use CFD data
-            if (bars.Instrument.Symbol.Contains("DE.30") || bars.Instrument.Symbol.Contains("DE-XTB"))
+            if (bars.Instrument.Name.Contains("DE.30"))
             {
                 //return new TimeSpan(9,00,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartDE.Hours, this._tim_OpenRangeStartDE.Minutes, this._tim_OpenRangeStartDE.Seconds);
             }
-            else if (bars.Instrument.Symbol.Contains("US.30") || bars.Instrument.Symbol.Contains("US-XTB"))
+            else if (bars.Instrument.Name.Contains("US.30") || bars.Instrument.Name.Contains("US.2000")
+                || bars.Instrument.Name.Contains("US.100") || bars.Instrument.Name.Contains("US.500"))
             {
                 //return new TimeSpan(15,30,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_OpenRangeStartUS.Hours, this._tim_OpenRangeStartUS.Minutes, this._tim_OpenRangeStartUS.Seconds);
@@ -365,12 +366,13 @@ namespace AgenaTrader.UserCode
             DateTime returnvalue = new DateTime(date.Year, date.Month, date.Day, this.TimePeriod.EndTime.Hours, this.TimePeriod.EndTime.Minutes, this.TimePeriod.EndTime.Seconds);
 
             //Use CFD data
-            if (bars.Instrument.Symbol.Contains("DE.30") || bars.Instrument.Symbol.Contains("DE-XTB"))
+            if (bars.Instrument.Name.Contains("DE.30"))
             {
                 //return new TimeSpan(9,00,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this.Time_EndOfDay_DE.Hours, this.Time_EndOfDay_DE.Minutes, this.Time_EndOfDay_DE.Seconds);
             }
-            else if (bars.Instrument.Symbol.Contains("US.30") || bars.Instrument.Symbol.Contains("US-XTB"))
+            else if (bars.Instrument.Name.Contains("US.30") || bars.Instrument.Name.Contains("US.2000")
+                ||  bars.Instrument.Name.Contains("US.100") || bars.Instrument.Name.Contains("US.500"))
             {
                 //return new TimeSpan(15,30,00);
                 returnvalue = new DateTime(date.Year, date.Month, date.Day, this._tim_EndOfDay_US.Hours, this._tim_EndOfDay_US.Minutes, this._tim_EndOfDay_US.Seconds);
@@ -820,7 +822,7 @@ namespace AgenaTrader.UserCode
 {
 	#region Indicator
 
-	public partial class UserIndicator : Indicator
+	public partial class UserIndicator
 	{
 		/// <summary>
 		/// ORB Indicator

@@ -14,7 +14,7 @@ using AgenaTrader.Helper.TradingManager;
 
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -26,7 +26,8 @@ namespace AgenaTrader.UserCode
 {
 
     [Description("Changes the quantity of an order by clicking on the chart.")]
-	public class ChangeQuantity : UserIndicator
+    [Category("Tools")]
+    public class ChangeQuantity_Tool : UserIndicator
 	{
 		#region Variables
 
@@ -112,14 +113,14 @@ namespace AgenaTrader.UserCode
 
         public override string ToString()
         {
-            return "Change Quantity";
+            return "Change quantity (T)";
         }
 
         public override string DisplayName
         {
             get
             {
-                return "Change Quantity";
+                return "Change quantity (T)";
             }
         }
 
@@ -142,27 +143,27 @@ namespace AgenaTrader.UserCode
 {
 	#region Indicator
 
-	public partial class UserIndicator : Indicator
+	public partial class UserIndicator
 	{
 		/// <summary>
 		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
-		public ChangeQuantity ChangeQuantity()
+		public ChangeQuantity_Tool ChangeQuantity_Tool()
         {
-			return ChangeQuantity(Input);
+			return ChangeQuantity_Tool(Input);
 		}
 
 		/// <summary>
 		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
-		public ChangeQuantity ChangeQuantity(IDataSeries input)
+		public ChangeQuantity_Tool ChangeQuantity_Tool(IDataSeries input)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<ChangeQuantity>(input);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<ChangeQuantity_Tool>(input);
 
 			if (indicator != null)
 				return indicator;
 
-			indicator = new ChangeQuantity
+			indicator = new ChangeQuantity_Tool
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
@@ -185,20 +186,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
-		public ChangeQuantity ChangeQuantity()
+		public ChangeQuantity_Tool ChangeQuantity_Tool()
 		{
-			return LeadIndicator.ChangeQuantity(Input);
+			return LeadIndicator.ChangeQuantity_Tool(Input);
 		}
 
 		/// <summary>
 		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
-		public ChangeQuantity ChangeQuantity(IDataSeries input)
+		public ChangeQuantity_Tool ChangeQuantity_Tool(IDataSeries input)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.ChangeQuantity(input);
+			return LeadIndicator.ChangeQuantity_Tool(input);
 		}
 	}
 
@@ -211,17 +212,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
-		public ChangeQuantity ChangeQuantity()
+		public ChangeQuantity_Tool ChangeQuantity_Tool()
 		{
-			return LeadIndicator.ChangeQuantity(Input);
+			return LeadIndicator.ChangeQuantity_Tool(Input);
 		}
 
 		/// <summary>
 		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
-		public ChangeQuantity ChangeQuantity(IDataSeries input)
+		public ChangeQuantity_Tool ChangeQuantity_Tool(IDataSeries input)
 		{
-			return LeadIndicator.ChangeQuantity(input);
+			return LeadIndicator.ChangeQuantity_Tool(input);
 		}
 	}
 
@@ -234,17 +235,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
-		public ChangeQuantity ChangeQuantity()
+		public ChangeQuantity_Tool ChangeQuantity_Tool()
 		{
-			return LeadIndicator.ChangeQuantity(Input);
+			return LeadIndicator.ChangeQuantity_Tool(Input);
 		}
 
 		/// <summary>
 		/// Changes the quantity of an order by clicking on the chart.
 		/// </summary>
-		public ChangeQuantity ChangeQuantity(IDataSeries input)
+		public ChangeQuantity_Tool ChangeQuantity_Tool(IDataSeries input)
 		{
-			return LeadIndicator.ChangeQuantity(input);
+			return LeadIndicator.ChangeQuantity_Tool(input);
 		}
 	}
 

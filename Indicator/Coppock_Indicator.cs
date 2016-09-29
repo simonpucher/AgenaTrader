@@ -86,7 +86,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		protected override void OnBarUpdate()
 		{
-
+            
 
             if (this.DatafeedPeriodicityIsValid(Bars))
             {
@@ -280,7 +280,7 @@ namespace AgenaTrader.UserCode
 {
 	#region Indicator
 
-	public partial class UserIndicator : Indicator
+	public partial class UserIndicator
 	{
 		/// <summary>
 		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.

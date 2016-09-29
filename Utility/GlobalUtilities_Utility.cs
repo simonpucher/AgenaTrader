@@ -19,10 +19,10 @@ using System.Windows.Forms;
 using System.Data.SqlTypes;
 using System.Linq.Expressions;
 using System.Net;
-using System.IO;
+using System.Globalization;
 
 /// <summary>
-/// Version: 1.5.15
+/// Version: 1.5.17
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -82,12 +82,65 @@ namespace AgenaTrader.UserCode
 
     #region Global static Helper with functions and methods.
 
+    /// <summary>
+    /// Default Soundfiles by AT 
+    /// </summary>
+    public enum Soundfile
+    {
+        Alert1,
+        Alert2,
+        Alert3,
+        Alert4,
+        Announcement,
+        AutoBreakEven,
+        AutoChase,
+        AutoTrail,
+        Blip,
+        Buzz,
+        Camera,
+        cashreg,
+        Connected,
+        ConnectionLost,
+        Limit_order_filled,
+        New,
+        notify,
+        OffsettedChange,
+        OrderCancelled,
+        OrderFilled,
+        OrderPending,
+        PositionClosed,
+        Reversing,
+        ringin,
+        ringout,
+        SOUND136,
+        StopFilled,
+        Stop_limit_order_filled,
+        Stop_order_filled,
+        TargetFilled,
+        WMonline
+    }
 
     /// <summary>
     /// Global static Helper with functions and methods.
     /// </summary>
     public static class GlobalUtilities
     {
+
+        #region Sounds
+
+        /// <summary>
+        /// Return the filename of the Soundfile.
+        /// </summary>
+        /// <param name="soundfile"></param>
+        /// <returns></returns>
+        public static string GetSoundfile(Soundfile soundfile) {
+            string returnfilename = null;
+            returnfilename = soundfile.ToString().Replace("_", "-");
+            returnfilename = returnfilename + ".wav";
+            return returnfilename;
+        }
+
+        #endregion
 
         #region Colors
 
@@ -320,41 +373,82 @@ namespace AgenaTrader.UserCode
             }
         }
 
+
+
+        #endregion
+
+        #region web harvester
+
+        private static decimal _vdax_new_value = 0;
+        private static DateTime? _vdax_new_lastcheck = null;
+        //Opening hours of VDAX are between: 08:50 - 17:50
+        private static TimeSpan _vdax_new_openinghours_open = new TimeSpan(8, 50, 0);
+        private static TimeSpan _vdax_new_openinghours_close = new TimeSpan(17, 50, 0);
+        private static TimeSpan _vdax_new_openinghours_marketdelay = new TimeSpan(0, 15, 0);
+
         /// <summary>
         /// dirty http request for the current VDAX-New value from the onvista website
         /// parsing is pretty dirty but does the job. anyway, expect some improvements or
         /// adaption as soon as the onvista site is changing :D
         /// </summary>
         /// <returns>vdax-new value</returns>
-        public static decimal GetCurrentVdaxNew()
+        public static decimal GetCurrentVdaxNew(int _CheckEveryXSeconds)
         {
-            string url = "http://www.onvista.de/index/VDAX-NEW-Index-12105789";
+            bool checkonline = false;
 
-            //Anfrage an die Übergebene URL starten
-            HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
+            //Check if we have not done this yet.
+            if (_vdax_new_lastcheck == null)
+            {
+                checkonline = true;
+            }
+            //Check the online service each x seconds
+            else if (_vdax_new_lastcheck.Value.AddSeconds(_CheckEveryXSeconds) <= DateTime.Now)
+            {
+                TimeSpan now = DateTime.Now.TimeOfDay;
+                //If the market is closed we do not need to ask the online service
+                if ((now >= _vdax_new_openinghours_open) && (now <= _vdax_new_openinghours_close.Add(_vdax_new_openinghours_marketdelay)))
+                {
+                    checkonline = true;
+                }
+            }
 
-            //Antwort-Objekt erstellen
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
+            //If true we check online for the data
+            if (checkonline)
+            {
+                string url = "http://www.onvista.de/index/VDAX-NEW-Index-12105789";
 
-            //Antwort Stream an Streamreader übergeben
-            StreamReader sr = new StreamReader(response.GetResponseStream());
+                //Anfrage an die Übergebene URL starten
+                HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(url);
 
-            //Antwort (HTML Code) auslesen
-            string html = sr.ReadToEnd();
+                //Antwort-Objekt erstellen
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
 
-            //Streamreader und Webanfrage schließen
-            sr.Close();
-            response.Close();
+                //Antwort Stream an Streamreader übergeben
+                StreamReader sr = new StreamReader(response.GetResponseStream());
+
+                //Antwort (HTML Code) auslesen
+                string html = sr.ReadToEnd();
+
+                //Streamreader und Webanfrage schließen
+                sr.Close();
+                response.Close();
 
 
-            int first = html.IndexOf("<div id=\"Index-Header\">");
+                int first = html.IndexOf("<div id=\"Index-Header\">");
 
-            int EndOfValue = html.IndexOf("</span>", first);
+                int EndOfValue = html.IndexOf("</span>", first);
 
-            return decimal.Parse(html.Substring(EndOfValue - 6, 5));
+                string _vdax_new_string_value = (html.Substring(EndOfValue - 6, 5));
+
+                _vdax_new_string_value = _vdax_new_string_value.Replace(",", CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
+                _vdax_new_value =  decimal.Parse(_vdax_new_string_value, NumberStyles.Any, CultureInfo.InvariantCulture);
+
+                _vdax_new_lastcheck = DateTime.Now;
+            }
+            
+            return _vdax_new_value;
 
         }
-
 
         #endregion
 

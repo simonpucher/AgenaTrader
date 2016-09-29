@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2.5
+/// Version: 1.2.8
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -27,7 +27,8 @@ namespace AgenaTrader.UserCode
     public enum FindHighLowTimeFrame_Type
     {
         Session = 1,
-        Candle = 2
+        Candle = 2,
+        BarsAvailable = 3
     }
 
 	[Description("This indicator finds the high, middle and low value in a dedicated timeframe or the current session.")]
@@ -127,22 +128,22 @@ namespace AgenaTrader.UserCode
                     {
                         if (this.IsDrawLowLineEnabled)
                         {
-                            DrawHorizontalLine("LowLine" + start.Ticks, true, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            DrawHorizontalLine("LowLine" + start.Ticks, this.AutoScale, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                         if (this.IsDrawHighLineEnabled)
                         {
-                            DrawHorizontalLine("HighLine" + start.Ticks, true, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            DrawHorizontalLine("HighLine" + start.Ticks, this.AutoScale, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                         if (this.IsDrawMiddleLineEnabled)
                         {
-                            DrawHorizontalLine("MiddleLine" + start.Ticks, true, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            DrawHorizontalLine("MiddleLine" + start.Ticks, this.AutoScale, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                     }
 
                     //Draw a rectangle at the dedicated time frame
                     if (this.IsDrawAreaplotEnabled)
                     {
-                        DrawRectangle("HighLowRect" + start.Ticks, true, start, this.LastLow, end, this.LastHigh, this.Color_TimeSpan, this.Color_TimeSpan, this.Opacity);
+                        DrawRectangle("HighLowRect" + start.Ticks, this.AutoScale, start, this.LastLow, end, this.LastHigh, this.Color_TimeSpan, this.Color_TimeSpan, this.Opacity);
                     }
                     break;
                 case FindHighLowTimeFrame_Type.Candle:
@@ -153,8 +154,32 @@ namespace AgenaTrader.UserCode
                         double lastmiddle = Bars[this.CandlesAgo].Low + (Bars[this.CandlesAgo].Range / 2);
                         if (this.IsDrawMiddleLineEnabled)
                         {
-                            DrawHorizontalLine("MiddleLineOnCandle" + startcandle.Ticks, true, lastmiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            DrawHorizontalLine("MiddleLineOnCandle" + startcandle.Ticks, this.AutoScale, lastmiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         } 
+                    }
+                    break;
+                case FindHighLowTimeFrame_Type.BarsAvailable:
+                    //Draw it for the candles
+                    if (Bars.Count() >= 1)
+                    {
+                        //We save the high and low values in public variables to get access from other scripts
+                        this.LastLow = Bars.Where(x => x.Low == Bars.Min(y => y.Low)).LastOrDefault().Low;
+                        this.LastHigh = Bars.Where(x => x.High == Bars.Max(y => y.High)).LastOrDefault().High;
+                        this.LastMiddle = this.LastLow + ((this.LastHigh - this.LastLow) / 2);
+
+                        string datenow = DateTime.Now.ToString();
+                        if (this.IsDrawLowLineEnabled)
+                        {
+                            DrawHorizontalLine("LowLine" + datenow, this.AutoScale, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                        }
+                        if (this.IsDrawHighLineEnabled)
+                        {
+                            DrawHorizontalLine("HighLine" + datenow, this.AutoScale, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                        }
+                        if (this.IsDrawMiddleLineEnabled)
+                        {
+                            DrawHorizontalLine("MiddleLine" + datenow, this.AutoScale, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                        }
                     }
                     break;
                 default:
@@ -182,7 +207,7 @@ namespace AgenaTrader.UserCode
 		#region Properties
 
 
-        #region Input
+        #region Input Parameters
 
 
         
@@ -190,41 +215,41 @@ namespace AgenaTrader.UserCode
         /// </summary>
         [Description("Candle will do measurement on candles. Session will to measurement on f.e. the last day.")]
         [Category("Parameters")]
-        [DisplayName("Type")]
+        [DisplayName("0.0 Type")]
         public FindHighLowTimeFrame_Type FindHighLowTimeFrame_Type
         {
             get { return _FindHighLowTimeFrame_Type; }
             set { _FindHighLowTimeFrame_Type = value; }
         }
 
-        /// <summary>
-        /// </summary>
-        [Description("0 is for the current candle. 1 is the candle yesterday. And so on.")]
-        [Category("Parameters")]
-        [DisplayName("Candles ago")]
-        public int CandlesAgo
-        {
-            get { return _CandlesAgo; }
-            set { _CandlesAgo = value; }
-        }
 
         /// <summary>
         /// </summary>
         [Description("0 is for the current session. 1 is the session yesterday. And so on.")]
         [Category("Parameters")]
-        [DisplayName("Sessions ago")]
+        [DisplayName("1.0 Sessions ago")]
         public int Sessionsago
         {
             get { return _sessionsago; }
             set { _sessionsago = value; }
         }
 
-
+        /// <summary>
+        /// </summary>
+        [Description("If true the you are able to specify a dedicated time span.")]
+        [Category("Parameters")]
+        [DisplayName("1.1 Use dedicated time span")]
+        public bool UseDedicatedTimeSpan
+        {
+            get { return _UseDedicatedTimeSpan; }
+            set { _UseDedicatedTimeSpan = value; }
+        }
+        
         /// <summary>
         /// </summary>
         [Description("The start time of the time frame.")]
         [Category("Parameters")]
-        [DisplayName("Start")]
+        [DisplayName("1.2 Start")]
         public TimeSpan Time_Start
         {
             get { return _tim_start; }
@@ -241,7 +266,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         [Description("The end time of the time frame.")]
         [Category("Parameters")]
-        [DisplayName("End")]
+        [DisplayName("1.3 End")]
         public TimeSpan Time_End
         {
             get { return _tim_end; }
@@ -253,22 +278,27 @@ namespace AgenaTrader.UserCode
             get { return _tim_end.Ticks; }
             set { _tim_end = new TimeSpan(value); }
         }
-
+        
 
         /// <summary>
         /// </summary>
-        [Description("If true the you are able to specify a dedicated time span.")]
+        [Description("0 is for the current candle. 1 is the candle yesterday. And so on.")]
         [Category("Parameters")]
-        [DisplayName("Dedicated time span")]
-        public bool UseDedicatedTimeSpan
+        [DisplayName("2.0 Candles ago")]
+        public int CandlesAgo
         {
-            get { return _UseDedicatedTimeSpan; }
-            set { _UseDedicatedTimeSpan = value; }
+            get { return _CandlesAgo; }
+            set { _CandlesAgo = value; }
         }
 
 
 
 
+        #endregion
+
+
+        #region Input Drawings
+        
         /// <summary>
         /// </summary>
         [Description("Opacity for Drawing")]
@@ -290,7 +320,7 @@ namespace AgenaTrader.UserCode
             }
         }
 
-      
+
 
         [XmlIgnore()]
         [Description("Select color for the current session")]
@@ -399,13 +429,12 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-       
 
 
         #region Output
 
 
-   
+
 
 
         /// <summary>
@@ -453,22 +482,22 @@ namespace AgenaTrader.UserCode
 {
 	#region Indicator
 
-	public partial class UserIndicator : Indicator
+	public partial class UserIndicator
 	{
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 candlesAgo, System.Int32 sessionsago, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeSpan)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 sessionsago, System.Boolean useDedicatedTimeSpan, TimeSpan time_Start, TimeSpan time_End, System.Int32 candlesAgo)
         {
-			return FindHighLowTimeFrame_Indicator(Input, findHighLowTimeFrame_Type, candlesAgo, sessionsago, time_Start, time_End, useDedicatedTimeSpan);
+			return FindHighLowTimeFrame_Indicator(Input, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
 		}
 
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 candlesAgo, System.Int32 sessionsago, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeSpan)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 sessionsago, System.Boolean useDedicatedTimeSpan, TimeSpan time_Start, TimeSpan time_End, System.Int32 candlesAgo)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<FindHighLowTimeFrame_Indicator>(input, i => i.FindHighLowTimeFrame_Type == findHighLowTimeFrame_Type && i.CandlesAgo == candlesAgo && i.Sessionsago == sessionsago && i.Time_Start == time_Start && i.Time_End == time_End && i.UseDedicatedTimeSpan == useDedicatedTimeSpan);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<FindHighLowTimeFrame_Indicator>(input, i => i.FindHighLowTimeFrame_Type == findHighLowTimeFrame_Type && i.Sessionsago == sessionsago && i.UseDedicatedTimeSpan == useDedicatedTimeSpan && i.Time_Start == time_Start && i.Time_End == time_End && i.CandlesAgo == candlesAgo);
 
 			if (indicator != null)
 				return indicator;
@@ -479,11 +508,11 @@ namespace AgenaTrader.UserCode
 							CalculateOnBarClose = CalculateOnBarClose,
 							Input = input,
 							FindHighLowTimeFrame_Type = findHighLowTimeFrame_Type,
-							CandlesAgo = candlesAgo,
 							Sessionsago = sessionsago,
+							UseDedicatedTimeSpan = useDedicatedTimeSpan,
 							Time_Start = time_Start,
 							Time_End = time_End,
-							UseDedicatedTimeSpan = useDedicatedTimeSpan
+							CandlesAgo = candlesAgo
 						};
 			indicator.SetUp();
 
@@ -502,20 +531,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 candlesAgo, System.Int32 sessionsago, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeSpan)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 sessionsago, System.Boolean useDedicatedTimeSpan, TimeSpan time_Start, TimeSpan time_End, System.Int32 candlesAgo)
 		{
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, findHighLowTimeFrame_Type, candlesAgo, sessionsago, time_Start, time_End, useDedicatedTimeSpan);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
 		}
 
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 candlesAgo, System.Int32 sessionsago, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeSpan)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 sessionsago, System.Boolean useDedicatedTimeSpan, TimeSpan time_Start, TimeSpan time_End, System.Int32 candlesAgo)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(input, findHighLowTimeFrame_Type, candlesAgo, sessionsago, time_Start, time_End, useDedicatedTimeSpan);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(input, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
 		}
 	}
 
@@ -528,17 +557,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 candlesAgo, System.Int32 sessionsago, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeSpan)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 sessionsago, System.Boolean useDedicatedTimeSpan, TimeSpan time_Start, TimeSpan time_End, System.Int32 candlesAgo)
 		{
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, findHighLowTimeFrame_Type, candlesAgo, sessionsago, time_Start, time_End, useDedicatedTimeSpan);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
 		}
 
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 candlesAgo, System.Int32 sessionsago, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeSpan)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 sessionsago, System.Boolean useDedicatedTimeSpan, TimeSpan time_Start, TimeSpan time_End, System.Int32 candlesAgo)
 		{
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(input, findHighLowTimeFrame_Type, candlesAgo, sessionsago, time_Start, time_End, useDedicatedTimeSpan);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(input, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
 		}
 	}
 
@@ -551,17 +580,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 candlesAgo, System.Int32 sessionsago, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeSpan)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 sessionsago, System.Boolean useDedicatedTimeSpan, TimeSpan time_Start, TimeSpan time_End, System.Int32 candlesAgo)
 		{
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, findHighLowTimeFrame_Type, candlesAgo, sessionsago, time_Start, time_End, useDedicatedTimeSpan);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
 		}
 
 		/// <summary>
 		/// This indicator finds the high, middle and low value in a dedicated timeframe or the current session.
 		/// </summary>
-		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 candlesAgo, System.Int32 sessionsago, TimeSpan time_Start, TimeSpan time_End, System.Boolean useDedicatedTimeSpan)
+		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 sessionsago, System.Boolean useDedicatedTimeSpan, TimeSpan time_Start, TimeSpan time_End, System.Int32 candlesAgo)
 		{
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(input, findHighLowTimeFrame_Type, candlesAgo, sessionsago, time_Start, time_End, useDedicatedTimeSpan);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(input, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
 		}
 	}
 
