@@ -12,9 +12,12 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2
+/// Version: 1.3
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
+/// -------------------------------------------------------------------------
+/// todo
+/// + crv calculation not working on proposals
 /// -------------------------------------------------------------------------
 /// Shows the CRV in the right upper corner of the chart.
 /// -------------------------------------------------------------------------
@@ -27,10 +30,11 @@ namespace AgenaTrader.UserCode
     public class CRV_Indicator_Tool : UserIndicator
 	{
 
+        private static DateTime _lastupdate = DateTime.Now;
         private TextPosition _TextPositionCRV = TextPosition.TopRight;
         private int _FontSizeCRV = 20;
-        private IEnumerable<ITradingTrade> openedtrades = null;
-
+        private int _seconds = 2;
+        private ITradingTrade openedtrade = null;
 
         protected override void Initialize()
 		{
@@ -39,6 +43,19 @@ namespace AgenaTrader.UserCode
         }
 
 
+        protected override void OnStartUp()
+        {
+
+            // Add event listener
+            if (ChartControl != null)
+                ChartControl.ChartPanelMouseMove += ChartControl_ChartPanelMouseMove; ;
+           
+        }
+
+        private void ChartControl_ChartPanelMouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
+        {
+            calculateannddrawdata();
+        }
 
         protected override void OnBarUpdate()
 		{
@@ -49,58 +66,88 @@ namespace AgenaTrader.UserCode
 
         private void calculateannddrawdata() {
 
-            string text = "flat";
-            openedtrades = this.Root.Core.TradingManager.GetOpenedTrades();
-            double crv = 0.0;
-            double entryprice = 0.0;
-            double ordersize = 0.0;
-            double pricestop = 0.0;
-            double pricetarget = 0.0;
-
-            if (openedtrades != null)
+            if (_lastupdate.AddSeconds(this._seconds) < DateTime.Now)
             {
-                foreach (ITradingTrade item in openedtrades)
+                string text = "flat";
+                openedtrade = this.Root.Core.TradingManager.GetOpenedTrade(this.Instrument);
+                //IEnumerable<ITradingOrder> SubmittedOrders = this.Root.Core.TradingManager.SubmittedOrders;
+                //IEnumerable<ITradingOrder> RegisteredOrders = this.Root.Core.TradingManager.RegisteredOrders;
+
+                //IEnumerable<ITradingOrder> ActiveOpenedOrders = this.Root.Core.TradingManager.ActiveOpenedOrders;
+                //IEnumerable<ITradingOrder> ActiveRegisteredOrders = this.Root.Core.TradingManager.ActiveRegisteredOrders;
+                //IEnumerable<ITradingOrder> ActiveSubmittedOrders = this.Root.Core.TradingManager.ActiveSubmittedOrders;
+
+
+
+                //todo _regorders = this.Root.Core.TradingManager.ActiveRegisteredOrders
+                double crv = 0.0;
+                double entryprice = 0.0;
+                //double ordersize = 0.0;
+                //double pricestop = 0.0;
+                //double pricetarget = 0.0;
+
+                if (openedtrade != null)
                 {
-                    if (openedtrades.Count() > 0)
+                    entryprice = openedtrade.EntryPrice;
+                    //ordersize = openedtrade.Quantity;
+                    //PositionType postype = openedtrade.Type;
+
+                    IEnumerable<ITradingOrder> data = this.Root.Core.TradingManager.OpenedOrders.Where(x => x.Instrument.Symbol == this.Instrument.Symbol);
+                    //IIfDoneGroup data = openedtrade.EntryOrder.IfDoneGroup;
+                    if (data != null)
                     {
-                        entryprice = openedtrades.First().EntryPrice;
-                        ordersize = openedtrades.First().Quantity;
-                        IIfDoneGroup data = item.EntryOrder.IfDoneGroup;
-                        if (data != null)
+                        double up = 0.0;
+                        double down = 0.0;
+
+                        foreach (ITradingOrder tradord in data)
                         {
-                            foreach (ITradingOrder tradord in data)
+                            if (tradord.IsOrderOpened)
                             {
-                                if (tradord.IsOrderOpened)
+
+                                //if (tradord.IsStopLoss)
+                                if (tradord.Type == OrderType.Stop)
                                 {
-                                    if (tradord.IsStopLoss)
-                                    {
-                                        pricestop = tradord.StopPrice;
-                                    }
-                                    else
-                                    {
-                                        pricetarget = tradord.Price;
-                                    }
+                                    //pricestop = tradord.StopPrice;
+                                    down = down + (entryprice - tradord.StopPrice);
+                                }
+                                else
+                                {
+                                    //pricetarget = tradord.Price;
+                                    up = up + (tradord.Price - entryprice);
                                 }
                             }
-                            crv = Math.Abs(((entryprice - pricetarget) * ordersize) / ((entryprice - pricestop) * ordersize));
                         }
+                        //crv = Math.Abs(((entryprice - pricetarget) * ordersize) / ((entryprice - pricestop) * ordersize));
+                        crv = up / down;
                     }
                 }
-            }
-            if (crv != 0.0)
-            {
-                if (pricetarget > entryprice && pricestop > entryprice)
-                {
-                    text = "no risk";
-                }
-                else
+                if (crv != 0.0)
                 {
                     text = Math.Round(crv, 3).ToString();
+
+                    //if (pricetarget > entryprice && pricestop > entryprice)
+                    //{
+                    //    text = "no risk";
+                    //}
+                    //else
+                    //{
+                    //    text = Math.Round(crv, 3).ToString();
+                    //}
                 }
+                DrawTextFixed("CRV_string", text, this.TextPositionCRV, Color.Black, new Font("Arial", this.FontSizeCRV, FontStyle.Regular), Color.Transparent, Color.Transparent);
+                _lastupdate = DateTime.Now;
             }
-            DrawTextFixed("CRV_string", text, this.TextPositionCRV, Color.Black, new Font("Arial", this.FontSizeCRV, FontStyle.Regular), Color.Transparent, Color.Transparent);
+           
         }
 
+
+        protected override void OnTermination()
+        {
+            // Remove event listener
+            if (ChartControl != null)
+                ChartControl.ChartPanelMouseMove -= ChartControl_ChartPanelMouseMove;
+        }
+        
 
 
         public override string ToString()
