@@ -12,14 +12,14 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.3
+/// Version: 1.3.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
 /// todo
 /// + crv calculation not working on proposals
 /// -------------------------------------------------------------------------
-/// Shows the CRV in the right upper corner of the chart.
+/// Shows the CRV of your current trade in the right upper corner of the chart.
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -45,11 +45,11 @@ namespace AgenaTrader.UserCode
 
         protected override void OnStartUp()
         {
-
             // Add event listener
             if (ChartControl != null)
-                ChartControl.ChartPanelMouseMove += ChartControl_ChartPanelMouseMove; ;
-           
+                ChartControl.ChartPanelMouseMove += ChartControl_ChartPanelMouseMove;
+
+            calculateannddrawdata(true);
         }
 
         private void ChartControl_ChartPanelMouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
@@ -64,9 +64,9 @@ namespace AgenaTrader.UserCode
         
 
 
-        private void calculateannddrawdata() {
+        private void calculateannddrawdata(bool force = false) {
 
-            if (_lastupdate.AddSeconds(this._seconds) < DateTime.Now)
+            if (force || _lastupdate.AddSeconds(this._seconds) < DateTime.Now)
             {
                 string text = "flat";
                 openedtrade = this.Root.Core.TradingManager.GetOpenedTrade(this.Instrument);
@@ -78,18 +78,35 @@ namespace AgenaTrader.UserCode
                 //IEnumerable<ITradingOrder> ActiveSubmittedOrders = this.Root.Core.TradingManager.ActiveSubmittedOrders;
 
 
-
-                //todo _regorders = this.Root.Core.TradingManager.ActiveRegisteredOrders
                 double crv = 0.0;
                 double entryprice = 0.0;
-                //double ordersize = 0.0;
+
+
+                //IEnumerable<ITradingOrder>  _regorders = this.Root.Core.TradingManager.ActiveRegisteredOrders.Where(x=>x.Instrument.Symbol == this.Instrument.Symbol);
+                //if (_regorders != null && _regorders.Count() > 0)
+                //{
+                //    double up = 0.0;
+                //    double down = 0.0;
+
+                //    foreach (ITradingOrder item in _regorders)
+                //    {
+                //        //TODO        
+                //    }
+                //    crv = up / down;
+                //}
+
+
+
+
+
+                double ordersize = 0.0;
                 //double pricestop = 0.0;
                 //double pricetarget = 0.0;
 
                 if (openedtrade != null)
                 {
                     entryprice = openedtrade.EntryPrice;
-                    //ordersize = openedtrade.Quantity;
+                    ordersize = openedtrade.Quantity;
                     //PositionType postype = openedtrade.Type;
 
                     IEnumerable<ITradingOrder> data = this.Root.Core.TradingManager.OpenedOrders.Where(x => x.Instrument.Symbol == this.Instrument.Symbol);
@@ -107,13 +124,13 @@ namespace AgenaTrader.UserCode
                                 //if (tradord.IsStopLoss)
                                 if (tradord.Type == OrderType.Stop)
                                 {
-                                    //pricestop = tradord.StopPrice;
                                     down = down + (entryprice - tradord.StopPrice);
+                                    //down = down + ((entryprice * ordersize) - (tradord.StopPrice * tradord.Quantity));
                                 }
                                 else
                                 {
-                                    //pricetarget = tradord.Price;
                                     up = up + (tradord.Price - entryprice);
+                                    //up = up + ((tradord.Price * tradord.Quantity) - (entryprice * ordersize));
                                 }
                             }
                         }
@@ -121,6 +138,8 @@ namespace AgenaTrader.UserCode
                         crv = up / down;
                     }
                 }
+
+
                 if (crv != 0.0)
                 {
                     text = Math.Round(crv, 3).ToString();
@@ -212,17 +231,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool(TextPosition textPositionCRV, System.Int32 fontSizeCRV)
+		public CRV_Indicator_Tool CRV_Indicator_Tool()
         {
-			return CRV_Indicator_Tool(Input, textPositionCRV, fontSizeCRV);
+			return CRV_Indicator_Tool(Input);
 		}
 
 		/// <summary>
 		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input, TextPosition textPositionCRV, System.Int32 fontSizeCRV)
+		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<CRV_Indicator_Tool>(input, i => i.TextPositionCRV == textPositionCRV && i.FontSizeCRV == fontSizeCRV);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<CRV_Indicator_Tool>(input);
 
 			if (indicator != null)
 				return indicator;
@@ -231,9 +250,7 @@ namespace AgenaTrader.UserCode
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
-							TextPositionCRV = textPositionCRV,
-							FontSizeCRV = fontSizeCRV
+							Input = input
 						};
 			indicator.SetUp();
 
@@ -252,20 +269,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool(TextPosition textPositionCRV, System.Int32 fontSizeCRV)
+		public CRV_Indicator_Tool CRV_Indicator_Tool()
 		{
-			return LeadIndicator.CRV_Indicator_Tool(Input, textPositionCRV, fontSizeCRV);
+			return LeadIndicator.CRV_Indicator_Tool(Input);
 		}
 
 		/// <summary>
 		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input, TextPosition textPositionCRV, System.Int32 fontSizeCRV)
+		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.CRV_Indicator_Tool(input, textPositionCRV, fontSizeCRV);
+			return LeadIndicator.CRV_Indicator_Tool(input);
 		}
 	}
 
@@ -278,17 +295,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool(TextPosition textPositionCRV, System.Int32 fontSizeCRV)
+		public CRV_Indicator_Tool CRV_Indicator_Tool()
 		{
-			return LeadIndicator.CRV_Indicator_Tool(Input, textPositionCRV, fontSizeCRV);
+			return LeadIndicator.CRV_Indicator_Tool(Input);
 		}
 
 		/// <summary>
 		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input, TextPosition textPositionCRV, System.Int32 fontSizeCRV)
+		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input)
 		{
-			return LeadIndicator.CRV_Indicator_Tool(input, textPositionCRV, fontSizeCRV);
+			return LeadIndicator.CRV_Indicator_Tool(input);
 		}
 	}
 
@@ -301,17 +318,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool(TextPosition textPositionCRV, System.Int32 fontSizeCRV)
+		public CRV_Indicator_Tool CRV_Indicator_Tool()
 		{
-			return LeadIndicator.CRV_Indicator_Tool(Input, textPositionCRV, fontSizeCRV);
+			return LeadIndicator.CRV_Indicator_Tool(Input);
 		}
 
 		/// <summary>
 		/// Shows the CRV of your current trade in the right upper corner of the chart.
 		/// </summary>
-		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input, TextPosition textPositionCRV, System.Int32 fontSizeCRV)
+		public CRV_Indicator_Tool CRV_Indicator_Tool(IDataSeries input)
 		{
-			return LeadIndicator.CRV_Indicator_Tool(input, textPositionCRV, fontSizeCRV);
+			return LeadIndicator.CRV_Indicator_Tool(input);
 		}
 	}
 
