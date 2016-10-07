@@ -74,9 +74,7 @@ namespace AgenaTrader.UserCode
             {
                 string text = "flat";
 
-
                
-
                 //openedtrade = this.Root.Core.TradingManager.GetOpenedTrade(this.Instrument);
                 //IEnumerable<ITradingOrder> SubmittedOrders = this.Root.Core.TradingManager.SubmittedOrders;
                 //IEnumerable<ITradingOrder> RegisteredOrders = this.Root.Core.TradingManager.RegisteredOrders;
