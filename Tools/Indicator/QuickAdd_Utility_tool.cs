@@ -35,8 +35,7 @@ namespace AgenaTrader.UserCode
         private RectangleF _rect2;
         //private Pen _pen = Pens.Black;
         private Brush _brush = Brushes.Gray;
-
-        private static Dictionary<string, DateTime> _timestamp_list = null;
+        
 
         #endregion
 
@@ -159,15 +158,7 @@ namespace AgenaTrader.UserCode
                     g.FillRectangle(tempbrush, _rect);
                     g.DrawString(Shortcut_list, font1, Brushes.White, _rect, stringFormat);
                     _rect2 = new RectangleF(r.Width - 100, 40, 86, 27);
-                    string datum = "-";
-                    if (this.TimestampList != null && this.TimestampList.ContainsKey(this.Instrument.Symbol))
-                    {
-                        datum = this.TimestampList[this.Instrument.Symbol].ToString();
-                    }
-                    using (Font font2 = new Font("Arial", 8, FontStyle.Regular, GraphicsUnit.Point))
-                    {
-                        g.DrawString(datum, font2, Brushes.Black, _rect2, stringFormat);
-                    }
+                  
                     //g.DrawRectangle(_pen, Rectangle.Round(_rect));
                 }
             }
@@ -185,12 +176,10 @@ namespace AgenaTrader.UserCode
                 if (!_list.Contains((Instrument)this.Instrument))
                 {
                     this.Root.Core.InstrumentManager.AddInstrument2List(this.Instrument, this.Name_of_list);
-                    this.AddToTimestamplist(this.Instrument);
                 }
                 else
                 {
                     this.Root.Core.InstrumentManager.RemoveInstrumentFromList(this.Name_of_list, this.Instrument);
-                    this.RemoveFromTimeStamplist(this.Instrument);
                 }
             }
             else
@@ -203,22 +192,6 @@ namespace AgenaTrader.UserCode
         }
 
 
-        private void AddToTimestamplist(IInstrument instrument) {
-            if (_timestamp_list == null)
-            {
-                _timestamp_list = new Dictionary<string, DateTime>();
-            }
-            _timestamp_list.Add(instrument.Symbol, DateTime.Now);
-        }
-
-        private void RemoveFromTimeStamplist(IInstrument instrument)
-        {
-            if (_timestamp_list == null)
-            {
-                _timestamp_list = new Dictionary<string, DateTime>();
-            }
-            _timestamp_list.Remove(instrument.Symbol);
-        }
 
         #endregion
 
@@ -236,11 +209,6 @@ namespace AgenaTrader.UserCode
         //    }
 
 
-        public Dictionary<string, DateTime> TimestampList {
-            get {
-                return _timestamp_list;
-                } 
-            }
 
         #endregion
 
