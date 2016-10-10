@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -62,19 +62,39 @@ namespace AgenaTrader.UserCode
         protected override void OnBarUpdate()
         {
 
-      
-
             ADX adx = ADX(14);
             EMA ema = EMA(20);
+            RSI rsi = RSI(14, 3);
 
             double singnaldata = 0;
 
 
             if (adx[0] > 30 && adx[0] > adx[1] && Input[0] <= ema[0])
             {
-                singnaldata = 1;
-                DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, Color.Green);
+                Color color = Color.Green;
+                if (rsi[0] <= 30)
+                {
+                    color = Color.LightGreen;
+                    singnaldata = 1;
+                }
+                else
+                {
+                    singnaldata = 0.5;
+                }
+                DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, color);
             }
+
+            //ADX adx = ADX(14);
+            //EMA ema = EMA(20);
+
+            //double singnaldata = 0;
+
+
+            //if (adx[0] > 30 && adx[0] > adx[1] && Input[0] <= ema[0])
+            //{
+            //    singnaldata = 1;
+            //    DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, Color.Green);
+            //}
 
 
             SignalLine.Set(singnaldata);
