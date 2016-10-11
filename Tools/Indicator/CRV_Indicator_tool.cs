@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.3.4
+/// Version: 1.3.5
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -36,6 +36,7 @@ namespace AgenaTrader.UserCode
         private int _FontSizeCRV = 20;
         private int _seconds = 2;
         private ITradingTrade openedtrade = null;
+        private int _rounddecimal = 3;
 
         protected override void Initialize()
 		{
@@ -49,12 +50,16 @@ namespace AgenaTrader.UserCode
             // Add event listener
             if (ChartControl != null)
                 ChartControl.ChartPanelMouseMove += ChartControl_ChartPanelMouseMove;
-
+  
             calculateannddrawdata(true);
         }
 
+       
+
         private void ChartControl_ChartPanelMouseMove(object sender, System.Windows.Forms.MouseEventArgs e)
         {
+            //DrawTextFixed("debug_string", "x: " + e.X + " y: "+e.Y, this.TextPositionCRV, Color.Black, new Font("Arial", this.FontSizeCRV, FontStyle.Regular), Color.Transparent, Color.Transparent);
+
             calculateannddrawdata();
         }
 
@@ -85,8 +90,11 @@ namespace AgenaTrader.UserCode
 
 
                 double crv = 0.0;
+                double crv_price = 0.0;
                 double up = 0.0;
                 double down = 0.0;
+                double up_price = 0.0;
+                double down_price = 0.0;
 
 
                 //IEnumerable<ITradingOrder> _regorders = this.Root.Core.TradingManager.ActiveRegisteredOrders.Where(x => x.Instrument.Symbol == this.Instrument.Symbol);
@@ -98,10 +106,10 @@ namespace AgenaTrader.UserCode
                 //    {
 
                 //    }
-                    
+
                 //}
 
-               
+
 
                 IEnumerable<ITradingOrder> _openorders = this.Root.Core.TradingManager.OpenedOrders.Where(x => x.Instrument.Symbol == this.Instrument.Symbol);
 
@@ -131,10 +139,12 @@ namespace AgenaTrader.UserCode
                             if (price < TradeInfo.AvgPrice && TradeInfo.MarketPosition == PositionType.Long
                                 || price > TradeInfo.AvgPrice && TradeInfo.MarketPosition == PositionType.Short)
                             {
+                                down_price = down_price + (TradeInfo.AvgPrice - item.StopPrice);
                                 down = down + ((TradeInfo.AvgPrice * item.Quantity) - (item.StopPrice * item.Quantity));
                             }
                             else
                             {
+                                up_price = up_price + (item.Price - TradeInfo.AvgPrice);
                                 up = up + ((item.Price * item.Quantity) - (TradeInfo.AvgPrice * item.Quantity));
                             }
                         }
@@ -144,49 +154,10 @@ namespace AgenaTrader.UserCode
 
 
 
-
-
-                //double ordersize = 0.0;
-                //double pricestop = 0.0;
-                //double pricetarget = 0.0;
-
-                //if (openedtrade != null)
-                //{
-                //    entryprice = openedtrade.EntryPrice;
-                //    ordersize = openedtrade.Quantity;
-                //    //PositionType postype = openedtrade.Type;
-
-                //    IEnumerable<ITradingOrder> data = this.Root.Core.TradingManager.OpenedOrders.Where(x => x.Instrument.Symbol == this.Instrument.Symbol);
-                //    //IIfDoneGroup data = openedtrade.EntryOrder.IfDoneGroup;
-                //    if (data != null)
-                //    {
-                //        double up = 0.0;
-                //        double down = 0.0;
-
-                //        foreach (ITradingOrder tradord in data)
-                //        {
-                //            if (tradord.IsOrderOpened)
-                //            {
-
-                //                //if (tradord.IsStopLoss)
-                //                if (tradord.Type == OrderType.Stop)
-                //                {
-                //                    down = down + (entryprice - tradord.StopPrice);
-                //                    //down = down + ((entryprice * ordersize) - (tradord.StopPrice * tradord.Quantity));
-                //                }
-                //                else
-                //                {
-                //                    up = up + (tradord.Price - entryprice);
-                //                    //up = up + ((tradord.Price * tradord.Quantity) - (entryprice * ordersize));
-                //                }
-                //            }
-                //        }
-                //        //crv = Math.Abs(((entryprice - pricetarget) * ordersize) / ((entryprice - pricestop) * ordersize));
-                //        crv = up / down;
-                //    }
-                //}
+              
 
                 crv = up / down;
+                crv_price = up_price / down_price;
 
                 if (down == 0.0 && up != 0.0)
                 {
@@ -215,7 +186,7 @@ namespace AgenaTrader.UserCode
                 }
                 else
                 {
-                    text = Math.Round(crv, 3).ToString();
+                    text = Math.Round(crv, this.RoundDecimal).ToString() + " / " + Math.Round(crv_price, this.RoundDecimal).ToString();
                 }
                
                 DrawTextFixed("CRV_string", text, this.TextPositionCRV, Color.Black, new Font("Arial", this.FontSizeCRV, FontStyle.Regular), Color.Transparent, Color.Transparent);
@@ -262,6 +233,17 @@ namespace AgenaTrader.UserCode
             set { _TextPositionCRV = value; }
         }
 
+
+        /// <summary>
+        /// </summary>
+        [Description("Round to decimal numbers.")]
+        [Category("Parameters")]
+        [DisplayName("Decimal numbers")]
+        public int RoundDecimal
+        {
+            get { return _rounddecimal; }
+            set { _rounddecimal = value; }
+        }
 
         /// <summary>
         /// </summary>
