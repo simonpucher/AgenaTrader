@@ -1,0 +1,371 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Drawing;
+using System.Drawing.Drawing2D;
+using System.Linq;
+using System.Xml;
+using System.Xml.Serialization;
+using AgenaTrader.API;
+using AgenaTrader.Custom;
+using AgenaTrader.Plugins;
+using AgenaTrader.Helper;
+
+/// <summary>
+/// Version: 1.1
+/// -------------------------------------------------------------------------
+/// Simon Pucher 2016
+/// -------------------------------------------------------------------------
+/// Description http://lindaraschke.net/wp-content/uploads/2013/11/august1997.pdf
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this script without any error you also need access to the utility indicator to use global source code elements.
+/// You will find this script on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
+namespace AgenaTrader.UserCode
+{
+    [Description("Watch out for the lonely warrior behind enemy lines.")]
+    public class Holy_Grail_Indicator : UserIndicator
+    {
+
+        //input
+        private bool _showarrows = true;
+        private Color _plot0color = Const.DefaultIndicatorColor;
+        private int _plot0width = Const.DefaultLineWidth;
+        private DashStyle _plot0dashstyle = Const.DefaultIndicatorDashStyle;
+        private Color _plot1color = Const.DefaultIndicatorColor_GreyedOut;
+        private int _plot1width = Const.DefaultLineWidth;
+        private DashStyle _plot1dashstyle = Const.DefaultIndicatorDashStyle;
+
+
+        /// <summary>
+        /// This method is used to configure the indicator and is called once before any bar data is loaded.
+        /// </summary>
+        protected override void Initialize()
+        {
+            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_Line1"));
+            Add(new Plot(new Pen(this.Plot1Color, this.Plot1Width), PlotStyle.Line, "Plot_Line2"));
+            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_Line3"));
+
+            CalculateOnBarClose = true;
+            Overlay = false;
+            AutoScale = true;
+
+            //Because of Backtesting reasons if we use the advanced mode we need at least two bars
+            this.BarsRequired = 20;
+        }
+
+   
+
+        protected override void OnBarUpdate()
+        {
+
+            ADX adx = ADX(14);
+            EMA ema = EMA(20);
+            RSI rsi = RSI(14, 3);
+
+            double singnaldata = 0;
+
+
+            if (adx[0] > 30 && adx[0] > adx[1] && Input[0] <= ema[0])
+            {
+                Color color = Color.Green;
+                if (rsi[0] <= 30)
+                {
+                    color = Color.LightGreen;
+                    singnaldata = 1;
+                }
+                else
+                {
+                    singnaldata = 0.5;
+                }
+                DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, color);
+            }
+
+            //ADX adx = ADX(14);
+            //EMA ema = EMA(20);
+
+            //double singnaldata = 0;
+
+
+            //if (adx[0] > 30 && adx[0] > adx[1] && Input[0] <= ema[0])
+            //{
+            //    singnaldata = 1;
+            //    DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, Color.Green);
+            //}
+
+
+            SignalLine.Set(singnaldata);
+            PlotLine_ADX.Set(adx[0]);
+            PlotLine_XMA.Set(ema[0]);
+
+
+
+            PlotColors[0][0] = this.Plot0Color;
+            Plots[0].PenStyle = this.Dash0Style;
+            Plots[0].Pen.Width = this.Plot0Width;
+
+            PlotColors[1][0] = this.Plot1Color;
+            Plots[1].PenStyle = this.Dash1Style;
+            Plots[1].Pen.Width = this.Plot1Width;
+
+            PlotColors[2][0] = this.Plot1Color;
+            Plots[2].PenStyle = this.Dash1Style;
+            Plots[2].Pen.Width = this.Plot1Width;
+
+        }
+
+
+        public override string ToString()
+        {
+            return "Holy Grail (I)";
+        }
+
+        public override string DisplayName
+        {
+            get
+            {
+                return "Holy Grail (I)";
+            }
+        }
+
+        #region Properties
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public DataSeries SignalLine
+        {
+            get { return Values[0]; }
+        }
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public DataSeries PlotLine_ADX
+        {
+            get { return Values[1]; }
+        }
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public DataSeries PlotLine_XMA
+        {
+            get { return Values[2]; }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("If true then arrows are drawn on the chart.")]
+        [Category("Plots")]
+        [DisplayName("Show arrows")]
+        public bool ShowArrows
+        {
+            get { return _showarrows; }
+            set { _showarrows = value; }
+        }
+
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the indicator.")]
+        [Category("Plots")]
+        [DisplayName("Color")]
+        public Color Plot0Color
+        {
+            get { return _plot0color; }
+            set { _plot0color = value; }
+        }
+        // Serialize Color object
+        [Browsable(false)]
+        public string Plot0ColorSerialize
+        {
+            get { return SerializableColor.ToString(_plot0color); }
+            set { _plot0color = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Line width for indicator.")]
+        [Category("Plots")]
+        [DisplayName("Line width")]
+        public int Plot0Width
+        {
+            get { return _plot0width; }
+            set { _plot0width = Math.Max(1, value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("DashStyle for indicator.")]
+        [Category("Plots")]
+        [DisplayName("DashStyle")]
+        public DashStyle Dash0Style
+        {
+            get { return _plot0dashstyle; }
+            set { _plot0dashstyle = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select color for the indicator.")]
+        [Category("Plots")]
+        [DisplayName("Color")]
+        public Color Plot1Color
+        {
+            get { return _plot1color; }
+            set { _plot1color = value; }
+        }
+        // Serialize Color object
+        [Browsable(false)]
+        public string Plot1ColorSerialize
+        {
+            get { return SerializableColor.ToString(_plot1color); }
+            set { _plot1color = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Line width for indicator.")]
+        [Category("Plots")]
+        [DisplayName("Line width")]
+        public int Plot1Width
+        {
+            get { return _plot1width; }
+            set { _plot1width = Math.Max(1, value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("DashStyle for indicator.")]
+        [Category("Plots")]
+        [DisplayName("DashStyle")]
+        public DashStyle Dash1Style
+        {
+            get { return _plot1dashstyle; }
+            set { _plot1dashstyle = value; }
+        }
+
+
+
+        #endregion
+    }
+}
+#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
+
+namespace AgenaTrader.UserCode
+{
+	#region Indicator
+
+	public partial class UserIndicator
+	{
+		/// <summary>
+		/// Watch out for the lonely warrior behind enemy lines.
+		/// </summary>
+		public Holy_Grail_Indicator Holy_Grail_Indicator()
+        {
+			return Holy_Grail_Indicator(Input);
+		}
+
+		/// <summary>
+		/// Watch out for the lonely warrior behind enemy lines.
+		/// </summary>
+		public Holy_Grail_Indicator Holy_Grail_Indicator(IDataSeries input)
+		{
+			var indicator = CachedCalculationUnits.GetCachedIndicator<Holy_Grail_Indicator>(input);
+
+			if (indicator != null)
+				return indicator;
+
+			indicator = new Holy_Grail_Indicator
+						{
+							BarsRequired = BarsRequired,
+							CalculateOnBarClose = CalculateOnBarClose,
+							Input = input
+						};
+			indicator.SetUp();
+
+			CachedCalculationUnits.AddIndicator2Cache(indicator);
+
+			return indicator;
+		}
+	}
+
+	#endregion
+
+	#region Strategy
+
+	public partial class UserStrategy
+	{
+		/// <summary>
+		/// Watch out for the lonely warrior behind enemy lines.
+		/// </summary>
+		public Holy_Grail_Indicator Holy_Grail_Indicator()
+		{
+			return LeadIndicator.Holy_Grail_Indicator(Input);
+		}
+
+		/// <summary>
+		/// Watch out for the lonely warrior behind enemy lines.
+		/// </summary>
+		public Holy_Grail_Indicator Holy_Grail_Indicator(IDataSeries input)
+		{
+			if (InInitialize && input == null)
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+
+			return LeadIndicator.Holy_Grail_Indicator(input);
+		}
+	}
+
+	#endregion
+
+	#region Column
+
+	public partial class UserColumn
+	{
+		/// <summary>
+		/// Watch out for the lonely warrior behind enemy lines.
+		/// </summary>
+		public Holy_Grail_Indicator Holy_Grail_Indicator()
+		{
+			return LeadIndicator.Holy_Grail_Indicator(Input);
+		}
+
+		/// <summary>
+		/// Watch out for the lonely warrior behind enemy lines.
+		/// </summary>
+		public Holy_Grail_Indicator Holy_Grail_Indicator(IDataSeries input)
+		{
+			return LeadIndicator.Holy_Grail_Indicator(input);
+		}
+	}
+
+	#endregion
+
+	#region Scripted Condition
+
+	public partial class UserScriptedCondition
+	{
+		/// <summary>
+		/// Watch out for the lonely warrior behind enemy lines.
+		/// </summary>
+		public Holy_Grail_Indicator Holy_Grail_Indicator()
+		{
+			return LeadIndicator.Holy_Grail_Indicator(Input);
+		}
+
+		/// <summary>
+		/// Watch out for the lonely warrior behind enemy lines.
+		/// </summary>
+		public Holy_Grail_Indicator Holy_Grail_Indicator(IDataSeries input)
+		{
+			return LeadIndicator.Holy_Grail_Indicator(input);
+		}
+	}
+
+	#endregion
+
+}
+
+#endregion
