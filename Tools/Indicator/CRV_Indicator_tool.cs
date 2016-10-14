@@ -16,6 +16,9 @@ using AgenaTrader.Helper;
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
+/// todo
+/// + synthetic orders does not work
+/// -------------------------------------------------------------------------
 /// Shows the CRV of your current trade in the right upper corner of the chart.
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
