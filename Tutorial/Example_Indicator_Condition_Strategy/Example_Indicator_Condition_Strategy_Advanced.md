@@ -1,2 +1,1 @@
-#Template for Indicator, Condition and Strategy
-[This tutorial has moved to the official AgenaTrader repository](https://agenatrader.github.io/Tutorials/)
+This posting has moved to our blog: http://script-trading.com/blog/
