@@ -85,9 +85,10 @@ namespace AgenaTrader.UserCode
         private Color _col_target_long = Color.PaleGreen;
 
         private int _orbminutes = Const.DefaultOpenRangeSizeinMinutes;
-        private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);   
-        private TimeSpan _tim_OpenRangeStartUS = new TimeSpan(15, 30, 0);   
-        private TimeSpan _tim_EndOfDay_DE = new TimeSpan(17, 30, 0);  
+        private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(8, 0, 0);
+        private TimeSpan _tim_OpenRangeStartUS = new TimeSpan(14, 30, 0);
+
+        private TimeSpan _tim_EndOfDay_DE = new TimeSpan(17, 30, 0);
         private TimeSpan _tim_EndOfDay_US = new TimeSpan(22, 00, 0);
 
 
