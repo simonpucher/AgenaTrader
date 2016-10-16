@@ -18,6 +18,8 @@ using AgenaTrader.Helper;
 /// -------------------------------------------------------------------------
 /// todo
 /// + synthetic orders does not work
+/// + show crv in scanner column
+/// + calculate crv with account data 
 /// -------------------------------------------------------------------------
 /// Shows the CRV of your current trade in the right upper corner of the chart.
 /// -------------------------------------------------------------------------
