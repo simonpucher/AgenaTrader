@@ -45,14 +45,12 @@ namespace AgenaTrader.UserCode
         private int _plot1width = Const.DefaultLineWidth;
         private DashStyle _plot1dashstyle = Const.DefaultIndicatorDashStyle;
 
-        private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(9, 0, 0);
-        //private TimeSpan _tim_OpenRangeEndDE = new TimeSpan(10, 15, 0);  
-
-        private TimeSpan _tim_OpenRangeStartUS = new TimeSpan(15, 30, 0);
-        //private TimeSpan _tim_OpenRangeEndUS = new TimeSpan(16, 45, 0);    
+        private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(8, 0, 0);
+        private TimeSpan _tim_OpenRangeStartUS = new TimeSpan(14, 30, 0);
 
         private TimeSpan _tim_EndOfDay_DE = new TimeSpan(17, 30, 0);
-        private TimeSpan _tim_EndOfDay_US = new TimeSpan(22, 00, 0);  
+        private TimeSpan _tim_EndOfDay_US = new TimeSpan(22, 00, 0);
+       
 
    
 
@@ -329,3 +327,120 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
+#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
+
+namespace AgenaTrader.UserCode
+{
+	#region Indicator
+
+	public partial class UserIndicator
+	{
+		/// <summary>
+		/// Open Range Breakout Condition
+		/// </summary>
+		public ORB_Condition ORB_Condition()
+        {
+			return ORB_Condition(Input);
+		}
+
+		/// <summary>
+		/// Open Range Breakout Condition
+		/// </summary>
+		public ORB_Condition ORB_Condition(IDataSeries input)
+		{
+			var indicator = CachedCalculationUnits.GetCachedIndicator<ORB_Condition>(input);
+
+			if (indicator != null)
+				return indicator;
+
+			indicator = new ORB_Condition
+						{
+							BarsRequired = BarsRequired,
+							CalculateOnBarClose = CalculateOnBarClose,
+							Input = input
+						};
+			indicator.SetUp();
+
+			CachedCalculationUnits.AddIndicator2Cache(indicator);
+
+			return indicator;
+		}
+	}
+
+	#endregion
+
+	#region Strategy
+
+	public partial class UserStrategy
+	{
+		/// <summary>
+		/// Open Range Breakout Condition
+		/// </summary>
+		public ORB_Condition ORB_Condition()
+		{
+			return LeadIndicator.ORB_Condition(Input);
+		}
+
+		/// <summary>
+		/// Open Range Breakout Condition
+		/// </summary>
+		public ORB_Condition ORB_Condition(IDataSeries input)
+		{
+			if (InInitialize && input == null)
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+
+			return LeadIndicator.ORB_Condition(input);
+		}
+	}
+
+	#endregion
+
+	#region Column
+
+	public partial class UserColumn
+	{
+		/// <summary>
+		/// Open Range Breakout Condition
+		/// </summary>
+		public ORB_Condition ORB_Condition()
+		{
+			return LeadIndicator.ORB_Condition(Input);
+		}
+
+		/// <summary>
+		/// Open Range Breakout Condition
+		/// </summary>
+		public ORB_Condition ORB_Condition(IDataSeries input)
+		{
+			return LeadIndicator.ORB_Condition(input);
+		}
+	}
+
+	#endregion
+
+	#region Scripted Condition
+
+	public partial class UserScriptedCondition
+	{
+		/// <summary>
+		/// Open Range Breakout Condition
+		/// </summary>
+		public ORB_Condition ORB_Condition()
+		{
+			return LeadIndicator.ORB_Condition(Input);
+		}
+
+		/// <summary>
+		/// Open Range Breakout Condition
+		/// </summary>
+		public ORB_Condition ORB_Condition(IDataSeries input)
+		{
+			return LeadIndicator.ORB_Condition(input);
+		}
+	}
+
+	#endregion
+
+}
+
+#endregion

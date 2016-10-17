@@ -12,9 +12,13 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.3.7
+/// Version: 1.3.8
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
+/// -------------------------------------------------------------------------
+/// todo
+/// + show crv in scanner column
+/// + calculate crv with account data 
 /// -------------------------------------------------------------------------
 /// Shows the CRV of your current trade in the right upper corner of the chart.
 /// -------------------------------------------------------------------------
@@ -88,56 +92,92 @@ namespace AgenaTrader.UserCode
 
         private void calculateannddrawdata(bool force = false) {
 
-
-            
+            int quantity = 0;
+            double price = 0.0;
+            PositionType marketposition = PositionType.Flat;
+            IList<ITradingOrder> stopstargets = new List<ITradingOrder>();
 
             if (force || _lastupdate.AddSeconds(this._seconds) < DateTime.Now)
             {
-                crv_resultobject resultdata = new crv_resultobject();
-                
                 IEnumerable<ITradingOrder> _regorders = this.Root.Core.TradingManager.ActiveRegisteredOrders.Where(x => x.Instrument.Symbol == this.Instrument.Symbol);
                 IEnumerable<ITradingOrder> _openorders = this.Root.Core.TradingManager.OpenedOrders.Where(x => x.Instrument.Symbol == this.Instrument.Symbol);
-
-                if (_regorders != null && _regorders.Count() > 0)
-                {
-                    resultdata = new crv_resultobject();
-                    int entry_quantity = 0;
-                    double entry_price = 0.0;
-                    PositionType MarketPosition = PositionType.Flat;
-                    IList<ITradingOrder> stopstargets = new List<ITradingOrder>();
-                    foreach (ITradingOrder item in _regorders)
-                    {
-                        if (item.IsManuallyConfirmable)
-                        {
-                            entry_quantity = item.Quantity;
-                            entry_price = item.Price;
-                            if (item.IsLong)
-                            {
-                                MarketPosition = PositionType.Long;
-                            }
-                            else
-                            {
-                                MarketPosition = PositionType.Short;
-                            }
-                        }
-                        else
-                        {
-                            stopstargets.Add(item);
-                        }
-                    }
-
-
-                    resultdata = this.calculate(stopstargets, entry_quantity, entry_price, MarketPosition);
-
-                }
-
 
                 
                 if (this.TradeInfo != null)
                 {
-                    resultdata = new crv_resultobject();
-                    resultdata = this.calculate(_openorders, this.TradeInfo.Quantity, TradeInfo.AvgPrice, TradeInfo.MarketPosition);
+                    quantity = this.TradeInfo.Quantity;
+                    price = TradeInfo.AvgPrice;
+                    marketposition = TradeInfo.MarketPosition;
                 }
+
+                foreach (ITradingOrder item in _regorders)
+                {
+                    if (item.IsManuallyConfirmable && this.TradeInfo == null)
+                    {
+                        quantity = item.Quantity;
+                        price = item.Price;
+                        if (item.IsLong)
+                        {
+                            marketposition = PositionType.Long;
+                        }
+                        else
+                        {
+                            marketposition = PositionType.Short;
+                        }
+                    }
+                    else
+                    {
+                        stopstargets.Add(item);
+                    }
+                }
+
+                _openorders = _openorders.Concat(stopstargets);
+
+                crv_resultobject resultdata = this.calculate(_openorders, quantity, price, marketposition);
+
+              
+
+
+                //if (_regorders != null && _regorders.Count() > 0)
+                //{
+                //    resultdata = new crv_resultobject();
+                //    int entry_quantity = 0;
+                //    double entry_price = 0.0;
+                //    PositionType MarketPosition = PositionType.Flat;
+                //    IList<ITradingOrder> stopstargets = new List<ITradingOrder>();
+                //    foreach (ITradingOrder item in _regorders)
+                //    {
+                //        if (item.IsManuallyConfirmable)
+                //        {
+                //            entry_quantity = item.Quantity;
+                //            entry_price = item.Price;
+                //            if (item.IsLong)
+                //            {
+                //                MarketPosition = PositionType.Long;
+                //            }
+                //            else
+                //            {
+                //                MarketPosition = PositionType.Short;
+                //            }
+                //        }
+                //        else
+                //        {
+                //            stopstargets.Add(item);
+                //        }
+                //    }
+
+
+                //    resultdata = this.calculate(stopstargets, entry_quantity, entry_price, MarketPosition);
+
+                //}
+
+
+
+                //if (this.TradeInfo != null)
+                //{
+                //    resultdata = new crv_resultobject();
+                //    resultdata = this.calculate(_openorders, this.TradeInfo.Quantity, TradeInfo.AvgPrice, TradeInfo.MarketPosition);
+                //}
 
 
                 DrawTextFixed("CRV_string", resultdata.text, this.TextPositionCRV, Color.Black, new Font("Arial", this.FontSizeCRV, FontStyle.Regular), Color.Transparent, Color.Transparent);
@@ -211,7 +251,7 @@ namespace AgenaTrader.UserCode
             }
             else if (result.down == 0.0 && result.up == 0.0)
             {
-                if (TradeInfo != null)
+                if (entry_price >= Double.Epsilon)
                 {
                     switch (positiontype)
                     {
