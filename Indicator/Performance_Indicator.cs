@@ -12,10 +12,9 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
-/// Christian Kovar 2016
 /// -------------------------------------------------------------------------
 /// This indicator can be used in the scanner column to display the yearly or daily performance.
 /// -------------------------------------------------------------------------
@@ -27,16 +26,25 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+
+    public enum PerformanceCalculationType
+    {
+        BarCount,
+        ThisYear
+    }
+
 	[Description("Show the performance of an instrument in the scanner column. Indicator calculates bars backwards so you need to configure the timeframe correctly.")]
 	public class Performance_Indicator : UserIndicator
 	{
         //Input
-        private int _barscount = 365;
+        private int _barscount = 400;
+        private PerformanceCalculationType _PerformanceCalculationType = PerformanceCalculationType.BarCount;
 
 
         protected override void Initialize()
 		{
-			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
+			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "Plot_Performance_Indicator"));
+
             //to get the latest data into the bars object
 			CalculateOnBarClose = false;
             Overlay = false;
@@ -49,7 +57,17 @@ namespace AgenaTrader.UserCode
 		{
             if (IsCurrentBarLast)
             {
-                MyPlot1.Set(((Close[0] - Close[this.BarsCount]) * 100) / Close[this.BarsCount]);
+                switch (this.PerformanceCalculationType)
+                {
+                    case PerformanceCalculationType.BarCount:
+                        Plot_Performance_Indicator.Set(((Close[0] - Close[this.BarsCount]) * 100) / Close[this.BarsCount]);
+                        break;
+                    case PerformanceCalculationType.ThisYear:
+                        IBar lb = Bars.Where(x => x.Time.Year != DateTime.Now.Year).Last();
+                        Plot_Performance_Indicator.Set(((Close[0] - lb.Close) * 100) / lb.Close);
+                        break;
+                }
+
             }
         }
 
@@ -79,15 +97,26 @@ namespace AgenaTrader.UserCode
             set { _barscount = value; }
         }
 
+        [Description("Choose the type of calculation. BarCount = The calculation will use the bars for the calculation. ThisYear = Calculation will be done for today minus the close of the last bar of last year.")]
+        [Category("Parameters")]
+        [DisplayName("Type")]
+        public PerformanceCalculationType PerformanceCalculationType
+        {
+            get { return _PerformanceCalculationType; }
+            set { _PerformanceCalculationType = value; }
+        }
+
         [Browsable(false)]
 		[XmlIgnore()]
-		public DataSeries MyPlot1
-		{
+		public DataSeries Plot_Performance_Indicator
+        {
 			get { return Values[0]; }
 		}
 
-		#endregion
-	}
+        
+
+        #endregion
+    }
 }
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 
@@ -100,17 +129,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show the performance of an instrument in the scanner column. Indicator calculates bars backwards so you need to configure the timeframe correctly.
 		/// </summary>
-		public Performance_Indicator Performance_Indicator(System.Int32 barsCount)
+		public Performance_Indicator Performance_Indicator(System.Int32 barsCount, PerformanceCalculationType performanceCalculationType)
         {
-			return Performance_Indicator(Input, barsCount);
+			return Performance_Indicator(Input, barsCount, performanceCalculationType);
 		}
 
 		/// <summary>
 		/// Show the performance of an instrument in the scanner column. Indicator calculates bars backwards so you need to configure the timeframe correctly.
 		/// </summary>
-		public Performance_Indicator Performance_Indicator(IDataSeries input, System.Int32 barsCount)
+		public Performance_Indicator Performance_Indicator(IDataSeries input, System.Int32 barsCount, PerformanceCalculationType performanceCalculationType)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Performance_Indicator>(input, i => i.BarsCount == barsCount);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<Performance_Indicator>(input, i => i.BarsCount == barsCount && i.PerformanceCalculationType == performanceCalculationType);
 
 			if (indicator != null)
 				return indicator;
@@ -120,7 +149,8 @@ namespace AgenaTrader.UserCode
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
 							Input = input,
-							BarsCount = barsCount
+							BarsCount = barsCount,
+							PerformanceCalculationType = performanceCalculationType
 						};
 			indicator.SetUp();
 
@@ -139,20 +169,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show the performance of an instrument in the scanner column. Indicator calculates bars backwards so you need to configure the timeframe correctly.
 		/// </summary>
-		public Performance_Indicator Performance_Indicator(System.Int32 barsCount)
+		public Performance_Indicator Performance_Indicator(System.Int32 barsCount, PerformanceCalculationType performanceCalculationType)
 		{
-			return LeadIndicator.Performance_Indicator(Input, barsCount);
+			return LeadIndicator.Performance_Indicator(Input, barsCount, performanceCalculationType);
 		}
 
 		/// <summary>
 		/// Show the performance of an instrument in the scanner column. Indicator calculates bars backwards so you need to configure the timeframe correctly.
 		/// </summary>
-		public Performance_Indicator Performance_Indicator(IDataSeries input, System.Int32 barsCount)
+		public Performance_Indicator Performance_Indicator(IDataSeries input, System.Int32 barsCount, PerformanceCalculationType performanceCalculationType)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.Performance_Indicator(input, barsCount);
+			return LeadIndicator.Performance_Indicator(input, barsCount, performanceCalculationType);
 		}
 	}
 
@@ -165,17 +195,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show the performance of an instrument in the scanner column. Indicator calculates bars backwards so you need to configure the timeframe correctly.
 		/// </summary>
-		public Performance_Indicator Performance_Indicator(System.Int32 barsCount)
+		public Performance_Indicator Performance_Indicator(System.Int32 barsCount, PerformanceCalculationType performanceCalculationType)
 		{
-			return LeadIndicator.Performance_Indicator(Input, barsCount);
+			return LeadIndicator.Performance_Indicator(Input, barsCount, performanceCalculationType);
 		}
 
 		/// <summary>
 		/// Show the performance of an instrument in the scanner column. Indicator calculates bars backwards so you need to configure the timeframe correctly.
 		/// </summary>
-		public Performance_Indicator Performance_Indicator(IDataSeries input, System.Int32 barsCount)
+		public Performance_Indicator Performance_Indicator(IDataSeries input, System.Int32 barsCount, PerformanceCalculationType performanceCalculationType)
 		{
-			return LeadIndicator.Performance_Indicator(input, barsCount);
+			return LeadIndicator.Performance_Indicator(input, barsCount, performanceCalculationType);
 		}
 	}
 
@@ -188,17 +218,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show the performance of an instrument in the scanner column. Indicator calculates bars backwards so you need to configure the timeframe correctly.
 		/// </summary>
-		public Performance_Indicator Performance_Indicator(System.Int32 barsCount)
+		public Performance_Indicator Performance_Indicator(System.Int32 barsCount, PerformanceCalculationType performanceCalculationType)
 		{
-			return LeadIndicator.Performance_Indicator(Input, barsCount);
+			return LeadIndicator.Performance_Indicator(Input, barsCount, performanceCalculationType);
 		}
 
 		/// <summary>
 		/// Show the performance of an instrument in the scanner column. Indicator calculates bars backwards so you need to configure the timeframe correctly.
 		/// </summary>
-		public Performance_Indicator Performance_Indicator(IDataSeries input, System.Int32 barsCount)
+		public Performance_Indicator Performance_Indicator(IDataSeries input, System.Int32 barsCount, PerformanceCalculationType performanceCalculationType)
 		{
-			return LeadIndicator.Performance_Indicator(input, barsCount);
+			return LeadIndicator.Performance_Indicator(input, barsCount, performanceCalculationType);
 		}
 	}
 
