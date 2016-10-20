@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.3.8
+/// Version: 1.3.9
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -239,7 +239,11 @@ namespace AgenaTrader.UserCode
             result.crv = result.up / result.down;
             result.crv_price = result.up_price / result.down_price;
 
-            if (result.down == 0.0 && result.up != 0.0)
+            if (result.target_quant < 0.0 || result.stop_quant < 0.0)
+            {
+                result.text = "?";
+            }
+            else if(result.down == 0.0 && result.up != 0.0)
             {
                 //text = "in risk";
                 result.text = "-";
