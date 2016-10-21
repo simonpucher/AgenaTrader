@@ -241,7 +241,8 @@ namespace AgenaTrader.UserCode
 
             if (result.target_quant < 0.0 || result.stop_quant < 0.0)
             {
-                result.text = "?";
+                //result.text = "?";
+                result.text = "?" + " / " + Math.Round(result.crv_price, this.RoundDecimal).ToString();
             }
             else if(result.down == 0.0 && result.up != 0.0)
             {
