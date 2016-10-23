@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.3.9
+/// Version: 1.3.10
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -115,7 +115,11 @@ namespace AgenaTrader.UserCode
                     if (item.IsManuallyConfirmable && this.TradeInfo == null)
                     {
                         quantity = item.Quantity;
-                        price = item.Price;
+                        price = item.StopPrice;
+                        if (price == 0.0)
+                        {
+                            price = item.Price;
+                        }
                         if (item.IsLong)
                         {
                             marketposition = PositionType.Long;
