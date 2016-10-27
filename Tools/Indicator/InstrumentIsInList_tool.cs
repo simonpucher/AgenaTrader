@@ -23,9 +23,7 @@ using AgenaTrader.Helper;
 namespace AgenaTrader.UserCode
 {
     
-
 	[Description("Check if the current instrument is in a list.")]
-    [Category("Tools")]
     public class InstrumentIsInList_Tool : UserIndicator
 	{
 		#region Variables

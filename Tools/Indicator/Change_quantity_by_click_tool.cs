@@ -26,7 +26,6 @@ namespace AgenaTrader.UserCode
 {
 
     [Description("Changes the quantity of an order by clicking on the chart.")]
-    [Category("Tools")]
     public class ChangeQuantity_Tool : UserIndicator
 	{
 		#region Variables
