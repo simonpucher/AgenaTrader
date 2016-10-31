@@ -21,7 +21,7 @@ using AgenaTrader.Helper;
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use global source code elements.
-/// You will find this script on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// You will find this script on GitHub: https://github.com/ScriptTrading/Basic-Package/blob/master/Utilities/GlobalUtilities_Utility.cs
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -115,7 +115,7 @@ namespace AgenaTrader.UserCode
             }
         }
 
-        //todo -100 wird noch nicht zurückgegeben oder?
+        //todo -100 wird noch nicht zurï¿½ckgegeben oder?
         public int calculate(IBars bars, int curbar, PopGunType popguntype)
         {
             bool noPopGunTrigger = false;
@@ -386,7 +386,7 @@ namespace AgenaTrader.UserCode
             set { _PopGunType = value; }
         }
 
-        [Description("Wieviel Bars ist PopGunTrigger gültig?")]
+        [Description("Wieviel Bars ist PopGunTrigger gï¿½ltig?")]
         [Category("Parameters")]
         [DisplayName("PopGunExpires")]
         public int PopGunExpires

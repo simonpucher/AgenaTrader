@@ -9,7 +9,7 @@ This project contains scripts for the AgenaTrader like indicators, conditions an
 These scripts are compiled against AT 1.9.0.501.
 
 ###Utility Indicator
-To compile indicators, conditions and other script resources without any error your **AgenaTrader also need access to the Utility Indicator** to use global source code elements! We use this indicator to share code snippets, so we do not need to copy and paste again and again. These reduces error sources, minimze the workload, gives us better testing opportunities and a better clarity. **You need to copy the Utility Indicator into the indicators directory of your AgenaTrader.** You will find the latest version of this Utility Indicator on GitHub: [Global Utilities](https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs)
+To compile indicators, conditions and other script resources without any error your **AgenaTrader also need access to the Utility Indicator** to use global source code elements! We use this indicator to share code snippets, so we do not need to copy and paste again and again. These reduces error sources, minimze the workload, gives us better testing opportunities and a better clarity. **You need to copy the Utility Indicator into the indicators directory of your AgenaTrader.** You will find the latest version of this Utility Indicator on GitHub: [Global Utilities](https://github.com/ScriptTrading/Basic-Package/blob/master/Utilities/GlobalUtilities_Utility.cs)
 
 When you have copied the Utility Indicator into your indicator directory, you need to click on compile in your AgenaTrader.
 
@@ -26,7 +26,7 @@ Each script should have a summary tag below the using directives. **If there is 
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use these global source code elements.
-/// You will find this indicator on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// You will find this indicator on GitHub: https://github.com/ScriptTrading/Basic-Package/blob/master/Utilities/GlobalUtilities_Utility.cs
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>

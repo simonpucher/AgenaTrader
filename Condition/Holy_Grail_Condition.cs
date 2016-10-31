@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -20,7 +20,7 @@ using AgenaTrader.Helper;
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use global source code elements.
-/// You will find this script on GitHub: https://github.com/simonpucher/AgenaTrader/blob/master/Utility/GlobalUtilities_Utility.cs
+/// You will find this script on GitHub: https://github.com/ScriptTrading/Basic-Package/blob/master/Utilities/GlobalUtilities_Utility.cs
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -54,15 +54,21 @@ namespace AgenaTrader.UserCode
             Add(new Plot(this.Plot0Color, "Entry"));
 
             Overlay = false;
-            CalculateOnBarClose = false; //do not change this
+            CalculateOnBarClose = true;
         }
 
 		protected override void OnBarUpdate()
 		{
- 
 
 
-            Occurred.Set(LeadIndicator.Holy_Grail_Indicator(this.Input)[0]);
+            double rv = 0;
+            if (LeadIndicator.Holy_Grail_Indicator(this.Input)[0] > 0 && LeadIndicator.Holy_Grail_Indicator(this.Input)[1] > 0 && LeadIndicator.Holy_Grail_Indicator(this.Input)[3] > 0)
+            {
+                rv = 1 ;
+            }
+
+
+            Occurred.Set(rv);
 
             PlotColors[0][0] = this.Plot0Color;
             Plots[0].PenStyle = this.Dash0Style;
