@@ -45,6 +45,7 @@ namespace AgenaTrader.UserCode
 			Overlay = true;
 			CalculateOnBarClose = true;
 	
+	 		this.BarsRequired = 400;
 		}
 		
 
