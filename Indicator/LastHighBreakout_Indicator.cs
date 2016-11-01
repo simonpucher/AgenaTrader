@@ -12,9 +12,13 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
+/// -------------------------------------------------------------------------
+/// todo
+/// * ATR https://www.traderfox.de/anleitung/pivtal-chart-events/expansion-52-week-high/
+/// * RSI
 /// -------------------------------------------------------------------------
 /// This indicator shows an arrow on a new x days. The indicator will plot 1 if there was a high in a specific range (default: 52 week high in a 7 days range). 
 /// -------------------------------------------------------------------------
@@ -31,7 +35,7 @@ namespace AgenaTrader.UserCode
 	{
 	
 	 private bool _showarrows = true;
-	 private bool _showindicatorbox = false;
+	 private bool _showindicatorbox = true;
 	 private int _days = 7;
 	 private Stack<DateTime> lasthighs;
 	 
