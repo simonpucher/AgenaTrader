@@ -816,7 +816,6 @@ namespace AgenaTrader.UserCode
     }
 }
 
-
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 
 namespace AgenaTrader.UserCode
@@ -934,5 +933,3 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
-
-
