@@ -13,9 +13,12 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
+/// -------------------------------------------------------------------------
+/// todo
+/// If barsrequired is smaller than the MAs print a warning message.
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use these global source code elements.
@@ -35,8 +38,8 @@ namespace AgenaTrader.UserCode
     }
 
     [Description("Use 5 different SMA or EMA at the same time in one indicator.")]
-	public class Moving_Averages_Indicator : UserIndicator
-	{
+    public class Moving_Averages_Indicator : UserIndicator
+    {
 
         //input 
         private Enum_Moving_Averages_Indicator_MA _MA_1_Selected = Enum_Moving_Averages_Indicator_MA.EMA;
@@ -71,11 +74,11 @@ namespace AgenaTrader.UserCode
         private DashStyle _linestyle_5 = DashStyle.Solid;
         private Color _col_5 = Color.DarkViolet;
 
-
+        
 
 
         protected override void Initialize()
-		{
+        {
             Add(new Plot(new Pen(this.Color_1, this.LineWidth_1), PlotStyle.Line, "MA_1"));
             Add(new Plot(new Pen(this.Color_2, this.LineWidth_2), PlotStyle.Line, "MA_2"));
             Add(new Plot(new Pen(this.Color_3, this.LineWidth_3), PlotStyle.Line, "MA_3"));
@@ -85,13 +88,19 @@ namespace AgenaTrader.UserCode
             CalculateOnBarClose = true;
             Overlay = true;
 
+            //this.GetNameOnchart();
+
         }
 
 
-   
 
-		protected override void OnBarUpdate()
-		{
+
+
+        protected override void OnBarUpdate()
+        {
+            //this.GetNameOnchart();
+
+           
 
             if (this.MA_1 != 0)
             {
@@ -190,18 +199,50 @@ namespace AgenaTrader.UserCode
 
         }
 
-       
+
+        private string GetNameOnchart()
+        {
+           string returnvalue = "Moving Averages (I) ";
+            
+            if (this.MA_1 != 0)
+            {
+                returnvalue += MA_1_Selected.ToString() + this.MA_1 + " ";
+            }
+            
+            if (this.MA_2 != 0)
+            {
+                returnvalue += MA_2_Selected.ToString() + this.MA_2 + " ";
+            }
+            
+            if (this.MA_3 != 0)
+            {
+                returnvalue += MA_3_Selected.ToString() + this.MA_3 + " ";
+            }
+
+            if (this.MA_4 != 0)
+            {
+                returnvalue += MA_4_Selected.ToString() + this.MA_4 + " ";
+            }
+
+            if (this.MA_5 != 0)
+            {
+                returnvalue += MA_5_Selected.ToString() + this.MA_5 + " ";
+            }
+
+            return returnvalue;
+        }
+
 
         public override string ToString()
         {
-            return "Moving Averages (I)";
+            return GetNameOnchart();
         }
 
         public override string DisplayName
         {
             get
             {
-                return "Moving Averages (I)";
+                return GetNameOnchart();
             }
         }
 
