@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -152,7 +152,7 @@ namespace AgenaTrader.UserCode
             Point cursorPos = new Point(e.X, e.Y);
             if (_rect.Contains(cursorPos))
             {
-                GUIHelper.OpenInBrowser("https://www.google.com/finance?q=aapl");
+                GUIHelper.OpenInBrowser("https://www.google.com/finance?q="+this.Instrument.Symbol);
                 //http://beta.morningstar.com/search.html?q=da
 
                 //                if (!_list.Contains((Instrument)this.Instrument))
