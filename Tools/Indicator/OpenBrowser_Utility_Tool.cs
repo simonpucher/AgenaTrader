@@ -111,7 +111,7 @@ namespace AgenaTrader.UserCode
 
              
             
-                using (Font font1 = new Font("Arial", 10, FontStyle.Bold, GraphicsUnit.Point))
+                using (Font font1 = new Font("Arial", 8, FontStyle.Bold, GraphicsUnit.Point))
                 {
                     StringFormat stringFormat = new StringFormat();
                     stringFormat.Alignment = StringAlignment.Center;
@@ -135,7 +135,7 @@ namespace AgenaTrader.UserCode
 
                     _rect = new RectangleF(r.Width - 100, 10, 86, 27);
                     g.FillRectangle(tempbrush, _rect);
-                    g.DrawString("click", font1, Brushes.White, _rect, stringFormat);
+                    g.DrawString("open browser", font1, Brushes.White, _rect, stringFormat);
                     _rect2 = new RectangleF(r.Width - 100, 40, 86, 27);
                   
                     //g.DrawRectangle(_pen, Rectangle.Round(_rect));
