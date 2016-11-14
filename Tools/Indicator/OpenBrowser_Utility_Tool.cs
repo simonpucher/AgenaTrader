@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.1.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -27,11 +27,14 @@ namespace AgenaTrader.UserCode
     {
         #region Variables
 
-        private IInstrumentsList _list = null;
+
         private RectangleF _rect;
         private RectangleF _rect2;
         //private Pen _pen = Pens.Black;
         private Brush _brush = Brushes.Gray;
+
+        private bool _opengooglefinance = true;
+        private bool _openmorningstar = true;
         
 
         #endregion
@@ -152,8 +155,15 @@ namespace AgenaTrader.UserCode
             Point cursorPos = new Point(e.X, e.Y);
             if (_rect.Contains(cursorPos))
             {
-                GUIHelper.OpenInBrowser("https://www.google.com/finance?q="+this.Instrument.Symbol);
-                //http://beta.morningstar.com/search.html?q=da
+                if (OpenGoogleFinance)
+                {
+                    GUIHelper.OpenInBrowser("https://www.google.com/finance?q=" + this.Instrument.Symbol);
+                }
+
+                if (OpenMorningstar)
+                {
+                    GUIHelper.OpenInBrowser("http://beta.morningstar.com/search.html?q=" + this.Instrument.ISIN);
+                }
 
                 //                if (!_list.Contains((Instrument)this.Instrument))
                 //                {
@@ -191,13 +201,29 @@ namespace AgenaTrader.UserCode
         //    }
 
 
-
         #endregion
 
         #region Input
 
+        [Description("Opens Google Finance with the current symbol displayed in the chart")]
+        [Category("Parameters")]
+        [DisplayName("Google Finance")]
+        public bool OpenGoogleFinance
+        {
+            get { return _opengooglefinance; }
+            set { _opengooglefinance = value; }
+        }
 
-    
+        [Description("Opens Morningstar with the current symbol displayed in the chart")]
+        [Category("Parameters")]
+        [DisplayName("Morningstar")]
+        public bool OpenMorningstar
+        {
+            get { return _openmorningstar; }
+            set { _openmorningstar = value; }
+        }
+
+
         private Color _col_positive = Color.Green;
         /// <summary>
         /// </summary>
@@ -260,17 +286,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool()
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openGoogleFinance, System.Boolean openMorningstar)
         {
-			return OpenBrowser_Utility_Tool(Input);
+			return OpenBrowser_Utility_Tool(Input, openGoogleFinance, openMorningstar);
 		}
 
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<OpenBrowser_Utility_Tool>(input);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<OpenBrowser_Utility_Tool>(input, i => i.OpenGoogleFinance == openGoogleFinance && i.OpenMorningstar == openMorningstar);
 
 			if (indicator != null)
 				return indicator;
@@ -279,7 +305,9 @@ namespace AgenaTrader.UserCode
 						{
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							Input = input,
+							OpenGoogleFinance = openGoogleFinance,
+							OpenMorningstar = openMorningstar
 						};
 			indicator.SetUp();
 
@@ -298,20 +326,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool()
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(Input);
+			return LeadIndicator.OpenBrowser_Utility_Tool(Input, openGoogleFinance, openMorningstar);
 		}
 
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.OpenBrowser_Utility_Tool(input);
+			return LeadIndicator.OpenBrowser_Utility_Tool(input, openGoogleFinance, openMorningstar);
 		}
 	}
 
@@ -324,17 +352,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool()
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(Input);
+			return LeadIndicator.OpenBrowser_Utility_Tool(Input, openGoogleFinance, openMorningstar);
 		}
 
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(input);
+			return LeadIndicator.OpenBrowser_Utility_Tool(input, openGoogleFinance, openMorningstar);
 		}
 	}
 
@@ -347,17 +375,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool()
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(Input);
+			return LeadIndicator.OpenBrowser_Utility_Tool(Input, openGoogleFinance, openMorningstar);
 		}
 
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(input);
+			return LeadIndicator.OpenBrowser_Utility_Tool(input, openGoogleFinance, openMorningstar);
 		}
 	}
 
