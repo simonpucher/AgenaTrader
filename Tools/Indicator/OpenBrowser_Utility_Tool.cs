@@ -35,6 +35,7 @@ namespace AgenaTrader.UserCode
 
         private bool _opengooglefinance = true;
         private bool _openmorningstar = true;
+        private bool _openyahoofinance = true;
         
 
         #endregion
@@ -59,20 +60,10 @@ namespace AgenaTrader.UserCode
 
         protected override void OnBarUpdate()
         {
-            //MyPlot1.Set(Input[0]);
 
             if (this.IsCurrentBarLast)
             {
               _brush = Brushes.Green;
-//                if (_list.Contains((Instrument)this.Instrument))
-//                {
-//                    //_pen = Pens.Red;
-//                    _brush = Brushes.Green;
-//                }
-//                else {
-//                    //_pen = Pens.Black;
-//                    _brush = Brushes.Gray;
-//                }
             }
 
         }
@@ -108,71 +99,65 @@ namespace AgenaTrader.UserCode
         {
             if (Bars == null || ChartControl == null) return;
 
+        
             //Only draw button if parameters are available.
             if (this.Instrument != null)
             {
-
-             
-            
-                using (Font font1 = new Font("Arial", 8, FontStyle.Bold, GraphicsUnit.Point))
+                //Only stocks are possible to lookup
+                if (this.Instrument.InstrumentType == InstrumentType.Stock)
                 {
-                    StringFormat stringFormat = new StringFormat();
-                    stringFormat.Alignment = StringAlignment.Center;
-                    stringFormat.LineAlignment = StringAlignment.Center;
+                    using (Font font1 = new Font("Arial", 8, FontStyle.Bold, GraphicsUnit.Point))
+                    {
+                        StringFormat stringFormat = new StringFormat();
+                        stringFormat.Alignment = StringAlignment.Center;
+                        stringFormat.LineAlignment = StringAlignment.Center;
 
-//                    if (String.IsNullOrEmpty(Shortcut_list))
-//                    {
-//                        if (this.Name_of_list.Count() >= 5)
-//                        {
-//                            this.Shortcut_list = this.Name_of_list.Substring(0, 5);
-//                        }
-//                        else
-//                        {
-//                            this.Shortcut_list = this.Name_of_list;
-//                        }
-//                    }
+                        this.Core.GetDataDirectory();
 
-                    this.Core.GetDataDirectory();
+                        Brush tempbrush = new SolidBrush(GlobalUtilities.AdjustOpacity(((SolidBrush)_brush).Color, 0.5F));
 
-                    Brush tempbrush = new SolidBrush(GlobalUtilities.AdjustOpacity(((SolidBrush)_brush).Color, 0.5F));
+                        _rect = new RectangleF(r.Width - 100, 10, 86, 27);
+                        g.FillRectangle(tempbrush, _rect);
+                        g.DrawString("open browser", font1, Brushes.White, _rect, stringFormat);
+                        _rect2 = new RectangleF(r.Width - 100, 40, 86, 27);
 
-                    _rect = new RectangleF(r.Width - 100, 10, 86, 27);
-                    g.FillRectangle(tempbrush, _rect);
-                    g.DrawString("open browser", font1, Brushes.White, _rect, stringFormat);
-                    _rect2 = new RectangleF(r.Width - 100, 40, 86, 27);
-                  
-                    //g.DrawRectangle(_pen, Rectangle.Round(_rect));
+                    }
                 }
+               
             }
         }
 
 
         private void OnChartPanelMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
-            //Print("X = {0}, Y = {1}", e.X, e.Y);
-            //Print("X = {0}, Y = {1}", ChartControl.GetDateTimeByX(e.X), ChartControl.GetPriceByY(e.Y));
 
             Point cursorPos = new Point(e.X, e.Y);
             if (_rect.Contains(cursorPos))
             {
-                if (OpenGoogleFinance)
+
+                string symbol = this.Instrument.Symbol;
+                string isin = this.Instrument.ISIN;
+
+                //if (this.Instrument.InstrumentType == InstrumentType.CFD)
+                //{
+
+                //}
+
+                if (this.OpenGoogleFinance)
                 {
-                    GUIHelper.OpenInBrowser("https://www.google.com/finance?q=" + this.Instrument.Symbol);
+                    GUIHelper.OpenInBrowser("https://www.google.com/finance?q=" + symbol);
                 }
 
-                if (OpenMorningstar)
+                if (this.OpenMorningstar)
                 {
-                    GUIHelper.OpenInBrowser("http://beta.morningstar.com/search.html?q=" + this.Instrument.ISIN);
+                    GUIHelper.OpenInBrowser("http://beta.morningstar.com/search.html?q=" + isin);
                 }
 
-                //                if (!_list.Contains((Instrument)this.Instrument))
-                //                {
-                //                    this.Root.Core.InstrumentManager.AddInstrument2List(this.Instrument, this.Name_of_list);
-                //                }
-                //                else
-                //                {
-                //                    this.Root.Core.InstrumentManager.RemoveInstrumentFromList(this.Name_of_list, this.Instrument);
-                //                }
+                if (this.OpenYahooFinance)
+                {
+                    GUIHelper.OpenInBrowser("https://finance.yahoo.com/quote/" + symbol);
+                }
+
             }
             else
             {
@@ -204,6 +189,15 @@ namespace AgenaTrader.UserCode
         #endregion
 
         #region Input
+
+        [Description("Opens Yahoo Finance with the current symbol displayed in the chart")]
+        [Category("Parameters")]
+        [DisplayName("Yahoo Finance")]
+        public bool OpenYahooFinance
+        {
+            get { return _openyahoofinance; }
+            set { _openyahoofinance = value; }
+        }
 
         [Description("Opens Google Finance with the current symbol displayed in the chart")]
         [Category("Parameters")]
@@ -286,17 +280,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openGoogleFinance, System.Boolean openMorningstar)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
         {
-			return OpenBrowser_Utility_Tool(Input, openGoogleFinance, openMorningstar);
+			return OpenBrowser_Utility_Tool(Input, openYahooFinance, openGoogleFinance, openMorningstar);
 		}
 
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<OpenBrowser_Utility_Tool>(input, i => i.OpenGoogleFinance == openGoogleFinance && i.OpenMorningstar == openMorningstar);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<OpenBrowser_Utility_Tool>(input, i => i.OpenYahooFinance == openYahooFinance && i.OpenGoogleFinance == openGoogleFinance && i.OpenMorningstar == openMorningstar);
 
 			if (indicator != null)
 				return indicator;
@@ -306,6 +300,7 @@ namespace AgenaTrader.UserCode
 							BarsRequired = BarsRequired,
 							CalculateOnBarClose = CalculateOnBarClose,
 							Input = input,
+							OpenYahooFinance = openYahooFinance,
 							OpenGoogleFinance = openGoogleFinance,
 							OpenMorningstar = openMorningstar
 						};
@@ -326,20 +321,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openGoogleFinance, System.Boolean openMorningstar)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(Input, openGoogleFinance, openMorningstar);
+			return LeadIndicator.OpenBrowser_Utility_Tool(Input, openYahooFinance, openGoogleFinance, openMorningstar);
 		}
 
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.OpenBrowser_Utility_Tool(input, openGoogleFinance, openMorningstar);
+			return LeadIndicator.OpenBrowser_Utility_Tool(input, openYahooFinance, openGoogleFinance, openMorningstar);
 		}
 	}
 
@@ -352,17 +347,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openGoogleFinance, System.Boolean openMorningstar)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(Input, openGoogleFinance, openMorningstar);
+			return LeadIndicator.OpenBrowser_Utility_Tool(Input, openYahooFinance, openGoogleFinance, openMorningstar);
 		}
 
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(input, openGoogleFinance, openMorningstar);
+			return LeadIndicator.OpenBrowser_Utility_Tool(input, openYahooFinance, openGoogleFinance, openMorningstar);
 		}
 	}
 
@@ -375,17 +370,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openGoogleFinance, System.Boolean openMorningstar)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(Input, openGoogleFinance, openMorningstar);
+			return LeadIndicator.OpenBrowser_Utility_Tool(Input, openYahooFinance, openGoogleFinance, openMorningstar);
 		}
 
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(input, openGoogleFinance, openMorningstar);
+			return LeadIndicator.OpenBrowser_Utility_Tool(input, openYahooFinance, openGoogleFinance, openMorningstar);
 		}
 	}
 
