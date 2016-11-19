@@ -37,10 +37,10 @@ namespace AgenaTrader.UserCode
 	[OverrulePreviousStopPrice(false)]
     public class ORB_Condition : UserScriptedCondition, IORB
 	{
-		#region Variables
+        #region Variables
 
         //input
-        private int _orbminutes = 75;
+        private int _orbminutes = Const.DefaultOpenRangeSizeinMinutes;
         private Color _plot1color = Const.DefaultIndicatorColor;
         private int _plot1width = Const.DefaultLineWidth;
         private DashStyle _plot1dashstyle = Const.DefaultIndicatorDashStyle;
@@ -444,3 +444,5 @@ namespace AgenaTrader.UserCode
 }
 
 #endregion
+
+

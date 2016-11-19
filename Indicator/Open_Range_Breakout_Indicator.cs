@@ -66,7 +66,7 @@ namespace AgenaTrader.UserCode
     }
 
 
-    [Description("ORB Indicator")]
+    [Description("Open Range Breakout Indicator")]
     public class ORB_Indicator : UserIndicator, IORB
     {
 
@@ -825,7 +825,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator
 	{
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator()
         {
@@ -833,7 +833,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator(IDataSeries input)
 		{
@@ -863,7 +863,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator()
 		{
@@ -871,7 +871,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator(IDataSeries input)
 		{
@@ -889,7 +889,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator()
 		{
@@ -897,7 +897,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator(IDataSeries input)
 		{
@@ -912,7 +912,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator()
 		{
@@ -920,7 +920,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// ORB Indicator
+		/// Open Range Breakout Indicator
 		/// </summary>
 		public ORB_Indicator ORB_Indicator(IDataSeries input)
 		{

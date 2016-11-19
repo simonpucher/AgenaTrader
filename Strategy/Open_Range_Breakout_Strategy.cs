@@ -32,11 +32,11 @@ using System.Threading;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-    [Description("Automatic trading for open range breakout strategy")]
+    [Description("Automatic trading for Open Range Breakout strategy")]
     public class ORB_Strategy : UserStrategy, IORB
 	{
         //input
-        private int _orbminutes = 75;
+        private int _orbminutes = Const.DefaultOpenRangeSizeinMinutes;
 
         private TimeSpan _tim_OpenRangeStartDE = new TimeSpan(8, 0, 0);
         private TimeSpan _tim_OpenRangeStartUS = new TimeSpan(14, 30, 0);  
