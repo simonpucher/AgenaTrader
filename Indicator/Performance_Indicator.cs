@@ -57,6 +57,15 @@ namespace AgenaTrader.UserCode
 		{
             if (IsCurrentBarLast)
             {
+                //if (!this.Instrument.IsInMarketHours(DateTime.Now))
+                //{
+                //    Plot_Performance_Indicator.Set(0);
+                //}
+                //else
+                //{
+
+                //}
+
                 switch (this.PerformanceCalculationType)
                 {
                     case PerformanceCalculationType.BarCount:
