@@ -53,21 +53,28 @@ namespace AgenaTrader.UserCode
         }
 
 
-        protected override void OnStartUp()
-        {
-
    
-            if (this.Instrument != null)
+
+
+        protected override void OnBarUpdate()
+        {
+            this.CheckForNewInstruments();
+        }
+
+      
+
+
+
+        private void CheckForNewInstruments() {
+
+
+            if (_lastupdate.AddSeconds(this._seconds) < DateTime.Now)
             {
                 if (!String.IsNullOrEmpty(Name_of_list))
                 {
 
                     this.Root.Core.InstrumentManager.GetInstrumentLists();
                     _list = this.Root.Core.InstrumentManager.GetInstrumentsListStatic(this.Name_of_list);
-                    //if (_list == null)
-                    //{
-                    //    _list = this.Root.Core.InstrumentManager.GetInstrumentsListDynamic(this.Name_of_list);
-                    //}
                     if (_list == null || _list.Count == 0)
                     {
                         Log(this.DisplayName + ": The list " + this.Name_of_list + " does not exist.", InfoLogLevel.Warning);
@@ -77,28 +84,7 @@ namespace AgenaTrader.UserCode
                 {
                     Log(this.DisplayName + ": You need to specify a name for the list.", InfoLogLevel.Warning);
                 }
-            }
 
-
-            this.CheckForNewInstruments();
-
-        }
-
-
-        protected override void OnBarUpdate()
-        {
-            this.CheckForNewInstruments();
-        }
-
-
-
-
-
-        private void CheckForNewInstruments() {
-
-
-            if (_lastupdate.AddSeconds(this._seconds) < DateTime.Now)
-            {
                 if (_list != null)
                 {
                     this.Root.Core.InstrumentManager.ClearInstrumentList(this.Name_of_list);
@@ -149,14 +135,14 @@ namespace AgenaTrader.UserCode
         {
             get
             {
-                return "Dynamic List Trades (T)";
+                return "DLT (T)";
             }
         }
 
 
         public override string ToString()
         {
-            return "Dynamic List Trades (T)";
+            return "DLT (T)";
         }
 
 
@@ -199,7 +185,7 @@ namespace AgenaTrader.UserCode
 
         [Description("Update interval in seconds.")]
         [Category("Parameters")]
-        [DisplayName("Update interval")]
+        [DisplayName("Update interval (sec.)")]
         public int Seconds
         {
             get { return _seconds; }

@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -49,34 +49,6 @@ namespace AgenaTrader.UserCode
         }
 
 
-        protected override void OnStartUp()
-        {
-
-            if (this.Instrument != null)
-            {
-                if (!String.IsNullOrEmpty(Name_of_list))
-                {
-
-                    this.Root.Core.InstrumentManager.GetInstrumentLists();
-                    _list = this.Root.Core.InstrumentManager.GetInstrumentsListStatic(this.Name_of_list);
-                    //if (_list == null)
-                    //{
-                    //    _list = this.Root.Core.InstrumentManager.GetInstrumentsListDynamic(this.Name_of_list);
-                    //}
-                    if (_list == null || _list.Count == 0)
-                    {
-                        Log(this.DisplayName + ": The list " + this.Name_of_list + " does not exist.", InfoLogLevel.Warning);
-                    }
-                }
-                else
-                {
-                    Log(this.DisplayName + ": You need to specify a name for the list.", InfoLogLevel.Warning);
-                }
-            }
-            
-            this.CheckForNewInstruments();
-
-        }
 
 
         protected override void OnBarUpdate()
@@ -91,13 +63,28 @@ namespace AgenaTrader.UserCode
 
             if (_lastupdate.AddSeconds(this._seconds) < DateTime.Now)
             {
+                if (!String.IsNullOrEmpty(Name_of_list))
+                {
+
+                    this.Root.Core.InstrumentManager.GetInstrumentLists();
+                    _list = this.Root.Core.InstrumentManager.GetInstrumentsListStatic(this.Name_of_list);
+                    if (_list == null || _list.Count == 0)
+                    {
+                        Log(this.DisplayName + ": The list " + this.Name_of_list + " does not exist.", InfoLogLevel.Warning);
+                    }
+                }
+                else
+                {
+                    Log(this.DisplayName + ": You need to specify a name for the list.", InfoLogLevel.Warning);
+                }
+
                 if (_list != null)
                 {
                     this.Root.Core.InstrumentManager.ClearInstrumentList(this.Name_of_list);
                 }
 
                
-                if (UseMarketHours && !String.IsNullOrWhiteSpace(this.Instrumentlists))
+                if (!String.IsNullOrWhiteSpace(this.Instrumentlists))
                 {
                     string[] arr_Instrumentlists = this.Instrumentlists.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
                     if (arr_Instrumentlists != null && arr_Instrumentlists.Count() > 0)
@@ -108,10 +95,22 @@ namespace AgenaTrader.UserCode
 
                             if (instlist != null && instlist.Count() > 0)
                             {
-                                ITimePeriod timper = this.Root.Core.MarketplaceManager.GetExchangeDescription(instlist.First().Exchange).TradingHours;
-
-
-                                if ((DateTime.Now.TimeOfDay > timper.StartTime) && (DateTime.Now.TimeOfDay < timper.EndTime))
+                                if (UseMarketHours)
+                                {
+                                    ITimePeriod timper = this.Root.Core.MarketplaceManager.GetExchangeDescription(instlist.First().Exchange).TradingHours;
+                                    
+                                    if ((DateTime.Now.TimeOfDay > timper.StartTime) && (DateTime.Now.TimeOfDay < timper.EndTime))
+                                    {
+                                        foreach (IInstrument inst in instlist)
+                                        {
+                                            if (!_list.Contains(inst))
+                                            {
+                                                this.Root.Core.InstrumentManager.AddInstrument2List(inst, this.Name_of_list);
+                                            }
+                                        }
+                                    }
+                                }
+                                else
                                 {
                                     foreach (IInstrument inst in instlist)
                                     {
@@ -121,6 +120,7 @@ namespace AgenaTrader.UserCode
                                         }
                                     }
                                 }
+                                
                             }
 
                         }
@@ -142,14 +142,14 @@ namespace AgenaTrader.UserCode
         {
             get
             {
-                return "Dynamic List Markets (T)";
+                return "DLM (T)";
             }
         }
 
 
         public override string ToString()
         {
-            return "Dynamic List Markets (T)";
+            return "DLM (T)";
         }
 
 
@@ -193,7 +193,7 @@ namespace AgenaTrader.UserCode
 
         [Description("Update interval in seconds.")]
         [Category("Parameters")]
-        [DisplayName("Update interval")]
+        [DisplayName("Update interval (sec.)")]
         public int Seconds
         {
             get { return _seconds; }
