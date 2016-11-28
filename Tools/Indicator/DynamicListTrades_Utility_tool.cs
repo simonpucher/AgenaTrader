@@ -33,6 +33,7 @@ namespace AgenaTrader.UserCode
 
         private bool _showtrades = true;
         private bool _showproposals = true;
+        private bool _showpricealert = true;
 
         private static DateTime _lastupdate = DateTime.Now;
         private int _seconds = 10; 
@@ -42,7 +43,7 @@ namespace AgenaTrader.UserCode
 
         private static  IEnumerable<ITradingTrade> _openedtrades = null;
         private static IEnumerable<ITradingOrder> _regorders = null;
-
+        private static IEnumerable<IPriceAlert> pricealerts = null;
 
         #endregion
 
@@ -53,21 +54,28 @@ namespace AgenaTrader.UserCode
         }
 
 
-        protected override void OnStartUp()
-        {
-
    
-            if (this.Instrument != null)
+
+
+        protected override void OnBarUpdate()
+        {
+            this.CheckForNewInstruments();
+        }
+
+      
+
+
+
+        private void CheckForNewInstruments() {
+
+
+            if (_lastupdate.AddSeconds(this._seconds) < DateTime.Now)
             {
                 if (!String.IsNullOrEmpty(Name_of_list))
                 {
 
                     this.Root.Core.InstrumentManager.GetInstrumentLists();
                     _list = this.Root.Core.InstrumentManager.GetInstrumentsListStatic(this.Name_of_list);
-                    //if (_list == null)
-                    //{
-                    //    _list = this.Root.Core.InstrumentManager.GetInstrumentsListDynamic(this.Name_of_list);
-                    //}
                     if (_list == null || _list.Count == 0)
                     {
                         Log(this.DisplayName + ": The list " + this.Name_of_list + " does not exist.", InfoLogLevel.Warning);
@@ -77,34 +85,13 @@ namespace AgenaTrader.UserCode
                 {
                     Log(this.DisplayName + ": You need to specify a name for the list.", InfoLogLevel.Warning);
                 }
-            }
 
-
-            this.CheckForNewInstruments();
-
-        }
-
-
-        protected override void OnBarUpdate()
-        {
-            this.CheckForNewInstruments();
-        }
-
-
-
-
-
-        private void CheckForNewInstruments() {
-
-
-            if (_lastupdate.AddSeconds(this._seconds) < DateTime.Now)
-            {
                 if (_list != null)
                 {
                     this.Root.Core.InstrumentManager.ClearInstrumentList(this.Name_of_list);
                 }
 
-                if (ShowProposals)
+                if (this.ShowProposals)
                 {
                     _regorders = this.Root.Core.TradingManager.ActiveRegisteredOrders;
                     if (_regorders != null)
@@ -119,12 +106,27 @@ namespace AgenaTrader.UserCode
                     }
                 }
 
-                if (ShowTrades)
+                if (this.ShowTrades)
                 {
                     _openedtrades = this.Root.Core.TradingManager.GetOpenedTrades();
                     if (_openedtrades != null)
                     {
                         foreach (ITradingTrade item in _openedtrades)
+                        {
+                            if (!_list.Contains((IInstrument)item.Instrument))
+                            {
+                                this.Root.Core.InstrumentManager.AddInstrument2List((IInstrument)item.Instrument, this.Name_of_list);
+                            }
+                        }
+                    }
+                }
+
+                if (this.ShowPriceAlert)
+                {
+                    pricealerts =  this.Root.Core.AlertManager.PriceAlerts;
+                    if (pricealerts != null)
+                    {
+                        foreach (IPriceAlert item in pricealerts)
                         {
                             if (!_list.Contains((IInstrument)item.Instrument))
                             {
@@ -149,14 +151,14 @@ namespace AgenaTrader.UserCode
         {
             get
             {
-                return "Dynamic List Trades (T)";
+                return "DLT (T)";
             }
         }
 
 
         public override string ToString()
         {
-            return "Dynamic List Trades (T)";
+            return "DLT (T)";
         }
 
 
@@ -197,9 +199,18 @@ namespace AgenaTrader.UserCode
             set { _showproposals = value; }
         }
 
+        [Description("If true then all instruments with price alerts will be added dynamical to the static list.")]
+        [Category("Parameters")]
+        [DisplayName("Show price alerts")]
+        public bool ShowPriceAlert
+        {
+            get { return _showpricealert; }
+            set { _showpricealert = value; }
+        }
+
         [Description("Update interval in seconds.")]
         [Category("Parameters")]
-        [DisplayName("Update interval")]
+        [DisplayName("Update interval (sec.)")]
         public int Seconds
         {
             get { return _seconds; }
@@ -229,17 +240,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Adds instruments dynamical to a static list (e.g. portfolio) if there is an order on it or there is an trade on it.
 		/// </summary>
-		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Int32 seconds)
+		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
         {
-			return DynamicListTrades_Indicator_Tool(Input, name_of_list, showTrades, showProposals, seconds);
+			return DynamicListTrades_Indicator_Tool(Input, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
 		}
 
 		/// <summary>
 		/// Adds instruments dynamical to a static list (e.g. portfolio) if there is an order on it or there is an trade on it.
 		/// </summary>
-		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(IDataSeries input, System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Int32 seconds)
+		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(IDataSeries input, System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<DynamicListTrades_Indicator_Tool>(input, i => i.Name_of_list == name_of_list && i.ShowTrades == showTrades && i.ShowProposals == showProposals && i.Seconds == seconds);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<DynamicListTrades_Indicator_Tool>(input, i => i.Name_of_list == name_of_list && i.ShowTrades == showTrades && i.ShowProposals == showProposals && i.ShowPriceAlert == showPriceAlert && i.Seconds == seconds);
 
 			if (indicator != null)
 				return indicator;
@@ -252,6 +263,7 @@ namespace AgenaTrader.UserCode
 							Name_of_list = name_of_list,
 							ShowTrades = showTrades,
 							ShowProposals = showProposals,
+							ShowPriceAlert = showPriceAlert,
 							Seconds = seconds
 						};
 			indicator.SetUp();
@@ -271,20 +283,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Adds instruments dynamical to a static list (e.g. portfolio) if there is an order on it or there is an trade on it.
 		/// </summary>
-		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Int32 seconds)
+		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
 		{
-			return LeadIndicator.DynamicListTrades_Indicator_Tool(Input, name_of_list, showTrades, showProposals, seconds);
+			return LeadIndicator.DynamicListTrades_Indicator_Tool(Input, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
 		}
 
 		/// <summary>
 		/// Adds instruments dynamical to a static list (e.g. portfolio) if there is an order on it or there is an trade on it.
 		/// </summary>
-		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(IDataSeries input, System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Int32 seconds)
+		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(IDataSeries input, System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.DynamicListTrades_Indicator_Tool(input, name_of_list, showTrades, showProposals, seconds);
+			return LeadIndicator.DynamicListTrades_Indicator_Tool(input, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
 		}
 	}
 
@@ -297,17 +309,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Adds instruments dynamical to a static list (e.g. portfolio) if there is an order on it or there is an trade on it.
 		/// </summary>
-		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Int32 seconds)
+		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
 		{
-			return LeadIndicator.DynamicListTrades_Indicator_Tool(Input, name_of_list, showTrades, showProposals, seconds);
+			return LeadIndicator.DynamicListTrades_Indicator_Tool(Input, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
 		}
 
 		/// <summary>
 		/// Adds instruments dynamical to a static list (e.g. portfolio) if there is an order on it or there is an trade on it.
 		/// </summary>
-		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(IDataSeries input, System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Int32 seconds)
+		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(IDataSeries input, System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
 		{
-			return LeadIndicator.DynamicListTrades_Indicator_Tool(input, name_of_list, showTrades, showProposals, seconds);
+			return LeadIndicator.DynamicListTrades_Indicator_Tool(input, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
 		}
 	}
 
@@ -320,17 +332,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Adds instruments dynamical to a static list (e.g. portfolio) if there is an order on it or there is an trade on it.
 		/// </summary>
-		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Int32 seconds)
+		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
 		{
-			return LeadIndicator.DynamicListTrades_Indicator_Tool(Input, name_of_list, showTrades, showProposals, seconds);
+			return LeadIndicator.DynamicListTrades_Indicator_Tool(Input, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
 		}
 
 		/// <summary>
 		/// Adds instruments dynamical to a static list (e.g. portfolio) if there is an order on it or there is an trade on it.
 		/// </summary>
-		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(IDataSeries input, System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Int32 seconds)
+		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(IDataSeries input, System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
 		{
-			return LeadIndicator.DynamicListTrades_Indicator_Tool(input, name_of_list, showTrades, showProposals, seconds);
+			return LeadIndicator.DynamicListTrades_Indicator_Tool(input, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
 		}
 	}
 

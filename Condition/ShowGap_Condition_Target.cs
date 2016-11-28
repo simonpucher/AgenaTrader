@@ -341,3 +341,122 @@ namespace AgenaTrader.UserCode
 		#endregion
 	}
 }
+#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
+
+namespace AgenaTrader.UserCode
+{
+	#region Indicator
+
+	public partial class UserIndicator
+	{
+		/// <summary>
+		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
+		/// </summary>
+		public ShowGap_Condition_Target ShowGap_Condition_Target(System.Int32 punkteGapMin, System.Int32 punkteGapMax)
+        {
+			return ShowGap_Condition_Target(Input, punkteGapMin, punkteGapMax);
+		}
+
+		/// <summary>
+		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
+		/// </summary>
+		public ShowGap_Condition_Target ShowGap_Condition_Target(IDataSeries input, System.Int32 punkteGapMin, System.Int32 punkteGapMax)
+		{
+			var indicator = CachedCalculationUnits.GetCachedIndicator<ShowGap_Condition_Target>(input, i => i.PunkteGapMin == punkteGapMin && i.PunkteGapMax == punkteGapMax);
+
+			if (indicator != null)
+				return indicator;
+
+			indicator = new ShowGap_Condition_Target
+						{
+							BarsRequired = BarsRequired,
+							CalculateOnBarClose = CalculateOnBarClose,
+							Input = input,
+							PunkteGapMin = punkteGapMin,
+							PunkteGapMax = punkteGapMax
+						};
+			indicator.SetUp();
+
+			CachedCalculationUnits.AddIndicator2Cache(indicator);
+
+			return indicator;
+		}
+	}
+
+	#endregion
+
+	#region Strategy
+
+	public partial class UserStrategy
+	{
+		/// <summary>
+		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
+		/// </summary>
+		public ShowGap_Condition_Target ShowGap_Condition_Target(System.Int32 punkteGapMin, System.Int32 punkteGapMax)
+		{
+			return LeadIndicator.ShowGap_Condition_Target(Input, punkteGapMin, punkteGapMax);
+		}
+
+		/// <summary>
+		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
+		/// </summary>
+		public ShowGap_Condition_Target ShowGap_Condition_Target(IDataSeries input, System.Int32 punkteGapMin, System.Int32 punkteGapMax)
+		{
+			if (InInitialize && input == null)
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+
+			return LeadIndicator.ShowGap_Condition_Target(input, punkteGapMin, punkteGapMax);
+		}
+	}
+
+	#endregion
+
+	#region Column
+
+	public partial class UserColumn
+	{
+		/// <summary>
+		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
+		/// </summary>
+		public ShowGap_Condition_Target ShowGap_Condition_Target(System.Int32 punkteGapMin, System.Int32 punkteGapMax)
+		{
+			return LeadIndicator.ShowGap_Condition_Target(Input, punkteGapMin, punkteGapMax);
+		}
+
+		/// <summary>
+		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
+		/// </summary>
+		public ShowGap_Condition_Target ShowGap_Condition_Target(IDataSeries input, System.Int32 punkteGapMin, System.Int32 punkteGapMax)
+		{
+			return LeadIndicator.ShowGap_Condition_Target(input, punkteGapMin, punkteGapMax);
+		}
+	}
+
+	#endregion
+
+	#region Scripted Condition
+
+	public partial class UserScriptedCondition
+	{
+		/// <summary>
+		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
+		/// </summary>
+		public ShowGap_Condition_Target ShowGap_Condition_Target(System.Int32 punkteGapMin, System.Int32 punkteGapMax)
+		{
+			return LeadIndicator.ShowGap_Condition_Target(Input, punkteGapMin, punkteGapMax);
+		}
+
+		/// <summary>
+		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
+		/// </summary>
+		public ShowGap_Condition_Target ShowGap_Condition_Target(IDataSeries input, System.Int32 punkteGapMin, System.Int32 punkteGapMax)
+		{
+			return LeadIndicator.ShowGap_Condition_Target(input, punkteGapMin, punkteGapMax);
+		}
+	}
+
+	#endregion
+
+}
+
+#endregion

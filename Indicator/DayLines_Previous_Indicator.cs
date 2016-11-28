@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -33,7 +33,8 @@ namespace AgenaTrader.UserCode
 		#region Variables
 
         private int _howmanydays = 3;
-        private bool _extendlines = false;
+        private bool _extendlines = true;
+        private bool _showcurrentday = false;
         private bool _showlines = true;
 
         private bool _showopen = true;
@@ -118,44 +119,51 @@ namespace AgenaTrader.UserCode
                         startdate = list.First().Time;
                     }
 
-                    if (_showopen)
+                    if (!_showcurrentday && i == 0)
                     {
-                        DrawLine("Open_" + date.ToString(), this.AutoScale, startdate, Opens[1][i], datetillend, Opens[1][i], this.Color_O, this.DashStyle_O, this.LineWidth_O);
+                        //omit
                     }
-                    if (_showhigh)
-                    {
-                        DrawLine("High_" + date.ToString(), this.AutoScale, startdate, Highs[1][i], datetillend, Highs[1][i], this.Color_H, this.DashStyle_H, this.LineWidth_H);
-                    }
-                    if (_showlow)
-                    {
-                        DrawLine("Low_" + date.ToString(), this.AutoScale, startdate, Lows[1][i], datetillend, Lows[1][i], this.Color_L, this.DashStyle_L, this.LineWidth_L);
-                    }
-                    if (_showclose)
-                    {
-                        DrawLine("Close_" + date.ToString(), this.AutoScale, startdate, Closes[1][i], datetillend, Closes[1][i], this.Color_C, this.DashStyle_C, this.LineWidth_C);
-                    }
-
-
-                    if (_showlines)
-                    {
-                        DateTime enddrawing_string = datetillend.AddSeconds(this.TimeFrame.GetSeconds() + this.TimeFrame.GetSeconds() * 0.15);
+                    else {
                         if (_showopen)
                         {
-                            DrawText("String_Open_" + date.ToString(), this.AutoScale, "O " + i.ToString(), enddrawing_string, Opens[1][i], 0, this.Color_O, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                            DrawLine("Open_" + date.ToString(), this.AutoScale, startdate, Opens[1][i], datetillend, Opens[1][i], this.Color_O, this.DashStyle_O, this.LineWidth_O);
                         }
                         if (_showhigh)
                         {
-                            DrawText("String_High_" + date.ToString(), this.AutoScale, "H " + i.ToString(), enddrawing_string, Highs[1][i], 0, this.Color_H, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                            DrawLine("High_" + date.ToString(), this.AutoScale, startdate, Highs[1][i], datetillend, Highs[1][i], this.Color_H, this.DashStyle_H, this.LineWidth_H);
                         }
                         if (_showlow)
                         {
-                            DrawText("String_Low_" + date.ToString(), this.AutoScale, "L " + i.ToString(), enddrawing_string, Lows[1][i], 0, this.Color_L, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                            DrawLine("Low_" + date.ToString(), this.AutoScale, startdate, Lows[1][i], datetillend, Lows[1][i], this.Color_L, this.DashStyle_L, this.LineWidth_L);
                         }
                         if (_showclose)
                         {
-                            DrawText("String_Close_" + date.ToString(), this.AutoScale, "C " + i.ToString(), enddrawing_string, Closes[1][i], 0, this.Color_C, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                            DrawLine("Close_" + date.ToString(), this.AutoScale, startdate, Closes[1][i], datetillend, Closes[1][i], this.Color_C, this.DashStyle_C, this.LineWidth_C);
+                        }
+
+
+                        if (_showlines)
+                        {
+                            DateTime enddrawing_string = datetillend.AddSeconds(this.TimeFrame.GetSeconds() + this.TimeFrame.GetSeconds() * 0.15);
+                            if (_showopen)
+                            {
+                                DrawText("String_Open_" + date.ToString(), this.AutoScale, "O " + i.ToString(), enddrawing_string, Opens[1][i], 0, this.Color_O, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                            }
+                            if (_showhigh)
+                            {
+                                DrawText("String_High_" + date.ToString(), this.AutoScale, "H " + i.ToString(), enddrawing_string, Highs[1][i], 0, this.Color_H, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                            }
+                            if (_showlow)
+                            {
+                                DrawText("String_Low_" + date.ToString(), this.AutoScale, "L " + i.ToString(), enddrawing_string, Lows[1][i], 0, this.Color_L, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                            }
+                            if (_showclose)
+                            {
+                                DrawText("String_Close_" + date.ToString(), this.AutoScale, "C " + i.ToString(), enddrawing_string, Closes[1][i], 0, this.Color_C, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                            }
                         }
                     }
+                    
 
                     ++i;
                 }
@@ -208,7 +216,16 @@ namespace AgenaTrader.UserCode
             set { _extendlines = value; }
         }
 
-      
+        
+        [Description("If true then the lines of the current day is shown.")]
+        [Category("Parameters")]
+        [DisplayName("Show current day")]
+        public bool ShowCurrentDay
+        {
+            get { return _showcurrentday; }
+            set { _showcurrentday = value; }
+        }
+
 
         [Description("Names of the lines will be shown next to the line.")]
         [Category("Parameters")]
@@ -475,17 +492,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Draws days lines from previous day.
 		/// </summary>
-		public DayLines_Previous_Indicator DayLines_Previous_Indicator(System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
+		public DayLines_Previous_Indicator DayLines_Previous_Indicator(System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showCurrentDay, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
         {
-			return DayLines_Previous_Indicator(Input, howManyDays, extendLines, showLines, showOpen, showHigh, showLow, showClose);
+			return DayLines_Previous_Indicator(Input, howManyDays, extendLines, showCurrentDay, showLines, showOpen, showHigh, showLow, showClose);
 		}
 
 		/// <summary>
 		/// Draws days lines from previous day.
 		/// </summary>
-		public DayLines_Previous_Indicator DayLines_Previous_Indicator(IDataSeries input, System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
+		public DayLines_Previous_Indicator DayLines_Previous_Indicator(IDataSeries input, System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showCurrentDay, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<DayLines_Previous_Indicator>(input, i => i.HowManyDays == howManyDays && i.ExtendLines == extendLines && i.ShowLines == showLines && i.ShowOpen == showOpen && i.ShowHigh == showHigh && i.ShowLow == showLow && i.ShowClose == showClose);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<DayLines_Previous_Indicator>(input, i => i.HowManyDays == howManyDays && i.ExtendLines == extendLines && i.ShowCurrentDay == showCurrentDay && i.ShowLines == showLines && i.ShowOpen == showOpen && i.ShowHigh == showHigh && i.ShowLow == showLow && i.ShowClose == showClose);
 
 			if (indicator != null)
 				return indicator;
@@ -497,6 +514,7 @@ namespace AgenaTrader.UserCode
 							Input = input,
 							HowManyDays = howManyDays,
 							ExtendLines = extendLines,
+							ShowCurrentDay = showCurrentDay,
 							ShowLines = showLines,
 							ShowOpen = showOpen,
 							ShowHigh = showHigh,
@@ -520,20 +538,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Draws days lines from previous day.
 		/// </summary>
-		public DayLines_Previous_Indicator DayLines_Previous_Indicator(System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
+		public DayLines_Previous_Indicator DayLines_Previous_Indicator(System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showCurrentDay, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
 		{
-			return LeadIndicator.DayLines_Previous_Indicator(Input, howManyDays, extendLines, showLines, showOpen, showHigh, showLow, showClose);
+			return LeadIndicator.DayLines_Previous_Indicator(Input, howManyDays, extendLines, showCurrentDay, showLines, showOpen, showHigh, showLow, showClose);
 		}
 
 		/// <summary>
 		/// Draws days lines from previous day.
 		/// </summary>
-		public DayLines_Previous_Indicator DayLines_Previous_Indicator(IDataSeries input, System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
+		public DayLines_Previous_Indicator DayLines_Previous_Indicator(IDataSeries input, System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showCurrentDay, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
 		{
 			if (InInitialize && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
-			return LeadIndicator.DayLines_Previous_Indicator(input, howManyDays, extendLines, showLines, showOpen, showHigh, showLow, showClose);
+			return LeadIndicator.DayLines_Previous_Indicator(input, howManyDays, extendLines, showCurrentDay, showLines, showOpen, showHigh, showLow, showClose);
 		}
 	}
 
@@ -546,17 +564,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Draws days lines from previous day.
 		/// </summary>
-		public DayLines_Previous_Indicator DayLines_Previous_Indicator(System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
+		public DayLines_Previous_Indicator DayLines_Previous_Indicator(System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showCurrentDay, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
 		{
-			return LeadIndicator.DayLines_Previous_Indicator(Input, howManyDays, extendLines, showLines, showOpen, showHigh, showLow, showClose);
+			return LeadIndicator.DayLines_Previous_Indicator(Input, howManyDays, extendLines, showCurrentDay, showLines, showOpen, showHigh, showLow, showClose);
 		}
 
 		/// <summary>
 		/// Draws days lines from previous day.
 		/// </summary>
-		public DayLines_Previous_Indicator DayLines_Previous_Indicator(IDataSeries input, System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
+		public DayLines_Previous_Indicator DayLines_Previous_Indicator(IDataSeries input, System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showCurrentDay, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
 		{
-			return LeadIndicator.DayLines_Previous_Indicator(input, howManyDays, extendLines, showLines, showOpen, showHigh, showLow, showClose);
+			return LeadIndicator.DayLines_Previous_Indicator(input, howManyDays, extendLines, showCurrentDay, showLines, showOpen, showHigh, showLow, showClose);
 		}
 	}
 
@@ -569,17 +587,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Draws days lines from previous day.
 		/// </summary>
-		public DayLines_Previous_Indicator DayLines_Previous_Indicator(System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
+		public DayLines_Previous_Indicator DayLines_Previous_Indicator(System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showCurrentDay, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
 		{
-			return LeadIndicator.DayLines_Previous_Indicator(Input, howManyDays, extendLines, showLines, showOpen, showHigh, showLow, showClose);
+			return LeadIndicator.DayLines_Previous_Indicator(Input, howManyDays, extendLines, showCurrentDay, showLines, showOpen, showHigh, showLow, showClose);
 		}
 
 		/// <summary>
 		/// Draws days lines from previous day.
 		/// </summary>
-		public DayLines_Previous_Indicator DayLines_Previous_Indicator(IDataSeries input, System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
+		public DayLines_Previous_Indicator DayLines_Previous_Indicator(IDataSeries input, System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showCurrentDay, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
 		{
-			return LeadIndicator.DayLines_Previous_Indicator(input, howManyDays, extendLines, showLines, showOpen, showHigh, showLow, showClose);
+			return LeadIndicator.DayLines_Previous_Indicator(input, howManyDays, extendLines, showCurrentDay, showLines, showOpen, showHigh, showLow, showClose);
 		}
 	}
 
