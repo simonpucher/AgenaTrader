@@ -80,7 +80,7 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnBarUpdate()
 		{
-            if (this.Bars != null && this.Bars.Count > 0)
+            if (this.Bars != null && this.Bars.Count >  0 && CurrentBar > 3)
             {
                 //ShowGap Indikator aufrufen. Dieser liefert 100 für Long Einstieg und -100 für Short Einstieg. Liefert 0 für kein Einstiegssignal
                 double PopGun_Indicator_Value = this._popgun_indicator.calculate(this.Bars, this.CurrentBar, this.PopGunType);
