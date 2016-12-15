@@ -183,27 +183,27 @@ namespace AgenaTrader.UserCode
  
             }
             else if (this.PopGunType == UserCode.PopGunType.ThreeBarReversal) {
-                if (Bars[2].IsFalling && Bars[1].IsFalling && TwoBarsAgo_Low > OneBarAgo_Low && bars[0].Close > TwoBarsAgo_High && bars[0].Close > OneBarAgo_High)
+                if (bars[2].IsFalling && bars[1].IsFalling && TwoBarsAgo_Low > OneBarAgo_Low && bars[0].Close > TwoBarsAgo_High && bars[0].Close > OneBarAgo_High)
                 {
                     returnvalue = 100;
                     if (this.DrawLinesOnChart)
                     {
-                        DrawLine("high_" + Bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[0].Close, bars[0].Time.AddDays(5), bars[0].Close, Color.Green, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
+                        DrawLine("high_" + bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[0].Close, bars[0].Time.AddDays(5), bars[0].Close, Color.Green, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
 
-                        DrawLine("low_" + Bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[1].Close, bars[0].Time.AddDays(5), bars[1].Close, Color.Red, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
+                        DrawLine("low_" + bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[1].Close, bars[0].Time.AddDays(5), bars[1].Close, Color.Red, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
                         
                     }
 
                 }
-                else if (Bars[2].IsGrowing && Bars[1].IsGrowing && TwoBarsAgo_High < OneBarAgo_High && bars[0].Close < TwoBarsAgo_Low && bars[0].Close < OneBarAgo_Low)
+                else if (bars[2].IsGrowing && bars[1].IsGrowing && TwoBarsAgo_High < OneBarAgo_High && bars[0].Close < TwoBarsAgo_Low && bars[0].Close < OneBarAgo_Low)
                 {
                     returnvalue = -100;
 
                     if (this.DrawLinesOnChart)
                     {
-                        DrawLine("high_" + Bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[0].Close, bars[0].Time.AddDays(5), bars[0].Close, Color.Red, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
+                        DrawLine("high_" + bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[0].Close, bars[0].Time.AddDays(5), bars[0].Close, Color.Red, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
 
-                        DrawLine("low_" + Bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[1].Close, bars[0].Time.AddDays(5), bars[1].Close, Color.Green, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
+                        DrawLine("low_" + bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[1].Close, bars[0].Time.AddDays(5), bars[1].Close, Color.Green, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
 
                     }
                 }
@@ -221,7 +221,7 @@ namespace AgenaTrader.UserCode
 
             if (this.DrawLinesOnChart && curbar == PopGunTriggerBar)
             {
-                DrawText(("PopGunSize" + curbar), (Math.Round((((Bars[0].High - Bars[0].Low) / Bars[0].Close) * 100),2)).ToString(), 0, bars.GetByIndex(PopGunTriggerBar).Low - TickSize*bars[0].Close, Color.Black);
+                DrawText(("PopGunSize" + curbar), (Math.Round((((bars[0].High - bars[0].Low) / bars[0].Close) * 100),2)).ToString(), 0, bars.GetByIndex(PopGunTriggerBar).Low - TickSize*bars[0].Close, Color.Black);
             }
 
             if (curbar <= PopGunTarget
