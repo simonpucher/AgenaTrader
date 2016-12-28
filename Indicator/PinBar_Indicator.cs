@@ -43,33 +43,33 @@ namespace AgenaTrader.UserCode
         private int _plot0width = Const.DefaultLineWidth;
         private DashStyle _plot0dashstyle = Const.DefaultIndicatorDashStyle;
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
             Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "PinBar_Indicator"));
-            Overlay = true;
-            CalculateOnBarClose = true;
-            AutoScale = true;
+            IsOverlay = true;
+            CalculateOnClosedBar = true;
+            IsAutoAdjustableScale = true;
 
-            //this.BarsRequired = 200;
+            //this.RequiredBarsCount = 200;
 
      
         }
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
 		{
             //Bars[0].IsGrowing && 
             if ((Bars[0].TailBottom/Bars[0].Range) > (this.Percentage/100.0))
             {
-                DrawArrowUp("ArrowLong_PinBar" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, this.ColorArrowLongSignal);
+                AddChartArrowUp("ArrowLong_PinBar" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, this.ColorArrowLongSignal);
             }
             else if ((Bars[0].TailTop/Bars[0].Range) > (this.Percentage/100.0))
             {
-                DrawArrowDown("ArrowShort_PinBar" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].High, this.ColorArrowShortSignal);
+                AddChartArrowDown("ArrowShort_PinBar" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].High, this.ColorArrowShortSignal);
             }
 
             //if (ShowArrows)
             //{
-            //    DrawArrowUp("ArrowLong_PinBar" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, this.ColorArrowLongSignal);
+            //    AddChartArrowUp("ArrowLong_PinBar" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, this.ColorArrowLongSignal);
             //}
 
 
@@ -99,7 +99,7 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries PlotLine
         {
-            get { return Values[0]; }
+            get { return Outputs[0]; }
         }
 
         /// <summary>
@@ -230,7 +230,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PinBar_indicator PinBar_indicator()
         {
-			return PinBar_indicator(Input);
+			return PinBar_indicator(InSeries);
 		}
 
 		/// <summary>
@@ -245,9 +245,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new PinBar_indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input
 						};
 			indicator.SetUp();
 
@@ -268,7 +268,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PinBar_indicator PinBar_indicator()
 		{
-			return LeadIndicator.PinBar_indicator(Input);
+			return LeadIndicator.PinBar_indicator(InSeries);
 		}
 
 		/// <summary>
@@ -276,7 +276,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PinBar_indicator PinBar_indicator(IDataSeries input)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.PinBar_indicator(input);
@@ -294,7 +294,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PinBar_indicator PinBar_indicator()
 		{
-			return LeadIndicator.PinBar_indicator(Input);
+			return LeadIndicator.PinBar_indicator(InSeries);
 		}
 
 		/// <summary>
@@ -317,7 +317,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PinBar_indicator PinBar_indicator()
 		{
-			return LeadIndicator.PinBar_indicator(Input);
+			return LeadIndicator.PinBar_indicator(InSeries);
 		}
 
 		/// <summary>

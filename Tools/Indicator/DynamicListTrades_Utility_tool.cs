@@ -18,7 +18,7 @@ using System.Windows.Forms;
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
 /// todo
-/// + if markets are closed no OnBarUpdate() is called so we need an timer event.
+/// + if markets are closed no OnCalculate() is called so we need an timer event.
 /// -------------------------------------------------------------------------
 /// Adds instruments dynamical to a static list (e.g. portfolio) if there is an order on it or there is an trade on it.
 /// -------------------------------------------------------------------------
@@ -47,17 +47,17 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
-            Overlay = true;
-            CalculateOnBarClose = false;
+            IsOverlay = true;
+            CalculateOnClosedBar = false;
         }
 
 
    
 
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
             this.CheckForNewInstruments();
         }
@@ -168,7 +168,7 @@ namespace AgenaTrader.UserCode
 
    
 
-        #region Input
+        #region InSeries
 
 
         [Description("The name of the static list to which you would like to add the instruments.")]
@@ -242,7 +242,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
         {
-			return DynamicListTrades_Indicator_Tool(Input, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
+			return DynamicListTrades_Indicator_Tool(InSeries, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
 		}
 
 		/// <summary>
@@ -257,9 +257,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new DynamicListTrades_Indicator_Tool
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							Name_of_list = name_of_list,
 							ShowTrades = showTrades,
 							ShowProposals = showProposals,
@@ -285,7 +285,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
 		{
-			return LeadIndicator.DynamicListTrades_Indicator_Tool(Input, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
+			return LeadIndicator.DynamicListTrades_Indicator_Tool(InSeries, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
 		}
 
 		/// <summary>
@@ -293,7 +293,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(IDataSeries input, System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.DynamicListTrades_Indicator_Tool(input, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
@@ -311,7 +311,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
 		{
-			return LeadIndicator.DynamicListTrades_Indicator_Tool(Input, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
+			return LeadIndicator.DynamicListTrades_Indicator_Tool(InSeries, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
 		}
 
 		/// <summary>
@@ -334,7 +334,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
 		{
-			return LeadIndicator.DynamicListTrades_Indicator_Tool(Input, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
+			return LeadIndicator.DynamicListTrades_Indicator_Tool(InSeries, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
 		}
 
 		/// <summary>

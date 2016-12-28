@@ -43,18 +43,18 @@ namespace AgenaTrader.UserCode
 
 
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
-            CalculateOnBarClose = true;
+            CalculateOnClosedBar = true;
             IsAutomated = false;
         }
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
             string ocoId;
             double StopForReversalTrade;
 
-            if (!IsCurrentBarLast || oEnter != null)
+            if (!IsProcessingBarIndexLast || oEnter != null)
             {
                 return;
             }
@@ -71,7 +71,7 @@ namespace AgenaTrader.UserCode
             else
             {
                 Reversal_Indicator_Value = 100;
-                StopForReversalTrade = (Bars[CurrentBar].Close - 50 * TickSize);
+                StopForReversalTrade = (Bars[ProcessingBarIndex].Close - 50 * TickSize);
             }
 
 
@@ -104,7 +104,7 @@ namespace AgenaTrader.UserCode
         }
 
 
-        protected override void OnExecution(IExecution execution)
+        protected override void OnOrderExecution(IExecution execution)
         {
             DateTime ts_Ausstieg;
 
@@ -123,7 +123,7 @@ namespace AgenaTrader.UserCode
             //}
 
 
-            if (execution.MarketPosition == PositionType.Flat)
+            if (execution.PositionType == PositionType.Flat)
             {
                 oStop = null;    //den Stop zuerst
                 oEnter = null;

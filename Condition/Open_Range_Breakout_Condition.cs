@@ -64,31 +64,31 @@ namespace AgenaTrader.UserCode
 
 		#endregion
 
-		protected override void Initialize()
+		protected override void OnInit()
 		{
 			IsEntry = true;
 			IsStop = false;
 			IsTarget = false;
             Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "Occurred"));
             //Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "Entry"));
-			Overlay = true;
-			CalculateOnBarClose = false;
+			IsOverlay = true;
+			CalculateOnClosedBar = false;
 
             //Because of Backtesting reasons if we use the afvanced mode we need at least two bars
-            this.BarsRequired = 2;
+            this.RequiredBarsCount = 2;
 		}
 
-        protected override void InitRequirements()
+        protected override void OnBarsRequirements()
         {
-            base.InitRequirements();
+            base.OnBarsRequirements();
 
         
         }
 
 
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
-            base.OnStartUp();
+            base.OnStart();
 
             //Init our indicator to get code access
             this._orb_indicator = new ORB_Indicator();
@@ -104,7 +104,7 @@ namespace AgenaTrader.UserCode
 
        
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
 
             _orb_indicator.calculate(this.Bars, this.Bars[0]);
@@ -153,7 +153,7 @@ namespace AgenaTrader.UserCode
         #region Properties
 
 
-        #region Input
+        #region InSeries
 
         /// <summary>
         /// </summary>
@@ -304,14 +304,14 @@ namespace AgenaTrader.UserCode
                 [XmlIgnore()]
                 public DataSeries Occurred
                 {
-                    get { return Values[0]; }
+                    get { return Outputs[0]; }
                 }
 
                 [Browsable(false)]
                 [XmlIgnore()]
                 public DataSeries Entry
                 {
-                    get { return Values[1]; }
+                    get { return Outputs[1]; }
                 }
 
                 public override IList<DataSeries> GetEntries()
@@ -340,7 +340,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ORB_Condition ORB_Condition()
         {
-			return ORB_Condition(Input);
+			return ORB_Condition(InSeries);
 		}
 
 		/// <summary>
@@ -355,9 +355,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new ORB_Condition
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input
 						};
 			indicator.SetUp();
 
@@ -378,7 +378,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ORB_Condition ORB_Condition()
 		{
-			return LeadIndicator.ORB_Condition(Input);
+			return LeadIndicator.ORB_Condition(InSeries);
 		}
 
 		/// <summary>
@@ -386,7 +386,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ORB_Condition ORB_Condition(IDataSeries input)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.ORB_Condition(input);
@@ -404,7 +404,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ORB_Condition ORB_Condition()
 		{
-			return LeadIndicator.ORB_Condition(Input);
+			return LeadIndicator.ORB_Condition(InSeries);
 		}
 
 		/// <summary>
@@ -427,7 +427,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ORB_Condition ORB_Condition()
 		{
-			return LeadIndicator.ORB_Condition(Input);
+			return LeadIndicator.ORB_Condition(InSeries);
 		}
 
 		/// <summary>

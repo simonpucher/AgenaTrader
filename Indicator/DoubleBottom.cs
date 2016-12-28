@@ -20,25 +20,25 @@ namespace AgenaTrader.UserCode
         double _tolerancePercentage = 0.6;
 
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
             Add(new Plot(Color.Red, "DoubleBottom_DS"));
-            Overlay = false;
-            CalculateOnBarClose = true;
+            IsOverlay = false;
+            CalculateOnClosedBar = true;
 
-            //Inhalt des OutputWindow löschen
+            //Inhalt des OutputWindow lï¿½schen
             ClearOutputWindow();
         }
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
 
-            if (CurrentBar == Bars.Count - 1)
+            if (ProcessingBarIndex == Bars.Count - 1)
             {
                 Print("asdf");
             }
 
-            if (CurrentBar == 1978)
+            if (ProcessingBarIndex == 1978)
             {
                 Print("asdf");
             }
@@ -73,7 +73,7 @@ namespace AgenaTrader.UserCode
                           bar.Close, bar.Time.ToString());
 
                     string strdoubleBottomConnecter = "DoubleBottomConnecter_" + Bars[0].Time.ToString() + "_" + bar.Time.ToString();
-                    DrawLine(strdoubleBottomConnecter, Bars.GetBarsAgo(bar.Time), bar.Low, 0, Bars[0].Low, Color.Red);
+                    AddChartLine(strdoubleBottomConnecter, Bars.GetBarsAgo(bar.Time), bar.Low, 0, Bars[0].Low, Color.Red);
 
 
                     double BreakThrough = HighestHighPrice(Bars.GetBarsAgo(bar.Time))[0];
@@ -81,8 +81,8 @@ namespace AgenaTrader.UserCode
 
                     string strBreakThrough = strdoubleBottomConnecter + "BreakThrough";
                     string strBreakThroughVert = strdoubleBottomConnecter + "BreakThroughVert";
-                    DrawHorizontalLine(strBreakThrough, BreakThrough, Color.Green);
-                    DrawLine(strBreakThroughVert, (int)BreakThroughAgo, bar.Low, (int)BreakThroughAgo, BreakThrough, Color.Aquamarine);
+                    AddChartHorizontalLine(strBreakThrough, BreakThrough, Color.Green);
+                    AddChartLine(strBreakThroughVert, (int)BreakThroughAgo, bar.Low, (int)BreakThroughAgo, BreakThrough, Color.Aquamarine);
 
                     DoubleBottom_DS.Set(1);
                     DoubleBottom_DS.Set(Bars.GetBarsAgo(bar.Time), 0.5);
@@ -100,7 +100,7 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries DoubleBottom_DS
         {
-            get { return Values[0]; }
+            get { return Outputs[0]; }
         }
 
         public double TolerancePercentage
@@ -132,7 +132,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DoubleBottom DoubleBottom()
         {
-			return DoubleBottom(Input);
+			return DoubleBottom(InSeries);
 		}
 
 		/// <summary>
@@ -147,9 +147,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new DoubleBottom
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input
 						};
 			indicator.SetUp();
 
@@ -170,7 +170,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DoubleBottom DoubleBottom()
 		{
-			return LeadIndicator.DoubleBottom(Input);
+			return LeadIndicator.DoubleBottom(InSeries);
 		}
 
 		/// <summary>
@@ -178,7 +178,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DoubleBottom DoubleBottom(IDataSeries input)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.DoubleBottom(input);
@@ -196,7 +196,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DoubleBottom DoubleBottom()
 		{
-			return LeadIndicator.DoubleBottom(Input);
+			return LeadIndicator.DoubleBottom(InSeries);
 		}
 
 		/// <summary>
@@ -219,7 +219,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DoubleBottom DoubleBottom()
 		{
-			return LeadIndicator.DoubleBottom(Input);
+			return LeadIndicator.DoubleBottom(InSeries);
 		}
 
 		/// <summary>

@@ -46,16 +46,16 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
-            CalculateOnBarClose = true;
-            BarsRequired = 5;
+            CalculateOnClosedBar = true;
+            RequiredBarsCount = 5;
             _DeepCorrectionTrend_Indikator = new DeepCorrectionTrend_Indikator();
         }
 
-        protected override void OnExecution(IExecution execution)
+        protected override void OnOrderExecution(IExecution execution)
         {
-            if (execution.MarketPosition == PositionType.Flat)
+            if (execution.PositionType == PositionType.Flat)
             {
                 _orderentershort = null;
                 _orderenterlong = null;
@@ -63,10 +63,10 @@ namespace AgenaTrader.UserCode
         }
 
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
             //for debugging reason only, just to get a hook in
-            if (CurrentBar + 1 == 157)
+            if (ProcessingBarIndex + 1 == 157)
             {
                 int a = 1 + 1;
             }
@@ -104,13 +104,13 @@ namespace AgenaTrader.UserCode
             if (_orderenterlong == null)
             {
                 Print("Strategie" + Bars[0].Time + " Long " + "Close: " + Bars[0].Close + " StopLoss: " + StopLoss + " Target: " + Target);
-                _orderenterlong = EnterLong(//GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), 
+                _orderenterlong = OpenLong(//GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), 
                                            10,
                                            this.GetType().Name + " " + PositionType.Long + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(),
                                            this.Instrument,
                                            this.TimeFrame);
-                SetStopLoss(_orderenterlong.Name, CalculationMode.Price, StopLoss, false);
-                SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, Target);
+                SetUpStopLoss(_orderenterlong.Name, CalculationMode.Price, StopLoss, false);
+                SetUpProfitTarget(_orderenterlong.Name, CalculationMode.Price, Target);
             }
         }
 
@@ -122,11 +122,11 @@ namespace AgenaTrader.UserCode
             if (_orderentershort == null)
             {
                 Print("Short" + "Close: " + Bars[0].Close + "StopLoss: " + StopLoss + " Target: " + Target);
-                _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-                ////SetStopLoss(_orderentershort.Name, CalculationMode.Price, StopLoss, false);
-                ////SetProfitTarget(_orderentershort.Name, CalculationMode.Price, Target);
-                SetStopLoss(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 1.05, false);
-                SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close / 1.11);
+                _orderentershort = OpenShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+                ////SetUpStopLoss(_orderentershort.Name, CalculationMode.Price, StopLoss, false);
+                ////SetUpProfitTarget(_orderentershort.Name, CalculationMode.Price, Target);
+                SetUpStopLoss(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 1.05, false);
+                SetUpProfitTarget(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close / 1.11);
             }
         }
 

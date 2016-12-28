@@ -38,20 +38,20 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
             //Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
-            Overlay = true;
+            IsOverlay = true;
             
         }
 
 
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
 
             // Add event listener
-            if (ChartControl != null)
-                ChartControl.ChartPanelMouseDown += OnChartPanelMouseDown;
+            if (Chart != null)
+                Chart.ChartPanelMouseDown += OnChartPanelMouseDown;
 
             if (this.Instrument != null)
             {
@@ -78,11 +78,11 @@ namespace AgenaTrader.UserCode
         }
 
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
-            //MyPlot1.Set(Input[0]);
+            //MyPlot1.Set(InSeries[0]);
 
-            if (this.IsCurrentBarLast && _list != null && _list.Count > 0)
+            if (this.IsProcessingBarIndexLast && _list != null && _list.Count > 0)
             {
                 if (_list.Contains((Instrument)this.Instrument))
                 {
@@ -97,11 +97,11 @@ namespace AgenaTrader.UserCode
 
         }
 
-        protected override void OnTermination()
+        protected override void OnDispose()
         {
             // Remove event listener
-            if (ChartControl != null)
-                ChartControl.ChartPanelMouseDown -= OnChartPanelMouseDown;
+            if (Chart != null)
+                Chart.ChartPanelMouseDown -= OnChartPanelMouseDown;
         }
 
 
@@ -124,9 +124,9 @@ namespace AgenaTrader.UserCode
 
 
 
-        public override void Plot(Graphics g, Rectangle r, double min, double max)
+        public override void OnPaint(Graphics g, Rectangle r, double min, double max)
         {
-            if (Bars == null || ChartControl == null) return;
+            if (Bars == null || Chart == null) return;
 
             //Only draw button if parameters are available.
             if (this.Instrument != null && _list != null && _list.Count > 0)
@@ -167,7 +167,7 @@ namespace AgenaTrader.UserCode
         private void OnChartPanelMouseDown(object sender, System.Windows.Forms.MouseEventArgs e)
         {
             //Print("X = {0}, Y = {1}", e.X, e.Y);
-            //Print("X = {0}, Y = {1}", ChartControl.GetDateTimeByX(e.X), ChartControl.GetPriceByY(e.Y));
+            //Print("X = {0}, Y = {1}", Chart.GetDateTimeByX(e.X), Chart.GetPriceByY(e.Y));
 
             Point cursorPos = new Point(e.X, e.Y);
             if (_rect.Contains(cursorPos))
@@ -186,7 +186,7 @@ namespace AgenaTrader.UserCode
                 //nothing to do
             }
 
-            this.OnBarUpdate();
+            this.OnCalculate();
 
         }
 
@@ -204,14 +204,14 @@ namespace AgenaTrader.UserCode
         //    [XmlIgnore()]
         //    public DataSeries MyPlot1
         //    {
-        //        get { return Values[0]; }
+        //        get { return Outputs[0]; }
         //    }
 
 
 
         #endregion
 
-        #region Input
+        #region InSeries
 
 
         [Description("The name of the static list to which you would like to add the instruments.")]
@@ -298,7 +298,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public QuickAdd_Indicator_Tool QuickAdd_Indicator_Tool()
         {
-			return QuickAdd_Indicator_Tool(Input);
+			return QuickAdd_Indicator_Tool(InSeries);
 		}
 
 		/// <summary>
@@ -313,9 +313,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new QuickAdd_Indicator_Tool
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input
 						};
 			indicator.SetUp();
 
@@ -336,7 +336,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public QuickAdd_Indicator_Tool QuickAdd_Indicator_Tool()
 		{
-			return LeadIndicator.QuickAdd_Indicator_Tool(Input);
+			return LeadIndicator.QuickAdd_Indicator_Tool(InSeries);
 		}
 
 		/// <summary>
@@ -344,7 +344,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public QuickAdd_Indicator_Tool QuickAdd_Indicator_Tool(IDataSeries input)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.QuickAdd_Indicator_Tool(input);
@@ -362,7 +362,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public QuickAdd_Indicator_Tool QuickAdd_Indicator_Tool()
 		{
-			return LeadIndicator.QuickAdd_Indicator_Tool(Input);
+			return LeadIndicator.QuickAdd_Indicator_Tool(InSeries);
 		}
 
 		/// <summary>
@@ -385,7 +385,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public QuickAdd_Indicator_Tool QuickAdd_Indicator_Tool()
 		{
-			return LeadIndicator.QuickAdd_Indicator_Tool(Input);
+			return LeadIndicator.QuickAdd_Indicator_Tool(InSeries);
 		}
 
 		/// <summary>

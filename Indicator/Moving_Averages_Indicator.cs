@@ -82,7 +82,7 @@ namespace AgenaTrader.UserCode
 
 
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
             
             Add(new Plot(new Pen(this.Color_1, this.LineWidth_1), PlotStyle.Line, "MA_1"));
@@ -92,15 +92,15 @@ namespace AgenaTrader.UserCode
             Add(new Plot(new Pen(this.Color_5, this.LineWidth_5), PlotStyle.Line, "MA_5"));
             Add(new Plot(new Pen(this.Color_6, this.LineWidth_6), PlotStyle.Line, "MA_6"));
 
-            CalculateOnBarClose = true;
-            Overlay = true;
+            CalculateOnClosedBar = true;
+            IsOverlay = true;
 
             //this.GetNameOnchart();
 
         }
 
 
-        //protected override void OnStartUp()
+        //protected override void OnStart()
         //{
         //    //Set the color
         //    PlotColors[0][0] = this.Color_1;
@@ -124,7 +124,7 @@ namespace AgenaTrader.UserCode
 
 
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
             //this.GetNameOnchart();
 
@@ -302,7 +302,7 @@ namespace AgenaTrader.UserCode
 
 		#region Properties
 
-        #region Input
+        #region InSeries
 
         
          /// <summary>
@@ -736,27 +736,27 @@ namespace AgenaTrader.UserCode
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries Plot_1 { get { return Values[0]; } }
+        public DataSeries Plot_1 { get { return Outputs[0]; } }
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries Plot_2 { get { return Values[1]; } }
+        public DataSeries Plot_2 { get { return Outputs[1]; } }
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries Plot_3 { get { return Values[2]; } }
+        public DataSeries Plot_3 { get { return Outputs[2]; } }
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries Plot_4 { get { return Values[3]; } }
+        public DataSeries Plot_4 { get { return Outputs[3]; } }
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries Plot_5 { get { return Values[4]; } }
+        public DataSeries Plot_5 { get { return Outputs[4]; } }
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries Plot_6 { get { return Values[5]; } }
+        public DataSeries Plot_6 { get { return Outputs[5]; } }
 
 
         #endregion
@@ -777,7 +777,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
         {
-			return Moving_Averages_Indicator(Input, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
+			return Moving_Averages_Indicator(InSeries, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
 		}
 
 		/// <summary>
@@ -792,9 +792,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new Moving_Averages_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							MA_1_Selected = mA_1_Selected,
 							MA_1 = mA_1,
 							MA_2_Selected = mA_2_Selected,
@@ -827,7 +827,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
 		{
-			return LeadIndicator.Moving_Averages_Indicator(Input, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
+			return LeadIndicator.Moving_Averages_Indicator(InSeries, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
 		}
 
 		/// <summary>
@@ -835,7 +835,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.Moving_Averages_Indicator(input, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
@@ -853,7 +853,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
 		{
-			return LeadIndicator.Moving_Averages_Indicator(Input, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
+			return LeadIndicator.Moving_Averages_Indicator(InSeries, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
 		}
 
 		/// <summary>
@@ -876,7 +876,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
 		{
-			return LeadIndicator.Moving_Averages_Indicator(Input, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
+			return LeadIndicator.Moving_Averages_Indicator(InSeries, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
 		}
 
 		/// <summary>

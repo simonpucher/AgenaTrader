@@ -58,13 +58,13 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This method is used to configure the indicator and is called once before any bar data is loaded.
 		/// </summary>
-		protected override void Initialize()
+		protected override void OnInit()
 		{
             Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Coppock_Curve"));
             Add(new Plot(new Pen(Const.DefaultIndicatorColor_GreyedOut, this.Plot0Width), PlotStyle.Line, "Coppock_Curve_GreyedOut"));
 
-            CalculateOnBarClose = true;
-            Overlay = false;
+            CalculateOnClosedBar = true;
+            IsOverlay = false;
 		}
 
 
@@ -72,7 +72,7 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Calculates the indicator value(s) at the current index.
 		/// </summary>
-		protected override void OnStartUp()
+		protected override void OnStart()
 		{
             this._ROC_Long = new DataSeries(this);
             this._ROC_Short = new DataSeries(this);
@@ -84,7 +84,7 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// 
 		/// </summary>
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
             
 
@@ -116,14 +116,14 @@ namespace AgenaTrader.UserCode
             else
             {
                 //Data feed perodicity is not valid, print info in chart panel 
-                if (IsCurrentBarLast)
+                if (IsProcessingBarIndexLast)
                 {
-                    DrawTextFixed("AlertText", Const.DefaultStringDatafeedPeriodicity, TextPosition.Center, Color.Red, new Font("Arial", 30), Color.Red, Color.Red, 20);
+                    AddChartTextFixed("AlertText", Const.DefaultStringDatafeedPeriodicity, TextPosition.Center, Color.Red, new Font("Arial", 30), Color.Red, Color.Red, 20);
                 }
             }
 		}
 
-        protected override void OnTermination()
+        protected override void OnDispose()
         {
             //Print("OnTermination");
         }
@@ -166,7 +166,7 @@ namespace AgenaTrader.UserCode
         #region Properties
 
 
-            #region Input 
+            #region InSeries 
 
                 /// <summary>
                 /// </summary>
@@ -258,14 +258,14 @@ namespace AgenaTrader.UserCode
                 [XmlIgnore()]
                 public DataSeries Coppock_Curve
                 {
-                    get { return Values[0]; }
+                    get { return Outputs[0]; }
                 }
 
                 [Browsable(false)]
                 [XmlIgnore()]
                 public DataSeries Coppock_GreyedOut
                 {
-                    get { return Values[1]; }
+                    get { return Outputs[1]; }
                 }
 
             #endregion
@@ -287,7 +287,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Coppock_Indicator Coppock_Indicator()
         {
-			return Coppock_Indicator(Input);
+			return Coppock_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -302,9 +302,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new Coppock_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input
 						};
 			indicator.SetUp();
 
@@ -325,7 +325,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Coppock_Indicator Coppock_Indicator()
 		{
-			return LeadIndicator.Coppock_Indicator(Input);
+			return LeadIndicator.Coppock_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -333,7 +333,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Coppock_Indicator Coppock_Indicator(IDataSeries input)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.Coppock_Indicator(input);
@@ -351,7 +351,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Coppock_Indicator Coppock_Indicator()
 		{
-			return LeadIndicator.Coppock_Indicator(Input);
+			return LeadIndicator.Coppock_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -374,7 +374,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Coppock_Indicator Coppock_Indicator()
 		{
-			return LeadIndicator.Coppock_Indicator(Input);
+			return LeadIndicator.Coppock_Indicator(InSeries);
 		}
 
 		/// <summary>

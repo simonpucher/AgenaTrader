@@ -72,7 +72,7 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// This method is used to configure the indicator and is called once before any bar data is loaded.
 		/// </summary>
-		protected override void Initialize()
+		protected override void OnInit()
 		{
             Add(new Plot(new Pen(this.Main, this.Plot0Width), PlotStyle.Line, "PriceLine"));
             Add(new Plot(new Pen(this.Signal, this.Plot1Width), PlotStyle.Line, "Signalline"));
@@ -81,20 +81,20 @@ namespace AgenaTrader.UserCode
             Add(new Plot(new Pen(this.BBUpper, this.Plot3Width), PlotStyle.Line, "Lower"));
             Add(new Plot(new Pen(Color.Gray, this.Plot3Width), PlotStyle.Line, "MidLine"));
 
-            CalculateOnBarClose = true;
-            Overlay = false;
+            CalculateOnClosedBar = true;
+            IsOverlay = false;
 		}
 
 
 		/// <summary>
 		/// Calculates the indicator value(s) at the current index.
 		/// </summary>
-		protected override void OnStartUp()
+		protected override void OnStart()
         {
             this._RSI_List = new DataSeries(this);
 		}
 		
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
             double RSI_value = RSI(this.RSIPeriod, 1)[0];
             this._RSI_List.Set(RSI_value);
@@ -157,7 +157,7 @@ namespace AgenaTrader.UserCode
         #region Properties
 
 
-        #region Input
+        #region InSeries
 
 
 
@@ -441,7 +441,7 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries PriceLine
         {
-            get { return Values[0]; }
+            get { return Outputs[0]; }
         }
 
 
@@ -449,7 +449,7 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries SignalLine
         {
-            get { return Values[1]; }
+            get { return Outputs[1]; }
         }
 
 
@@ -457,28 +457,28 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries Average
         {
-            get { return Values[2]; }
+            get { return Outputs[2]; }
         }
 
         [Browsable(false)]
         [XmlIgnore()]
         public DataSeries Upper
         {
-            get { return Values[3]; }
+            get { return Outputs[3]; }
         }
 
         [Browsable(false)]
         [XmlIgnore()]
         public DataSeries Lower
         {
-            get { return Values[4]; }
+            get { return Outputs[4]; }
         }
 
         [Browsable(false)]
         [XmlIgnore()]
         public DataSeries MidLine
         {
-            get { return Values[5]; }
+            get { return Outputs[5]; }
         }
         #endregion
 
@@ -506,7 +506,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public TDI_Indicator TDI_Indicator(Color main, Color signal, Color bBAverage, Color bBUpper, Color bBLower, Color midPositive, Color midNegative, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber, System.Int32 plot0Width, DashStyle dash0Style, System.Int32 plot1Width, DashStyle dash1Style, System.Int32 plot2Width, DashStyle dash2Style, System.Int32 plot3Width, DashStyle dash3Style)
         {
-			return TDI_Indicator(Input, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
+			return TDI_Indicator(InSeries, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
 		}
 
 		/// <summary>
@@ -521,9 +521,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new TDI_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							Main = main,
 							Signal = signal,
 							BBAverage = bBAverage,
@@ -564,7 +564,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public TDI_Indicator TDI_Indicator(Color main, Color signal, Color bBAverage, Color bBUpper, Color bBLower, Color midPositive, Color midNegative, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber, System.Int32 plot0Width, DashStyle dash0Style, System.Int32 plot1Width, DashStyle dash1Style, System.Int32 plot2Width, DashStyle dash2Style, System.Int32 plot3Width, DashStyle dash3Style)
 		{
-			return LeadIndicator.TDI_Indicator(Input, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
+			return LeadIndicator.TDI_Indicator(InSeries, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
 		}
 
 		/// <summary>
@@ -572,7 +572,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public TDI_Indicator TDI_Indicator(IDataSeries input, Color main, Color signal, Color bBAverage, Color bBUpper, Color bBLower, Color midPositive, Color midNegative, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber, System.Int32 plot0Width, DashStyle dash0Style, System.Int32 plot1Width, DashStyle dash1Style, System.Int32 plot2Width, DashStyle dash2Style, System.Int32 plot3Width, DashStyle dash3Style)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.TDI_Indicator(input, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
@@ -590,7 +590,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public TDI_Indicator TDI_Indicator(Color main, Color signal, Color bBAverage, Color bBUpper, Color bBLower, Color midPositive, Color midNegative, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber, System.Int32 plot0Width, DashStyle dash0Style, System.Int32 plot1Width, DashStyle dash1Style, System.Int32 plot2Width, DashStyle dash2Style, System.Int32 plot3Width, DashStyle dash3Style)
 		{
-			return LeadIndicator.TDI_Indicator(Input, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
+			return LeadIndicator.TDI_Indicator(InSeries, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
 		}
 
 		/// <summary>
@@ -613,7 +613,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public TDI_Indicator TDI_Indicator(Color main, Color signal, Color bBAverage, Color bBUpper, Color bBLower, Color midPositive, Color midNegative, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber, System.Int32 plot0Width, DashStyle dash0Style, System.Int32 plot1Width, DashStyle dash1Style, System.Int32 plot2Width, DashStyle dash2Style, System.Int32 plot3Width, DashStyle dash3Style)
 		{
-			return LeadIndicator.TDI_Indicator(Input, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
+			return LeadIndicator.TDI_Indicator(InSeries, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
 		}
 
 		/// <summary>

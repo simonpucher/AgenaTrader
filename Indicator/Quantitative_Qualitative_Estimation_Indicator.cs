@@ -61,23 +61,23 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// This method is used to configure the indicator and is called once before any bar data is loaded.
         /// </summary>
-            protected override void Initialize()
+            protected override void OnInit()
         {
 
             Add(new Plot(new Pen(this.Line_01, 2), PlotStyle.Line, "Value1"));
             Add(new Plot(new Pen(this.Line_02, 2), PlotStyle.Line, "Value2"));
             Plots[1].Pen.DashStyle = DashStyle.Dash;
 
-            Add(new Line(_line_lower, 70, "Upper Line"));
-            Add(new Line(_line_mid, 50, "Mid Line"));
-            Add(new Line(_line_upper, 30, "Lower Line"));
+            Add(new LevelLine(_line_lower, 70, "Upper Line"));
+            Add(new LevelLine(_line_mid, 50, "Mid Line"));
+            Add(new LevelLine(_line_upper, 30, "Lower Line"));
 
 			Lines[0].Pen.DashStyle = DashStyle.Dash;
 			Lines[1].Pen.DashStyle = DashStyle.Dash;
 			
 			
-			CalculateOnBarClose	= true;
-            Overlay				= false;
+			CalculateOnClosedBar	= true;
+            IsOverlay				= false;
             PriceTypeSupported	= true;
 			
 			AtrRsi = new DataSeries(this);
@@ -96,11 +96,11 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// Called on each bar update event (incoming tick)
         /// </summary>
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
 			double rsi0, rsi1, dar, tr, dv;
 			
-			if(CurrentBar <= StartBar)
+			if(ProcessingBarIndex <= StartBar)
 				return;
 			
 				
@@ -161,14 +161,14 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]		// this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
         public DataSeries Value1
         {
-            get { return Values[0]; }
+            get { return Outputs[0]; }
         }
 
         [Browsable(false)]	// this line prevents the data series from being displayed in the indicator properties dialog, do not remove
         [XmlIgnore()]		// this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
         public DataSeries Value2
         {
-            get { return Values[1]; }
+            get { return Outputs[1]; }
         }
 
         [Description("Period for the RSI")]
@@ -264,7 +264,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public QQE QQE(System.Int32 rSI_Period, System.Int32 sF)
         {
-			return QQE(Input, rSI_Period, sF);
+			return QQE(InSeries, rSI_Period, sF);
 		}
 
 		/// <summary>
@@ -279,9 +279,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new QQE
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							RSI_Period = rSI_Period,
 							SF = sF
 						};
@@ -304,7 +304,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public QQE QQE(System.Int32 rSI_Period, System.Int32 sF)
 		{
-			return LeadIndicator.QQE(Input, rSI_Period, sF);
+			return LeadIndicator.QQE(InSeries, rSI_Period, sF);
 		}
 
 		/// <summary>
@@ -312,7 +312,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public QQE QQE(IDataSeries input, System.Int32 rSI_Period, System.Int32 sF)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.QQE(input, rSI_Period, sF);
@@ -330,7 +330,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public QQE QQE(System.Int32 rSI_Period, System.Int32 sF)
 		{
-			return LeadIndicator.QQE(Input, rSI_Period, sF);
+			return LeadIndicator.QQE(InSeries, rSI_Period, sF);
 		}
 
 		/// <summary>
@@ -353,7 +353,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public QQE QQE(System.Int32 rSI_Period, System.Int32 sF)
 		{
-			return LeadIndicator.QQE(Input, rSI_Period, sF);
+			return LeadIndicator.QQE(InSeries, rSI_Period, sF);
 		}
 
 		/// <summary>

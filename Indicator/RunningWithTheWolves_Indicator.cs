@@ -62,7 +62,7 @@ namespace AgenaTrader.UserCode
         Indicator _mafast = null;
 
 
-		protected override void Initialize()
+		protected override void OnInit()
 		{
             //Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
 
@@ -70,8 +70,8 @@ namespace AgenaTrader.UserCode
             Add(new Plot(new Pen(Color.FromKnownColor(KnownColor.Orange), 2), PlotStyle.Line, "MA_Medium")); 
             Add(new Plot(new Pen(Color.FromKnownColor(KnownColor.Blue), 2), PlotStyle.Line, "MA_Slow"));
 
-			CalculateOnBarClose = true;
-            Overlay = true;
+			CalculateOnClosedBar = true;
+            IsOverlay = true;
 
             //init
             this._Delta_Price_to_xMA_Slow = new DataSeries(this);
@@ -81,7 +81,7 @@ namespace AgenaTrader.UserCode
 
    
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
             //we need more contrast
             if (this.UseWhiteCandles)
@@ -90,7 +90,7 @@ namespace AgenaTrader.UserCode
             }
     
             //calculate data
-            OrderAction? resultdata = this.calculate(Input, this.MA_Selected, this.MA_Fast, this.MA_Medium, this.MA_Slow);
+            OrderAction? resultdata = this.calculate(InSeries, this.MA_Selected, this.MA_Fast, this.MA_Medium, this.MA_Slow);
 
             //draw indicator lines
             Plot_1.Set(this._mafast[0]);
@@ -106,16 +106,16 @@ namespace AgenaTrader.UserCode
                 switch (resultdata)
                 {
                     case OrderAction.Buy:
-                        DrawDot("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
+                        AddChartDot("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
                         break;
                     case OrderAction.SellShort:
-                        DrawDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
+                        AddChartDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
                         break;
                     case OrderAction.BuyToCover:
-                        DrawDiamond("ArrowShort_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
+                        AddChartDiamond("ArrowShort_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
                         break;
                     case OrderAction.Sell:
-                        DrawDot("ArrowLong_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
+                        AddChartDot("ArrowLong_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
                         break;
                     default:
                         break;
@@ -188,7 +188,7 @@ namespace AgenaTrader.UserCode
             }
 
 
-            //2  && Rising(_mafast) && Falling(_mafast)
+            //2  && IsSeriesRising(_mafast) && IsSeriesFalling(_mafast)
             if (IsLongEnabled && CrossAbove(_mafast, _maslow, 0) )
             {
                 return OrderAction.Buy;
@@ -250,7 +250,7 @@ namespace AgenaTrader.UserCode
 
 		#region Properties
 
-        #region Input
+        #region InSeries
 
         
               /// <summary>
@@ -349,15 +349,15 @@ namespace AgenaTrader.UserCode
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries Plot_1 { get { return Values[0]; } }
+        public DataSeries Plot_1 { get { return Outputs[0]; } }
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries Plot_2 { get { return Values[1]; } }
+        public DataSeries Plot_2 { get { return Outputs[1]; } }
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries Plot_3 { get { return Values[2]; } }
+        public DataSeries Plot_3 { get { return Outputs[2]; } }
 
         /// <summary>
         /// This is the delta value from price to slow xMA.
@@ -398,7 +398,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
         {
-			return RunningWithTheWolves_Indicator(Input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
+			return RunningWithTheWolves_Indicator(InSeries, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
 		}
 
 		/// <summary>
@@ -413,9 +413,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new RunningWithTheWolves_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							MA_Selected = mA_Selected,
 							MA_Slow = mA_Slow,
 							MA_Medium = mA_Medium,
@@ -443,7 +443,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(Input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
+			return LeadIndicator.RunningWithTheWolves_Indicator(InSeries, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
 		}
 
 		/// <summary>
@@ -451,7 +451,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.RunningWithTheWolves_Indicator(input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
@@ -469,7 +469,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(Input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
+			return LeadIndicator.RunningWithTheWolves_Indicator(InSeries, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
 		}
 
 		/// <summary>
@@ -492,7 +492,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
 		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(Input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
+			return LeadIndicator.RunningWithTheWolves_Indicator(InSeries, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
 		}
 
 		/// <summary>
