@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1.1
+/// Version: 1.1.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -77,14 +77,17 @@ namespace AgenaTrader.UserCode
                         b = Bars[this.BarsCount];
                         break;
                     case PerformanceCalculationType.ThisYear:
-                        b = Bars.Where(x => x.Time.Year != DateTime.Now.Year).Last();                
+                        b = Bars.Where(x => x.Time.Year != DateTime.Now.Year).LastOrDefault();                
                         break;
                     case PerformanceCalculationType.SelectedDate:
                         b = Bars.GetBar(this.SelectedDate);
                         break;
                 }
 
-                Plot_Performance_Indicator.Set(((Close[0] - b.Close) * 100) / b.Close);
+                if (b != null)
+                {
+                    Plot_Performance_Indicator.Set(((Close[0] - b.Close) * 100) / b.Close);
+                }
 
                 if (Chart != null)
                 {
@@ -255,7 +258,7 @@ namespace AgenaTrader.UserCode
 		public Performance_Indicator Performance_Indicator(IDataSeries input, System.Int32 barsCount, DateTime selectedDate, PerformanceCalculationType performanceCalculationType)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.Performance_Indicator(input, barsCount, selectedDate, performanceCalculationType);
 		}
