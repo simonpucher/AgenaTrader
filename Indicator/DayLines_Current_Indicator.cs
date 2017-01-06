@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.2.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -84,7 +84,7 @@ namespace AgenaTrader.UserCode
         protected override void OnCalculate()
         {
             TimeFrame tf = (TimeFrame)Bars.TimeFrame;
-            if (this.IsProcessingBarIndexLast && (tf.Periodicity != DatafeedHistoryPeriodicity.Year && tf.Periodicity != DatafeedHistoryPeriodicity.Day && tf.Periodicity != DatafeedHistoryPeriodicity.Week))
+            if (Bars != null && Times != null && this.IsProcessingBarIndexLast && (tf.Periodicity != DatafeedHistoryPeriodicity.Year && tf.Periodicity != DatafeedHistoryPeriodicity.Day && tf.Periodicity != DatafeedHistoryPeriodicity.Week))
             {
                 
                 DateTime datetillend = Bars.Where(x => x.Time.Date == Times[0][0].Date).Last().Time;
@@ -501,7 +501,7 @@ namespace AgenaTrader.UserCode
 		public DayLines_Current_Indicator DayLines_Current_Indicator(IDataSeries input, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.DayLines_Current_Indicator(input, showLines, showOpen, showHigh, showLow, showClose);
 		}

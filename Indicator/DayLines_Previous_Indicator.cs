@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2
+/// Version: 1.2.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -90,7 +90,7 @@ namespace AgenaTrader.UserCode
         protected override void OnCalculate()
         {
             TimeFrame tf = (TimeFrame)Bars.TimeFrame;
-            if (this.IsProcessingBarIndexLast && 
+            if (Bars != null && Times != null && this.IsProcessingBarIndexLast && 
                 ( tf.Periodicity != DatafeedHistoryPeriodicity.Year 
                 && tf.Periodicity != DatafeedHistoryPeriodicity.Day && tf.Periodicity != DatafeedHistoryPeriodicity.Week))
             {
@@ -549,7 +549,7 @@ namespace AgenaTrader.UserCode
 		public DayLines_Previous_Indicator DayLines_Previous_Indicator(IDataSeries input, System.Int32 howManyDays, System.Boolean extendLines, System.Boolean showCurrentDay, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.DayLines_Previous_Indicator(input, howManyDays, extendLines, showCurrentDay, showLines, showOpen, showHigh, showLow, showClose);
 		}
