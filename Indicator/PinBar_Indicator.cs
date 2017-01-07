@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -28,12 +28,11 @@ namespace AgenaTrader.UserCode
 {
 	
 
-    [Category("DEVELOPMENT")]
-    [Description("Show the in Bar Signal.")]
+    [Description("Show the Pin Bar Signal.")]
 	public class PinBar_indicator : UserIndicator
 	{
         private bool _showarrows = true;
-        private bool _showindicatorbox = false;
+        private bool _showindicatorbox = true;
 
         private int _percentage = 50;
 
@@ -46,7 +45,7 @@ namespace AgenaTrader.UserCode
         protected override void OnInit()
         {
             Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "PinBar_Indicator"));
-            IsOverlay = true;
+            IsOverlay = false;
             CalculateOnClosedBar = true;
             IsAutoAdjustableScale = true;
 
@@ -57,20 +56,30 @@ namespace AgenaTrader.UserCode
 
         protected override void OnCalculate()
 		{
+            int signal = 0;
             //Bars[0].IsGrowing && 
             if ((Bars[0].TailBottom/Bars[0].Range) > (this.Percentage/100.0))
             {
-                AddChartArrowUp("ArrowLong_PinBar" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, this.ColorArrowLongSignal);
+                signal = 1;
+                if (this.ShowArrows)
+                {
+                    AddChartArrowUp("ArrowLong_PinBar" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, this.ColorArrowLongSignal);
+                }
             }
             else if ((Bars[0].TailTop/Bars[0].Range) > (this.Percentage/100.0))
             {
-                AddChartArrowDown("ArrowShort_PinBar" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].High, this.ColorArrowShortSignal);
+                signal = -1;
+                if (this.ShowArrows)
+                {
+                    AddChartArrowDown("ArrowShort_PinBar" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].High, this.ColorArrowShortSignal);
+                }
             }
 
-            //if (ShowArrows)
-            //{
-            //    AddChartArrowUp("ArrowLong_PinBar" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, this.ColorArrowLongSignal);
-            //}
+            if (ShowIndicatorBox)
+            {
+                PlotLine.Set(signal);
+            }
+
 
 
             PlotColors[0][0] = this.Plot0Color;
@@ -128,7 +137,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         [Description("Select Color for the long arrows signal.")]
         [Category("Plots")]
-        [DisplayName("Arrow Signal")]
+        [DisplayName("Signal Long")]
         public Color ColorArrowLongSignal
         {
             get { return _color_arrow_long_signal; }
@@ -147,7 +156,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         [Description("Select Color for the short arrows signal.")]
         [Category("Plots")]
-        [DisplayName("Short Signal")]
+        [DisplayName("Signal Short")]
         public Color ColorArrowShortSignal
         {
             get { return _color_arrow_short_signal; }
@@ -226,7 +235,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator
 	{
 		/// <summary>
-		/// Show the in Bar Signal.
+		/// Show the Pin Bar Signal.
 		/// </summary>
 		public PinBar_indicator PinBar_indicator()
         {
@@ -234,7 +243,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Show the in Bar Signal.
+		/// Show the Pin Bar Signal.
 		/// </summary>
 		public PinBar_indicator PinBar_indicator(IDataSeries input)
 		{
@@ -264,7 +273,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Show the in Bar Signal.
+		/// Show the Pin Bar Signal.
 		/// </summary>
 		public PinBar_indicator PinBar_indicator()
 		{
@@ -272,12 +281,12 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Show the in Bar Signal.
+		/// Show the Pin Bar Signal.
 		/// </summary>
 		public PinBar_indicator PinBar_indicator(IDataSeries input)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.PinBar_indicator(input);
 		}
@@ -290,7 +299,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Show the in Bar Signal.
+		/// Show the Pin Bar Signal.
 		/// </summary>
 		public PinBar_indicator PinBar_indicator()
 		{
@@ -298,7 +307,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Show the in Bar Signal.
+		/// Show the Pin Bar Signal.
 		/// </summary>
 		public PinBar_indicator PinBar_indicator(IDataSeries input)
 		{
@@ -313,7 +322,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Show the in Bar Signal.
+		/// Show the Pin Bar Signal.
 		/// </summary>
 		public PinBar_indicator PinBar_indicator()
 		{
@@ -321,7 +330,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Show the in Bar Signal.
+		/// Show the Pin Bar Signal.
 		/// </summary>
 		public PinBar_indicator PinBar_indicator(IDataSeries input)
 		{
