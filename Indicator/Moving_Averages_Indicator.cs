@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: 1.2
+/// Version: 1.2.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -42,12 +42,12 @@ namespace AgenaTrader.UserCode
     {
 
         //input 
-        private Enum_Moving_Averages_Indicator_MA _MA_1_Selected = Enum_Moving_Averages_Indicator_MA.EMA;
+        private Enum_Moving_Averages_Indicator_MA _MA_1_Selected = Enum_Moving_Averages_Indicator_MA.SMA;
         private Enum_Moving_Averages_Indicator_MA _MA_2_Selected = Enum_Moving_Averages_Indicator_MA.SMA;
         private Enum_Moving_Averages_Indicator_MA _MA_3_Selected = Enum_Moving_Averages_Indicator_MA.SMA;
-        private Enum_Moving_Averages_Indicator_MA _MA_4_Selected = Enum_Moving_Averages_Indicator_MA.SMA;
-        private Enum_Moving_Averages_Indicator_MA _MA_5_Selected = Enum_Moving_Averages_Indicator_MA.SMA;
-        private Enum_Moving_Averages_Indicator_MA _MA_6_Selected = Enum_Moving_Averages_Indicator_MA.SMA;
+        private Enum_Moving_Averages_Indicator_MA _MA_4_Selected = Enum_Moving_Averages_Indicator_MA.EMA;
+        private Enum_Moving_Averages_Indicator_MA _MA_5_Selected = Enum_Moving_Averages_Indicator_MA.EMA;
+        private Enum_Moving_Averages_Indicator_MA _MA_6_Selected = Enum_Moving_Averages_Indicator_MA.EMA;
 
         private int _ma_1 = 50;
         private int _ma_2 = 100;
@@ -56,27 +56,27 @@ namespace AgenaTrader.UserCode
         private int _ma_5 = 0;
         private int _ma_6 = 0;
 
-        private int _linewidth_1 = 2;
+        private int _linewidth_1 = 1;
         private DashStyle _linestyle_1 = DashStyle.Solid;
         private Color _col_1 = Color.Red;
 
-        private int _linewidth_2 = 2;
+        private int _linewidth_2 = 1;
         private DashStyle _linestyle_2 = DashStyle.Solid;
         private Color _col_2 = Color.Orange;
 
-        private int _linewidth_3 = 2;
+        private int _linewidth_3 = 1;
         private DashStyle _linestyle_3 = DashStyle.Solid;
         private Color _col_3 = Color.Blue;
 
-        private int _linewidth_4 = 2;
+        private int _linewidth_4 = 1;
         private DashStyle _linestyle_4 = DashStyle.Solid;
         private Color _col_4 = Color.Green;
 
-        private int _linewidth_5 = 2;
+        private int _linewidth_5 = 1;
         private DashStyle _linestyle_5 = DashStyle.Solid;
         private Color _col_5 = Color.DarkViolet;
 
-        private int _linewidth_6 = 2;
+        private int _linewidth_6 = 1;
         private DashStyle _linestyle_6 = DashStyle.Solid;
         private Color _col_6 = Color.DarkGoldenrod;
 
@@ -212,10 +212,10 @@ namespace AgenaTrader.UserCode
                 switch (MA_6_Selected)
                 {
                     case Enum_Moving_Averages_Indicator_MA.SMA:
-                        Plot_5.Set(SMA(this.MA_6)[0]);
+                        Plot_6.Set(SMA(this.MA_6)[0]);
                         break;
                     case Enum_Moving_Averages_Indicator_MA.EMA:
-                        Plot_5.Set(EMA(this.MA_6)[0]);
+                        Plot_6.Set(EMA(this.MA_6)[0]);
                         break;
                     default:
                         break;
@@ -836,7 +836,7 @@ namespace AgenaTrader.UserCode
 		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.Moving_Averages_Indicator(input, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
 		}
