@@ -290,7 +290,7 @@ namespace AgenaTrader.UserCode
 		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.Lonely_Warrior_Indicator(input);
 		}
