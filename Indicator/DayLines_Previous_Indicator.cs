@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2.1
+/// Version: 1.2.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -90,7 +90,7 @@ namespace AgenaTrader.UserCode
         protected override void OnCalculate()
         {
             TimeFrame tf = (TimeFrame)Bars.TimeFrame;
-            if (Bars != null && Times != null && this.IsProcessingBarIndexLast && 
+            if (Bars != null && Bars.Count() > 0 && Times != null && Times.Count > 0 && this.IsProcessingBarIndexLast && 
                 ( tf.Periodicity != DatafeedHistoryPeriodicity.Year 
                 && tf.Periodicity != DatafeedHistoryPeriodicity.Day && tf.Periodicity != DatafeedHistoryPeriodicity.Week))
             {
@@ -99,73 +99,78 @@ namespace AgenaTrader.UserCode
 
                 int i = 0;
                 //DateTime datetillend = Times[0][0].Date.AddDays(1).AddSeconds(-1);
-                DateTime datetillend = Bars.Where(x => x.Time.Date == Times[0][0].Date).Last().Time;
-                foreach (DateTime date in _alldays)
+                IBar datetillendbar = Bars.Where(x => x.Time.Date == Times[0][0].Date).Last();
+                if (datetillendbar != null)
                 {
-                    if (!_extendlines)
+                    DateTime datetillend = datetillendbar.Time;
+                    foreach (DateTime date in _alldays)
                     {
-                        IEnumerable<IBar> lisdateend = Bars.Where(x => x.Time.Date == date.Date);
-                        datetillend = date.Date.AddDays(1).AddSeconds(-1);
-                        if (lisdateend != null && lisdateend.Count() > 0)
+                        if (!_extendlines)
                         {
-                            datetillend = Bars.Where(x => x.Time.Date == date.Date).Last().Time;
-                        }
-                    }
-
-                    IEnumerable<IBar> list = Bars.Where(x => x.Time.Date == date.Date);
-                    DateTime startdate = date.Date;
-                    if (list != null && list.Count() > 0)
-                    {
-                        startdate = list.First().Time;
-                    }
-
-                    if (!_showcurrentday && i == 0)
-                    {
-                        //omit
-                    }
-                    else {
-                        if (_showopen)
-                        {
-                            AddChartLine("Open_" + date.ToString(), this.IsAutoAdjustableScale, startdate, Opens[1][i], datetillend, Opens[1][i], this.Color_O, this.DashStyle_O, this.LineWidth_O);
-                        }
-                        if (_showhigh)
-                        {
-                            AddChartLine("High_" + date.ToString(), this.IsAutoAdjustableScale, startdate, Highs[1][i], datetillend, Highs[1][i], this.Color_H, this.DashStyle_H, this.LineWidth_H);
-                        }
-                        if (_showlow)
-                        {
-                            AddChartLine("Low_" + date.ToString(), this.IsAutoAdjustableScale, startdate, Lows[1][i], datetillend, Lows[1][i], this.Color_L, this.DashStyle_L, this.LineWidth_L);
-                        }
-                        if (_showclose)
-                        {
-                            AddChartLine("Close_" + date.ToString(), this.IsAutoAdjustableScale, startdate, Closes[1][i], datetillend, Closes[1][i], this.Color_C, this.DashStyle_C, this.LineWidth_C);
+                            IEnumerable<IBar> lisdateend = Bars.Where(x => x.Time.Date == date.Date);
+                            datetillend = date.Date.AddDays(1).AddSeconds(-1);
+                            if (lisdateend != null && lisdateend.Count() > 0)
+                            {
+                                datetillend = Bars.Where(x => x.Time.Date == date.Date).Last().Time;
+                            }
                         }
 
-
-                        if (_showlines)
+                        IEnumerable<IBar> list = Bars.Where(x => x.Time.Date == date.Date);
+                        DateTime startdate = date.Date;
+                        if (list != null && list.Count() > 0)
                         {
-                            DateTime enddrawing_string = datetillend.AddSeconds(this.TimeFrame.GetSeconds() + this.TimeFrame.GetSeconds() * 0.15);
+                            startdate = list.First().Time;
+                        }
+
+                        if (!_showcurrentday && i == 0)
+                        {
+                            //omit
+                        }
+                        else
+                        {
                             if (_showopen)
                             {
-                                AddChartText("String_Open_" + date.ToString(), this.IsAutoAdjustableScale, "O " + i.ToString(), enddrawing_string, Opens[1][i], 0, this.Color_O, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                                AddChartLine("Open_" + date.ToString(), this.IsAutoAdjustableScale, startdate, Opens[1][i], datetillend, Opens[1][i], this.Color_O, this.DashStyle_O, this.LineWidth_O);
                             }
                             if (_showhigh)
                             {
-                                AddChartText("String_High_" + date.ToString(), this.IsAutoAdjustableScale, "H " + i.ToString(), enddrawing_string, Highs[1][i], 0, this.Color_H, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                                AddChartLine("High_" + date.ToString(), this.IsAutoAdjustableScale, startdate, Highs[1][i], datetillend, Highs[1][i], this.Color_H, this.DashStyle_H, this.LineWidth_H);
                             }
                             if (_showlow)
                             {
-                                AddChartText("String_Low_" + date.ToString(), this.IsAutoAdjustableScale, "L " + i.ToString(), enddrawing_string, Lows[1][i], 0, this.Color_L, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                                AddChartLine("Low_" + date.ToString(), this.IsAutoAdjustableScale, startdate, Lows[1][i], datetillend, Lows[1][i], this.Color_L, this.DashStyle_L, this.LineWidth_L);
                             }
                             if (_showclose)
                             {
-                                AddChartText("String_Close_" + date.ToString(), this.IsAutoAdjustableScale, "C " + i.ToString(), enddrawing_string, Closes[1][i], 0, this.Color_C, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                                AddChartLine("Close_" + date.ToString(), this.IsAutoAdjustableScale, startdate, Closes[1][i], datetillend, Closes[1][i], this.Color_C, this.DashStyle_C, this.LineWidth_C);
+                            }
+
+
+                            if (_showlines)
+                            {
+                                DateTime enddrawing_string = datetillend.AddSeconds(this.TimeFrame.GetSeconds() + this.TimeFrame.GetSeconds() * 0.15);
+                                if (_showopen)
+                                {
+                                    AddChartText("String_Open_" + date.ToString(), this.IsAutoAdjustableScale, "O " + i.ToString(), enddrawing_string, Opens[1][i], 0, this.Color_O, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                                }
+                                if (_showhigh)
+                                {
+                                    AddChartText("String_High_" + date.ToString(), this.IsAutoAdjustableScale, "H " + i.ToString(), enddrawing_string, Highs[1][i], 0, this.Color_H, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                                }
+                                if (_showlow)
+                                {
+                                    AddChartText("String_Low_" + date.ToString(), this.IsAutoAdjustableScale, "L " + i.ToString(), enddrawing_string, Lows[1][i], 0, this.Color_L, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                                }
+                                if (_showclose)
+                                {
+                                    AddChartText("String_Close_" + date.ToString(), this.IsAutoAdjustableScale, "C " + i.ToString(), enddrawing_string, Closes[1][i], 0, this.Color_C, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                                }
                             }
                         }
-                    }
-                    
 
-                    ++i;
+
+                        ++i;
+                    }
                 }
 
 

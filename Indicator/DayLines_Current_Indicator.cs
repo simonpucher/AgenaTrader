@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2.1
+/// Version: 1.2.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -84,12 +84,15 @@ namespace AgenaTrader.UserCode
         protected override void OnCalculate()
         {
             TimeFrame tf = (TimeFrame)Bars.TimeFrame;
-            if (Bars != null && Times != null && this.IsProcessingBarIndexLast && (tf.Periodicity != DatafeedHistoryPeriodicity.Year && tf.Periodicity != DatafeedHistoryPeriodicity.Day && tf.Periodicity != DatafeedHistoryPeriodicity.Week))
+            if (Bars != null && Bars.Count() > 0 && Times != null && Times.Count > 0 && this.IsProcessingBarIndexLast && (tf.Periodicity != DatafeedHistoryPeriodicity.Year && tf.Periodicity != DatafeedHistoryPeriodicity.Day && tf.Periodicity != DatafeedHistoryPeriodicity.Week))
             {
                 
-                DateTime datetillend = Bars.Where(x => x.Time.Date == Times[0][0].Date).Last().Time;
-                DateTime date = Times[1][0];
-
+                IBar datetillendbar = Bars.Where(x => x.Time.Date == Times[0][0].Date).Last();
+                if (datetillendbar != null)
+                {
+                    DateTime datetillend = datetillendbar.Time;
+                    DateTime date = Times[1][0];
+                    
                     //if (!_extendlines)
                     //{
                     //    IEnumerable<IBar> lisdateend = Bars.Where(x => x.Time.Date == date.Date);
@@ -145,12 +148,8 @@ namespace AgenaTrader.UserCode
                             AddChartText("String_Close_" + date.ToString(), this.IsAutoAdjustableScale, "CDC", enddrawing_string, Closes[1][0], 0, this.Color_C, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
                         }
                     }
-
-              
-
-                  
-
-
+                }
+               
             }
 
             ////Output Listen
