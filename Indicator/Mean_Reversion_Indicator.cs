@@ -73,7 +73,7 @@ namespace AgenaTrader.UserCode
         double bb_middle = Double.MinValue;
         double bb_lower = Double.MinValue;
 
-		protected override void Initialize()
+		protected override void OnInit()
 		{
             //Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
 
@@ -81,8 +81,8 @@ namespace AgenaTrader.UserCode
             Add(new Plot(new Pen(Color.FromKnownColor(KnownColor.Orange), 2), PlotStyle.Line, "BBMiddle"));
             Add(new Plot(new Pen(Color.FromKnownColor(KnownColor.LightGray), 2), PlotStyle.Line, "BBLower"));
 
-			CalculateOnBarClose = true;
-            Overlay = true;
+			CalculateOnClosedBar = true;
+            IsOverlay = true;
         }
 
 
@@ -90,10 +90,10 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// Is called on startup.
         /// </summary>
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
             //Print("OnStartUp");
-            base.OnStartUp();
+            base.OnStart();
 
             this.ErrorOccured = false;
             this.WarningOccured = false;
@@ -102,14 +102,14 @@ namespace AgenaTrader.UserCode
 
    
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
 
             ////we need more contrast
             //this.BarColor = Color.White;
     
             //calculate data
-            ResultValue returnvalue = this.calculate(Input, Open, High, null, null, this.Bollinger_Period, this.Bollinger_Standard_Deviation, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
+            ResultValue returnvalue = this.calculate(InSeries, Open, High, null, null, this.Bollinger_Period, this.Bollinger_Standard_Deviation, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
 
             //If the calculate method was not finished we need to stop and show an alert message to the user.
             if (returnvalue.ErrorOccured)
@@ -133,11 +133,11 @@ namespace AgenaTrader.UserCode
                 switch (returnvalue.Entry)
                 {
                     case OrderAction.Buy:
-                        DrawDot("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
+                        AddChartDot("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
                         //this.Indicator_Curve_Entry.Set(1);
                         break;
                     case OrderAction.SellShort:
-                        DrawDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
+                        AddChartDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
                         //this.Indicator_Curve_Entry.Set(-1);
                         break;
                 }
@@ -154,11 +154,11 @@ namespace AgenaTrader.UserCode
                 switch (returnvalue.Exit)
                 {
                     case OrderAction.BuyToCover:
-                        DrawDiamond("ArrowShort_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
+                        AddChartDiamond("ArrowShort_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
                         //this.Indicator_Curve_Exit.Set(0.5);
                         break;
                     case OrderAction.Sell:
-                        DrawDot("ArrowLong_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
+                        AddChartDot("ArrowLong_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
                         //this.Indicator_Curve_Exit.Set(-0.5);
                         break;
                 }
@@ -368,7 +368,7 @@ namespace AgenaTrader.UserCode
         }
         #endregion
 
-        #region Input
+        #region InSeries
 
       
 
@@ -377,15 +377,15 @@ namespace AgenaTrader.UserCode
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries Plot_1 { get { return Values[0]; } }
+        public DataSeries Plot_1 { get { return Outputs[0]; } }
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries Plot_2 { get { return Values[1]; } }
+        public DataSeries Plot_2 { get { return Outputs[1]; } }
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries Plot_3 { get { return Values[2]; } }
+        public DataSeries Plot_3 { get { return Outputs[2]; } }
 
 		#endregion
 
@@ -406,7 +406,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Mean_Reversion_Indicator Mean_Reversion_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviation, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
         {
-			return Mean_Reversion_Indicator(Input, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviation, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
+			return Mean_Reversion_Indicator(InSeries, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviation, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
 		}
 
 		/// <summary>
@@ -421,9 +421,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new Mean_Reversion_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							IsLongEnabled = isLongEnabled,
 							IsShortEnabled = isShortEnabled,
 							Bollinger_Period = bollinger_Period,
@@ -455,7 +455,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Mean_Reversion_Indicator Mean_Reversion_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviation, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
 		{
-			return LeadIndicator.Mean_Reversion_Indicator(Input, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviation, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
+			return LeadIndicator.Mean_Reversion_Indicator(InSeries, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviation, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
 		}
 
 		/// <summary>
@@ -463,7 +463,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Mean_Reversion_Indicator Mean_Reversion_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviation, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.Mean_Reversion_Indicator(input, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviation, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
@@ -481,7 +481,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Mean_Reversion_Indicator Mean_Reversion_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviation, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
 		{
-			return LeadIndicator.Mean_Reversion_Indicator(Input, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviation, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
+			return LeadIndicator.Mean_Reversion_Indicator(InSeries, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviation, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
 		}
 
 		/// <summary>
@@ -504,7 +504,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Mean_Reversion_Indicator Mean_Reversion_Indicator(System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviation, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
 		{
-			return LeadIndicator.Mean_Reversion_Indicator(Input, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviation, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
+			return LeadIndicator.Mean_Reversion_Indicator(InSeries, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviation, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
 		}
 
 		/// <summary>

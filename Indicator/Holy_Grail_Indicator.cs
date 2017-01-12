@@ -43,23 +43,23 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// This method is used to configure the indicator and is called once before any bar data is loaded.
         /// </summary>
-        protected override void Initialize()
+        protected override void OnInit()
         {
             Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_Line1"));
             Add(new Plot(new Pen(this.Plot1Color, this.Plot1Width), PlotStyle.Line, "Plot_Line2"));
             Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_Line3"));
 
-            CalculateOnBarClose = true;
-            Overlay = false;
-            AutoScale = true;
+            CalculateOnClosedBar = true;
+            IsOverlay = false;
+            IsAutoAdjustableScale = true;
 
             //Because of Backtesting reasons if we use the advanced mode we need at least two bars
-            this.BarsRequired = 20;
+            this.RequiredBarsCount = 20;
         }
 
    
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
 
             ADX adx = ADX(14);
@@ -69,7 +69,7 @@ namespace AgenaTrader.UserCode
             double singnaldata = 0;
 
 
-            if (adx[0] > 30 && adx[0] > adx[1] && Input[0] <= ema[0])
+            if (adx[0] > 30 && adx[0] > adx[1] && InSeries[0] <= ema[0])
             {
                 Color color = Color.Green;
                 if (rsi[0] <= 30)
@@ -81,7 +81,7 @@ namespace AgenaTrader.UserCode
                 {
                     singnaldata = 0.5;
                 }
-                DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, color);
+                AddChartArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, color);
             }
 
             //ADX adx = ADX(14);
@@ -90,10 +90,10 @@ namespace AgenaTrader.UserCode
             //double singnaldata = 0;
 
 
-            //if (adx[0] > 30 && adx[0] > adx[1] && Input[0] <= ema[0])
+            //if (adx[0] > 30 && adx[0] > adx[1] && InSeries[0] <= ema[0])
             //{
             //    singnaldata = 1;
-            //    DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, Color.Green);
+            //    AddChartArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, Color.Green);
             //}
 
 
@@ -137,21 +137,21 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries SignalLine
         {
-            get { return Values[0]; }
+            get { return Outputs[0]; }
         }
 
         [Browsable(false)]
         [XmlIgnore()]
         public DataSeries PlotLine_ADX
         {
-            get { return Values[1]; }
+            get { return Outputs[1]; }
         }
 
         [Browsable(false)]
         [XmlIgnore()]
         public DataSeries PlotLine_XMA
         {
-            get { return Values[2]; }
+            get { return Outputs[2]; }
         }
 
 
@@ -265,7 +265,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Holy_Grail_Indicator Holy_Grail_Indicator()
         {
-			return Holy_Grail_Indicator(Input);
+			return Holy_Grail_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -280,9 +280,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new Holy_Grail_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input
 						};
 			indicator.SetUp();
 
@@ -303,7 +303,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Holy_Grail_Indicator Holy_Grail_Indicator()
 		{
-			return LeadIndicator.Holy_Grail_Indicator(Input);
+			return LeadIndicator.Holy_Grail_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -311,7 +311,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Holy_Grail_Indicator Holy_Grail_Indicator(IDataSeries input)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.Holy_Grail_Indicator(input);
@@ -329,7 +329,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Holy_Grail_Indicator Holy_Grail_Indicator()
 		{
-			return LeadIndicator.Holy_Grail_Indicator(Input);
+			return LeadIndicator.Holy_Grail_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -352,7 +352,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Holy_Grail_Indicator Holy_Grail_Indicator()
 		{
-			return LeadIndicator.Holy_Grail_Indicator(Input);
+			return LeadIndicator.Holy_Grail_Indicator(InSeries);
 		}
 
 		/// <summary>

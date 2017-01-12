@@ -85,11 +85,11 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// This method is used to configure the indicator and is called once before any bar data is loaded.
         /// </summary>
-        protected override void Initialize()
+        protected override void OnInit()
         {
-            DisplayInDataBox = false;
-            CalculateOnBarClose = true;
-            Overlay = false;
+            IsShowInDataBox = false;
+            CalculateOnClosedBar = true;
+            IsOverlay = false;
             PriceTypeSupported = false;
 
             lastHighCache = new ArrayList(); // used to identify swing points; from default Swing indicator
@@ -103,7 +103,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// Called on each bar update event (incoming tick)
         /// </summary>
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
             int temp_signal_value = 0;
 
@@ -134,8 +134,8 @@ namespace AgenaTrader.UserCode
                 
                 if (isSwingHigh) // if we have a new swing high then we draw a ray line on the chart
                 {
-                    DrawRay("highRay" + (CurrentBar - strength), false, strength, lastSwingHighValue, 0, lastSwingHighValue, swingHighColor, DashStyle.Dot, 2);
-                    RayObject newRayObject = new RayObject("highRay" + (CurrentBar - strength), strength, lastSwingHighValue, 0, lastSwingHighValue);
+                    AddChartRay("highRay" + (ProcessingBarIndex - strength), false, strength, lastSwingHighValue, 0, lastSwingHighValue, swingHighColor, DashStyle.Dot, 2);
+                    RayObject newRayObject = new RayObject("highRay" + (ProcessingBarIndex - strength), strength, lastSwingHighValue, 0, lastSwingHighValue);
                     swingHighRays.Push(newRayObject); // store a reference so we can remove it from the chart later
                 }
                 else if (High[0] > lastSwingHighValue) // otherwise, we test to see if price has broken through prior swing high
@@ -148,15 +148,15 @@ namespace AgenaTrader.UserCode
                         {
                             if (enableAlerts)
                             {
-                                Alert("Swing High at " + currentRay.Y1 + " broken", GlobalUtilities.GetSoundfile(this.Soundfile));
+                                ShowAlert("Swing High at " + currentRay.Y1 + " broken", GlobalUtilities.GetSoundfile(this.Soundfile));
                             }
                             temp_signal_value = 1;
                             if (keepBrokenLines) // draw a line between swing point and break bar 
                             {
                                 int barsAgo = currentRay.BarsAgo1;
-                                ITrendLine newLine = DrawLine("highLine" + (CurrentBar - barsAgo), false, barsAgo, currentRay.Y1, 0, currentRay.Y1, swingHighColor, DashStyle.Solid, 2);
+                                ITrendLine newLine = AddChartLine("highLine" + (ProcessingBarIndex - barsAgo), false, barsAgo, currentRay.Y1, 0, currentRay.Y1, swingHighColor, DashStyle.Solid, 2);
                             }
-                            RemoveDrawObject(currentRay.Tag);
+                            RemoveChartDrawing(currentRay.Tag);
                             if (swingHighRays.Count > 0)
                             {
                                 //IRay priorRay = (IRay)swingHighRays.Peek();
@@ -191,8 +191,8 @@ namespace AgenaTrader.UserCode
 
                 if (isSwingLow) // found a new swing low; draw it on the chart
                 {
-                    DrawRay("lowRay" + (CurrentBar - strength), false, strength, lastSwingLowValue, 0, lastSwingLowValue, swingLowColor, DashStyle.Dot, 2);
-                    RayObject newRayObject = new RayObject("lowRay" + (CurrentBar - strength), strength, lastSwingLowValue, 0, lastSwingLowValue);
+                    AddChartRay("lowRay" + (ProcessingBarIndex - strength), false, strength, lastSwingLowValue, 0, lastSwingLowValue, swingLowColor, DashStyle.Dot, 2);
+                    RayObject newRayObject = new RayObject("lowRay" + (ProcessingBarIndex - strength), strength, lastSwingLowValue, 0, lastSwingLowValue);
                     swingLowRays.Push(newRayObject);
                 }
                 else if (Low[0] < lastSwingLowValue) // otherwise test to see if price has broken through prior swing low
@@ -205,15 +205,15 @@ namespace AgenaTrader.UserCode
                         {
                             if (enableAlerts)
                             {
-                                Alert("Swing Low at " + currentRay.Y1 + " broken", GlobalUtilities.GetSoundfile(this.Soundfile));
+                                ShowAlert("Swing Low at " + currentRay.Y1 + " broken", GlobalUtilities.GetSoundfile(this.Soundfile));
                             }
                             temp_signal_value = -1;
                             if (keepBrokenLines) // draw a line between swing point and break bar 
                             {
                                 int barsAgo = currentRay.BarsAgo1;
-                                ITrendLine newLine = DrawLine("highLine" + (CurrentBar - barsAgo), false, barsAgo, currentRay.Y1, 0, currentRay.Y1, swingLowColor, DashStyle.Solid, 2);
+                                ITrendLine newLine = AddChartLine("highLine" + (ProcessingBarIndex - barsAgo), false, barsAgo, currentRay.Y1, 0, currentRay.Y1, swingLowColor, DashStyle.Solid, 2);
                             }
-                            RemoveDrawObject(currentRay.Tag);
+                            RemoveChartDrawing(currentRay.Tag);
 
                             if (swingLowRays.Count > 0)
                             {
@@ -249,7 +249,7 @@ namespace AgenaTrader.UserCode
         }
 
 
-        #region Input Parameters
+        #region InSeries Parameters
 
         [Description("Number of bars before/after each pivot bar")]
             [Category("Parameters")]
@@ -326,7 +326,7 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-        #region Input Drawings
+        #region InSeries Drawings
 
         [XmlIgnore()]
         [Description("Select Color")]
@@ -376,35 +376,35 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries SignalLine
         {
-            get { return Values[0]; }
+            get { return Outputs[0]; }
         }
 
         //[Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
         //    [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
         //    public DataSeries HighRay
         //    {
-        //        get { return Values[0]; }
+        //        get { return Outputs[0]; }
         //    }
 
         //    [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
         //    [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
         //    public DataSeries LowRay
         //    {
-        //        get { return Values[1]; }
+        //        get { return Outputs[1]; }
         //    }
 
         //    [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
         //    [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
         //    public DataSeries HighLine
         //    {
-        //        get { return Values[2]; }
+        //        get { return Outputs[2]; }
         //    }
 
         //    [Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
         //    [XmlIgnore()]   // this line ensures that the indicator can be saved/recovered as part of a chart template, do not remove
         //    public DataSeries LowLine
         //    {
-        //        get { return Values[3]; }
+        //        get { return Outputs[3]; }
         //    }
 
         #endregion
@@ -428,7 +428,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
         {
-			return SwingRays(Input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
+			return SwingRays(InSeries, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
 		}
 
 		/// <summary>
@@ -443,9 +443,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new SwingRays
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							Strength = strength,
 							EnableAlerts = enableAlerts,
 							KeepBrokenLines = keepBrokenLines,
@@ -472,7 +472,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
-			return LeadIndicator.SwingRays(Input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
+			return LeadIndicator.SwingRays(InSeries, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
 		}
 
 		/// <summary>
@@ -480,7 +480,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.SwingRays(input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
@@ -498,7 +498,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
-			return LeadIndicator.SwingRays(Input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
+			return LeadIndicator.SwingRays(InSeries, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
 		}
 
 		/// <summary>
@@ -521,7 +521,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
-			return LeadIndicator.SwingRays(Input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
+			return LeadIndicator.SwingRays(InSeries, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
 		}
 
 		/// <summary>

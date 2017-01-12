@@ -60,9 +60,9 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
-            base.OnStartUp();
+            base.OnStart();
 
             //Init our indicator to get code access
             this._popgun_indicator = new PopGun_Indicator();
@@ -70,13 +70,13 @@ namespace AgenaTrader.UserCode
             this._popgun_indicator.SetTimeFrame(this.TimeFrame);
         }
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
-            CalculateOnBarClose = true;
-            BarsRequired = 3;
+            CalculateOnClosedBar = true;
+            RequiredBarsCount = 3;
         }
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
 
 
@@ -85,11 +85,11 @@ namespace AgenaTrader.UserCode
             {
                 if (this._orderenterlong != null)
                 {
-                    ExitLong(this._orderenterlong.Quantity, "PopGunTarget", this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
+                    CloseLong(this._orderenterlong.Quantity, "PopGunTarget", this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
                 }
                 if (this._orderentershort != null)
                 {
-                    ExitShort(this._orderentershort.Quantity, "PopGunTarget", this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
+                    CloseShort(this._orderentershort.Quantity, "PopGunTarget", this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
                 }
             }
 
@@ -103,9 +103,9 @@ namespace AgenaTrader.UserCode
 
 
 
-        protected override void OnExecution(IExecution execution)
+        protected override void OnOrderExecution(IExecution execution)
         {
-            if (execution.MarketPosition == PositionType.Flat)
+            if (execution.PositionType == PositionType.Flat)
             {
                 _orderentershort = null;
                 _orderenterlong = null;
@@ -114,11 +114,11 @@ namespace AgenaTrader.UserCode
 
         private void calculate()
         {
-            double PopGun_Indicator_Value = this._popgun_indicator.calculate(this.Bars, this.CurrentBar, this.PopGunType);
+            double PopGun_Indicator_Value = this._popgun_indicator.calculate(this.Bars, this.ProcessingBarIndex, this.PopGunType);
 
-            if (!IsCurrentBarLast || oEnter != null) return;
+            if (!IsProcessingBarIndexLast || oEnter != null) return;
 
-            this._popgun_indicator.calculate(this.Bars, this.CurrentBar, this.PopGunType);
+            this._popgun_indicator.calculate(this.Bars, this.ProcessingBarIndex, this.PopGunType);
 
             if (PopGun_Indicator_Value == 100)
             {
@@ -163,41 +163,41 @@ namespace AgenaTrader.UserCode
 
         private void DoEnterLong()
         {
-            _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager,
+            _orderenterlong = OpenLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager,
                                                                                        this.Root.Core.PreferenceManager,
                                                                                        this.Instrument, Bars[0].Close),
                                                                                        "PopGun_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(),
                                                                                        this.Instrument, this.TimeFrame);
             if (UseStopLoss)
             {
-                SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._popgun_indicator.PopGunTriggerShort, false);
+                SetUpStopLoss(_orderenterlong.Name, CalculationMode.Price, this._popgun_indicator.PopGunTriggerShort, false);
             }
 
             if (UseTrailingStop)
             {
-                SetTrailStop(_orderenterlong.Name, CalculationMode.Ticks, 10, false);
+                SetUpTrailStop(_orderenterlong.Name, CalculationMode.Ticks, 10, false);
             }
 
-            //SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, <<<<TARGET>>>>);
+            //SetUpProfitTarget(_orderenterlong.Name, CalculationMode.Price, <<<<TARGET>>>>);
         }
 
         private void DoEnterShort()
         {
-            _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager,
+            _orderentershort = OpenShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager,
                                                                                          this.Root.Core.PreferenceManager,
                                                                                          this.Instrument, Bars[0].Close),
                                                                                          "PopGun_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(),
                                                                                          this.Instrument, this.TimeFrame);
             if (UseStopLoss)
             {
-                SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._popgun_indicator.PopGunTriggerLong, false);
+                SetUpStopLoss(_orderentershort.Name, CalculationMode.Price, this._popgun_indicator.PopGunTriggerLong, false);
             }
 
             if (UseTrailingStop)
             {
-                SetTrailStop(_orderenterlong.Name, CalculationMode.Ticks, 10, false);
+                SetUpTrailStop(_orderenterlong.Name, CalculationMode.Ticks, 10, false);
             }
-            //SetProfitTarget(_orderentershort.Name, CalculationMode.Price, <<<<TARGET>>>>);
+            //SetUpProfitTarget(_orderentershort.Name, CalculationMode.Price, <<<<TARGET>>>>);
         }
 
         public override string ToString()

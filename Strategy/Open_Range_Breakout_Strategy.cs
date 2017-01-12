@@ -66,7 +66,7 @@ namespace AgenaTrader.UserCode
         private Statistic _statisticshort;
 
 
-		protected override void Initialize()
+		protected override void OnInit()
 		{
             //Set the default time frame if you start the strategy via the strategy-escort
             //if you start the strategy on a chart the TimeFrame is automatically set, this will lead to a better usability
@@ -76,13 +76,13 @@ namespace AgenaTrader.UserCode
             }
 
             //Because of Backtesting reasons if we use the advanced mode we need at least two bars
-            this.BarsRequired = 2;
+            this.RequiredBarsCount = 2;
 		}
 
 
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
-            base.OnStartUp();
+            base.OnStart();
 
             //Print("OnStartUp" + Bars[0].Time);
 
@@ -104,9 +104,9 @@ namespace AgenaTrader.UserCode
             }
         }
 
-        protected override void OnTermination()
+        protected override void OnDispose()
         {
-            base.OnTermination();
+            base.OnDispose();
 
             //Print("OnTermination" + Bars[0].Time);
 
@@ -150,7 +150,7 @@ namespace AgenaTrader.UserCode
             //}
         }
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
             //Print("OnBarUpdate" + Bars[0].Time.ToString());
 
@@ -219,7 +219,7 @@ namespace AgenaTrader.UserCode
         /// OnExecution of orders
         /// </summary>
         /// <param name="execution"></param>
-            protected override void OnExecution(IExecution execution)
+            protected override void OnOrderExecution(IExecution execution)
             {
                 ////info: was uncommented because exired date is not working in simulation mode or in backtesting mode AND also not in AT 1.9
                 ////set expiration date to close at the end of the trading day
@@ -258,14 +258,14 @@ namespace AgenaTrader.UserCode
             if (this._orderenterlong == null)
             {
                 string entryreason = "ORB_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString();
-                _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
+                _orderenterlong = OpenLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
                 if (this.UseStopLoss)
                 {
-                    SetStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
+                    SetUpStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
                 }
                 if (this.UseProfitTarget)
                 {
-                      SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong); 
+                      SetUpProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong); 
                 }
 
                 if (this.StatisticBacktesting)
@@ -283,14 +283,14 @@ namespace AgenaTrader.UserCode
             if (this._orderentershort == null)
             {
                 string entryreason = "ORB_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString();
-                _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
+                _orderentershort = OpenShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
                 if (this.UseStopLoss)
                 {
-                    SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
+                    SetUpStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
                 }
                 if (this.UseProfitTarget)
                 {
-                     SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+                     SetUpProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
                 }
 
                 if (this.StatisticBacktesting)
@@ -310,7 +310,7 @@ namespace AgenaTrader.UserCode
             if (_orderenterlong != null)
             {
                 //todo exit reason on target?
-                ExitLong(this._orderenterlong.Quantity, Const.DefaultExitReasonEOD, this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
+                CloseLong(this._orderenterlong.Quantity, Const.DefaultExitReasonEOD, this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
 
                 if (this.StatisticBacktesting)
                 {
@@ -332,7 +332,7 @@ namespace AgenaTrader.UserCode
             if (_orderentershort != null)
             {
                 //todo exit reason on target?
-                ExitShort(this._orderentershort.Quantity, Const.DefaultExitReasonEOD, this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
+                CloseShort(this._orderentershort.Quantity, Const.DefaultExitReasonEOD, this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
 
                 if (this.StatisticBacktesting)
                 {
@@ -366,7 +366,7 @@ namespace AgenaTrader.UserCode
 
 
 
-        #region Input
+        #region InSeries
 
 
         /// <summary>

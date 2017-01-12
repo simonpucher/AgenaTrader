@@ -18,7 +18,7 @@ using System.Windows.Forms;
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
 /// todo
-/// + if markets are closed no OnBarUpdate() is called so we need an timer event. 
+/// + if markets are closed no OnCalculate() is called so we need an timer event. 
 /// -------------------------------------------------------------------------
 /// Adds instruments dynamical to a static list (e.g. portfolio) if the market is currently open.
 /// -------------------------------------------------------------------------
@@ -42,16 +42,16 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
-            Overlay = true;
-            CalculateOnBarClose = false;
+            IsOverlay = true;
+            CalculateOnClosedBar = false;
         }
 
 
 
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
             this.CheckForNewInstruments();
         }
@@ -159,7 +159,7 @@ namespace AgenaTrader.UserCode
 
     
 
-        #region Input
+        #region InSeries
 
 
         [Description("The name of the static list to which you would like to add the instruments.")]
@@ -226,7 +226,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DynamicListMarkets_Indicator_Tool DynamicListMarkets_Indicator_Tool(System.String name_of_list, System.Boolean useMarketHours, System.String instrumentlists, System.Int32 seconds)
         {
-			return DynamicListMarkets_Indicator_Tool(Input, name_of_list, useMarketHours, instrumentlists, seconds);
+			return DynamicListMarkets_Indicator_Tool(InSeries, name_of_list, useMarketHours, instrumentlists, seconds);
 		}
 
 		/// <summary>
@@ -241,9 +241,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new DynamicListMarkets_Indicator_Tool
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							Name_of_list = name_of_list,
 							UseMarketHours = useMarketHours,
 							Instrumentlists = instrumentlists,
@@ -268,7 +268,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DynamicListMarkets_Indicator_Tool DynamicListMarkets_Indicator_Tool(System.String name_of_list, System.Boolean useMarketHours, System.String instrumentlists, System.Int32 seconds)
 		{
-			return LeadIndicator.DynamicListMarkets_Indicator_Tool(Input, name_of_list, useMarketHours, instrumentlists, seconds);
+			return LeadIndicator.DynamicListMarkets_Indicator_Tool(InSeries, name_of_list, useMarketHours, instrumentlists, seconds);
 		}
 
 		/// <summary>
@@ -276,7 +276,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DynamicListMarkets_Indicator_Tool DynamicListMarkets_Indicator_Tool(IDataSeries input, System.String name_of_list, System.Boolean useMarketHours, System.String instrumentlists, System.Int32 seconds)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.DynamicListMarkets_Indicator_Tool(input, name_of_list, useMarketHours, instrumentlists, seconds);
@@ -294,7 +294,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DynamicListMarkets_Indicator_Tool DynamicListMarkets_Indicator_Tool(System.String name_of_list, System.Boolean useMarketHours, System.String instrumentlists, System.Int32 seconds)
 		{
-			return LeadIndicator.DynamicListMarkets_Indicator_Tool(Input, name_of_list, useMarketHours, instrumentlists, seconds);
+			return LeadIndicator.DynamicListMarkets_Indicator_Tool(InSeries, name_of_list, useMarketHours, instrumentlists, seconds);
 		}
 
 		/// <summary>
@@ -317,7 +317,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DynamicListMarkets_Indicator_Tool DynamicListMarkets_Indicator_Tool(System.String name_of_list, System.Boolean useMarketHours, System.String instrumentlists, System.Int32 seconds)
 		{
-			return LeadIndicator.DynamicListMarkets_Indicator_Tool(Input, name_of_list, useMarketHours, instrumentlists, seconds);
+			return LeadIndicator.DynamicListMarkets_Indicator_Tool(InSeries, name_of_list, useMarketHours, instrumentlists, seconds);
 		}
 
 		/// <summary>

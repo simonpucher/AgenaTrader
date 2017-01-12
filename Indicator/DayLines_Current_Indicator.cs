@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.2.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -57,13 +57,13 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-        protected override void InitRequirements()
+        protected override void OnBarsRequirements()
         {
             Add(new TimeFrame(DatafeedHistoryPeriodicity.Day, 1));
         }
 
 
-        protected override void Initialize()
+        protected override void OnInit()
 		{
             //Output Listen
             //Add(new Plot(new Pen(this.Color_O, this.LineWidth_O), PlotStyle.Line, "Plot_Open"));
@@ -71,25 +71,28 @@ namespace AgenaTrader.UserCode
             //Add(new Plot(new Pen(this.Color_L, this.LineWidth_L), PlotStyle.Line, "Plot_Low"));
             //Add(new Plot(new Pen(this.Color_C, this.LineWidth_C), PlotStyle.Line, "Plot_Close"));
 
-            Overlay = true;
-			CalculateOnBarClose = false; //do not change this
-            PaintPriceMarkers = false;
-            DisplayInDataBox = false;
+            IsOverlay = true;
+			CalculateOnClosedBar = false; //do not change this
+            IsShowPriceMarkers = false;
+            IsShowInDataBox = false;
 
         }
 
 
 
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
             TimeFrame tf = (TimeFrame)Bars.TimeFrame;
-            if (this.IsCurrentBarLast && (tf.Periodicity != DatafeedHistoryPeriodicity.Year && tf.Periodicity != DatafeedHistoryPeriodicity.Day && tf.Periodicity != DatafeedHistoryPeriodicity.Week))
+            if (Bars != null && Bars.Count() > 0 && Times != null && Times.Count > 0 && this.IsProcessingBarIndexLast && (tf.Periodicity != DatafeedHistoryPeriodicity.Year && tf.Periodicity != DatafeedHistoryPeriodicity.Day && tf.Periodicity != DatafeedHistoryPeriodicity.Week))
             {
                 
-                DateTime datetillend = Bars.Where(x => x.Time.Date == Times[0][0].Date).Last().Time;
-                DateTime date = Times[1][0];
-
+                IBar datetillendbar = Bars.Where(x => x.Time.Date == Times[0][0].Date).Last();
+                if (datetillendbar != null)
+                {
+                    DateTime datetillend = datetillendbar.Time;
+                    DateTime date = Times[1][0];
+                    
                     //if (!_extendlines)
                     //{
                     //    IEnumerable<IBar> lisdateend = Bars.Where(x => x.Time.Date == date.Date);
@@ -109,19 +112,19 @@ namespace AgenaTrader.UserCode
 
                     if (_showopen)
                     {
-                        DrawLine("Open_" + date.ToString(), this.AutoScale, startdate, Opens[1][0], datetillend, Opens[1][0], this.Color_O, this.DashStyle_O, this.LineWidth_O);
+                        AddChartLine("Open_" + date.ToString(), this.IsAutoAdjustableScale, startdate, Opens[1][0], datetillend, Opens[1][0], this.Color_O, this.DashStyle_O, this.LineWidth_O);
                     }
                     if (_showhigh)
                     {
-                        DrawLine("High_" + date.ToString(), this.AutoScale, startdate, Highs[1][0], datetillend, Highs[1][0], this.Color_H, this.DashStyle_H, this.LineWidth_H);
+                        AddChartLine("High_" + date.ToString(), this.IsAutoAdjustableScale, startdate, Highs[1][0], datetillend, Highs[1][0], this.Color_H, this.DashStyle_H, this.LineWidth_H);
                     }
                     if (_showlow)
                     {
-                        DrawLine("Low_" + date.ToString(), this.AutoScale, startdate, Lows[1][0], datetillend, Lows[1][0], this.Color_L, this.DashStyle_L, this.LineWidth_L);
+                        AddChartLine("Low_" + date.ToString(), this.IsAutoAdjustableScale, startdate, Lows[1][0], datetillend, Lows[1][0], this.Color_L, this.DashStyle_L, this.LineWidth_L);
                     }
                     if (_showclose)
                     {
-                        DrawLine("Close_" + date.ToString(), this.AutoScale, startdate, Closes[1][0], datetillend, Closes[1][0], this.Color_C, this.DashStyle_C, this.LineWidth_C);
+                        AddChartLine("Close_" + date.ToString(), this.IsAutoAdjustableScale, startdate, Closes[1][0], datetillend, Closes[1][0], this.Color_C, this.DashStyle_C, this.LineWidth_C);
                     }
 
 
@@ -130,27 +133,23 @@ namespace AgenaTrader.UserCode
                         DateTime enddrawing_string = datetillend.AddSeconds(this.TimeFrame.GetSeconds() + this.TimeFrame.GetSeconds() * 0.15);
                         if (_showopen)
                         {
-                            DrawText("String_Open_" + date.ToString(), this.AutoScale, "CDO", enddrawing_string, Opens[1][0], 0, this.Color_O, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                            AddChartText("String_Open_" + date.ToString(), this.IsAutoAdjustableScale, "CDO", enddrawing_string, Opens[1][0], 0, this.Color_O, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
                         }
                         if (_showhigh)
                         {
-                            DrawText("String_High_" + date.ToString(), this.AutoScale, "CDH", enddrawing_string, Highs[1][0], 0, this.Color_H, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                            AddChartText("String_High_" + date.ToString(), this.IsAutoAdjustableScale, "CDH", enddrawing_string, Highs[1][0], 0, this.Color_H, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
                         }
                         if (_showlow)
                         {
-                            DrawText("String_Low_" + date.ToString(), this.AutoScale, "CDL", enddrawing_string, Lows[1][0], 0, this.Color_L, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                            AddChartText("String_Low_" + date.ToString(), this.IsAutoAdjustableScale, "CDL", enddrawing_string, Lows[1][0], 0, this.Color_L, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
                         }
                         if (_showclose)
                         {
-                            DrawText("String_Close_" + date.ToString(), this.AutoScale, "CDC", enddrawing_string, Closes[1][0], 0, this.Color_C, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
+                            AddChartText("String_Close_" + date.ToString(), this.IsAutoAdjustableScale, "CDC", enddrawing_string, Closes[1][0], 0, this.Color_C, new Font("Arial", 7.5f), StringAlignment.Far, Color.Transparent, Color.Transparent, 100);
                         }
                     }
-
-              
-
-                  
-
-
+                }
+               
             }
 
             ////Output Listen
@@ -407,14 +406,14 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries Indicator_Curve_Open
         {
-            get { return Values[0]; }
+            get { return Outputs[0]; }
         }
 
         [Browsable(false)]
         [XmlIgnore()]
         public DataSeries Indicator_Curve_High
         {
-            get { return Values[1]; }
+            get { return Outputs[1]; }
         }
 
 
@@ -422,14 +421,14 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries Indicator_Curve_Low
         {
-            get { return Values[2]; }
+            get { return Outputs[2]; }
         }
 
         [Browsable(false)]
         [XmlIgnore()]
         public DataSeries Indicator_Curve_Close
         {
-            get { return Values[3]; }
+            get { return Outputs[3]; }
         }
 
 
@@ -449,7 +448,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DayLines_Current_Indicator DayLines_Current_Indicator(System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
         {
-			return DayLines_Current_Indicator(Input, showLines, showOpen, showHigh, showLow, showClose);
+			return DayLines_Current_Indicator(InSeries, showLines, showOpen, showHigh, showLow, showClose);
 		}
 
 		/// <summary>
@@ -464,9 +463,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new DayLines_Current_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							ShowLines = showLines,
 							ShowOpen = showOpen,
 							ShowHigh = showHigh,
@@ -492,7 +491,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DayLines_Current_Indicator DayLines_Current_Indicator(System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
 		{
-			return LeadIndicator.DayLines_Current_Indicator(Input, showLines, showOpen, showHigh, showLow, showClose);
+			return LeadIndicator.DayLines_Current_Indicator(InSeries, showLines, showOpen, showHigh, showLow, showClose);
 		}
 
 		/// <summary>
@@ -500,8 +499,8 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DayLines_Current_Indicator DayLines_Current_Indicator(IDataSeries input, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
 		{
-			if (InInitialize && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+			if (IsInInit && input == null)
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.DayLines_Current_Indicator(input, showLines, showOpen, showHigh, showLow, showClose);
 		}
@@ -518,7 +517,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DayLines_Current_Indicator DayLines_Current_Indicator(System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
 		{
-			return LeadIndicator.DayLines_Current_Indicator(Input, showLines, showOpen, showHigh, showLow, showClose);
+			return LeadIndicator.DayLines_Current_Indicator(InSeries, showLines, showOpen, showHigh, showLow, showClose);
 		}
 
 		/// <summary>
@@ -541,7 +540,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DayLines_Current_Indicator DayLines_Current_Indicator(System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
 		{
-			return LeadIndicator.DayLines_Current_Indicator(Input, showLines, showOpen, showHigh, showLow, showClose);
+			return LeadIndicator.DayLines_Current_Indicator(InSeries, showLines, showOpen, showHigh, showLow, showClose);
 		}
 
 		/// <summary>

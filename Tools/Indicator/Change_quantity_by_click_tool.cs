@@ -34,20 +34,20 @@ namespace AgenaTrader.UserCode
 
 		#endregion
 
-		protected override void Initialize()
+		protected override void OnInit()
 		{
 			Add(new Plot(Color.FromKnownColor(KnownColor.Transparent), "MyPlot1"));
-			Overlay = true;
-			CalculateOnBarClose = true;
+			IsOverlay = true;
+			CalculateOnClosedBar = true;
 		}
 
 
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
 
             // Add event listener
-            if (ChartControl != null)
-                ChartControl.ChartPanelMouseDown += OnChartPanelMouseDown;
+            if (Chart != null)
+                Chart.ChartPanelMouseDown += OnChartPanelMouseDown;
 
             //Init Filter
             olf.Instruments = new List<IInstrument>();
@@ -57,17 +57,17 @@ namespace AgenaTrader.UserCode
 
 
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
-			MyPlot1.Set(Input[0]);
+			MyPlot1.Set(InSeries[0]);
 		}
 
 
-        protected override void OnTermination()
+        protected override void OnDispose()
         {
             // Remove event listener
-            if (ChartControl != null)
-                ChartControl.ChartPanelMouseDown -= OnChartPanelMouseDown;
+            if (Chart != null)
+                Chart.ChartPanelMouseDown -= OnChartPanelMouseDown;
         }
 
 
@@ -89,7 +89,7 @@ namespace AgenaTrader.UserCode
                         if (ord != null && ord.State == OrderState.PendingSubmit)
                         {
                             //Change quantity
-                            double clickprice = ChartControl.GetPriceByY(e.Y);
+                            double clickprice = Chart.GetPriceByY(e.Y);
                             if (clickprice >= ord.Price + (ord.Price/100*1) )
                             {
                                 ord.Quantity = ord.Quantity + 1;
@@ -130,7 +130,7 @@ namespace AgenaTrader.UserCode
 		[XmlIgnore()]
 		public DataSeries MyPlot1
 		{
-			get { return Values[0]; }
+			get { return Outputs[0]; }
 		}
 
 		#endregion
@@ -149,7 +149,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ChangeQuantity_Tool ChangeQuantity_Tool()
         {
-			return ChangeQuantity_Tool(Input);
+			return ChangeQuantity_Tool(InSeries);
 		}
 
 		/// <summary>
@@ -164,9 +164,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new ChangeQuantity_Tool
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input
 						};
 			indicator.SetUp();
 
@@ -187,7 +187,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ChangeQuantity_Tool ChangeQuantity_Tool()
 		{
-			return LeadIndicator.ChangeQuantity_Tool(Input);
+			return LeadIndicator.ChangeQuantity_Tool(InSeries);
 		}
 
 		/// <summary>
@@ -195,7 +195,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ChangeQuantity_Tool ChangeQuantity_Tool(IDataSeries input)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.ChangeQuantity_Tool(input);
@@ -213,7 +213,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ChangeQuantity_Tool ChangeQuantity_Tool()
 		{
-			return LeadIndicator.ChangeQuantity_Tool(Input);
+			return LeadIndicator.ChangeQuantity_Tool(InSeries);
 		}
 
 		/// <summary>
@@ -236,7 +236,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ChangeQuantity_Tool ChangeQuantity_Tool()
 		{
-			return LeadIndicator.ChangeQuantity_Tool(Input);
+			return LeadIndicator.ChangeQuantity_Tool(InSeries);
 		}
 
 		/// <summary>

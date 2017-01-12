@@ -95,23 +95,23 @@ namespace AgenaTrader.UserCode
             this.TimeFrame = timeFrame;
         }
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
             Add(new Plot(Color.Orange, "PopGun"));
             Add(new Plot(Color.Green, PlotStyle.Block, "PopGunTrigger"));
-            Overlay = false; //underneath the price chart in his own subchart
-            DrawOnPricePanel = true;
-            CalculateOnBarClose = true;
-            BarsRequired = 3;
+            IsOverlay = false; //underneath the price chart in his own subchart
+            IsAddDrawingsToPricePanel = true;
+            CalculateOnClosedBar = true;
+            RequiredBarsCount = 3;
         }
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
-            int returnvalue = calculate(Bars, CurrentBar, this.PopGunType);
-            Value.Set(returnvalue);
-            if (CurrentBar <= this.PopGunTarget)
+            int returnvalue = calculate(Bars, ProcessingBarIndex, this.PopGunType);
+            OutSeries.Set(returnvalue);
+            if (ProcessingBarIndex <= this.PopGunTarget)
             {
-                Values[1].Set(0); //Indicates that there is a PopGun Trigger!      
+                Outputs[1].Set(0); //Indicates that there is a PopGun Trigger!      
             }
         }
 
@@ -159,7 +159,7 @@ namespace AgenaTrader.UserCode
                         if (noPopGunTrigger == false)
                         {
                             this.PopGunTarget = curbar + this.PopGunExpires;
-                            PopGunTriggerBar = CurrentBar;
+                            PopGunTriggerBar = ProcessingBarIndex;
                             this.PopGunTriggerLong = CurrentBar_High;
                             this.PopGunTriggerShort = CurrentBar_Low;
                         }
@@ -188,9 +188,9 @@ namespace AgenaTrader.UserCode
                     returnvalue = 100;
                     if (this.DrawLinesOnChart)
                     {
-                        DrawLine("high_" + bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[0].Close, bars[0].Time.AddDays(5), bars[0].Close, Color.Green, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
+                        AddChartLine("high_" + bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[0].Close, bars[0].Time.AddDays(5), bars[0].Close, Color.Green, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
 
-                        DrawLine("low_" + bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[1].Close, bars[0].Time.AddDays(5), bars[1].Close, Color.Red, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
+                        AddChartLine("low_" + bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[1].Close, bars[0].Time.AddDays(5), bars[1].Close, Color.Red, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
                         
                     }
 
@@ -201,9 +201,9 @@ namespace AgenaTrader.UserCode
 
                     if (this.DrawLinesOnChart)
                     {
-                        DrawLine("high_" + bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[0].Close, bars[0].Time.AddDays(5), bars[0].Close, Color.Red, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
+                        AddChartLine("high_" + bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[0].Close, bars[0].Time.AddDays(5), bars[0].Close, Color.Red, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
 
-                        DrawLine("low_" + bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[1].Close, bars[0].Time.AddDays(5), bars[1].Close, Color.Green, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
+                        AddChartLine("low_" + bars[0].Time.Ticks.ToString(), true, bars[0].Time, bars[1].Close, bars[0].Time.AddDays(5), bars[1].Close, Color.Green, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
 
                     }
                 }
@@ -221,7 +221,7 @@ namespace AgenaTrader.UserCode
 
             if (this.DrawLinesOnChart && curbar == PopGunTriggerBar)
             {
-                DrawText(("PopGunSize" + curbar), (Math.Round((((bars[0].High - bars[0].Low) / bars[0].Close) * 100),2)).ToString(), 0, bars.GetByIndex(PopGunTriggerBar).Low - TickSize*bars[0].Close, Color.Black);
+                AddChartText(("PopGunSize" + curbar), (Math.Round((((bars[0].High - bars[0].Low) / bars[0].Close) * 100),2)).ToString(), 0, bars.GetByIndex(PopGunTriggerBar).Low - TickSize*bars[0].Close, Color.Black);
             }
 
             if (curbar <= PopGunTarget
@@ -237,10 +237,10 @@ namespace AgenaTrader.UserCode
                     string strPopGunLong = "PopGunLong" + curbar;
                     string strPopGunShort = "PopGunShort" + curbar;
 
-                    DrawLine(strPopGunLong, true, bars.GetByIndex(PopGunTriggerBar).Time, PopGunTriggerLong, lineend, PopGunTriggerLong,
+                    AddChartLine(strPopGunLong, true, bars.GetByIndex(PopGunTriggerBar).Time, PopGunTriggerLong, lineend, PopGunTriggerLong,
                                                             Color.Green, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
 
-                    DrawLine(strPopGunShort, true, bars.GetByIndex(PopGunTriggerBar).Time, PopGunTriggerShort, lineend, PopGunTriggerShort,
+                    AddChartLine(strPopGunShort, true, bars.GetByIndex(PopGunTriggerBar).Time, PopGunTriggerShort, lineend, PopGunTriggerShort,
                                                             Color.Red, Const.DefaultIndicatorDashStyle, Const.DefaultLineWidth_large);
                 }
 
@@ -469,7 +469,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PopGun_Indicator PopGun_Indicator(PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
         {
-			return PopGun_Indicator(Input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+			return PopGun_Indicator(InSeries, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
 		}
 
 		/// <summary>
@@ -484,9 +484,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new PopGun_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							PopGunType = popGunType,
 							PopGunExpires = popGunExpires,
 							IsSnapshotActive = isSnapshotActive,
@@ -511,7 +511,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PopGun_Indicator PopGun_Indicator(PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
 		{
-			return LeadIndicator.PopGun_Indicator(Input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+			return LeadIndicator.PopGun_Indicator(InSeries, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
 		}
 
 		/// <summary>
@@ -519,8 +519,8 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PopGun_Indicator PopGun_Indicator(IDataSeries input, PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
 		{
-			if (InInitialize && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+			if (IsInInit && input == null)
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.PopGun_Indicator(input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
 		}
@@ -537,7 +537,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PopGun_Indicator PopGun_Indicator(PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
 		{
-			return LeadIndicator.PopGun_Indicator(Input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+			return LeadIndicator.PopGun_Indicator(InSeries, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
 		}
 
 		/// <summary>
@@ -560,7 +560,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PopGun_Indicator PopGun_Indicator(PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
 		{
-			return LeadIndicator.PopGun_Indicator(Input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+			return LeadIndicator.PopGun_Indicator(InSeries, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
 		}
 
 		/// <summary>

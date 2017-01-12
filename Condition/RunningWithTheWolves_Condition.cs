@@ -55,7 +55,7 @@ namespace AgenaTrader.UserCode
 
 		#endregion
 
-		protected override void Initialize()
+		protected override void OnInit()
 		{
 			IsEntry = true;
 			IsStop = false;
@@ -63,23 +63,23 @@ namespace AgenaTrader.UserCode
 			Add(new Plot(Const.DefaultIndicatorColor, "Occurred"));
             Add(new Plot(Const.DefaultIndicatorColor, "Entry"));
 
-			Overlay = false;
-			CalculateOnBarClose = true;
+			IsOverlay = false;
+			CalculateOnClosedBar = true;
 
             //For SMA200 we need at least 200 Bars.
-            this.BarsRequired = 200;
+            this.RequiredBarsCount = 200;
 		}
 
-        protected override void InitRequirements()
+        protected override void OnBarsRequirements()
         {
-            base.InitRequirements();
+            base.OnBarsRequirements();
 
         }
 
 
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
-            base.OnStartUp();
+            base.OnStart();
 
             //Init our indicator to get code access
             this._RunningWithTheWolves_Indicator = new RunningWithTheWolves_Indicator();
@@ -87,22 +87,22 @@ namespace AgenaTrader.UserCode
 
        
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
 
             //calculate data
-            OrderAction? resultdata = this._RunningWithTheWolves_Indicator.calculate(Input, this.MA_Selected, this.MA_Fast, this.MA_Medium, this.MA_Slow);
+            OrderAction? resultdata = this._RunningWithTheWolves_Indicator.calculate(InSeries, this.MA_Selected, this.MA_Fast, this.MA_Medium, this.MA_Slow);
             if (resultdata.HasValue)
             {
                 switch (resultdata)
                 {
                     case OrderAction.Buy:
                         Occurred.Set(1);
-                        //Entry.Set(Input[0]);
+                        //Entry.Set(InSeries[0]);
                         break;
                     case OrderAction.SellShort:
                         Occurred.Set(-1);
-                        //Entry.Set(Input[0]);
+                        //Entry.Set(InSeries[0]);
                         break;
                     //case OrderAction.BuyToCover:
                     //    break;
@@ -111,7 +111,7 @@ namespace AgenaTrader.UserCode
                     default:
                         //nothing to do
                         Occurred.Set(0);
-                        //Entry.Set(Input[0]);
+                        //Entry.Set(InSeries[0]);
                         break;
                 }
             }
@@ -142,7 +142,7 @@ namespace AgenaTrader.UserCode
         #region Properties
 
 
-        #region Input
+        #region InSeries
 
 
         /// <summary>
@@ -236,14 +236,14 @@ namespace AgenaTrader.UserCode
                 [XmlIgnore()]
                 public DataSeries Occurred
                 {
-                    get { return Values[0]; }
+                    get { return Outputs[0]; }
                 }
 
                 [Browsable(false)]
                 [XmlIgnore()]
                 public DataSeries Entry
                 {
-                    get { return Values[1]; }
+                    get { return Outputs[1]; }
                 }
 
                 public override IList<DataSeries> GetEntries()

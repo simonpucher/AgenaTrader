@@ -51,39 +51,39 @@ namespace AgenaTrader.UserCode
 
         
 
-		protected override void Initialize()
+		protected override void OnInit()
 		{
 			IsEntry = true;
 			IsStop = false;
 			IsTarget = false;
 			Add(new Plot(Color.FromKnownColor(KnownColor.Black), "Occurred"));
 			Add(new Plot(Color.FromArgb(255, 92, 242, 57), "Entry"));
-			Overlay = false;
-			CalculateOnBarClose = true;
-            BarsRequired = 3;
+			IsOverlay = false;
+			CalculateOnClosedBar = true;
+            RequiredBarsCount = 3;
 		}
 
-        protected override void InitRequirements()
+        protected override void OnBarsRequirements()
         {
-            base.InitRequirements();
+            base.OnBarsRequirements();
 
         }
 
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
-            base.OnStartUp();
+            base.OnStart();
 
             //Init our indicator to get code access
             this._popgun_indicator = new PopGun_Indicator();
             this._popgun_indicator.SetData(this.PopGunExpires, this.IsSnapshotActive, this.IsEvaluationActive, this.Filter_NoTriggerEOD);
         }
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
-            if (this.Bars != null && this.Bars.Count >  0 && CurrentBar > 3)
+            if (this.Bars != null && this.Bars.Count >  0 && ProcessingBarIndex > 3)
             {
                 //ShowGap Indikator aufrufen. Dieser liefert 100 für Long Einstieg und -100 für Short Einstieg. Liefert 0 für kein Einstiegssignal
-                double PopGun_Indicator_Value = this._popgun_indicator.calculate(this.Bars, this.CurrentBar, this.PopGunType);
+                double PopGun_Indicator_Value = this._popgun_indicator.calculate(this.Bars, this.ProcessingBarIndex, this.PopGunType);
                 if (PopGun_Indicator_Value == 100)
                 {
                     Occurred.Set(1);
@@ -110,14 +110,14 @@ namespace AgenaTrader.UserCode
 		[XmlIgnore()]
 		public DataSeries Occurred
 		{
-			get { return Values[0]; }
+			get { return Outputs[0]; }
 		}
 
 		[Browsable(false)]
 		[XmlIgnore()]
 		public DataSeries Entry
 		{
-			get { return Values[1]; }
+			get { return Outputs[1]; }
 		}
 
 		public override IList<DataSeries> GetEntries()
@@ -205,7 +205,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PopGun_Condition PopGun_Condition(PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
         {
-			return PopGun_Condition(Input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+			return PopGun_Condition(InSeries, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
 		}
 
 		/// <summary>
@@ -220,9 +220,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new PopGun_Condition
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							PopGunType = popGunType,
 							PopGunExpires = popGunExpires,
 							IsSnapshotActive = isSnapshotActive,
@@ -247,7 +247,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PopGun_Condition PopGun_Condition(PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
 		{
-			return LeadIndicator.PopGun_Condition(Input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+			return LeadIndicator.PopGun_Condition(InSeries, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
 		}
 
 		/// <summary>
@@ -255,7 +255,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PopGun_Condition PopGun_Condition(IDataSeries input, PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.PopGun_Condition(input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
@@ -273,7 +273,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PopGun_Condition PopGun_Condition(PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
 		{
-			return LeadIndicator.PopGun_Condition(Input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+			return LeadIndicator.PopGun_Condition(InSeries, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
 		}
 
 		/// <summary>
@@ -296,7 +296,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public PopGun_Condition PopGun_Condition(PopGunType popGunType, System.Int32 popGunExpires, System.Boolean isSnapshotActive, System.Boolean isEvaluationActive)
 		{
-			return LeadIndicator.PopGun_Condition(Input, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
+			return LeadIndicator.PopGun_Condition(InSeries, popGunType, popGunExpires, isSnapshotActive, isEvaluationActive);
 		}
 
 		/// <summary>

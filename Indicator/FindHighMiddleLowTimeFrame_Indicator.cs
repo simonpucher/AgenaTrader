@@ -60,15 +60,15 @@ namespace AgenaTrader.UserCode
         //internal
  
 
-		protected override void Initialize()
+		protected override void OnInit()
 		{
-            CalculateOnBarClose = false;
-            Overlay = true;
+            CalculateOnClosedBar = false;
+            IsOverlay = true;
 		}
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
-            if (Bars != null && Bars.Count > 0 && this.IsCurrentBarLast)
+            if (Bars != null && Bars.Count > 0 && this.IsProcessingBarIndexLast)
             {
                 this.calculateanddrawhighlowlines();
             }
@@ -128,22 +128,22 @@ namespace AgenaTrader.UserCode
                     {
                         if (this.IsDrawLowLineEnabled)
                         {
-                            DrawHorizontalLine("LowLine" + start.Ticks, this.AutoScale, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            AddChartHorizontalLine("LowLine" + start.Ticks, this.IsAutoAdjustableScale, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                         if (this.IsDrawHighLineEnabled)
                         {
-                            DrawHorizontalLine("HighLine" + start.Ticks, this.AutoScale, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            AddChartHorizontalLine("HighLine" + start.Ticks, this.IsAutoAdjustableScale, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                         if (this.IsDrawMiddleLineEnabled)
                         {
-                            DrawHorizontalLine("MiddleLine" + start.Ticks, this.AutoScale, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            AddChartHorizontalLine("MiddleLine" + start.Ticks, this.IsAutoAdjustableScale, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                     }
 
                     //Draw a rectangle at the dedicated time frame
                     if (this.IsDrawAreaplotEnabled)
                     {
-                        DrawRectangle("HighLowRect" + start.Ticks, this.AutoScale, start, this.LastLow, end, this.LastHigh, this.Color_TimeSpan, this.Color_TimeSpan, this.Opacity);
+                        AddChartRectangle("HighLowRect" + start.Ticks, this.IsAutoAdjustableScale, start, this.LastLow, end, this.LastHigh, this.Color_TimeSpan, this.Color_TimeSpan, this.Opacity);
                     }
                     break;
                 case FindHighLowTimeFrame_Type.Candle:
@@ -154,7 +154,7 @@ namespace AgenaTrader.UserCode
                         double lastmiddle = Bars[this.CandlesAgo].Low + (Bars[this.CandlesAgo].Range / 2);
                         if (this.IsDrawMiddleLineEnabled)
                         {
-                            DrawHorizontalLine("MiddleLineOnCandle" + startcandle.Ticks, this.AutoScale, lastmiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            AddChartHorizontalLine("MiddleLineOnCandle" + startcandle.Ticks, this.IsAutoAdjustableScale, lastmiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         } 
                     }
                     break;
@@ -170,15 +170,15 @@ namespace AgenaTrader.UserCode
                         string datenow = DateTime.Now.ToString();
                         if (this.IsDrawLowLineEnabled)
                         {
-                            DrawHorizontalLine("LowLine" + datenow, this.AutoScale, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            AddChartHorizontalLine("LowLine" + datenow, this.IsAutoAdjustableScale, this.LastLow, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                         if (this.IsDrawHighLineEnabled)
                         {
-                            DrawHorizontalLine("HighLine" + datenow, this.AutoScale, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            AddChartHorizontalLine("HighLine" + datenow, this.IsAutoAdjustableScale, this.LastHigh, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                         if (this.IsDrawMiddleLineEnabled)
                         {
-                            DrawHorizontalLine("MiddleLine" + datenow, this.AutoScale, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
+                            AddChartHorizontalLine("MiddleLine" + datenow, this.IsAutoAdjustableScale, this.LastMiddle, this.CurrentSessionLineColor, this.CurrentSessionLineStyle, this.CurrentSessionLineWidth);
                         }
                     }
                     break;
@@ -207,7 +207,7 @@ namespace AgenaTrader.UserCode
 		#region Properties
 
 
-        #region Input Parameters
+        #region InSeries Parameters
 
 
         
@@ -297,7 +297,7 @@ namespace AgenaTrader.UserCode
         #endregion
 
 
-        #region Input Drawings
+        #region InSeries Drawings
         
         /// <summary>
         /// </summary>
@@ -489,7 +489,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 sessionsago, System.Boolean useDedicatedTimeSpan, TimeSpan time_Start, TimeSpan time_End, System.Int32 candlesAgo)
         {
-			return FindHighLowTimeFrame_Indicator(Input, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
+			return FindHighLowTimeFrame_Indicator(InSeries, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
 		}
 
 		/// <summary>
@@ -504,9 +504,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new FindHighLowTimeFrame_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							FindHighLowTimeFrame_Type = findHighLowTimeFrame_Type,
 							Sessionsago = sessionsago,
 							UseDedicatedTimeSpan = useDedicatedTimeSpan,
@@ -533,7 +533,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 sessionsago, System.Boolean useDedicatedTimeSpan, TimeSpan time_Start, TimeSpan time_End, System.Int32 candlesAgo)
 		{
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(InSeries, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
 		}
 
 		/// <summary>
@@ -541,7 +541,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(IDataSeries input, FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 sessionsago, System.Boolean useDedicatedTimeSpan, TimeSpan time_Start, TimeSpan time_End, System.Int32 candlesAgo)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.FindHighLowTimeFrame_Indicator(input, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
@@ -559,7 +559,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 sessionsago, System.Boolean useDedicatedTimeSpan, TimeSpan time_Start, TimeSpan time_End, System.Int32 candlesAgo)
 		{
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(InSeries, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
 		}
 
 		/// <summary>
@@ -582,7 +582,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public FindHighLowTimeFrame_Indicator FindHighLowTimeFrame_Indicator(FindHighLowTimeFrame_Type findHighLowTimeFrame_Type, System.Int32 sessionsago, System.Boolean useDedicatedTimeSpan, TimeSpan time_Start, TimeSpan time_End, System.Int32 candlesAgo)
 		{
-			return LeadIndicator.FindHighLowTimeFrame_Indicator(Input, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
+			return LeadIndicator.FindHighLowTimeFrame_Indicator(InSeries, findHighLowTimeFrame_Type, sessionsago, useDedicatedTimeSpan, time_Start, time_End, candlesAgo);
 		}
 
 		/// <summary>

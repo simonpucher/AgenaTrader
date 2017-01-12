@@ -43,17 +43,17 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-        protected override void Initialize()
+        protected override void OnInit()
 		{
 			IsEntry = true;
 			IsStop = false;
 			IsTarget = false;
 			Add(new Plot(Color.FromKnownColor(KnownColor.Black), "Occurred"));
 			//Add(new Plot(Color.FromArgb(255, 183, 128, 170), "Entry"));
-			Overlay = false;
+			IsOverlay = false;
 		}
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
             //Print(Time[0]);
 
@@ -77,14 +77,14 @@ namespace AgenaTrader.UserCode
 		[XmlIgnore()]
 		public DataSeries Occurred
 		{
-			get { return Values[0]; }
+			get { return Outputs[0]; }
 		}
 
         [Browsable(false)]
         [XmlIgnore()]
         public DataSeries Entry
         {
-            get { return Values[1]; }
+            get { return Outputs[1]; }
         }
 
         public override IList<DataSeries> GetEntries()
@@ -158,7 +158,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public TradingTimeActive_Condition TradingTimeActive_Condition(System.String start, System.String end)
         {
-			return TradingTimeActive_Condition(Input, start, end);
+			return TradingTimeActive_Condition(InSeries, start, end);
 		}
 
 		/// <summary>
@@ -173,9 +173,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new TradingTimeActive_Condition
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							Start = start,
 							End = end
 						};
@@ -198,7 +198,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public TradingTimeActive_Condition TradingTimeActive_Condition(System.String start, System.String end)
 		{
-			return LeadIndicator.TradingTimeActive_Condition(Input, start, end);
+			return LeadIndicator.TradingTimeActive_Condition(InSeries, start, end);
 		}
 
 		/// <summary>
@@ -206,7 +206,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public TradingTimeActive_Condition TradingTimeActive_Condition(IDataSeries input, System.String start, System.String end)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.TradingTimeActive_Condition(input, start, end);
@@ -224,7 +224,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public TradingTimeActive_Condition TradingTimeActive_Condition(System.String start, System.String end)
 		{
-			return LeadIndicator.TradingTimeActive_Condition(Input, start, end);
+			return LeadIndicator.TradingTimeActive_Condition(InSeries, start, end);
 		}
 
 		/// <summary>
@@ -247,7 +247,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public TradingTimeActive_Condition TradingTimeActive_Condition(System.String start, System.String end)
 		{
-			return LeadIndicator.TradingTimeActive_Condition(Input, start, end);
+			return LeadIndicator.TradingTimeActive_Condition(InSeries, start, end);
 		}
 
 		/// <summary>

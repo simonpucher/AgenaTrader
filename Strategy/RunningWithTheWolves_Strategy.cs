@@ -61,9 +61,9 @@ namespace AgenaTrader.UserCode
       
      
 
-		protected override void Initialize()
+		protected override void OnInit()
 		{
-            CalculateOnBarClose = true;
+            CalculateOnClosedBar = true;
 
             //Set the default time frame if you start the strategy via the strategy-escort
             //if you start the strategy on a chart the TimeFrame is automatically set, this will lead to a better usability
@@ -73,21 +73,21 @@ namespace AgenaTrader.UserCode
             }
 
             //For xMA200 we need at least 200 Bars.
-            this.BarsRequired = 200;
+            this.RequiredBarsCount = 200;
 		}
 
         /// <summary>
         /// init data for multi frame
         /// </summary>
-        protected override void InitRequirements()
+        protected override void OnBarsRequirements()
         {
             //Add(this.HigherTimeFrame.Periodicity, this.HigherTimeFrame.PeriodicityValue);
         }
 
 
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
-            base.OnStartUp();
+            base.OnStart();
 
             //Print("OnStartUp" + Bars[0].Time);
 
@@ -102,9 +102,9 @@ namespace AgenaTrader.UserCode
             }
         }
 
-        protected override void OnTermination()
+        protected override void OnDispose()
         {
-            base.OnTermination();
+            base.OnDispose();
 
             ////Print("OnTermination" + Bars[0].Time);
             //IAccount account = this.Core.AccountManager.GetAccount(this.Instrument, true);
@@ -126,7 +126,7 @@ namespace AgenaTrader.UserCode
             }
         }
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
             //Set automated during configuration in input dialog at strategy escort in chart
             this.IsAutomated = this.Autopilot;
@@ -147,7 +147,7 @@ namespace AgenaTrader.UserCode
                         // && this._orderentershort.IsOpened && !this._orderentershort.IsManuallyConfirmable
                         if (this._orderentershort != null && this.IsAutomated)
                         {
-                            ExitShort();
+                            CloseShort();
                             this._orderentershort = null;
                         }
                         break;
@@ -155,7 +155,7 @@ namespace AgenaTrader.UserCode
                         // && this._orderenterlong.IsOpened && !this._orderenterlong.IsManuallyConfirmable
                         if (this._orderenterlong != null && this.IsAutomated)
                         {
-                            ExitLong();
+                            CloseLong();
                             this._orderenterlong = null;
                         }
                         break;
@@ -169,10 +169,10 @@ namespace AgenaTrader.UserCode
             if (this.StatisticBacktesting)
             {
                 ////todo Create statistic only on bar close and not during the candle session
-                //if (CalculateOnBarClose == false)
+                //if (CalculateOnClosedBar == false)
                 //{
                     _CsvExport.AddRow();
-                    _CsvExport.AddRowBasicData(this, this.Instrument, this.TimeFrame, Bars[0], CurrentBar);
+                    _CsvExport.AddRowBasicData(this, this.Instrument, this.TimeFrame, Bars[0], ProcessingBarIndex);
 
                     //Order &  Trade
                     _CsvExport["OrderAction"] = resultdata;
@@ -209,7 +209,7 @@ namespace AgenaTrader.UserCode
         /// OnExecution of orders
         /// </summary>
         /// <param name="execution"></param>
-        protected override void OnExecution(IExecution execution)
+        protected override void OnOrderExecution(IExecution execution)
         {
             //Create statistic for execution
             if (this.StatisticBacktesting)
@@ -231,9 +231,9 @@ namespace AgenaTrader.UserCode
         /// </summary>
         private void DoEnterLong()
         {
-            _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Long + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-            SetStopLoss(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close / 1.05, false);
-            SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 1.11);
+            _orderenterlong = OpenLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Long + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+            SetUpStopLoss(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close / 1.05, false);
+            SetUpProfitTarget(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 1.11);
         }
 
         /// <summary>
@@ -241,9 +241,9 @@ namespace AgenaTrader.UserCode
         /// </summary>
         private void DoEnterShort()
         {
-            _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-            SetStopLoss(_orderentershort.Name, CalculationMode.Price, Bars[0].Close * 1.05, false);
-            SetProfitTarget(_orderentershort.Name, CalculationMode.Price, Bars[0].Close / 1.11);
+            _orderentershort = OpenShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+            SetUpStopLoss(_orderentershort.Name, CalculationMode.Price, Bars[0].Close * 1.05, false);
+            SetUpProfitTarget(_orderentershort.Name, CalculationMode.Price, Bars[0].Close / 1.11);
         }
 
 
@@ -262,7 +262,7 @@ namespace AgenaTrader.UserCode
 
         #region Properties
 
-        #region Input
+        #region InSeries
 
         //private TimeFrame _HigherTimeFrame = new TimeFrame(DatafeedHistoryPeriodicity.Day, 1);
         ///// <summary>

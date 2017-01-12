@@ -44,7 +44,7 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-        protected override void Initialize()
+        protected override void OnInit()
 		{
 			IsEntry = true;
 			IsStop = false;
@@ -52,13 +52,13 @@ namespace AgenaTrader.UserCode
             Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Occurred"));
             Add(new Plot(new Pen(this.Plot0Color, this.Plot1Width), PlotStyle.Line, "Entry"));
 
-            Overlay = false;
-			CalculateOnBarClose = true;
+            IsOverlay = false;
+			CalculateOnClosedBar = true;
 
-            this.BarsRequired = 20;
+            this.RequiredBarsCount = 20;
         }
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
             Occurred.Set(LeadIndicator.Lonely_Warrior_Indicator()[0]);
 
@@ -91,14 +91,14 @@ namespace AgenaTrader.UserCode
 		[XmlIgnore()]
 		public DataSeries Occurred
 		{
-			get { return Values[0]; }
+			get { return Outputs[0]; }
 		}
 
 		[Browsable(false)]
 		[XmlIgnore()]
 		public DataSeries Entry
 		{
-			get { return Values[1]; }
+			get { return Outputs[1]; }
 		}
 
 		public override IList<DataSeries> GetEntries()
@@ -202,7 +202,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Lonely_Warrior_Condition Lonely_Warrior_Condition()
         {
-			return Lonely_Warrior_Condition(Input);
+			return Lonely_Warrior_Condition(InSeries);
 		}
 
 		/// <summary>
@@ -217,9 +217,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new Lonely_Warrior_Condition
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input
 						};
 			indicator.SetUp();
 
@@ -240,7 +240,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Lonely_Warrior_Condition Lonely_Warrior_Condition()
 		{
-			return LeadIndicator.Lonely_Warrior_Condition(Input);
+			return LeadIndicator.Lonely_Warrior_Condition(InSeries);
 		}
 
 		/// <summary>
@@ -248,7 +248,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Lonely_Warrior_Condition Lonely_Warrior_Condition(IDataSeries input)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.Lonely_Warrior_Condition(input);
@@ -266,7 +266,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Lonely_Warrior_Condition Lonely_Warrior_Condition()
 		{
-			return LeadIndicator.Lonely_Warrior_Condition(Input);
+			return LeadIndicator.Lonely_Warrior_Condition(InSeries);
 		}
 
 		/// <summary>
@@ -289,7 +289,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Lonely_Warrior_Condition Lonely_Warrior_Condition()
 		{
-			return LeadIndicator.Lonely_Warrior_Condition(Input);
+			return LeadIndicator.Lonely_Warrior_Condition(InSeries);
 		}
 
 		/// <summary>

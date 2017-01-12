@@ -40,18 +40,18 @@ namespace AgenaTrader.UserCode
         double ShowGap_Indicator_Value;
         #endregion
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
             IsEntry = true;
             IsStop = false;
             IsTarget = false;
             Add(new Plot(Color.Azure, "Occurred"));
             Add(new Plot(Color.LightCyan, "Entry"));
-            Overlay = true;
-            CalculateOnBarClose = true;
+            IsOverlay = true;
+            CalculateOnClosedBar = true;
         }
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
 
 //ShowGap Indikator aufrufen. Dieser liefert 100 für Long Einstieg und -100 für Short Einstieg. Liefert 0 für kein Einstiegssignal
@@ -76,14 +76,14 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries Occurred
         {
-            get { return Values[0]; }
+            get { return Outputs[0]; }
         }
 
         [Browsable(false)]
         [XmlIgnore()]
         public DataSeries Entry
         {
-            get { return Values[1]; }
+            get { return Outputs[1]; }
         }
 
         public override IList<DataSeries> GetEntries()
@@ -124,7 +124,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ShowGap_Condition ShowGap_Condition(System.Decimal punkteGapMin, System.Decimal punkteGapMax)
         {
-			return ShowGap_Condition(Input, punkteGapMin, punkteGapMax);
+			return ShowGap_Condition(InSeries, punkteGapMin, punkteGapMax);
 		}
 
 		/// <summary>
@@ -139,9 +139,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new ShowGap_Condition
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							PunkteGapMin = punkteGapMin,
 							PunkteGapMax = punkteGapMax
 						};
@@ -164,7 +164,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ShowGap_Condition ShowGap_Condition(System.Decimal punkteGapMin, System.Decimal punkteGapMax)
 		{
-			return LeadIndicator.ShowGap_Condition(Input, punkteGapMin, punkteGapMax);
+			return LeadIndicator.ShowGap_Condition(InSeries, punkteGapMin, punkteGapMax);
 		}
 
 		/// <summary>
@@ -172,7 +172,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ShowGap_Condition ShowGap_Condition(IDataSeries input, System.Decimal punkteGapMin, System.Decimal punkteGapMax)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.ShowGap_Condition(input, punkteGapMin, punkteGapMax);
@@ -190,7 +190,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ShowGap_Condition ShowGap_Condition(System.Decimal punkteGapMin, System.Decimal punkteGapMax)
 		{
-			return LeadIndicator.ShowGap_Condition(Input, punkteGapMin, punkteGapMax);
+			return LeadIndicator.ShowGap_Condition(InSeries, punkteGapMin, punkteGapMax);
 		}
 
 		/// <summary>
@@ -213,7 +213,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ShowGap_Condition ShowGap_Condition(System.Decimal punkteGapMin, System.Decimal punkteGapMax)
 		{
-			return LeadIndicator.ShowGap_Condition(Input, punkteGapMin, punkteGapMax);
+			return LeadIndicator.ShowGap_Condition(InSeries, punkteGapMin, punkteGapMax);
 		}
 
 		/// <summary>

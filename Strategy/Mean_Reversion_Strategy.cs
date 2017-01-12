@@ -61,15 +61,15 @@ namespace AgenaTrader.UserCode
         //todo
         //private StatisticContainer _StatisticContainer = null;
 
-		protected override void Initialize()
+		protected override void OnInit()
 		{
             //We need at least xy bars
-            this.BarsRequired = 130;
+            this.RequiredBarsCount = 130;
 		}
 
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
-            base.OnStartUp();
+            base.OnStart();
 
             //Print("OnStartUp" + Bars[0].Time);
 
@@ -86,9 +86,9 @@ namespace AgenaTrader.UserCode
             this.WarningOccured = false;
         }
 
-        protected override void OnTermination()
+        protected override void OnDispose()
         {
-            base.OnTermination();
+            base.OnDispose();
 
             ////Print("OnTermination" + Bars[0].Time);
             //IAccount account = this.Core.AccountManager.GetAccount(this.Instrument, true);
@@ -108,13 +108,13 @@ namespace AgenaTrader.UserCode
             //}
         }
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
             //Set automated during configuration in input dialog at strategy escort in chart
             this.IsAutomated = this.Autopilot;
 
             //calculate data
-            ResultValue returnvalue = this._Mean_Reversion_Indicator.calculate(Input, Open, High, _orderenterlong, _orderentershort, this.Bollinger_Period, this.Bollinger_Standard_Deviation, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
+            ResultValue returnvalue = this._Mean_Reversion_Indicator.calculate(InSeries, Open, High, _orderenterlong, _orderentershort, this.Bollinger_Period, this.Bollinger_Standard_Deviation, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
 
             //If the calculate method was not finished we need to stop and show an alert message to the user.
             if (returnvalue.ErrorOccured)
@@ -157,7 +157,7 @@ namespace AgenaTrader.UserCode
             }
 
             //todo move stop of long order 
-            // SetTrailStop(CalculationMode.Ticks, 30);
+            // SetUpTrailStop(CalculationMode.Ticks, 30);
     
 		}
 
@@ -169,7 +169,7 @@ namespace AgenaTrader.UserCode
         /// OnExecution of orders
         /// </summary>
         /// <param name="execution"></param>
-        protected override void OnExecution(IExecution execution)
+        protected override void OnOrderExecution(IExecution execution)
         {
             ////todo Create statistic for execution
             //if (this.StatisticBacktesting)
@@ -194,9 +194,9 @@ namespace AgenaTrader.UserCode
         {
             if (_orderenterlong == null)
             {
-                _orderenterlong = EnterLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.Buy + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-                SetStopLoss(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 0.97, false);
-                //SetProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong); 
+                _orderenterlong = OpenLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.Buy + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+                SetUpStopLoss(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 0.97, false);
+                //SetUpProfitTarget(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.TargetLong); 
             }
         }
 
@@ -207,9 +207,9 @@ namespace AgenaTrader.UserCode
         {
             if (_orderentershort == null)
             {
-                _orderentershort = EnterShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.SellShort + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
-                //SetStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
-                //SetProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
+                _orderentershort = OpenShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.DisplayName + "_" + OrderAction.SellShort + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+                //SetUpStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
+                //SetUpProfitTarget(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.TargetShort);
             }
         }
 
@@ -220,7 +220,7 @@ namespace AgenaTrader.UserCode
         {
             if (this._orderenterlong != null)
             {
-                ExitLong(this._orderenterlong.Name);
+                CloseLong(this._orderenterlong.Name);
                 this._orderenterlong = null;
             }
         }
@@ -232,7 +232,7 @@ namespace AgenaTrader.UserCode
         {
             if (this._orderentershort != null)
             {
-                ExitShort(this._orderentershort.Name);
+                CloseShort(this._orderentershort.Name);
                 this._orderentershort = null;
             }
         }

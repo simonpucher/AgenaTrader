@@ -33,17 +33,17 @@ namespace AgenaTrader.UserCode
 
         #endregion
 
-        protected override void Initialize()
+        protected override void OnInit()
 		{
 			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
-			Overlay = true;
-			CalculateOnBarClose = true;
+			IsOverlay = true;
+			CalculateOnClosedBar = true;
 		}
 
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
 		{
-            if (this.IsCurrentBarLast && this.Instrument != null)
+            if (this.IsProcessingBarIndexLast && this.Instrument != null)
             {
                 if (!String.IsNullOrEmpty(Instrumentlist))
                 {
@@ -80,7 +80,7 @@ namespace AgenaTrader.UserCode
             }
 
 
-            //MyPlot1.Set(Input[0]);
+            //MyPlot1.Set(InSeries[0]);
 		}
 
 
@@ -104,7 +104,7 @@ namespace AgenaTrader.UserCode
 		[XmlIgnore()]
 		public DataSeries MyPlot1
 		{
-			get { return Values[0]; }
+			get { return Outputs[0]; }
 		}
 
         [Description("The name of the static list to which you would like to use.")]
@@ -132,7 +132,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public InstrumentIsInList_Tool InstrumentIsInList_Tool(System.String instrumentlist)
         {
-			return InstrumentIsInList_Tool(Input, instrumentlist);
+			return InstrumentIsInList_Tool(InSeries, instrumentlist);
 		}
 
 		/// <summary>
@@ -147,9 +147,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new InstrumentIsInList_Tool
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							Instrumentlist = instrumentlist
 						};
 			indicator.SetUp();
@@ -171,7 +171,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public InstrumentIsInList_Tool InstrumentIsInList_Tool(System.String instrumentlist)
 		{
-			return LeadIndicator.InstrumentIsInList_Tool(Input, instrumentlist);
+			return LeadIndicator.InstrumentIsInList_Tool(InSeries, instrumentlist);
 		}
 
 		/// <summary>
@@ -179,7 +179,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public InstrumentIsInList_Tool InstrumentIsInList_Tool(IDataSeries input, System.String instrumentlist)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.InstrumentIsInList_Tool(input, instrumentlist);
@@ -197,7 +197,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public InstrumentIsInList_Tool InstrumentIsInList_Tool(System.String instrumentlist)
 		{
-			return LeadIndicator.InstrumentIsInList_Tool(Input, instrumentlist);
+			return LeadIndicator.InstrumentIsInList_Tool(InSeries, instrumentlist);
 		}
 
 		/// <summary>
@@ -220,7 +220,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public InstrumentIsInList_Tool InstrumentIsInList_Tool(System.String instrumentlist)
 		{
-			return LeadIndicator.InstrumentIsInList_Tool(Input, instrumentlist);
+			return LeadIndicator.InstrumentIsInList_Tool(InSeries, instrumentlist);
 		}
 
 		/// <summary>

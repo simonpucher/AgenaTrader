@@ -32,18 +32,18 @@ namespace AgenaTrader.UserCode
 	{
         private Queue<DateTime> _distributionlist = null;
 
-        protected override void Initialize()
+        protected override void OnInit()
 		{
 			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
-			CalculateOnBarClose = true;
+			CalculateOnClosedBar = true;
 		}
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
             //http://www.optionstradingiq.com/distribution-days-can-foreshadow-a-correction/
 
             //Init list on startup
-            if (CurrentBar == 0)
+            if (ProcessingBarIndex == 0)
             {
                 _distributionlist = new Queue<DateTime>();
             }
@@ -57,7 +57,7 @@ namespace AgenaTrader.UserCode
             //Draw Disrtibution Arrow.
             if (Volume[0] > Volume[1] && ((Close[1] - Close[0]) / Close[1]) > 0.002)
             {
-                DrawArrowDown(CurrentBar.ToString(), true, 0, High[0] + 3 * TickSize, Color.Blue);
+                AddChartArrowDown(ProcessingBarIndex.ToString(), true, 0, High[0] + 3 * TickSize, Color.Blue);
                 this._distributionlist.Enqueue(Time[0]);
                 
                 //Draw the indicator
@@ -81,7 +81,7 @@ namespace AgenaTrader.UserCode
 		[XmlIgnore()]
 		public DataSeries MyPlot1
 		{
-			get { return Values[0]; }
+			get { return Outputs[0]; }
 		}
 
 		#endregion
@@ -100,7 +100,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DistributionDay_Indicator DistributionDay_Indicator()
         {
-			return DistributionDay_Indicator(Input);
+			return DistributionDay_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -115,9 +115,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new DistributionDay_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input
 						};
 			indicator.SetUp();
 
@@ -138,7 +138,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DistributionDay_Indicator DistributionDay_Indicator()
 		{
-			return LeadIndicator.DistributionDay_Indicator(Input);
+			return LeadIndicator.DistributionDay_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -146,7 +146,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.DistributionDay_Indicator(input);
@@ -164,7 +164,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DistributionDay_Indicator DistributionDay_Indicator()
 		{
-			return LeadIndicator.DistributionDay_Indicator(Input);
+			return LeadIndicator.DistributionDay_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -187,7 +187,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DistributionDay_Indicator DistributionDay_Indicator()
 		{
-			return LeadIndicator.DistributionDay_Indicator(Input);
+			return LeadIndicator.DistributionDay_Indicator(InSeries);
 		}
 
 		/// <summary>

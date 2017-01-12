@@ -58,19 +58,19 @@ namespace AgenaTrader.UserCode
         string TradeDir;
         
 
-		protected override void Initialize()
+		protected override void OnInit()
 		{
 			//Add(new Plot(Color.FromKnownColor(KnownColor.Orange), PlotStyle.Square, "MyGap"));
             Add(new Plot(Color.Orange, "MyGap"));
-			Overlay = true;
-			CalculateOnBarClose = true;
+			IsOverlay = true;
+			CalculateOnClosedBar = true;
 		}
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
             process_ShowGap();
 
-            if (IsCurrentBarLast)
+            if (IsProcessingBarIndexLast)
             {
 
             }
@@ -91,7 +91,7 @@ namespace AgenaTrader.UserCode
             }
 
 //Prüfen, ob es sich um die erste Kerze des Tage handelt, nur mit dieser kann Gap berechnet werden
-            if (Bars.BarsSinceSession == 0)
+            if (Bars.BarsCountForSession == 0)
             {
                 sessionprocessed = false;
             }
@@ -100,7 +100,7 @@ namespace AgenaTrader.UserCode
             TimeSpan openingtime = GlobalUtilities.GetOfficialMarketOpeningTime(Instrument.Symbol);
 
 //Prüfen, ob aktuelle Kerze nach der offiziellen Marktöffnung ist, oder ob es eine vorbörsliche Kerze ist
-            if (Bars.GetTime(CurrentBar).TimeOfDay > openingtime //größer 09.00 geht für 15M und 1Std (und 1Tag?)
+            if (Bars.GetTime(ProcessingBarIndex).TimeOfDay > openingtime //größer 09.00 geht für 15M und 1Std (und 1Tag?)
             && sessionprocessed == false)        //Tag noch nicht verarbeitet
             {
                 sessionprocessed = true;
@@ -150,8 +150,8 @@ namespace AgenaTrader.UserCode
                     if (IsUpwardsGap() == true)
                     {
 //Long
-                        DrawRectangle(strMyRect, true, LastDayCloseDate, LastDayClose, LastPeriod, GlobalUtilities.GetHighestHigh(Bars, Bars.BarsSinceSession), _col_gap, _col_gap, 70);
-                        DrawText(strMyGapSize, true, Math.Round(GapSize, 1).ToString(), GapOpenBar.Time, LastDayClose - (60 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, Color.Azure, 1);
+                        AddChartRectangle(strMyRect, true, LastDayCloseDate, LastDayClose, LastPeriod, GlobalUtilities.GetHighestHigh(Bars, Bars.BarsCountForSession), _col_gap, _col_gap, 70);
+                        AddChartText(strMyGapSize, true, Math.Round(GapSize, 1).ToString(), GapOpenBar.Time, LastDayClose - (60 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, Color.Azure, 1);
 
 
                         if (GapIndicatesTradeLong() == true)
@@ -165,8 +165,8 @@ namespace AgenaTrader.UserCode
                     else
                     {
 //Short                 
-                        DrawRectangle(strMyRect, true, LastDayCloseDate, LastDayClose, LastPeriod, GlobalUtilities.GetLowestLow(Bars, Bars.BarsSinceSession), _col_gap, _col_gap, 70);
-                        DrawText(strMyGapSize, true, Math.Round(GapSize, 1).ToString(), GapOpenBar.Time, LastDayClose + (60 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, Color.Azure, 1);
+                        AddChartRectangle(strMyRect, true, LastDayCloseDate, LastDayClose, LastPeriod, GlobalUtilities.GetLowestLow(Bars, Bars.BarsCountForSession), _col_gap, _col_gap, 70);
+                        AddChartText(strMyGapSize, true, Math.Round(GapSize, 1).ToString(), GapOpenBar.Time, LastDayClose + (60 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, Color.Azure, 1);
 
                         if (GapIndicatesTradeShort() == true)
                         {
@@ -189,7 +189,7 @@ namespace AgenaTrader.UserCode
             }
 
 //09.15. - 09.30 Kerze
-//            else if (Bars.BarsSinceSession == 6 && existgap == true)
+//            else if (Bars.BarsCountForSession == 6 && existgap == true)
             else if (Bars[0].Time.TimeOfDay == new TimeSpan(9,15,0))
             {
 //Auswertung nach ShowGap Handelszeit (=09.30)   
@@ -205,21 +205,21 @@ namespace AgenaTrader.UserCode
 
             if (dev_mode == true)
             {
-                Value.Set(100);
+                OutSeries.Set(100);
                 return true;
             }
 
 
-            if (LinReg(Closes[0], Bars.BarsSinceSession)[0] > GapOpen
+            if (LinReg(Closes[0], Bars.BarsCountForSession)[0] > GapOpen
             && (decimal)GapSize > PunkteGapMin
             && (decimal)GapSize < PunkteGapMax)
             {
-                Value.Set(100);
+                OutSeries.Set(100);
                 return true;                
             }
             else
             {
-                Value.Set(0);
+                OutSeries.Set(0);
                 return false;
             }
         }
@@ -230,20 +230,20 @@ namespace AgenaTrader.UserCode
 
             if (dev_mode == true)
             {
-                Value.Set(-100);
+                OutSeries.Set(-100);
                 return true;
             }
 
-            if (LinReg(Closes[0], Bars.BarsSinceSession)[0] < GapOpen
+            if (LinReg(Closes[0], Bars.BarsCountForSession)[0] < GapOpen
             && Math.Abs((decimal)GapSize) > PunkteGapMin
             && Math.Abs((decimal)GapSize) < PunkteGapMax)
             {
-                Value.Set(-100);
+                OutSeries.Set(-100);
                 return true;
             }
             else
             {
-                Value.Set(0);
+                OutSeries.Set(0);
                 return false;
             }
         }
@@ -252,16 +252,16 @@ namespace AgenaTrader.UserCode
 //grafische Darstellung Einstieg Short
         private void PrepareTradeShort()
         {
-            string strArrowDown = "ArrowDown" + Bars.GetTime(CurrentBar);
-            DrawArrowDown(strArrowDown, true, Bars.GetTime(Count - 1), Bars.GetOpen(CurrentBar) + 100 * TickSize, Color.Red);
+            string strArrowDown = "ArrowDown" + Bars.GetTime(ProcessingBarIndex);
+            AddChartArrowDown(strArrowDown, true, Bars.GetTime(Count - 1), Bars.GetOpen(ProcessingBarIndex) + 100 * TickSize, Color.Red);
             GapTradeShort = true;
         }
 
 //grafische Darstellung Einstieg Long
         private void PrepareTradeLong()
         {
-            string strArrowUp = "ArrowUp" + Bars.GetTime(CurrentBar);
-            DrawArrowUp(strArrowUp, true, Bars.GetTime(Count - 1), Bars.GetOpen(CurrentBar) - 100 * TickSize, Color.Green);
+            string strArrowUp = "ArrowUp" + Bars.GetTime(ProcessingBarIndex);
+            AddChartArrowUp(strArrowUp, true, Bars.GetTime(Count - 1), Bars.GetOpen(ProcessingBarIndex) - 100 * TickSize, Color.Green);
             GapTradeLong = true;
         }
 
@@ -305,7 +305,7 @@ namespace AgenaTrader.UserCode
             Color colorTextBox;
             string strResultDescr = "";
 
-            GapTradeResult = (decimal)Bars.GetClose(CurrentBar - 1) - (decimal)Bars.GetOpen(CurrentBar - 1);
+            GapTradeResult = (decimal)Bars.GetClose(ProcessingBarIndex - 1) - (decimal)Bars.GetOpen(ProcessingBarIndex - 1);
             if (GapTradeLong == true)
             {
                 //Long
@@ -313,7 +313,7 @@ namespace AgenaTrader.UserCode
                 GapTradeResultTotalLong = GapTradeResultTotalLong + GapTradeResult;
 
 
-                string strGapeTradeLong = "GapTradeLong" + CurrentBar;
+                string strGapeTradeLong = "GapTradeLong" + ProcessingBarIndex;
                 string strTradeResultLong;
                 TradeDir = "Long";
 
@@ -335,7 +335,7 @@ namespace AgenaTrader.UserCode
                     strTradeResultLong = "Win " + GapTradeResult.ToString();
                     colorTextBox = colWin;
                 }
-                DrawText(strGapeTradeLong, true, strTradeResultLong, Time[1], Bars.GetHigh(CurrentBar - 1) + (100 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, colorTextBox, 70);
+                AddChartText(strGapeTradeLong, true, strTradeResultLong, Time[1], Bars.GetHigh(ProcessingBarIndex - 1) + (100 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, colorTextBox, 70);
 
             }
             else if (GapTradeShort == true)
@@ -345,7 +345,7 @@ namespace AgenaTrader.UserCode
                 GapTradeResultTotalShort = GapTradeResultTotalShort + GapTradeResult;
 
 
-                string strGapeTradeShort = "GapTradeLong" + CurrentBar;
+                string strGapeTradeShort = "GapTradeLong" + ProcessingBarIndex;
                 string strTradeResultShort;
                 TradeDir = "Short";
 
@@ -367,7 +367,7 @@ namespace AgenaTrader.UserCode
                     strTradeResultShort = "Win " + GapTradeResult.ToString();
                     colorTextBox = colWin;
                 }
-                DrawText(strGapeTradeShort, true, strTradeResultShort, Time[1], Bars.GetLow(CurrentBar - 1) - (100 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, colorTextBox, 70);
+                AddChartText(strGapeTradeShort, true, strTradeResultShort, Time[1], Bars.GetLow(ProcessingBarIndex - 1) - (100 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, colorTextBox, 70);
             }
             if (_print_info == true)
             {
@@ -387,7 +387,7 @@ namespace AgenaTrader.UserCode
         //[XmlIgnore()]
         //public DataSeries MyGap
         //{
-        //    get { return Values[0]; }
+        //    get { return Outputs[0]; }
         //}
 
 
@@ -464,7 +464,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ShowGap_Indicator ShowGap_Indicator(System.Decimal punkteGapMinProz, System.Decimal punkteGapMaxProz)
         {
-			return ShowGap_Indicator(Input, punkteGapMinProz, punkteGapMaxProz);
+			return ShowGap_Indicator(InSeries, punkteGapMinProz, punkteGapMaxProz);
 		}
 
 		/// <summary>
@@ -479,9 +479,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new ShowGap_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							PunkteGapMinProz = punkteGapMinProz,
 							PunkteGapMaxProz = punkteGapMaxProz
 						};
@@ -504,7 +504,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ShowGap_Indicator ShowGap_Indicator(System.Decimal punkteGapMinProz, System.Decimal punkteGapMaxProz)
 		{
-			return LeadIndicator.ShowGap_Indicator(Input, punkteGapMinProz, punkteGapMaxProz);
+			return LeadIndicator.ShowGap_Indicator(InSeries, punkteGapMinProz, punkteGapMaxProz);
 		}
 
 		/// <summary>
@@ -512,7 +512,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ShowGap_Indicator ShowGap_Indicator(IDataSeries input, System.Decimal punkteGapMinProz, System.Decimal punkteGapMaxProz)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.ShowGap_Indicator(input, punkteGapMinProz, punkteGapMaxProz);
@@ -530,7 +530,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ShowGap_Indicator ShowGap_Indicator(System.Decimal punkteGapMinProz, System.Decimal punkteGapMaxProz)
 		{
-			return LeadIndicator.ShowGap_Indicator(Input, punkteGapMinProz, punkteGapMaxProz);
+			return LeadIndicator.ShowGap_Indicator(InSeries, punkteGapMinProz, punkteGapMaxProz);
 		}
 
 		/// <summary>
@@ -553,7 +553,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public ShowGap_Indicator ShowGap_Indicator(System.Decimal punkteGapMinProz, System.Decimal punkteGapMaxProz)
 		{
-			return LeadIndicator.ShowGap_Indicator(Input, punkteGapMinProz, punkteGapMaxProz);
+			return LeadIndicator.ShowGap_Indicator(InSeries, punkteGapMinProz, punkteGapMaxProz);
 		}
 
 		/// <summary>

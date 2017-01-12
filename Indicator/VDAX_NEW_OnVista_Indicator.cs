@@ -38,20 +38,20 @@ namespace AgenaTrader.UserCode
 
 
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
-            Overlay = true;
+            IsOverlay = true;
         }
 
 
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
             decimal vdax_new = GlobalUtilities.GetCurrentVdaxNew(this.CheckEveryXSeconds);
-            DrawTextFixed("VDAX_NEW", "VDAX-NEW: " + vdax_new, this.TextPosition, Color.Black, new Font("Arial", this.TextSize), Color.Transparent, Color.Transparent);
+            AddChartTextFixed("VDAX_NEW", "VDAX-NEW: " + vdax_new, this.TextPosition, Color.Black, new Font("Arial", this.TextSize), Color.Transparent, Color.Transparent);
         }
 
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
 
         }
@@ -71,7 +71,7 @@ namespace AgenaTrader.UserCode
 
         #region Properties
 
-        #region Input
+        #region InSeries
 
 
         
@@ -130,7 +130,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public VDAX_NEW_OnVista_Indicator VDAX_NEW_OnVista_Indicator()
         {
-			return VDAX_NEW_OnVista_Indicator(Input);
+			return VDAX_NEW_OnVista_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -145,9 +145,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new VDAX_NEW_OnVista_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input
 						};
 			indicator.SetUp();
 
@@ -168,7 +168,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public VDAX_NEW_OnVista_Indicator VDAX_NEW_OnVista_Indicator()
 		{
-			return LeadIndicator.VDAX_NEW_OnVista_Indicator(Input);
+			return LeadIndicator.VDAX_NEW_OnVista_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -176,7 +176,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public VDAX_NEW_OnVista_Indicator VDAX_NEW_OnVista_Indicator(IDataSeries input)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.VDAX_NEW_OnVista_Indicator(input);
@@ -194,7 +194,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public VDAX_NEW_OnVista_Indicator VDAX_NEW_OnVista_Indicator()
 		{
-			return LeadIndicator.VDAX_NEW_OnVista_Indicator(Input);
+			return LeadIndicator.VDAX_NEW_OnVista_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -217,7 +217,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public VDAX_NEW_OnVista_Indicator VDAX_NEW_OnVista_Indicator()
 		{
-			return LeadIndicator.VDAX_NEW_OnVista_Indicator(Input);
+			return LeadIndicator.VDAX_NEW_OnVista_Indicator(InSeries);
 		}
 
 		/// <summary>

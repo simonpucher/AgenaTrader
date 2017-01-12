@@ -44,13 +44,13 @@ namespace AgenaTrader.UserCode
         string SignalNameStop;
         #endregion
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
-            CalculateOnBarClose = false;
+            CalculateOnClosedBar = false;
             IsAutomated = false;
         }
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
 
             string ocoId;
@@ -84,17 +84,17 @@ namespace AgenaTrader.UserCode
             //    {
             //        if (this.oEnter.Action == OrderAction.Buy)
             //        {
-            //            ExitLong(this.oEnter.Quantity, "EOD", this.oEnter.Name, this.oEnter.Instrument, this.oEnter.TimeFrame);
+            //            CloseLong(this.oEnter.Quantity, "EOD", this.oEnter.Name, this.oEnter.Instrument, this.oEnter.TimeFrame);
             //        }
             //        else if (this.oEnter.Action == OrderAction.SellShort)
             //        {
-            //            ExitShort(this.oEnter.Quantity, "EOD", this.oEnter.Name, this.oEnter.Instrument, this.oEnter.TimeFrame);
+            //            CloseShort(this.oEnter.Quantity, "EOD", this.oEnter.Name, this.oEnter.Instrument, this.oEnter.TimeFrame);
             //        }
             //    }
             //}
 
 
-            if (!IsCurrentBarLast || oEnter != null)
+            if (!IsProcessingBarIndexLast || oEnter != null)
             {
               return;
             }
@@ -141,7 +141,7 @@ namespace AgenaTrader.UserCode
         }
 
 
-        protected override void OnExecution(IExecution execution)
+        protected override void OnOrderExecution(IExecution execution)
         {
 
             ////todo this is not working in 1.9
@@ -165,7 +165,7 @@ namespace AgenaTrader.UserCode
 
 
 
-            if (execution.MarketPosition == PositionType.Flat) {
+            if (execution.PositionType == PositionType.Flat) {
                 oStop = null;    //den Stop zuerst
                 oEnter = null;                    
             }

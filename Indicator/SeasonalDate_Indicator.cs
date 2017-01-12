@@ -74,19 +74,19 @@ namespace AgenaTrader.UserCode
         #endregion
 
 
-		protected override void Initialize()
+		protected override void OnInit()
 		{
 			//Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
-			Overlay = true;
+			IsOverlay = true;
 		}
 
-        protected override void InitRequirements()
+        protected override void OnBarsRequirements()
         {
             //Print("InitRequirements");
         }
    
 
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
             //Print("OnStartUp");
 
@@ -113,14 +113,14 @@ namespace AgenaTrader.UserCode
                     break;
             }
 
-            CalculateOnBarClose = true;
-            Overlay = true;
+            CalculateOnClosedBar = true;
+            IsOverlay = true;
         }
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
             //Check if peridocity is valid for this script
-            if (this.IsCurrentBarLast && !DatafeedPeriodicityIsValid(Bars.TimeFrame))
+            if (this.IsProcessingBarIndexLast && !DatafeedPeriodicityIsValid(Bars.TimeFrame))
             {
                 GlobalUtilities.DrawWarningTextOnChart(this, Const.DefaultStringDatafeedPeriodicity);
             }
@@ -156,8 +156,8 @@ namespace AgenaTrader.UserCode
             //We need to get ensure that each name is unique.
             name = name + list.First().Time.Ticks;
 
-            DrawRectangle("Seasonal_rect" + name, true, list.First().Time, high, list.Last().Time, low, color, color, 70);
-            DrawText("Seasonal_text" + name, true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
+            AddChartRectangle("Seasonal_rect" + name, true, list.First().Time, high, list.Last().Time, low, color, color, 70);
+            AddChartText("Seasonal_text" + name, true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
         }
 
 
@@ -288,7 +288,7 @@ namespace AgenaTrader.UserCode
 
 		#region Properties
 
-        #region Input 
+        #region InSeries 
         
             /// <summary>
             /// </summary>
@@ -307,7 +307,7 @@ namespace AgenaTrader.UserCode
         //[XmlIgnore()]
         //public DataSeries MyPlot1
         //{
-        //    get { return Values[0]; }
+        //    get { return Outputs[0]; }
         //}
 
 
@@ -329,7 +329,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType)
         {
-			return SeasonalDate_Indicator(Input, seasonalDateType);
+			return SeasonalDate_Indicator(InSeries, seasonalDateType);
 		}
 
 		/// <summary>
@@ -344,9 +344,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new SeasonalDate_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							SeasonalDateType = seasonalDateType
 						};
 			indicator.SetUp();
@@ -368,7 +368,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType)
 		{
-			return LeadIndicator.SeasonalDate_Indicator(Input, seasonalDateType);
+			return LeadIndicator.SeasonalDate_Indicator(InSeries, seasonalDateType);
 		}
 
 		/// <summary>
@@ -376,7 +376,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public SeasonalDate_Indicator SeasonalDate_Indicator(IDataSeries input, SeasonalDateType seasonalDateType)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.SeasonalDate_Indicator(input, seasonalDateType);
@@ -394,7 +394,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType)
 		{
-			return LeadIndicator.SeasonalDate_Indicator(Input, seasonalDateType);
+			return LeadIndicator.SeasonalDate_Indicator(InSeries, seasonalDateType);
 		}
 
 		/// <summary>
@@ -417,7 +417,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType)
 		{
-			return LeadIndicator.SeasonalDate_Indicator(Input, seasonalDateType);
+			return LeadIndicator.SeasonalDate_Indicator(InSeries, seasonalDateType);
 		}
 
 		/// <summary>

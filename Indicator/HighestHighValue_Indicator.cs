@@ -51,18 +51,18 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// Initalizie the Plot.
         /// </summary>
-		protected override void Initialize()
+		protected override void OnInit()
 		{
             Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "HighestHighValue_Indicator"));
 
-            CalculateOnBarClose = true;
-            Overlay = false;
+            CalculateOnClosedBar = true;
+            IsOverlay = false;
 		}
 
         /// <summary>
         /// Init all variables on startup.
         /// </summary>
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
             this._DATA_List = new DataSeries(this);
         }
@@ -70,7 +70,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// Recalculate all data on each each bar update. 
         /// </summary>
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
             double currentvalue = 0.0;
             switch (IndicatorEnum)
@@ -122,7 +122,7 @@ namespace AgenaTrader.UserCode
 
 		#region Properties
 
-        #region Input
+        #region InSeries
 
         [Description("Type of the indicator")]
         [Category("Parameters")]
@@ -215,7 +215,7 @@ namespace AgenaTrader.UserCode
             [XmlIgnore()]
             public DataSeries MyPlot1
             {
-                get { return Values[0]; }
+                get { return Outputs[0]; }
             }
 
         #endregion
@@ -238,7 +238,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public HighestHighValue_Indicator HighestHighValue_Indicator(IndicatorEnum_HighestHighValue indicatorEnum, System.Int32 indicatorSMAPeriod, System.Int32 indicatorEMAPeriod, System.Int32 comparisonPeriod, Color plot1Color, System.Int32 plot0Width, DashStyle dash0Style)
         {
-			return HighestHighValue_Indicator(Input, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
+			return HighestHighValue_Indicator(InSeries, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
 		}
 
 		/// <summary>
@@ -253,9 +253,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new HighestHighValue_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							IndicatorEnum = indicatorEnum,
 							IndicatorSMAPeriod = indicatorSMAPeriod,
 							IndicatorEMAPeriod = indicatorEMAPeriod,
@@ -283,7 +283,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public HighestHighValue_Indicator HighestHighValue_Indicator(IndicatorEnum_HighestHighValue indicatorEnum, System.Int32 indicatorSMAPeriod, System.Int32 indicatorEMAPeriod, System.Int32 comparisonPeriod, Color plot1Color, System.Int32 plot0Width, DashStyle dash0Style)
 		{
-			return LeadIndicator.HighestHighValue_Indicator(Input, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
+			return LeadIndicator.HighestHighValue_Indicator(InSeries, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
 		}
 
 		/// <summary>
@@ -291,7 +291,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public HighestHighValue_Indicator HighestHighValue_Indicator(IDataSeries input, IndicatorEnum_HighestHighValue indicatorEnum, System.Int32 indicatorSMAPeriod, System.Int32 indicatorEMAPeriod, System.Int32 comparisonPeriod, Color plot1Color, System.Int32 plot0Width, DashStyle dash0Style)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.HighestHighValue_Indicator(input, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
@@ -309,7 +309,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public HighestHighValue_Indicator HighestHighValue_Indicator(IndicatorEnum_HighestHighValue indicatorEnum, System.Int32 indicatorSMAPeriod, System.Int32 indicatorEMAPeriod, System.Int32 comparisonPeriod, Color plot1Color, System.Int32 plot0Width, DashStyle dash0Style)
 		{
-			return LeadIndicator.HighestHighValue_Indicator(Input, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
+			return LeadIndicator.HighestHighValue_Indicator(InSeries, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
 		}
 
 		/// <summary>
@@ -332,7 +332,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public HighestHighValue_Indicator HighestHighValue_Indicator(IndicatorEnum_HighestHighValue indicatorEnum, System.Int32 indicatorSMAPeriod, System.Int32 indicatorEMAPeriod, System.Int32 comparisonPeriod, Color plot1Color, System.Int32 plot0Width, DashStyle dash0Style)
 		{
-			return LeadIndicator.HighestHighValue_Indicator(Input, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
+			return LeadIndicator.HighestHighValue_Indicator(InSeries, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
 		}
 
 		/// <summary>

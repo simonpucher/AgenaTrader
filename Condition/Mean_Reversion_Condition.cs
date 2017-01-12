@@ -65,7 +65,7 @@ namespace AgenaTrader.UserCode
 
 		#endregion
 
-		protected override void Initialize()
+		protected override void OnInit()
 		{
 			IsEntry = true;
 			IsStop = false;
@@ -73,23 +73,23 @@ namespace AgenaTrader.UserCode
 			Add(new Plot(Const.DefaultIndicatorColor, "Occurred"));
             Add(new Plot(Const.DefaultIndicatorColor, "Entry"));
 
-			Overlay = false;
-			CalculateOnBarClose = true;
+			IsOverlay = false;
+			CalculateOnClosedBar = true;
 
             //We need at least xy bars
-            this.BarsRequired = 130;
+            this.RequiredBarsCount = 130;
 		}
 
-        protected override void InitRequirements()
+        protected override void OnBarsRequirements()
         {
-            base.InitRequirements();
+            base.OnBarsRequirements();
 
         }
 
 
-        protected override void OnStartUp()
+        protected override void OnStart()
         {
-            base.OnStartUp();
+            base.OnStart();
 
             //Init our indicator to get code access
             this._Mean_Reversion_Indicator = new Mean_Reversion_Indicator();
@@ -100,11 +100,11 @@ namespace AgenaTrader.UserCode
 
        
 
-		protected override void OnBarUpdate()
+		protected override void OnCalculate()
 		{
 
             //calculate data
-            ResultValue returnvalue = this._Mean_Reversion_Indicator.calculate(Input, Open, High, null, null, this.Bollinger_Period, this.Bollinger_Standard_Deviation, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
+            ResultValue returnvalue = this._Mean_Reversion_Indicator.calculate(InSeries, Open, High, null, null, this.Bollinger_Period, this.Bollinger_Standard_Deviation, this.Momentum_Period, this.RSI_Period, this.RSI_Smooth, this.RSI_Level_Low, this.RSI_Level_High, this.Momentum_Level_Low, this.Momentum_Level_High);
 
             //If the calculate method was not finished we need to stop and show an alert message to the user.
             if (returnvalue.ErrorOccured)
@@ -298,7 +298,7 @@ namespace AgenaTrader.UserCode
         #endregion
 
 
-        #region Input
+        #region InSeries
 
 
 
@@ -311,14 +311,14 @@ namespace AgenaTrader.UserCode
                 [XmlIgnore()]
                 public DataSeries Occurred
                 {
-                    get { return Values[0]; }
+                    get { return Outputs[0]; }
                 }
 
                 [Browsable(false)]
                 [XmlIgnore()]
                 public DataSeries Entry
                 {
-                    get { return Values[1]; }
+                    get { return Outputs[1]; }
                 }
 
                 public override IList<DataSeries> GetEntries()

@@ -43,27 +43,27 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// This method is used to configure the indicator and is called once before any bar data is loaded.
         /// </summary>
-        protected override void Initialize()
+        protected override void OnInit()
         {
             Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_Line"));
 
-            CalculateOnBarClose = true;
-            Overlay = false;
-            AutoScale = true;
+            CalculateOnClosedBar = true;
+            IsOverlay = false;
+            IsAutoAdjustableScale = true;
 
             //Because of Backtesting reasons if we use the advanced mode we need at least two bars
-            this.BarsRequired = 20;
+            this.RequiredBarsCount = 20;
         }
 
    
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
             Bollinger bb = Bollinger(2, 20);
 
-            DrawLine("Plot_Middle" + Time[0].ToString(), this.AutoScale, 1, bb.Middle[1], 0, bb.Middle[0], this.Plot1Color, this.Dash1Style, this.Plot1Width);
-            DrawLine("Plot_Low" + Time[0].ToString(), this.AutoScale, 1, bb.Lower[1], 0, bb.Lower[0], this.Plot0Color, this.Dash0Style, this.Plot0Width);
-            DrawLine("Plot_High" + Time[0].ToString(), this.AutoScale, 1, bb.Upper[1], 0, bb.Upper[0], this.Plot0Color, this.Dash0Style, this.Plot0Width);
+            AddChartLine("Plot_Middle" + Time[0].ToString(), this.IsAutoAdjustableScale, 1, bb.Middle[1], 0, bb.Middle[0], this.Plot1Color, this.Dash1Style, this.Plot1Width);
+            AddChartLine("Plot_Low" + Time[0].ToString(), this.IsAutoAdjustableScale, 1, bb.Lower[1], 0, bb.Lower[0], this.Plot0Color, this.Dash0Style, this.Plot0Width);
+            AddChartLine("Plot_High" + Time[0].ToString(), this.IsAutoAdjustableScale, 1, bb.Upper[1], 0, bb.Upper[0], this.Plot0Color, this.Dash0Style, this.Plot0Width);
 
             if (High[0] < bb.Lower[0] || Low[0] > bb.Upper[0])
             {
@@ -82,7 +82,7 @@ namespace AgenaTrader.UserCode
                 {
                     if (ShowArrows)
                     {
-                        DrawArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].Low, Color.LightGreen);
+                        AddChartArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, Color.LightGreen);
                     }
                     signal = 1;
                 }
@@ -93,7 +93,7 @@ namespace AgenaTrader.UserCode
                 {
                     if (ShowArrows)
                     {
-                        DrawArrowDown("ArrowShort_Entry" + +Bars[0].Time.Ticks, this.AutoScale, 0, Bars[0].High, Color.Red);
+                        AddChartArrowDown("ArrowShort_Entry" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].High, Color.Red);
                     }
                     signal = -1;
                 }
@@ -129,7 +129,7 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries PlotLine
         {
-            get { return Values[0]; }
+            get { return Outputs[0]; }
         }
 
 
@@ -243,7 +243,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator()
         {
-			return Lonely_Warrior_Indicator(Input);
+			return Lonely_Warrior_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -258,9 +258,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new Lonely_Warrior_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input
 						};
 			indicator.SetUp();
 
@@ -281,7 +281,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator()
 		{
-			return LeadIndicator.Lonely_Warrior_Indicator(Input);
+			return LeadIndicator.Lonely_Warrior_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -289,8 +289,8 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input)
 		{
-			if (InInitialize && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+			if (IsInInit && input == null)
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.Lonely_Warrior_Indicator(input);
 		}
@@ -307,7 +307,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator()
 		{
-			return LeadIndicator.Lonely_Warrior_Indicator(Input);
+			return LeadIndicator.Lonely_Warrior_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -330,7 +330,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator()
 		{
-			return LeadIndicator.Lonely_Warrior_Indicator(Input);
+			return LeadIndicator.Lonely_Warrior_Indicator(InSeries);
 		}
 
 		/// <summary>

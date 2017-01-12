@@ -39,25 +39,25 @@ namespace AgenaTrader.UserCode
         bool FirstOnBarUpdate = false;
         bool FirstCalculate = false;
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
             Add(new Plot(Color.Brown, PlotStyle.Block, "DeepCorrection"));
             Add(new Plot(Color.Green, "Entry"));
-            Overlay = false;
-            CalculateOnBarClose = true;
-           // BarsRequired = 20;
+            IsOverlay = false;
+            CalculateOnClosedBar = true;
+           // RequiredBarsCount = 20;
         }
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
 
             //for debugging reason only, just to get a hook in
-            if (CurrentBar + 1 == 1051)
+            if (ProcessingBarIndex + 1 == 1051)
             {
                 int a = 1 + 1;
             }
 
-            if (CurrentBar < BarsRequired)
+            if (ProcessingBarIndex < RequiredBarsCount)
             {
                 return;
             }
@@ -77,25 +77,25 @@ namespace AgenaTrader.UserCode
                 switch (ResultValue.Entry)
                 {
                     case OrderAction.Buy:
-                        Values[1].Set(1);
+                        Outputs[1].Set(1);
                         break;
                     case OrderAction.SellShort:
-                        //DrawDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
-                        Values[1].Set(-1);
+                        //AddChartDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
+                        Outputs[1].Set(-1);
                         break;
                 }
             }
             else
             {
                 //Value was null so nothing to do.
-                Values[1].Set(0);
+                Outputs[1].Set(0);
             }
 
 
         }
 
 
-        public ResultValue_DeepCorrection calculate(IDataSeries Input, int TrendSize, IBar myBar, string caller)
+        public ResultValue_DeepCorrection calculate(IDataSeries InSeries, int TrendSize, IBar myBar, string caller)
         {
 
 
@@ -108,64 +108,64 @@ namespace AgenaTrader.UserCode
             //Create a return object
             ResultValue_DeepCorrection ResultValue = new ResultValue_DeepCorrection();
 
-            if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionLong
-             || MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionWithTrendLong)
+            if (MarketPhasesAdv(InSeries, TrendSize)[0] == MarketPhaseDeepCorrectionLong
+             || MarketPhasesAdv(InSeries, TrendSize)[0] == MarketPhaseDeepCorrectionWithTrendLong)
             {
-                //Print(Bars[0].Time + " " + MarketPhasesAdv(Input, TrendSize)[0] + " tmp Pkt3 " + P123(Close, _trendSize).TempP3Price[0] + " valid Pkt3 " + P123(Input, _trendSize).ValidP3Price[0]);
+                //Print(Bars[0].Time + " " + MarketPhasesAdv(InSeries, TrendSize)[0] + " tmp Pkt3 " + P123(Close, _trendSize).TempP3Price[0] + " valid Pkt3 " + P123(InSeries, _trendSize).ValidP3Price[0]);
 
                 //try to get the temporary P3, if it does not exist, take the already validated P3
-                if (P123(Input, _trendSize).TempP3Price[0] != 0)
+                if (P123(InSeries, _trendSize).TempP3Price[0] != 0)
                 {
                     ResultValue.DeepCorrection = true;
                     ResultValue.Entry = OrderAction.Buy;
-                    ResultValue.StopLoss = P123(Input, _trendSize).TempP3Price[0];
+                    ResultValue.StopLoss = P123(InSeries, _trendSize).TempP3Price[0];
                     
                 }
-                else if (P123(Input, _trendSize).ValidP3Price[0] != 0)
+                else if (P123(InSeries, _trendSize).ValidP3Price[0] != 0)
                 {
                     ResultValue.DeepCorrection = true;
                     ResultValue.Entry = OrderAction.Buy;
-                    ResultValue.StopLoss = P123(Input, _trendSize).ValidP3Price[0];
+                    ResultValue.StopLoss = P123(InSeries, _trendSize).ValidP3Price[0];
                 }
 
                 //Check, if current Price is lower than P2 (because we want to go long towards P2)
-                if (Input[0] < P123(Input, _trendSize).P2Price[0])
+                if (InSeries[0] < P123(InSeries, _trendSize).P2Price[0])
                 {
-                    ResultValue.Target = P123(Input, _trendSize).P2Price[0];
-                    Print("Indikator" + myBar.Time + " Long " + "Close: " + myBar.Close + " StopLoss: " + ResultValue.StopLoss + " Target: " + ResultValue.Target + " Marktphase: " + MarketPhasesAdv(Input, TrendSize)[0] + " BarsCount: " + Input.Count);
+                    ResultValue.Target = P123(InSeries, _trendSize).P2Price[0];
+                    Print("Indikator" + myBar.Time + " Long " + "Close: " + myBar.Close + " StopLoss: " + ResultValue.StopLoss + " Target: " + ResultValue.Target + " Marktphase: " + MarketPhasesAdv(InSeries, TrendSize)[0] + " BarsCount: " + InSeries.Count);
                 }
                 else
                 {
-                    ResultValue.Target = Input[0] * 1.005;
-                    Print("Indikator" + myBar.Time + " Long " + "Close: " + myBar.Close + " StopLoss: " + ResultValue.StopLoss + " Target: " + ResultValue.Target + " Marktphase: " + MarketPhasesAdv(Input, TrendSize)[0] + " BarsCount: " + Input.Count);
+                    ResultValue.Target = InSeries[0] * 1.005;
+                    Print("Indikator" + myBar.Time + " Long " + "Close: " + myBar.Close + " StopLoss: " + ResultValue.StopLoss + " Target: " + ResultValue.Target + " Marktphase: " + MarketPhasesAdv(InSeries, TrendSize)[0] + " BarsCount: " + InSeries.Count);
                 }
             }
-            else if (MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionShort
-                  || MarketPhasesAdv(Input, TrendSize)[0] == MarketPhaseDeepCorrectionWithTrendShort)
+            else if (MarketPhasesAdv(InSeries, TrendSize)[0] == MarketPhaseDeepCorrectionShort
+                  || MarketPhasesAdv(InSeries, TrendSize)[0] == MarketPhaseDeepCorrectionWithTrendShort)
             {
 
                 //try to get the temporary P3, if it does not exist, take the already validated P3
-                if (P123(Input, _trendSize).TempP3Price[0] != 0)
+                if (P123(InSeries, _trendSize).TempP3Price[0] != 0)
                 {
                     ResultValue.DeepCorrection = true;
                     ResultValue.Entry = OrderAction.SellShort;
-                    ResultValue.StopLoss = P123(Input, _trendSize).TempP3Price[0];
-                    ResultValue.Target = P123(Input, _trendSize).P2Price[0];
+                    ResultValue.StopLoss = P123(InSeries, _trendSize).TempP3Price[0];
+                    ResultValue.Target = P123(InSeries, _trendSize).P2Price[0];
                 }
-                else if (P123(Input, _trendSize).ValidP3Price[0] != 0)
+                else if (P123(InSeries, _trendSize).ValidP3Price[0] != 0)
                 {
                     ResultValue.DeepCorrection = true;
                     ResultValue.Entry = OrderAction.SellShort;
-                    ResultValue.StopLoss = P123(Input, _trendSize).ValidP3Price[0];
+                    ResultValue.StopLoss = P123(InSeries, _trendSize).ValidP3Price[0];
                 }
                 //Check, if current Price is higher than P2 (because we want to go short towards P2)
-                    if (Input[0] > P123(Input, _trendSize).P2Price[0])
+                    if (InSeries[0] > P123(InSeries, _trendSize).P2Price[0])
                 {
-                    ResultValue.Target = P123(Input, _trendSize).P2Price[0];
+                    ResultValue.Target = P123(InSeries, _trendSize).P2Price[0];
                 }
                 else
                 {
-                    ResultValue.Target = Input[0] / 1.005;
+                    ResultValue.Target = InSeries[0] / 1.005;
                 }
             }
             return ResultValue;
@@ -190,7 +190,7 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries DeepCorrection
         {
-            get { return Values[0]; }
+            get { return Outputs[0]; }
         }
 
 
@@ -248,7 +248,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DeepCorrectionTrend_Indikator DeepCorrectionTrend_Indikator(System.Int32 trendSize)
         {
-			return DeepCorrectionTrend_Indikator(Input, trendSize);
+			return DeepCorrectionTrend_Indikator(InSeries, trendSize);
 		}
 
 		/// <summary>
@@ -263,9 +263,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new DeepCorrectionTrend_Indikator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input,
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input,
 							TrendSize = trendSize
 						};
 			indicator.SetUp();
@@ -287,7 +287,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DeepCorrectionTrend_Indikator DeepCorrectionTrend_Indikator(System.Int32 trendSize)
 		{
-			return LeadIndicator.DeepCorrectionTrend_Indikator(Input, trendSize);
+			return LeadIndicator.DeepCorrectionTrend_Indikator(InSeries, trendSize);
 		}
 
 		/// <summary>
@@ -295,7 +295,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DeepCorrectionTrend_Indikator DeepCorrectionTrend_Indikator(IDataSeries input, System.Int32 trendSize)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.DeepCorrectionTrend_Indikator(input, trendSize);
@@ -313,7 +313,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DeepCorrectionTrend_Indikator DeepCorrectionTrend_Indikator(System.Int32 trendSize)
 		{
-			return LeadIndicator.DeepCorrectionTrend_Indikator(Input, trendSize);
+			return LeadIndicator.DeepCorrectionTrend_Indikator(InSeries, trendSize);
 		}
 
 		/// <summary>
@@ -336,7 +336,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public DeepCorrectionTrend_Indikator DeepCorrectionTrend_Indikator(System.Int32 trendSize)
 		{
-			return LeadIndicator.DeepCorrectionTrend_Indikator(Input, trendSize);
+			return LeadIndicator.DeepCorrectionTrend_Indikator(InSeries, trendSize);
 		}
 
 		/// <summary>

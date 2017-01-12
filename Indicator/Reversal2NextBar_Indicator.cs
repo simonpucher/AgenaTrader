@@ -43,18 +43,18 @@ namespace AgenaTrader.UserCode
         private Color colWin = Color.Yellow;
         private Color colFail = Color.Brown;
 
-        protected override void Initialize()
+        protected override void OnInit()
         {
             Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "Reversal2NextBar"));
-            Overlay = true;
-            CalculateOnBarClose = true;
+            IsOverlay = true;
+            CalculateOnClosedBar = true;
         }
 
-        protected override void OnBarUpdate()
+        protected override void OnCalculate()
         {
 
-            string strReversalTradeLong = "ReversalTradeLong" + CurrentBar;
-            string strReversalTradeShort = "ReversalTradeShort" + CurrentBar;
+            string strReversalTradeLong = "ReversalTradeLong" + ProcessingBarIndex;
+            string strReversalTradeShort = "ReversalTradeShort" + ProcessingBarIndex;
             string strTradeResultLong;
             string strTradeResultShort;
             Color colorTextBox;
@@ -67,7 +67,7 @@ namespace AgenaTrader.UserCode
                 ReversalTradeStartTSLong = Bars[0].Time;
                 //TargetBarTime = GetTargetBar(Bars[0].Time);
                 TargetBarTime = GlobalUtilities.GetTargetBar(Bars, Bars[0].Time, TimeFrame, 1);
-                Value.Set(100);
+                OutSeries.Set(100);
                 Reversal2NextBar.Set(100);
             }
             else if (IsReversalShortTrade() == true)
@@ -76,7 +76,7 @@ namespace AgenaTrader.UserCode
                 ReversalTradeStartTSShort = Bars[0].Time;
                 //TargetBarTime = GetTargetBar(Bars[0].Time);
                 TargetBarTime = GlobalUtilities.GetTargetBar(Bars, Bars[0].Time, TimeFrame, 1);
-                Value.Set(-100);
+                OutSeries.Set(-100);
 
             }
             else
@@ -89,7 +89,7 @@ namespace AgenaTrader.UserCode
             {
 
 
-                ReversalTradeResult = (decimal)Bars.GetClose(CurrentBar) - (decimal)Bars.GetOpen(CurrentBar);
+                ReversalTradeResult = (decimal)Bars.GetClose(ProcessingBarIndex) - (decimal)Bars.GetOpen(ProcessingBarIndex);
                 TradeCounter += 1;
 
                 if (ReversalTradeStartTSLong > DateTime.MinValue)
@@ -108,7 +108,7 @@ namespace AgenaTrader.UserCode
                         colorTextBox = colWin;
                         TradeCounterLongWin += 1;
                     }
-                    DrawText(strReversalTradeLong, true, strTradeResultLong, Time[1], Bars.GetHigh(CurrentBar) + (100 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, colorTextBox, 70);
+                    AddChartText(strReversalTradeLong, true, strTradeResultLong, Time[1], Bars.GetHigh(ProcessingBarIndex) + (100 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, colorTextBox, 70);
                 }
                 else if (ReversalTradeStartTSShort > DateTime.MinValue)
                 {
@@ -125,7 +125,7 @@ namespace AgenaTrader.UserCode
                         colorTextBox = colFail;
                         TradeCounterShortFail += 1;
                     }
-                    DrawText(strReversalTradeShort, true, strTradeResultShort, Time[1], Bars.GetHigh(CurrentBar) - (100 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, colorTextBox, 70);
+                    AddChartText(strReversalTradeShort, true, strTradeResultShort, Time[1], Bars.GetHigh(ProcessingBarIndex) - (100 * TickSize), 9, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Black, colorTextBox, 70);
                 }
 
                 //Variablen Resetten
@@ -133,7 +133,7 @@ namespace AgenaTrader.UserCode
                 ReversalTradeStartTSShort = DateTime.MinValue;
             }
 
-            if (IsCurrentBarLast)
+            if (IsProcessingBarIndexLast)
             {
                 //       Print("LongWin: " + TradeCounterLongWin + " LongFail: " + TradeCounterLongFail + " ShortWin: " + TradeCounterShortWin + " ShortFail: " + TradeCounterShortFail);
                 //       Print(Instrument.Name + "Trades: " + TradeCounter + " LongPunkte: " + ReversalTradeResultTotalLong + " ShortPunkte: " + ReversalTradeResultTotalShort);
@@ -286,7 +286,7 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries Reversal2NextBar
         {
-            get { return Values[0]; }
+            get { return Outputs[0]; }
         }
 
         #endregion
@@ -306,7 +306,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Reversal2NextBar_Indicator Reversal2NextBar_Indicator()
         {
-			return Reversal2NextBar_Indicator(Input);
+			return Reversal2NextBar_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -321,9 +321,9 @@ namespace AgenaTrader.UserCode
 
 			indicator = new Reversal2NextBar_Indicator
 						{
-							BarsRequired = BarsRequired,
-							CalculateOnBarClose = CalculateOnBarClose,
-							Input = input
+							RequiredBarsCount = RequiredBarsCount,
+							CalculateOnClosedBar = CalculateOnClosedBar,
+							InSeries = input
 						};
 			indicator.SetUp();
 
@@ -344,7 +344,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Reversal2NextBar_Indicator Reversal2NextBar_Indicator()
 		{
-			return LeadIndicator.Reversal2NextBar_Indicator(Input);
+			return LeadIndicator.Reversal2NextBar_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -352,7 +352,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Reversal2NextBar_Indicator Reversal2NextBar_Indicator(IDataSeries input)
 		{
-			if (InInitialize && input == null)
+			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
 
 			return LeadIndicator.Reversal2NextBar_Indicator(input);
@@ -370,7 +370,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Reversal2NextBar_Indicator Reversal2NextBar_Indicator()
 		{
-			return LeadIndicator.Reversal2NextBar_Indicator(Input);
+			return LeadIndicator.Reversal2NextBar_Indicator(InSeries);
 		}
 
 		/// <summary>
@@ -393,7 +393,7 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		public Reversal2NextBar_Indicator Reversal2NextBar_Indicator()
 		{
-			return LeadIndicator.Reversal2NextBar_Indicator(Input);
+			return LeadIndicator.Reversal2NextBar_Indicator(InSeries);
 		}
 
 		/// <summary>
