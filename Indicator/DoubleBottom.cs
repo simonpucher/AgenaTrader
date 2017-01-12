@@ -17,7 +17,29 @@ namespace AgenaTrader.UserCode
     public class DoubleBottom : UserIndicator
     {
 
-        double _tolerancePercentage = 0.6;
+        public struct HighLow
+        {
+            public string HighOrLow;
+            public DateTime DateTime;
+            public double Close;
+
+            public HighLow(string highorlow, DateTime datetime, double close)
+            {
+                HighOrLow = highorlow;
+                DateTime = datetime;
+                Close = close;
+            }
+        }
+
+        private double lastHigh = Double.MinValue;
+        private double lastLow = Double.MaxValue;
+
+        private Boolean SetSuccessFromEcho = false;
+
+        public List<HighLow> HighLowList;
+
+        private double _tolerancePercentage = 0.6;
+        private int _candles = 8;
 
 
         protected override void OnInit()
@@ -32,18 +54,74 @@ namespace AgenaTrader.UserCode
 
         protected override void OnCalculate()
         {
+            if (SetSuccessFromEcho)
+            {
+                DoubleBottom_DS.Set(1);
+            }
+            else
+            {
+                DoubleBottom_DS.Set(0);
+            }
+            
 
-            if (ProcessingBarIndex == Bars.Count - 1)
+            //if (!IsProcessingBarIndexLast)
+            //{
+            //    return;
+            //    Print("LastBar-Index");
+            //}
+                
+
+            //if (Bars[1]==null)
+            //{
+            //    HighLowList = new List<HighLow>();
+            //    return;
+            //}
+
+            //if (ProcessingBarIndex == Bars.Count - 1)
+            //{
+            //    Print("LastBar");
+            //}
+
+
+            //////////////NEW BUT NOT WORKING BEGIN//////////////
+            //if (Close[0] > lastHigh)
+            //{
+            //    //higher
+            //    HighLowList.Add(new HighLow("High", Bars[0].Time, Bars[0].Close));
+
+            //    //reset LastLow
+            //    lastLow = Double.MaxValue;
+            //}
+            //else if (Close[0] < lastLow)
+            //{
+            //    //lower
+            //    HighLowList.Add(new HighLow("Low", Bars[0].Time, Bars[0].Close));
+
+            //    //reset LastHigh
+            //    lastHigh = Double.MinValue;
+            //}
+            //////////////NEW BUT NOT WORKING END//////////////
+
+
+            //////////////////OLD BUT WORKING BEGIN//////////////////
+
+
+
+            if (ProcessingBarIndex >= ( Bars.Count - this.Candles) - 1)
+            {
+                Print("LastBar");
+            }
+            else
+            {
+                return;  //Just the Last Bar plus the Echo-Bars
+            }
+
+            if (ProcessingBarIndex == 269)
             {
                 Print("asdf");
             }
 
-            if (ProcessingBarIndex == 1978)
-            {
-                Print("asdf");
-            }
-
-            DoubleBottom_DS.Set(0);
+            //DoubleBottom_DS.Set(0);
 
             DateTime OneMonthAgo = Time[0].AddMonths(-1);
             double tolerance = Bars[0].Low * (TolerancePercentage / 100);
@@ -57,7 +135,12 @@ namespace AgenaTrader.UserCode
             IEnumerable<IBar> lastBottoms = Bars.Where(x => x.Time <= OneMonthAgo)                  //older than 1 Month
                                                  .Where(y => y.Low <= (Bars[0].Low + tolerance)     // Close <= current Close + Tolerance
                                                          && y.Low >= (Bars[0].Low - tolerance)      // Close >= current Close + Tolerance    
-                                                         );
+                                                         )
+                                                   //      .OrderByDescending(x => x.Time)
+                                                         ;
+
+
+
             foreach (IBar bar in lastBottoms)
             {
                 double LowestLow = LowestLowPrice(Bars.GetBarsAgo(bar.Time))[0]; //search for the lowest low 
@@ -67,6 +150,7 @@ namespace AgenaTrader.UserCode
                  && LowestLow >= (Bars[0].Low - tolerance)
                  && LowestLowBefore <= (Bars[0].Low + tolerance)
                  && LowestLowBefore >= (Bars[0].Low - tolerance)
+//                 && LowestLow < LowestLowBefore
                     )
                 {
                     Print("DoubleBottom   {0}, {1}",
@@ -86,9 +170,11 @@ namespace AgenaTrader.UserCode
 
                     DoubleBottom_DS.Set(1);
                     DoubleBottom_DS.Set(Bars.GetBarsAgo(bar.Time), 0.5);
+                    SetSuccessFromEcho = true;
+//                    break; only take the first found bottom
                 }
             }
-
+            //////////////////OLD BUT WORKING END//////////////////
 
 
 
@@ -103,6 +189,9 @@ namespace AgenaTrader.UserCode
             get { return Outputs[0]; }
         }
 
+        [Description("Tolerance level in percent.")]
+        [Category("Parameters")]
+        [DisplayName("Tolerance")]
         public double TolerancePercentage
         {
             get
@@ -115,6 +204,17 @@ namespace AgenaTrader.UserCode
                 _tolerancePercentage = value;
             }
         }
+
+
+        [Description("The script shows a signal if the double bottom was reached within the last x candles.")]
+        [Category("Parameters")]
+        [DisplayName("Candles")]
+        public int Candles
+        {
+            get { return _candles; }
+            set { _candles = value; }
+        }
+
 
         #endregion
     }
@@ -130,17 +230,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom()
+		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles)
         {
-			return DoubleBottom(InSeries);
+			return DoubleBottom(InSeries, tolerancePercentage, candles);
 		}
 
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input)
+		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<DoubleBottom>(input);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<DoubleBottom>(input, i => Math.Abs(i.TolerancePercentage - tolerancePercentage) <= Double.Epsilon && i.Candles == candles);
 
 			if (indicator != null)
 				return indicator;
@@ -149,7 +249,9 @@ namespace AgenaTrader.UserCode
 						{
 							RequiredBarsCount = RequiredBarsCount,
 							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input
+							InSeries = input,
+							TolerancePercentage = tolerancePercentage,
+							Candles = candles
 						};
 			indicator.SetUp();
 
@@ -168,20 +270,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom()
+		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles)
 		{
-			return LeadIndicator.DoubleBottom(InSeries);
+			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles);
 		}
 
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input)
+		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
-			return LeadIndicator.DoubleBottom(input);
+			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles);
 		}
 	}
 
@@ -194,17 +296,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom()
+		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles)
 		{
-			return LeadIndicator.DoubleBottom(InSeries);
+			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles);
 		}
 
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input)
+		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles)
 		{
-			return LeadIndicator.DoubleBottom(input);
+			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles);
 		}
 	}
 
@@ -217,17 +319,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom()
+		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles)
 		{
-			return LeadIndicator.DoubleBottom(InSeries);
+			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles);
 		}
 
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input)
+		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles)
 		{
-			return LeadIndicator.DoubleBottom(input);
+			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles);
 		}
 	}
 
