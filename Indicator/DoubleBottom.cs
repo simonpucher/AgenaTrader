@@ -37,26 +37,7 @@ namespace AgenaTrader.UserCode
     public class DoubleBottom : UserIndicator
     {
 
-        public struct HighLow
-        {
-            public string HighOrLow;
-            public DateTime DateTime;
-            public double Close;
-
-            public HighLow(string highorlow, DateTime datetime, double close)
-            {
-                HighOrLow = highorlow;
-                DateTime = datetime;
-                Close = close;
-            }
-        }
-
-        private double lastHigh = Double.MinValue;
-        private double lastLow = Double.MaxValue;
-
         private Boolean SetSuccessFromEcho = false;
-
-        public List<HighLow> HighLowList;
 
         //input
         private double _tolerancePercentage = 0.6;
@@ -67,9 +48,9 @@ namespace AgenaTrader.UserCode
 
         protected override void OnInit()
         {
-            Add(new Plot(Color.Red, "DoubleBottom_DS"));
+            Add(new Plot(Color.LawnGreen, "DoubleBottom_DS"));
             IsOverlay = false;
-            CalculateOnClosedBar = true;
+            CalculateOnClosedBar = false;
 
             //Inhalt des OutputWindow l�schen
             ClearOutputWindow();
@@ -117,8 +98,7 @@ namespace AgenaTrader.UserCode
             
 
             //Check, when the chart was the last time below our current low. That period becomes irrelevant for us and gets ignored
-            IEnumerable<IBar> belowLow = Bars.Where(y => y.Low <= tolerance_min).OrderBy(x => x.Low)
-                                             .OrderByDescending(x => x.Time);
+            IEnumerable<IBar> belowLow = Bars.Where(y => y.Low <= tolerance_min).OrderByDescending(x => x.Time);
 
             //if there is no other Low and the chart is coming all the way from a higher price, than just leave this indicator
             if (!belowLow.Any())
@@ -137,7 +117,7 @@ namespace AgenaTrader.UserCode
 
 
             //find previous bottom
-            //Select all data and find high & low.
+            //Select all data and find lows.
             IEnumerable<IBar> lastBottoms = Bars.Where(x => x.Time <= MinBarsAgoDateTime           //older than x Bars, so we have a arch in between the two low points 
                                                          && x.Time >= IgnoreFromHereOn )           //but younger than the timeperiod when the chart was below our low     
                                                 .Where(y => y.Low <= tolerance_max                 // Low <= current Low + Tolerance
@@ -168,7 +148,7 @@ namespace AgenaTrader.UserCode
                     //Drawings
                     //Red Connection Line of the Bottoms
                     string strdoubleBottomConnecter = "DoubleBottomConnecter_" + Bars[0].Time.ToString() + "_" + bar.Time.ToString();
-                    AddChartLine(strdoubleBottomConnecter, Bars.GetBarsAgo(bar.Time), bar.Low, (int)LowestLowFromEchoBarsIndex, LowestLowFromEchoBars, Color.Red);
+                    AddChartLine(strdoubleBottomConnecter, Bars.GetBarsAgo(bar.Time), bar.Low, (int)LowestLowFromEchoBarsIndex, LowestLowFromEchoBars, Color.LawnGreen);
 
                     //High and Breakthrough
                     double BreakThrough    = HighestHighPrice(Bars.GetBarsAgo(bar.Time))[0];
@@ -176,8 +156,8 @@ namespace AgenaTrader.UserCode
 
                     string strBreakThrough     = strdoubleBottomConnecter + "BreakThrough";
                     string strBreakThroughVert = strdoubleBottomConnecter + "BreakThroughVert";
-                    AddChartLine(strBreakThrough,     (int)BreakThroughAgo, BreakThrough, 0 , BreakThrough, Color.Green, DashStyle.Solid, 2);
-                    AddChartLine(strBreakThroughVert, (int)BreakThroughAgo, bar.Low, (int)BreakThroughAgo, BreakThrough, Color.Aquamarine);
+                    AddChartLine(strBreakThrough,     (int)BreakThroughAgo, BreakThrough, 0 , BreakThrough, Color.Aquamarine, DashStyle.Solid, 2);
+                    AddChartLine(strBreakThroughVert, (int)BreakThroughAgo, bar.Low, (int)BreakThroughAgo, BreakThrough, Color.Aquamarine, DashStyle.Solid, 2);
 
                     //Mark current low
                     DoubleBottom_DS.Set((int)LowestLowFromEchoBarsIndex,1);
