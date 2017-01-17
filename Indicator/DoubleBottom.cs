@@ -38,9 +38,11 @@ namespace AgenaTrader.UserCode
 
         public List<HighLow> HighLowList;
 
+        //input
         private double _tolerancePercentage = 0.6;
         private int _candles = 8;
         private bool _drawTolerance;
+        private int _barsAgo = 20;
 
 
         protected override void OnInit()
@@ -55,56 +57,9 @@ namespace AgenaTrader.UserCode
 
         protected override void OnCalculate()
         {
-            if (SetSuccessFromEcho)
-            {
-                DoubleBottom_DS.Set(1);
-            }
-            else
-            {
+
                 DoubleBottom_DS.Set(0);
-            }
 
-
-            //if (!IsProcessingBarIndexLast)
-            //{
-            //    return;
-            //    Print("LastBar-Index");
-            //}
-
-
-            //if (Bars[1]==null)
-            //{
-            //    HighLowList = new List<HighLow>();
-            //    return;
-            //}
-
-            //if (ProcessingBarIndex == Bars.Count - 1)
-            //{
-            //    Print("LastBar");
-            //}
-
-
-            //////////////NEW BUT NOT WORKING BEGIN//////////////
-            //if (Close[0] > lastHigh)
-            //{
-            //    //higher
-            //    HighLowList.Add(new HighLow("High", Bars[0].Time, Bars[0].Close));
-
-            //    //reset LastLow
-            //    lastLow = Double.MaxValue;
-            //}
-            //else if (Close[0] < lastLow)
-            //{
-            //    //lower
-            //    HighLowList.Add(new HighLow("Low", Bars[0].Time, Bars[0].Close));
-
-            //    //reset LastHigh
-            //    lastHigh = Double.MinValue;
-            //}
-            //////////////NEW BUT NOT WORKING END//////////////
-
-
-            //////////////////OLD BUT WORKING BEGIN//////////////////
 
 
             double LowestLowFromEchoBars;
@@ -120,44 +75,68 @@ namespace AgenaTrader.UserCode
             {
                 return;  //Just the Last Bar plus the Echo-Bars
             }
-                    
-            DateTime OneMonthAgo = Time[0].AddMonths(-1);
+
+
+            //check if datafeed is providing appropriate data
+            if (Bars[BarsAgo + (int)LowestLowFromEchoBarsIndex] == null)
+            {
+                return;
+            }
+            
+            //Calculate the minimum distance from current low to the next low
+            DateTime MinBarsAgoDateTime = Bars[BarsAgo + (int)LowestLowFromEchoBarsIndex].Time;
+
+            //Calculate Tolerance
             double tolerance     = LowestLowFromEchoBars * (TolerancePercentage / 100);
             double tolerance_min = LowestLowFromEchoBars - tolerance;
             double tolerance_max = LowestLowFromEchoBars + tolerance;
 
+
             Print("  Bar {0}, Tol+{1}, Tol-{2}",
             Bars[0].Time.ToString(), Math.Round(tolerance_max, 2), Math.Round(tolerance_min, 2));
+            
 
+            //Check, when the chart was the last time below our current low. That period becomes irrelevant for us and gets ignored
+            IEnumerable<IBar> belowLow = Bars.Where(y => y.Low <= tolerance_min).OrderBy(x => x.Low)
+                                             .OrderByDescending(x => x.Time);
+
+            //if there is no other Low and the chart is coming all the way from a higher price, than just leave this indicator
+            if (!belowLow.Any())
+            {
+                return;
+            }
+            
+
+            DateTime IgnoreFromHereOn = belowLow.FirstOrDefault().Time;
+
+            //Draw ToleranceArea for the respected timeperiod
             if (DrawTolerance)
             {
-                //Show Tolerance
-                AddChartRectangle("ToleranceRectangle", true, Bars.Count - 1 , tolerance_max, 0, tolerance_min, Color.Yellow, Color.Yellow, 50);
+                AddChartRectangle("ToleranceRectangle", true, Bars.GetBarsAgo(IgnoreFromHereOn), tolerance_max, 0, tolerance_min, Color.Yellow, Color.Yellow, 50);
             }
+
 
             //find previous bottom
             //Select all data and find high & low.
-            IEnumerable<IBar> lastBottoms = Bars.Where(x => x.Time <= OneMonthAgo)                 //older than 1 Month, so we have a arch in between the two low points
+            IEnumerable<IBar> lastBottoms = Bars.Where(x => x.Time <= MinBarsAgoDateTime           //older than x Bars, so we have a arch in between the two low points 
+                                                         && x.Time >= IgnoreFromHereOn )           //but younger than the timeperiod when the chart was below our low     
                                                 .Where(y => y.Low <= tolerance_max                 // Low <= current Low + Tolerance
                                                          && y.Low >= tolerance_min                 // Low >= current Low + Tolerance    
                                                          )
-                                                         .OrderBy(x => x.Low)
+                                                .OrderBy(x => x.Low)
                                                          ;
 
-
+            int LowestLowBarsBefore = 5;
 
             foreach (IBar bar in lastBottoms)
             {
                 double LowestLow       = LowestLowPrice(Bars.GetBarsAgo(bar.Time))[0];      //calculate the lowest low between current bar and potential bottom
-                double LowestLowBefore = LowestLowPrice(Bars.GetBarsAgo(bar.Time) + 20)[0]; //calculate the lowest low before the potential bottom. this is to make sure that there is no lower price leading up to the bottom
-
-                int previous = Bars.GetBarsAgo(bar.Time) + 20;
-                double LowestLowBefore2 = LowestLowPrice(previous)[0];
+                double LowestLowBefore = LowestLowPrice(Bars.GetBarsAgo(bar.Time) + LowestLowBarsBefore)[0]; //calculate the lowest low before the potential bottom. this is to make sure that there is no lower price leading up to the bottom
 
                 //now check, if the current bar is on the same price level as the potential bottom. just to make sure, there is no lower price in that period.
                 if (LowestLow       <= (tolerance_max)            //check if that lowest low is inside tolerance levels   
                  && LowestLow       >= (tolerance_min)
-                 && LowestLowBefore <= (tolerance_max)            //check if the lowest low B
+                 && LowestLowBefore <= (tolerance_max)            //check if the lowest low Before is inside tolerance levels 
                  && LowestLowBefore >= (tolerance_min)
                  && ( LowestLow == LowestLowBefore                //LowestLow has to be either current bar or the current bottom from loop
                  ||   LowestLow == LowestLowFromEchoBars )
@@ -166,33 +145,35 @@ namespace AgenaTrader.UserCode
                     Print("DoubleBottom  Low: {0}, Time: {1}, LowestLow: {2}, LowestLowBefore: {3}",
                           bar.Low, bar.Time.ToString(), LowestLow, LowestLowBefore);
 
+                    //Drawings
+                    //Red Connection Line of the Bottoms
                     string strdoubleBottomConnecter = "DoubleBottomConnecter_" + Bars[0].Time.ToString() + "_" + bar.Time.ToString();
-                    //strdoubleBottomConnecter = "DoubleBottomConnecter";
                     AddChartLine(strdoubleBottomConnecter, Bars.GetBarsAgo(bar.Time), bar.Low, (int)LowestLowFromEchoBarsIndex, LowestLowFromEchoBars, Color.Red);
 
-
+                    //High and Breakthrough
                     double BreakThrough    = HighestHighPrice(Bars.GetBarsAgo(bar.Time))[0];
                     double BreakThroughAgo = HighestHighIndex(Bars.GetBarsAgo(bar.Time))[0];
 
                     string strBreakThrough     = strdoubleBottomConnecter + "BreakThrough";
                     string strBreakThroughVert = strdoubleBottomConnecter + "BreakThroughVert";
-                    AddChartHorizontalLine(strBreakThrough, BreakThrough, Color.Green);
+                    AddChartLine(strBreakThrough,     (int)BreakThroughAgo, BreakThrough, 0 , BreakThrough, Color.Green, DashStyle.Solid, 2);
                     AddChartLine(strBreakThroughVert, (int)BreakThroughAgo, bar.Low, (int)BreakThroughAgo, BreakThrough, Color.Aquamarine);
 
-                    DoubleBottom_DS.Set(1);
+                    //Mark current low
+                    DoubleBottom_DS.Set((int)LowestLowFromEchoBarsIndex,1);
+                    //Mark previous low(s)
                     DoubleBottom_DS.Set(Bars.GetBarsAgo(bar.Time), 0.5);
                     SetSuccessFromEcho = true;
-//                    break; only take the first found bottom
                 }
             }
-            //////////////////OLD BUT WORKING END//////////////////
-
-            if (true)
+            if (SetSuccessFromEcho)
             {
-
+                DoubleBottom_DS.Set(1);
             }
-
-
+            else
+            {
+                DoubleBottom_DS.Set(0);
+            }
         }
 
         #region Properties
@@ -247,6 +228,23 @@ namespace AgenaTrader.UserCode
         }
 
 
+        [Description("Determines, how many bars the other bottom(s) should be at least away from the current low")]
+        [Category("Parameters")]
+        [DisplayName("Min Bars ago for last bottom")]
+        public int BarsAgo
+        {
+            get
+            {
+                return _barsAgo;
+            }
+
+            set
+            {
+                _barsAgo = value;
+            }
+        }
+
+
         #endregion
     }
 }
@@ -261,17 +259,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance)
+		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
         {
-			return DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance);
+			return DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo);
 		}
 
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance)
+		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<DoubleBottom>(input, i => Math.Abs(i.TolerancePercentage - tolerancePercentage) <= Double.Epsilon && i.Candles == candles && i.DrawTolerance == drawTolerance);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<DoubleBottom>(input, i => Math.Abs(i.TolerancePercentage - tolerancePercentage) <= Double.Epsilon && i.Candles == candles && i.DrawTolerance == drawTolerance && i.BarsAgo == barsAgo);
 
 			if (indicator != null)
 				return indicator;
@@ -283,7 +281,8 @@ namespace AgenaTrader.UserCode
 							InSeries = input,
 							TolerancePercentage = tolerancePercentage,
 							Candles = candles,
-							DrawTolerance = drawTolerance
+							DrawTolerance = drawTolerance,
+							BarsAgo = barsAgo
 						};
 			indicator.SetUp();
 
@@ -302,20 +301,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance)
+		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
 		{
-			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance);
+			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo);
 		}
 
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance)
+		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
 		{
 			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
-			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance);
+			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance, barsAgo);
 		}
 	}
 
@@ -328,17 +327,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance)
+		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
 		{
-			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance);
+			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo);
 		}
 
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance)
+		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
 		{
-			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance);
+			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance, barsAgo);
 		}
 	}
 
@@ -351,17 +350,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance)
+		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
 		{
-			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance);
+			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo);
 		}
 
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance)
+		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
 		{
-			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance);
+			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance, barsAgo);
 		}
 	}
 
