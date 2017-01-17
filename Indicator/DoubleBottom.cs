@@ -11,6 +11,26 @@ using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
+/// <summary>
+/// Version: stable
+/// -------------------------------------------------------------------------
+/// Christian Kovar 2017
+/// Simon Pucher 2017
+/// http://script-trading.com
+/// -------------------------------------------------------------------------
+/// inspired by the geomatrical figures of a double/tripple bottom, this indicator
+/// is showing and highlighting lows that occur on the same level.
+/// -use the _tolerancePercentage parameter to adjust your price tolerance in percentage
+/// -use the _barsAgo parameter to adjust the length of the arch that should be between your
+/// current and past low(s)
+/// -us the _candles parameter to implement an "echo" funcionality. this feature is not only
+/// checking the current/last bar but also the last 8 bars. This makes screening much easier, 
+/// especially in the scanner column
+/// -------------------------------------------------------------------------
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
+
 namespace AgenaTrader.UserCode
 {
     [Description("DoubleBottom")]
