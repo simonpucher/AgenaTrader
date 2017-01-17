@@ -387,7 +387,7 @@ namespace AgenaTrader.UserCode
 		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.OpenBrowser_Utility_Tool(input, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks);
 		}
