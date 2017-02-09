@@ -115,6 +115,7 @@ namespace AgenaTrader.UserCode
             return "Elder Ray (I)";
 
         }
+
         #region Properties
 
         [Browsable(false)]
