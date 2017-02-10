@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: not working
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2017
 /// -------------------------------------------------------------------------
@@ -38,6 +38,9 @@ namespace AgenaTrader.UserCode
         private int _period = 13;
         private ElderRayTyp _ElderRayTyp = ElderRayTyp.BullPower;
 
+        private DoubleSeries ds_bull_power;
+        private DoubleSeries ds_bear_power;
+
         private Color _plot0color = Const.DefaultIndicatorColor;
         private int _plot0width = Const.DefaultLineWidth;
         private DashStyle _plot0dashstyle = Const.DefaultIndicatorDashStyle;
@@ -55,6 +58,9 @@ namespace AgenaTrader.UserCode
             Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Occurred"));
             Add(new Plot(new Pen(this.Plot0Color, this.Plot1Width), PlotStyle.Line, "Entry"));
 
+            ds_bull_power = new DoubleSeries(this);
+            ds_bear_power = new DoubleSeries(this);
+
             IsOverlay = false;
 			CalculateOnClosedBar = true;
 
@@ -66,30 +72,21 @@ namespace AgenaTrader.UserCode
             EMA ema = EMA(this.Period);
             double bull_power = High[0] - ema[0];
             double bear_power = Low[0] - ema[0];
+            ds_bull_power.Set(bull_power);
+            ds_bear_power.Set(bear_power);
 
+            int resultsignal = 0;
+            if (ema[0] > ema[1] && bear_power < 0 && bear_power > ds_bear_power.Get(1))
+            {
+                resultsignal = 1;
+            }
 
-            //if (_ElderRayTyp == ElderRayTyp.BullPower)
-            //{
-            //    MyPlot1.Set(bull_power);
-            //}
-            //else
-            //{
-            //    MyPlot2.Set(bear_power);
-            //}
+            if (ema[0] < ema[1] && bull_power > 0 && bull_power < ds_bull_power.Get(1))
+            {
+                resultsignal = -1;
+            }
 
-
-
-           
-
-            //if (ema[0] > ema[1] && bear_power < 0 && bear_power > MyPlot2[1])
-            //{
-            //    AddChartArrowUp("ArrowLong" + Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, Color.LightGreen);
-            //}
-
-            //if (ema[0] < ema[1] && bull_power > 0 && bull_power < MyPlot1[1])
-            //{
-            //    AddChartArrowDown("ArrowShort" + Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].High, Color.Red);
-            //}
+            Occurred.Set(resultsignal);
 
             PlotColors[0][0] = this.Plot0Color;
             Plots[0].PenStyle = this.Dash0Style;
@@ -105,14 +102,14 @@ namespace AgenaTrader.UserCode
         {
             get
             {
-                return "Elder Ray (I)";
+                return "Elder Ray (C)";
             }
         }
 
 
         public override string ToString()
         {
-            return "Elder Ray (I)";
+            return "Elder Ray (C)";
 
         }
 

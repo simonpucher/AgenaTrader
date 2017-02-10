@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2017
 /// -------------------------------------------------------------------------
@@ -38,11 +38,17 @@ namespace AgenaTrader.UserCode
         private int _period = 13;
         private ElderRayTyp _ElderRayTyp = ElderRayTyp.BullPower;
 
+        private DoubleSeries ds_bull_power;
+        private DoubleSeries ds_bear_power;
+
 
         protected override void OnInit()
 		{
 			Add(new Plot(Color.FromKnownColor(KnownColor.Gray), "bull_power"));
             Add(new Plot(Color.FromKnownColor(KnownColor.Gray), "bear_power"));
+
+            ds_bull_power = new DoubleSeries(this);
+            ds_bear_power = new DoubleSeries(this);
         }
 
 		protected override void OnCalculate()
@@ -50,6 +56,9 @@ namespace AgenaTrader.UserCode
             EMA ema = EMA(this.Period);
             double bull_power = High[0] - ema[0];
             double bear_power = Low[0] - ema[0];
+            ds_bull_power.Set(bull_power);
+            ds_bear_power.Set(bear_power);
+
             if (_ElderRayTyp == ElderRayTyp.BullPower)
             {
                 MyPlot1.Set(bull_power);
@@ -59,7 +68,6 @@ namespace AgenaTrader.UserCode
                 MyPlot2.Set(bear_power);
             }
            
-            
 
             //Set the color
             if (ema[0] > ema[1])
@@ -88,12 +96,12 @@ namespace AgenaTrader.UserCode
             Plots[1].PenStyle = DashStyle.Solid;
             Plots[1].PlotStyle = PlotStyle.Bar;
 
-            if (ema[0] > ema[1] && bear_power < 0 && bear_power > MyPlot2[1])
+            if (ema[0] > ema[1] && bear_power < 0 && bear_power > ds_bear_power.Get(1))
             {
                 AddChartArrowUp("ArrowLong" +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, Color.LightGreen);
             }
 
-            if (ema[0] < ema[1] && bull_power > 0 && bull_power < MyPlot1[1])
+            if (ema[0] < ema[1] && bull_power > 0 && bull_power < ds_bull_power.Get(1))
             {
                 AddChartArrowDown("ArrowShort" + Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].High, Color.Red);
             }
