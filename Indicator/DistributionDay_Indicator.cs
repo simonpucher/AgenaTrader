@@ -14,12 +14,9 @@ using AgenaTrader.Helper;
 namespace AgenaTrader.UserCode
 {
 	/// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
-/// -------------------------------------------------------------------------
-/// https://www.youtube.com/watch?v=RpHOt08GRlE
-/// http://investdaily.custhelp.com/app/answers/detail/a_id/276/~/what-exactly-is-a-distribution-day-in-a-market-index%3F
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use these global source code elements.
@@ -27,15 +24,19 @@ namespace AgenaTrader.UserCode
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
-    [Description("Enter the description for the new custom indicator here")]
+    [Description("Take your money and run when the smart money start the distribution.")]
 	public class DistributionDay_Indicator : UserIndicator
 	{
         private Queue<DateTime> _distributionlist = null;
+        private int _period = 25;
+        private double _percent = 0.2;
+
 
         protected override void OnInit()
 		{
-			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
-			CalculateOnClosedBar = true;
+			//Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
+			CalculateOnClosedBar = false;
+            this.IsOverlay = true;
 		}
 
         protected override void OnCalculate()
@@ -49,43 +50,63 @@ namespace AgenaTrader.UserCode
             }
 
             //Delete all old 
-            if (this._distributionlist.Count() > 0 && this._distributionlist.Peek() <= Time[0].AddDays(-25))
+            if (this._distributionlist.Count() > 0 && this._distributionlist.Peek() <= Time[0].AddDays(this.Period * (-1)))
             {
                 this._distributionlist.Dequeue();
             }
 
             //Draw Disrtibution Arrow.
-            if (Volume[0] > Volume[1] && ((Close[1] - Close[0]) / Close[1]) > 0.002)
+            if (Volume[0] > Volume[1] && ((Close[1] - Close[0]) / Close[1]) > (this.Percent / 100.0))
             {
-                AddChartArrowDown(ProcessingBarIndex.ToString(), true, 0, High[0] + 3 * TickSize, Color.Blue);
+                Color colori = Color.LightPink;
                 this._distributionlist.Enqueue(Time[0]);
-                
+
                 //Draw the indicator
                 if (this._distributionlist.Count > 4)
                 {
-                    MyPlot1.Set(1);
+                    //MyPlot1.Set(1);
+                    colori = Color.DeepPink;
                 }
-                else {
-                    MyPlot1.Set(0);
-                }
+                AddChartArrowDown(ProcessingBarIndex.ToString(), true, 0, High[0], colori);
             }
             else
             {
-                MyPlot1.Set(0);
+                //MyPlot1.Set(0);
             }
 		}
 
 		#region Properties
 
-		[Browsable(false)]
-		[XmlIgnore()]
-		public DataSeries MyPlot1
-		{
-			get { return Outputs[0]; }
-		}
+		//[Browsable(false)]
+		//[XmlIgnore()]
+		//public DataSeries MyPlot1
+		//{
+		//	get { return Outputs[0]; }
+		//}
 
-		#endregion
-	}
+        /// <summary>
+        /// </summary>
+        [Description("Period which will be used to count distribution days.")]
+        [Category("Parameters")]
+        [DisplayName("Period")]
+        public int Period
+        {
+            get { return _period; }
+            set { _period = value; }
+        }
+
+        [Description("Percent down to count as a distribution day.")]
+        [Category("Parameters")]
+        [DisplayName("Percent")]
+        public double Percent
+        {
+            get { return _percent; }
+            set { _percent = value; }
+        }
+
+
+        #endregion
+    }
 }
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 
@@ -96,19 +117,19 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator
 	{
 		/// <summary>
-		/// Enter the description for the new custom indicator here
+		/// Take your money and run when the smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator()
+		public DistributionDay_Indicator DistributionDay_Indicator(System.Int32 period, System.Double percent)
         {
-			return DistributionDay_Indicator(InSeries);
+			return DistributionDay_Indicator(InSeries, period, percent);
 		}
 
 		/// <summary>
-		/// Enter the description for the new custom indicator here
+		/// Take your money and run when the smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input)
+		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input, System.Int32 period, System.Double percent)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<DistributionDay_Indicator>(input);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<DistributionDay_Indicator>(input, i => i.Period == period && Math.Abs(i.Percent - percent) <= Double.Epsilon);
 
 			if (indicator != null)
 				return indicator;
@@ -117,7 +138,9 @@ namespace AgenaTrader.UserCode
 						{
 							RequiredBarsCount = RequiredBarsCount,
 							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input
+							InSeries = input,
+							Period = period,
+							Percent = percent
 						};
 			indicator.SetUp();
 
@@ -134,22 +157,22 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Enter the description for the new custom indicator here
+		/// Take your money and run when the smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator()
+		public DistributionDay_Indicator DistributionDay_Indicator(System.Int32 period, System.Double percent)
 		{
-			return LeadIndicator.DistributionDay_Indicator(InSeries);
+			return LeadIndicator.DistributionDay_Indicator(InSeries, period, percent);
 		}
 
 		/// <summary>
-		/// Enter the description for the new custom indicator here
+		/// Take your money and run when the smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input)
+		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input, System.Int32 period, System.Double percent)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
-			return LeadIndicator.DistributionDay_Indicator(input);
+			return LeadIndicator.DistributionDay_Indicator(input, period, percent);
 		}
 	}
 
@@ -160,19 +183,19 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Enter the description for the new custom indicator here
+		/// Take your money and run when the smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator()
+		public DistributionDay_Indicator DistributionDay_Indicator(System.Int32 period, System.Double percent)
 		{
-			return LeadIndicator.DistributionDay_Indicator(InSeries);
+			return LeadIndicator.DistributionDay_Indicator(InSeries, period, percent);
 		}
 
 		/// <summary>
-		/// Enter the description for the new custom indicator here
+		/// Take your money and run when the smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input)
+		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input, System.Int32 period, System.Double percent)
 		{
-			return LeadIndicator.DistributionDay_Indicator(input);
+			return LeadIndicator.DistributionDay_Indicator(input, period, percent);
 		}
 	}
 
@@ -183,19 +206,19 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Enter the description for the new custom indicator here
+		/// Take your money and run when the smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator()
+		public DistributionDay_Indicator DistributionDay_Indicator(System.Int32 period, System.Double percent)
 		{
-			return LeadIndicator.DistributionDay_Indicator(InSeries);
+			return LeadIndicator.DistributionDay_Indicator(InSeries, period, percent);
 		}
 
 		/// <summary>
-		/// Enter the description for the new custom indicator here
+		/// Take your money and run when the smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input)
+		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input, System.Int32 period, System.Double percent)
 		{
-			return LeadIndicator.DistributionDay_Indicator(input);
+			return LeadIndicator.DistributionDay_Indicator(input, period, percent);
 		}
 	}
 
