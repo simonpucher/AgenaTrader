@@ -37,10 +37,11 @@ A rudimentary documentation exists in form of code comments in each script.
 We are working on development [tutorials](https://github.com/simonpucher/AgenaTrader/tree/master/Tutorial) with a more detailed documentation and covering the basics for AgenaTrader scripts templates. If you want to help, please feel free to [open an issue on GitHub](https://github.com/simonpucher/AgenaTrader/issues) or fork this project and create a pull request.
 
 #Installation of AgenaTrader scripts
--   Install our free basic package[Script-Trading Basic-Package](http://script-trading.com/en/agenatrader/)
--   Locate your UserCode directory (e.g. C:\Users\yourusername\Documents\AgenaTrader\UserCode)
--   Download the script you want to use and copy it into the correct directory (Indicators into folder Indicators, folder Conditions into folder ScriptedConditions, Strategies into folder Strategies, Alerts into folder AlertHandlers)
--   Now you are ready to click on "compile" in AgenaTrader (in the menu bar: Strategy Handling => Programming => Compile)
+-   Download our Global Utility code bundle [GlobalUtilities_Utility](https://raw.githubusercontent.com/simonpucher/AgenaTrader/master/Utilities/GlobalUtilities_Utility.cs)
+-   Locate your UserCode directory (e.g. C:\\Users\\yourusername\\Documents\\AgenaTrader\\UserCode)
+-   Install the Global Utility code bundle into your local \\Indicator folder.
+-   Download the script you want to use and copy it into the local directory (Indicators into folder \\Indicators, Conditions into folder \\ScriptedConditions, Strategies into folder \\Strategies, Alerts into folder \\AlertHandlers)
+-   Now you are ready to *click on compile* in AgenaTrader (via menu bar: Strategy Handling => Programming => Compile)
 
 ##Contact
 -   [Twitter Simon](https://twitter.com/SimonPucher) [![Twitter](https://img.shields.io/twitter/follow/simonpucher.svg?style=social&label=Follow)](https://twitter.com/SimonPucher)
