@@ -41,7 +41,7 @@ We are working on development [tutorials](https://github.com/simonpucher/AgenaTr
 -   Locate your UserCode directory (e.g. C:\\Users\\yourusername\\Documents\\AgenaTrader\\UserCode)
 -   Install the Global Utility code bundle into your local \\Indicator folder.
 -   Download the script you want to use and copy it into the local directory (Indicators into folder \\Indicators, Conditions into folder \\ScriptedConditions, Strategies into folder \\Strategies, Alerts into folder \\AlertHandlers)
--   Now you are ready to *click on compile* in AgenaTrader (via menu bar: Strategy Handling => Programming => Compile)
+-   Now you are ready to **click on compile in AgenaTrader** (via menu bar: Strategy Handling => Programming => Compile)
 
 ## Contact
 -   [Twitter Simon](https://twitter.com/SimonPucher) [![Twitter](https://img.shields.io/twitter/follow/simonpucher.svg?style=social&label=Follow)](https://twitter.com/SimonPucher)
