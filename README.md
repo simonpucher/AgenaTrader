@@ -51,3 +51,4 @@ We are working on development [tutorials](https://github.com/simonpucher/AgenaTr
 -   [Twitter AgenaTrader](https://twitter.com/AgenaTrader) [![Twitter AgenaTrader Software](https://img.shields.io/twitter/follow/AgenaTrader.svg?style=social&label=Follow)](https://twitter.com/AgenaTrader)
 -   [AgenaTrader Software](http://www.tradeescort.com)
 -   [AgenaTrader Support Forum](http://www.tradeescort.com/phpbb_de/)
+-   [GitHub Markdown](https://enterprise.github.com/downloads/en/markdown-cheatsheet.pdf)
