@@ -14,10 +14,9 @@ using System.Runtime.CompilerServices;
 
 
 /// <summary>
-/// Version: 1.1.2
+/// Version: 1.1.3
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
-/// Christian Kovar 2016
 /// -------------------------------------------------------------------------
 /// The initial version was inspired by this link: http://emini-watch.com/stock-market-seasonal-trades/5701/
 /// -------------------------------------------------------------------------
@@ -40,7 +39,8 @@ namespace AgenaTrader.UserCode
     {
         SellInMay = 1,
         SantaClausRally = 2,
-        fourthofjuly = 3
+        fourthofjuly = 3,
+        manual = 100
     }
 
     [Description("Show seasonal trends")]
@@ -51,7 +51,8 @@ namespace AgenaTrader.UserCode
 
         //input
         private SeasonalDateType _seasonal = SeasonalDateType.SellInMay;
-
+        private int _start_month = 2;
+        private int _end_month = 10;
 
         //output
 
@@ -70,11 +71,14 @@ namespace AgenaTrader.UserCode
         //4th of july
         private IEnumerable<IBar> _list_fourthofjuly_buy = null;
         private IBar _last_start_fourthofjuly = null;
+        //manual
+        private IEnumerable<IBar> _list_manual_buy = null;
+        private IBar _last_start_manual = null;
 
         #endregion
 
 
-		protected override void OnInit()
+        protected override void OnInit()
 		{
 			//Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
 			IsOverlay = true;
@@ -109,6 +113,12 @@ namespace AgenaTrader.UserCode
                                                 select b;
                     hashset = new HashSet<DateTime>(_list_fourthofjuly_buy.Select(x => x.Time));
                     break;
+                case SeasonalDateType.manual:
+                    _list_manual_buy = from b in Bars
+                                             where (b.Time.Month >= this.Start_Month  && b.Time.Month <= this.End_Month)
+                                             select b;
+                    hashset = new HashSet<DateTime>(_list_manual_buy.Select(x => x.Time));
+                    break;
                 default:
                     break;
             }
@@ -136,6 +146,9 @@ namespace AgenaTrader.UserCode
                 case SeasonalDateType.fourthofjuly:
                     this.calculate_4th_of_July_Rally();
                     break;
+                case SeasonalDateType.manual:
+                    this.calculate_manual();
+                    break;
                 default:
                     break;
             }
@@ -162,7 +175,32 @@ namespace AgenaTrader.UserCode
 
 
         #region calculate methods
-       
+
+        
+        /// <summary>
+        /// Calculate the seasonal indicator for "manual".
+        /// </summary>
+        private void calculate_manual()
+        {
+            if (hashset.Contains(Bars[0].Time))
+            {
+                if (this._last_start_manual == null)
+                {
+                    this._last_start_manual = Bars[0];
+                }
+            }
+            else
+            {
+                if (this._last_start_manual != null)
+                {
+                    DrawAreaRectangle(this._list_manual_buy.Where(x => x.Time >= this._last_start_manual.Time).Where(x => x.Time <= Bars[0].Time), Color.Green, "manual_buy");
+
+                    this._last_start_manual = null;
+                }
+            }
+
+        }
+
         /// <summary>
         /// Calculate the seasonal indicator for "4th of July".
         /// </summary>
@@ -301,7 +339,29 @@ namespace AgenaTrader.UserCode
                 set { _seasonal = value; }
             }
 
-	    #endregion
+
+      
+  
+
+        [Description("Start month of the manual seasonal type")]
+        [Category("Parameters")]
+        [DisplayName("Start month (manual)")]
+        public int Start_Month
+        {
+            get { return _start_month; }
+            set { _start_month = value; }
+        }
+
+        [Description("End month of the manual seasonal type")]
+        [Category("Parameters")]
+        [DisplayName("End month (manual)")]
+        public int End_Month
+        {
+            get { return _end_month; }
+            set { _end_month = value; }
+        }
+
+        #endregion
 
         //[Browsable(false)]
         //[XmlIgnore()]
@@ -311,10 +371,10 @@ namespace AgenaTrader.UserCode
         //}
 
 
-        
 
-		#endregion
-	}
+
+        #endregion
+    }
 }
 #region AgenaTrader Automaticaly Generated Code. Do not change it manualy
 
@@ -327,17 +387,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType, System.Int32 start_Month, System.Int32 end_Month)
         {
-			return SeasonalDate_Indicator(InSeries, seasonalDateType);
+			return SeasonalDate_Indicator(InSeries, seasonalDateType, start_Month, end_Month);
 		}
 
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public SeasonalDate_Indicator SeasonalDate_Indicator(IDataSeries input, SeasonalDateType seasonalDateType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(IDataSeries input, SeasonalDateType seasonalDateType, System.Int32 start_Month, System.Int32 end_Month)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<SeasonalDate_Indicator>(input, i => i.SeasonalDateType == seasonalDateType);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<SeasonalDate_Indicator>(input, i => i.SeasonalDateType == seasonalDateType && i.Start_Month == start_Month && i.End_Month == end_Month);
 
 			if (indicator != null)
 				return indicator;
@@ -347,7 +407,9 @@ namespace AgenaTrader.UserCode
 							RequiredBarsCount = RequiredBarsCount,
 							CalculateOnClosedBar = CalculateOnClosedBar,
 							InSeries = input,
-							SeasonalDateType = seasonalDateType
+							SeasonalDateType = seasonalDateType,
+							Start_Month = start_Month,
+							End_Month = end_Month
 						};
 			indicator.SetUp();
 
@@ -366,20 +428,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType, System.Int32 start_Month, System.Int32 end_Month)
 		{
-			return LeadIndicator.SeasonalDate_Indicator(InSeries, seasonalDateType);
+			return LeadIndicator.SeasonalDate_Indicator(InSeries, seasonalDateType, start_Month, end_Month);
 		}
 
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public SeasonalDate_Indicator SeasonalDate_Indicator(IDataSeries input, SeasonalDateType seasonalDateType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(IDataSeries input, SeasonalDateType seasonalDateType, System.Int32 start_Month, System.Int32 end_Month)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
-			return LeadIndicator.SeasonalDate_Indicator(input, seasonalDateType);
+			return LeadIndicator.SeasonalDate_Indicator(input, seasonalDateType, start_Month, end_Month);
 		}
 	}
 
@@ -392,17 +454,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType, System.Int32 start_Month, System.Int32 end_Month)
 		{
-			return LeadIndicator.SeasonalDate_Indicator(InSeries, seasonalDateType);
+			return LeadIndicator.SeasonalDate_Indicator(InSeries, seasonalDateType, start_Month, end_Month);
 		}
 
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public SeasonalDate_Indicator SeasonalDate_Indicator(IDataSeries input, SeasonalDateType seasonalDateType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(IDataSeries input, SeasonalDateType seasonalDateType, System.Int32 start_Month, System.Int32 end_Month)
 		{
-			return LeadIndicator.SeasonalDate_Indicator(input, seasonalDateType);
+			return LeadIndicator.SeasonalDate_Indicator(input, seasonalDateType, start_Month, end_Month);
 		}
 	}
 
@@ -415,17 +477,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(SeasonalDateType seasonalDateType, System.Int32 start_Month, System.Int32 end_Month)
 		{
-			return LeadIndicator.SeasonalDate_Indicator(InSeries, seasonalDateType);
+			return LeadIndicator.SeasonalDate_Indicator(InSeries, seasonalDateType, start_Month, end_Month);
 		}
 
 		/// <summary>
 		/// Show seasonal trends
 		/// </summary>
-		public SeasonalDate_Indicator SeasonalDate_Indicator(IDataSeries input, SeasonalDateType seasonalDateType)
+		public SeasonalDate_Indicator SeasonalDate_Indicator(IDataSeries input, SeasonalDateType seasonalDateType, System.Int32 start_Month, System.Int32 end_Month)
 		{
-			return LeadIndicator.SeasonalDate_Indicator(input, seasonalDateType);
+			return LeadIndicator.SeasonalDate_Indicator(input, seasonalDateType, start_Month, end_Month);
 		}
 	}
 
