@@ -22,6 +22,10 @@ using System.Windows.Forms;
 /// -------------------------------------------------------------------------
 /// Adds instruments dynamical to a static list (e.g. portfolio) if there is an order on it or there is an trade on it.
 /// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
+/// You will find this indicator on GitHub: https://raw.githubusercontent.com/simonpucher/AgenaTrader/master/Utilities/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
 namespace AgenaTrader.UserCode
