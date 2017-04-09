@@ -399,7 +399,7 @@ namespace AgenaTrader.UserCode
 {
 	#region Indicator
 
-	public partial class UserIndicator : Indicator
+	public partial class UserIndicator
 	{
 		/// <summary>
 		/// The mean reversion is the theory suggesting that prices and returns eventually move back towards the mean or average.
@@ -464,7 +464,7 @@ namespace AgenaTrader.UserCode
 		public Mean_Reversion_Indicator Mean_Reversion_Indicator(IDataSeries input, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Int32 bollinger_Period, System.Double bollinger_Standard_Deviation, System.Int32 momentum_Period, System.Int32 rSI_Period, System.Int32 rSI_Smooth, System.Int32 rSI_Level_Low, System.Int32 rSI_Level_High, System.Int32 momentum_Level_Low, System.Int32 momentum_Level_High)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.Mean_Reversion_Indicator(input, isLongEnabled, isShortEnabled, bollinger_Period, bollinger_Standard_Deviation, momentum_Period, rSI_Period, rSI_Smooth, rSI_Level_Low, rSI_Level_High, momentum_Level_Low, momentum_Level_High);
 		}
