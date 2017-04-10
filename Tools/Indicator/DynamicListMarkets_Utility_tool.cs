@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.2
+/// Version: 1.2.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -109,7 +109,8 @@ namespace AgenaTrader.UserCode
                                         {
                                             if (!_list.Contains(inst))
                                             {
-                                                this.Root.Core.InstrumentManager.AddInstrument2List(inst, this.Name_of_list);
+                                                //this.Root.Core.InstrumentManager.AddInstrument2List(inst, this.Name_of_list);
+                                                Core.GuiManager.BeginInvoke((Action)(() => Core.InstrumentManager.AddInstrument2List(inst, this.Name_of_list)));
                                             }
                                         }
                                     }
@@ -120,7 +121,8 @@ namespace AgenaTrader.UserCode
                                     {
                                         if (!_list.Contains(inst))
                                         {
-                                            this.Root.Core.InstrumentManager.AddInstrument2List(inst, this.Name_of_list);
+                                            //this.Root.Core.InstrumentManager.AddInstrument2List(inst, this.Name_of_list);
+                                            Core.GuiManager.BeginInvoke((Action)(() => Core.InstrumentManager.AddInstrument2List(inst, this.Name_of_list)));
                                         }
                                     }
                                 }
@@ -281,7 +283,7 @@ namespace AgenaTrader.UserCode
 		public DynamicListMarkets_Indicator_Tool DynamicListMarkets_Indicator_Tool(IDataSeries input, System.String name_of_list, System.Boolean useMarketHours, System.String instrumentlists, System.Int32 seconds)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.DynamicListMarkets_Indicator_Tool(input, name_of_list, useMarketHours, instrumentlists, seconds);
 		}

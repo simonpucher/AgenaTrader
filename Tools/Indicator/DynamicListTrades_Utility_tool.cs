@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -104,7 +104,8 @@ namespace AgenaTrader.UserCode
                         {
                             if (!_list.Contains(item))
                             {
-                                this.Root.Core.InstrumentManager.AddInstrument2List(item, this.Name_of_list);
+                                //this.Root.Core.InstrumentManager.AddInstrument2List(item, this.Name_of_list);
+                                Core.GuiManager.BeginInvoke((Action)(() => Core.InstrumentManager.AddInstrument2List(item, this.Name_of_list)));
                             }
                         }
                     }
@@ -119,7 +120,8 @@ namespace AgenaTrader.UserCode
                         {
                             if (!_list.Contains((IInstrument)item.Instrument))
                             {
-                                this.Root.Core.InstrumentManager.AddInstrument2List((IInstrument)item.Instrument, this.Name_of_list);
+                                //this.Root.Core.InstrumentManager.AddInstrument2List((IInstrument)item.Instrument, this.Name_of_list);
+                                Core.GuiManager.BeginInvoke((Action)(() => Core.InstrumentManager.AddInstrument2List((IInstrument)item.Instrument, this.Name_of_list)));
                             }
                         }
                     }
@@ -134,7 +136,8 @@ namespace AgenaTrader.UserCode
                         {
                             if (!_list.Contains((IInstrument)item.Instrument))
                             {
-                                this.Root.Core.InstrumentManager.AddInstrument2List((IInstrument)item.Instrument, this.Name_of_list);
+                                //this.Root.Core.InstrumentManager.AddInstrument2List((IInstrument)item.Instrument, this.Name_of_list);
+                                Core.GuiManager.BeginInvoke((Action)(() => Core.InstrumentManager.AddInstrument2List((IInstrument)item.Instrument, this.Name_of_list)));
                             }
                         }
                     }
@@ -142,7 +145,6 @@ namespace AgenaTrader.UserCode
                 
                 _lastupdate = DateTime.Now;
             
-                //((AgenaTrader.Plugins.IWatchComponent[])((AgenaTrader.WatchManager.WatchManager)this.Root.Core.WatchManager).GetComponents)[0].ReloadInstrumentList();
             }
             
         }
@@ -298,7 +300,7 @@ namespace AgenaTrader.UserCode
 		public DynamicListTrades_Indicator_Tool DynamicListTrades_Indicator_Tool(IDataSeries input, System.String name_of_list, System.Boolean showTrades, System.Boolean showProposals, System.Boolean showPriceAlert, System.Int32 seconds)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.DynamicListTrades_Indicator_Tool(input, name_of_list, showTrades, showProposals, showPriceAlert, seconds);
 		}
