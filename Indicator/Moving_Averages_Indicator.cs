@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: 1.2.1
+/// Version: 1.2.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -80,6 +80,7 @@ namespace AgenaTrader.UserCode
         private DashStyle _linestyle_6 = DashStyle.Solid;
         private Color _col_6 = Color.DarkGoldenrod;
 
+        private IntSeries _signals;
 
 
         protected override void OnInit()
@@ -92,10 +93,10 @@ namespace AgenaTrader.UserCode
             Add(new Plot(new Pen(this.Color_5, this.LineWidth_5), PlotStyle.Line, "MA_5"));
             Add(new Plot(new Pen(this.Color_6, this.LineWidth_6), PlotStyle.Line, "MA_6"));
 
-            CalculateOnClosedBar = true;
+            CalculateOnClosedBar = false;
             IsOverlay = true;
 
-            //this.GetNameOnchart();
+            _signals = new IntSeries(this);
 
         }
 
@@ -128,7 +129,7 @@ namespace AgenaTrader.UserCode
         {
             //this.GetNameOnchart();
 
-           
+            int _signal_value = 0;
 
             if (this.MA_1 != 0)
             {
@@ -222,6 +223,45 @@ namespace AgenaTrader.UserCode
                 }
             }
 
+            //Background test 
+          
+            if (Plot_1.Last() > Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
+            {
+                _signal_value = 1;
+            }
+            //if (Plot_2.Last() > Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0)
+            //{
+            //    _signal_value = 2;
+            //}
+            //if (Plot_3.Last() > Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0)
+            //{
+            //    _signal_value = 3;
+            //}
+            //if (Plot_4.Last() > Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0)
+            //{
+            //    _signal_value = 4;
+            //}
+            //if (Plot_5.Last() > Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0)
+            //{
+            //    _signal_value = 5;
+            //}
+
+            _signals.Set(_signal_value);
+
+
+            if (_signals[0] >= 1 && _signals[0] <= 3)
+            {
+                this.BackColor = GlobalUtilities.AdjustOpacity(Color.LightGreen, 0.25);
+                
+                //AddChartArrowUp("AddChartArrowUp" + Time[0], true, 0, High[0], Color.Green);
+            }
+
+            if (_signals[0] <= 0)
+            {
+                this.BackColor = GlobalUtilities.AdjustOpacity(Color.Red, 0.25);
+
+                //AddChartArrowUp("AddChartArrowUp" + Time[0], true, 0, High[0], Color.Green);
+            }
 
             //Set the color
             PlotColors[0][0] = this.Color_1;
@@ -245,8 +285,14 @@ namespace AgenaTrader.UserCode
 
         }
 
+        //public override void OnPaint(Graphics g, Rectangle r, double min, double max)
+        //{
+        //    if (Chart == null || img == null) return;
+        //    g.FillRectangle(img, r);
+        //}
+    
 
-        private string GetNameOnchart()
+    private string GetNameOnchart()
         {
            string returnvalue = "Moving Averages (I) ";
             
@@ -758,6 +804,9 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public DataSeries Plot_6 { get { return Outputs[5]; } }
 
+        [Browsable(false)]
+        [XmlIgnore()]
+        public IntSeries Signals { get { return _signals; } }
 
         #endregion
     }

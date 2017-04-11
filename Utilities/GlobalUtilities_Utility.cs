@@ -173,6 +173,7 @@ namespace AgenaTrader.UserCode
         {
             return Color.FromArgb((int)(originalColour.A * opacityFactor), originalColour.R, originalColour.G, originalColour.B);
         }
+ 
 
         #endregion
 
