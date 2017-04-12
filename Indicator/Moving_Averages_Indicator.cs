@@ -13,12 +13,9 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: 1.2.2
+/// Version: 1.2.3
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
-/// -------------------------------------------------------------------------
-/// todo
-/// If barsrequired is smaller than the MAs print a warning message.
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use these global source code elements.
@@ -37,9 +34,11 @@ namespace AgenaTrader.UserCode
         EMA = 1
     }
 
-    [Description("Use 5 different SMA or EMA at the same time in one indicator.")]
+    [Description("Use 6 different SMA or EMA at the same time in one indicator.")]
     public class Moving_Averages_Indicator : UserIndicator
     {
+
+       
 
         //input 
         private Enum_Moving_Averages_Indicator_MA _MA_1_Selected = Enum_Moving_Averages_Indicator_MA.SMA;
@@ -81,6 +80,11 @@ namespace AgenaTrader.UserCode
         private Color _col_6 = Color.DarkGoldenrod;
 
         private IntSeries _signals;
+
+        private Color _color_long_signal = Const.DefaultArrowLongColor;
+        private Color _color_short_signal = Const.DefaultArrowShortColor;
+        private int _opacity_long_signal = 35;
+        private int _opacity_short_signal = 35;
 
 
         protected override void OnInit()
@@ -127,6 +131,16 @@ namespace AgenaTrader.UserCode
 
         protected override void OnCalculate()
         {
+            if (this.MA_1 != 0 && this.MA_1 > this.RequiredBarsCount ||
+                this.MA_2 != 0 && this.MA_2 > this.RequiredBarsCount ||
+                this.MA_3 != 0 && this.MA_3 > this.RequiredBarsCount ||
+                this.MA_4 != 0 && this.MA_4 > this.RequiredBarsCount ||
+                this.MA_5 != 0 && this.MA_5 > this.RequiredBarsCount ||
+                this.MA_6 != 0 && this.MA_6 > this.RequiredBarsCount)
+            {
+                AddChartTextFixed("AlertText", "Required bars must be at least as high as the largest mean average period.", TextPosition.Center, Color.Red, new Font("Arial", 30), Color.Red, Color.Red, 20);
+            }
+
             //this.GetNameOnchart();
 
             int _signal_value = 0;
@@ -223,7 +237,7 @@ namespace AgenaTrader.UserCode
                 }
             }
 
-            //Background test 
+            //Background 
           
             if (Plot_1.Last() > Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
             {
@@ -251,16 +265,12 @@ namespace AgenaTrader.UserCode
 
             if (_signals[0] >= 1 && _signals[0] <= 3)
             {
-                this.BackColor = GlobalUtilities.AdjustOpacity(Color.LightGreen, 0.25);
-                
-                //AddChartArrowUp("AddChartArrowUp" + Time[0], true, 0, High[0], Color.Green);
+                this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
             }
 
             if (_signals[0] <= 0)
             {
-                this.BackColor = GlobalUtilities.AdjustOpacity(Color.Red, 0.25);
-
-                //AddChartArrowUp("AddChartArrowUp" + Time[0], true, 0, High[0], Color.Green);
+                this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
             }
 
             //Set the color
@@ -808,6 +818,77 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public IntSeries Signals { get { return _signals; } }
 
+        /// <summary>
+        /// </summary>
+        [Description("Select opacity for the background in long setup in percent.")]
+        [Category("Background")]
+        [DisplayName("Opacity Long %")]
+        public int OpacityLongSignal
+        {
+            get { return _opacity_long_signal; }
+            set
+            {
+                if (value < 0) value = 0;
+                if (value > 100) value = 100;
+                _opacity_long_signal = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select opacity for the background in short setup in percent.")]
+        [Category("Background")]
+        [DisplayName("Opacity Short %")]
+        public int OpacityShortSignal
+        {
+            get { return _opacity_short_signal; }
+            set
+            {
+                if (value < 0) value = 0;
+                if (value > 100) value = 100;
+                _opacity_short_signal = value;
+            }
+        }
+
+  
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the background in long setup.")]
+        [Category("Background")]
+        [DisplayName("Color Long")]
+        public Color ColorLongSignal
+        {
+            get { return _color_long_signal; }
+            set { _color_long_signal = value; }
+        }
+
+        
+        // Serialize Color object
+        [Browsable(false)]
+        public string ColorLongSignalSerialize
+        {
+            get { return SerializableColor.ToString(_color_long_signal); }
+            set { _color_long_signal = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the background in short setup.")]
+        [Category("Background")]
+        [DisplayName("Color Short")]
+        public Color ColorShortSignal
+        {
+            get { return _color_short_signal; }
+            set { _color_short_signal = value; }
+        }
+        // Serialize Color object
+        [Browsable(false)]
+        public string ColorShortSignalSerialize
+        {
+            get { return SerializableColor.ToString(_color_short_signal); }
+            set { _color_short_signal = SerializableColor.FromString(value); }
+        }
+
         #endregion
     }
 }
@@ -822,7 +903,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator
 	{
 		/// <summary>
-		/// Use 5 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different SMA or EMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
         {
@@ -830,7 +911,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Use 5 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different SMA or EMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
 		{
@@ -872,7 +953,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Use 5 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different SMA or EMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
 		{
@@ -880,7 +961,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Use 5 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different SMA or EMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
 		{
@@ -898,7 +979,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Use 5 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different SMA or EMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
 		{
@@ -906,7 +987,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Use 5 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different SMA or EMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
 		{
@@ -921,7 +1002,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Use 5 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different SMA or EMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
 		{
@@ -929,7 +1010,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Use 5 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different SMA or EMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
 		{
