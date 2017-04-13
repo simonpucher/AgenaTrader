@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: 1.2.3
+/// Version: 1.2.4
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -37,9 +37,7 @@ namespace AgenaTrader.UserCode
     [Description("Use 6 different SMA or EMA at the same time in one indicator.")]
     public class Moving_Averages_Indicator : UserIndicator
     {
-
-       
-
+        
         //input 
         private Enum_Moving_Averages_Indicator_MA _MA_1_Selected = Enum_Moving_Averages_Indicator_MA.SMA;
         private Enum_Moving_Averages_Indicator_MA _MA_2_Selected = Enum_Moving_Averages_Indicator_MA.SMA;
@@ -54,6 +52,9 @@ namespace AgenaTrader.UserCode
         private int _ma_4 = 0;
         private int _ma_5 = 0;
         private int _ma_6 = 0;
+
+        private int _signallongequalorlargerthan = 4;
+        private bool _showsignalstrengthtext = false;
 
         private int _linewidth_1 = 1;
         private DashStyle _linestyle_1 = DashStyle.Solid;
@@ -100,6 +101,7 @@ namespace AgenaTrader.UserCode
             CalculateOnClosedBar = false;
             IsOverlay = true;
 
+            this.RequiredBarsCount = 200; 
             _signals = new IntSeries(this);
 
         }
@@ -140,8 +142,6 @@ namespace AgenaTrader.UserCode
             {
                 AddChartTextFixed("AlertText", "Required bars must be at least as high as the largest mean average period.", TextPosition.Center, Color.Red, new Font("Arial", 30), Color.Red, Color.Red, 20);
             }
-
-            //this.GetNameOnchart();
 
             int _signal_value = 0;
 
@@ -237,40 +237,47 @@ namespace AgenaTrader.UserCode
                 }
             }
 
-            //Background 
-          
-            if (Plot_1.Last() > Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
+            //Signals 
+           
+           
+           
+           
+            if (Plot_5.Last() > Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0)
             {
                 _signal_value = 1;
             }
-            //if (Plot_2.Last() > Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0)
-            //{
-            //    _signal_value = 2;
-            //}
-            //if (Plot_3.Last() > Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0)
-            //{
-            //    _signal_value = 3;
-            //}
-            //if (Plot_4.Last() > Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0)
-            //{
-            //    _signal_value = 4;
-            //}
-            //if (Plot_5.Last() > Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0)
-            //{
-            //    _signal_value = 5;
-            //}
+            if (Plot_4.Last() > Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0)
+            {
+                _signal_value = 2;
+            }
+            if (Plot_3.Last() > Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0)
+            {
+                _signal_value = 3;
+            }
+            if (Plot_2.Last() > Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0)
+            {
+                _signal_value = 4;
+            }
+            if (Plot_1.Last() > Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
+            {
+                _signal_value = 5;
+            }
 
             _signals.Set(_signal_value);
 
 
-            if (_signals[0] >= 1 && _signals[0] <= 3)
+            if (_signals[0] >= this.SignalLongEqualOrLargerThan)
             {
                 this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
             }
-
-            if (_signals[0] <= 0)
+            else
             {
                 this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
+            }
+
+            if (ShowSignalStrengthText)
+            {
+                AddChartText("showsignallongequalorlargerthan" + Time[0], _signal_value.ToString(), 0, High[0], Color.Black);
             }
 
             //Set the color
@@ -294,12 +301,6 @@ namespace AgenaTrader.UserCode
             Plots[5].Pen.Width = this.LineWidth_6;
 
         }
-
-        //public override void OnPaint(Graphics g, Rectangle r, double min, double max)
-        //{
-        //    if (Chart == null || img == null) return;
-        //    g.FillRectangle(img, r);
-        //}
     
 
     private string GetNameOnchart()
@@ -817,6 +818,36 @@ namespace AgenaTrader.UserCode
         [Browsable(false)]
         [XmlIgnore()]
         public IntSeries Signals { get { return _signals; } }
+
+        /// <summary>
+        /// </summary>
+        [Description("Show signal strength on the chart (candle).")]
+        [Category("Background")]
+        [DisplayName("Show signal strength")]
+        public bool ShowSignalStrengthText
+        {
+            get { return _showsignalstrengthtext; }
+            set
+            {
+                _showsignalstrengthtext = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select the signal strength for the background color signal.")]
+        [Category("Background")]
+        [DisplayName("Signal strength")]
+        public int SignalLongEqualOrLargerThan
+        {
+            get { return _signallongequalorlargerthan; }
+            set
+            {
+                if (value < 1) value = 1;
+                if (value > 5) value = 5;
+                _signallongequalorlargerthan = value;
+            }
+        }
 
         /// <summary>
         /// </summary>
