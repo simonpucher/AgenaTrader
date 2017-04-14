@@ -107,29 +107,6 @@ namespace AgenaTrader.UserCode
         }
 
 
-        //protected override void OnStart()
-        //{
-        //    //Set the color
-        //    PlotColors[0][0] = this.Color_1;
-        //    Plots[0].PenStyle = this.DashStyle_1;
-        //    Plots[0].Pen.Width = this.LineWidth_1;
-        //    PlotColors[1][0] = this.Color_2;
-        //    Plots[1].PenStyle = this.DashStyle_2;
-        //    Plots[1].Pen.Width = this.LineWidth_2;
-        //    PlotColors[2][0] = this.Color_3;
-        //    Plots[2].PenStyle = this.DashStyle_3;
-        //    Plots[2].Pen.Width = this.LineWidth_3;
-        //    PlotColors[3][0] = this.Color_4;
-        //    Plots[3].PenStyle = this.DashStyle_4;
-        //    Plots[3].Pen.Width = this.LineWidth_4;
-        //    PlotColors[4][0] = this.Color_5;
-        //    Plots[4].PenStyle = this.DashStyle_5;
-        //    Plots[4].Pen.Width = this.LineWidth_5;
-        //}
-
-
-
-
 
         protected override void OnCalculate()
         {
@@ -238,42 +215,60 @@ namespace AgenaTrader.UserCode
             }
 
             //Signals 
-           
-           
-           
-           
-            if (Plot_5.Last() > Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0)
+            //if (Plot_5.Last() > Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0)
+            //{
+            //    _signal_value = 1;
+            //}
+            //if (Plot_4.Last() > Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0)
+            //{
+            //    _signal_value = 2;
+            //}
+            //if (Plot_3.Last() > Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0)
+            //{
+            //    _signal_value = 3;
+            //}
+            //if (Plot_2.Last() > Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0)
+            //{
+            //    _signal_value = 4;
+            //}
+            //if (Plot_1.Last() > Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
+            //{
+            //    _signal_value = 5;
+            //}
+
+            //_signals.Set(_signal_value);
+
+
+            //if (_signals[0] >= this.SignalLongEqualOrLargerThan)
+            //{
+            //    this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
+            //}
+            //else
+            //{
+            //    this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
+            //}
+
+            if (Plot_5.Last() > Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0
+                && Plot_4.Last() > Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0
+                && Plot_3.Last() > Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0
+                && Plot_2.Last() > Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0
+                && Plot_1.Last() > Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
             {
                 _signal_value = 1;
+                this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
             }
-            if (Plot_4.Last() > Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0)
+            else if (Plot_5.Last() < Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0
+                && Plot_4.Last() < Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0
+                && Plot_3.Last() < Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0
+                && Plot_2.Last() < Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0
+                && Plot_1.Last() < Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
             {
-                _signal_value = 2;
-            }
-            if (Plot_3.Last() > Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0)
-            {
-                _signal_value = 3;
-            }
-            if (Plot_2.Last() > Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0)
-            {
-                _signal_value = 4;
-            }
-            if (Plot_1.Last() > Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
-            {
-                _signal_value = 5;
+                _signal_value = -1;
+                this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
             }
 
             _signals.Set(_signal_value);
 
-
-            if (_signals[0] >= this.SignalLongEqualOrLargerThan)
-            {
-                this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
-            }
-            else
-            {
-                this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
-            }
 
             if (ShowSignalStrengthText)
             {
