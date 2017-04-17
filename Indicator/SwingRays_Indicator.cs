@@ -62,8 +62,8 @@ namespace AgenaTrader.UserCode
         // Wizard generated variables
         private int strength = 5; // number of bars required to left and right of the pivot high/low
                                   // User defined variables (add any user defined variables below)
-        private Color swingHighColor = Color.DarkCyan;
-        private Color swingLowColor = Color.Magenta;
+        private Color swingHighColor = Color.Green;
+        private Color swingLowColor = Color.Red;
 
         private ArrayList lastHighCache;
         private ArrayList lastLowCache;
@@ -134,7 +134,7 @@ namespace AgenaTrader.UserCode
                 
                 if (isSwingHigh) // if we have a new swing high then we draw a ray line on the chart
                 {
-                    AddChartRay("highRay" + (ProcessingBarIndex - strength), false, strength, lastSwingHighValue, 0, lastSwingHighValue, swingHighColor, DashStyle.Dot, 2);
+                    AddChartRay("highRay" + (ProcessingBarIndex - strength), false, strength, lastSwingHighValue, 0, lastSwingHighValue, swingHighColor, DashStyle.Solid, 1);
                     RayObject newRayObject = new RayObject("highRay" + (ProcessingBarIndex - strength), strength, lastSwingHighValue, 0, lastSwingHighValue);
                     swingHighRays.Push(newRayObject); // store a reference so we can remove it from the chart later
                 }
@@ -154,7 +154,7 @@ namespace AgenaTrader.UserCode
                             if (keepBrokenLines) // draw a line between swing point and break bar 
                             {
                                 int barsAgo = currentRay.BarsAgo1;
-                                ITrendLine newLine = AddChartLine("highLine" + (ProcessingBarIndex - barsAgo), false, barsAgo, currentRay.Y1, 0, currentRay.Y1, swingHighColor, DashStyle.Solid, 2);
+                                ITrendLine newLine = AddChartLine("highLine" + (ProcessingBarIndex - barsAgo), false, barsAgo, currentRay.Y1, 0, currentRay.Y1, swingHighColor, DashStyle.Dot, 2);
                             }
                             RemoveChartDrawing(currentRay.Tag);
                             if (swingHighRays.Count > 0)
@@ -191,7 +191,7 @@ namespace AgenaTrader.UserCode
 
                 if (isSwingLow) // found a new swing low; draw it on the chart
                 {
-                    AddChartRay("lowRay" + (ProcessingBarIndex - strength), false, strength, lastSwingLowValue, 0, lastSwingLowValue, swingLowColor, DashStyle.Dot, 2);
+                    AddChartRay("lowRay" + (ProcessingBarIndex - strength), false, strength, lastSwingLowValue, 0, lastSwingLowValue, swingLowColor, DashStyle.Solid, 1);
                     RayObject newRayObject = new RayObject("lowRay" + (ProcessingBarIndex - strength), strength, lastSwingLowValue, 0, lastSwingLowValue);
                     swingLowRays.Push(newRayObject);
                 }
@@ -211,7 +211,7 @@ namespace AgenaTrader.UserCode
                             if (keepBrokenLines) // draw a line between swing point and break bar 
                             {
                                 int barsAgo = currentRay.BarsAgo1;
-                                ITrendLine newLine = AddChartLine("highLine" + (ProcessingBarIndex - barsAgo), false, barsAgo, currentRay.Y1, 0, currentRay.Y1, swingLowColor, DashStyle.Solid, 2);
+                                ITrendLine newLine = AddChartLine("highLine" + (ProcessingBarIndex - barsAgo), false, barsAgo, currentRay.Y1, 0, currentRay.Y1, swingLowColor, DashStyle.Dot, 2);
                             }
                             RemoveChartDrawing(currentRay.Tag);
 
@@ -481,7 +481,7 @@ namespace AgenaTrader.UserCode
 		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.SwingRays(input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
 		}
