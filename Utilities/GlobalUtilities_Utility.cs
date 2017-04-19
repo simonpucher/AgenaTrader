@@ -22,7 +22,7 @@ using System.Net;
 using System.Globalization;
 
 /// <summary>
-/// Version: 1.5.21
+/// Version: 1.5.22
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// Christian Kovar 2016
@@ -1761,7 +1761,7 @@ public static class StringExtensions
 #endregion
 
 [Description("We use this indicator to share global code in AgenaTrader.")]
-[Category("Script-Trading Basic Package")]
+[Category("GlobalUtility")]
 public class GlobalUtility : AgenaTrader.UserCode.UserIndicator
 {
     //https://www.youtube.com/watch?v=5NNOrp_83RU
