@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: 1.2.4
+/// Version: 1.2.5
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -53,8 +53,13 @@ namespace AgenaTrader.UserCode
         private int _ma_5 = 0;
         private int _ma_6 = 0;
 
-        private int _signallongequalorlargerthan = 4;
-        private bool _showsignalstrengthtext = false;
+        private bool _1_over_2 = true;
+        private bool _2_over_3 = true;
+        private bool _3_over_4 = false;
+        private bool _4_over_5 = false;
+        private bool _5_over_6 = false;
+
+        private bool _ShowSignalOnChartBackground = false;
 
         private int _linewidth_1 = 1;
         private DashStyle _linestyle_1 = DashStyle.Solid;
@@ -81,6 +86,7 @@ namespace AgenaTrader.UserCode
         private Color _col_6 = Color.DarkGoldenrod;
 
         private IntSeries _signals;
+        private IntSeries _days;
 
         private Color _color_long_signal = Const.DefaultArrowLongColor;
         private Color _color_short_signal = Const.DefaultArrowShortColor;
@@ -103,6 +109,7 @@ namespace AgenaTrader.UserCode
 
             this.RequiredBarsCount = 200; 
             _signals = new IntSeries(this);
+            _days = new IntSeries(this);
 
         }
 
@@ -121,6 +128,7 @@ namespace AgenaTrader.UserCode
             }
 
             int _signal_value = 0;
+            int _enabled_ifs = 0;
 
             if (this.MA_1 != 0)
             {
@@ -247,33 +255,135 @@ namespace AgenaTrader.UserCode
             //{
             //    this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
             //}
+            
 
-            if (Plot_5.Last() > Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0
-                && Plot_4.Last() > Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0
-                && Plot_3.Last() > Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0
-                && Plot_2.Last() > Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0
-                && Plot_1.Last() > Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
+            if (this.If_1_over_2)
             {
-                _signal_value = 1;
-                this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
-            }
-            else if (Plot_5.Last() < Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0
-                && Plot_4.Last() < Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0
-                && Plot_3.Last() < Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0
-                && Plot_2.Last() < Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0
-                && Plot_1.Last() < Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
-            {
-                _signal_value = -1;
-                this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
+                _enabled_ifs++;
+                if (this.MA_1 != 0 && this.MA_2 != 0 && Plot_1.Last() > Plot_2.Last())
+                {
+                    _signal_value++;
+                }
+                else if (this.MA_1 != 0 && this.MA_2 != 0 && Plot_1.Last() < Plot_2.Last())
+                {
+                    _signal_value--;
+                }
             }
 
-            _signals.Set(_signal_value);
-
-
-            if (ShowSignalStrengthText)
+            if (this.If_2_over_3)
             {
-                AddChartText("showsignallongequalorlargerthan" + Time[0], _signal_value.ToString(), 0, High[0], Color.Black);
+                _enabled_ifs++;
+                if (this.MA_2 != 0 && this.MA_3 != 0 && Plot_2.Last() > Plot_3.Last())
+                {
+                    _signal_value++;
+                }
+                else if (this.MA_2 != 0 && this.MA_3 != 0 && Plot_2.Last() < Plot_3.Last())
+                {
+                    _signal_value--;
+                }
             }
+
+            if (this.If_3_over_4)
+            {
+                _enabled_ifs++;
+                if (this.MA_3 != 0 && this.MA_4 != 0 && Plot_3.Last() > Plot_4.Last())
+                {
+                    _signal_value++;
+                }
+                else if (this.MA_3 != 0 && this.MA_4 != 0 && Plot_3.Last() < Plot_4.Last())
+                {
+                    _signal_value--;
+                }
+            }
+
+            if (this.If_4_over_5)
+            {
+                _enabled_ifs++;
+                if (this.MA_4 != 0 && this.MA_5 != 0 && Plot_4.Last() > Plot_5.Last())
+                {
+                    _signal_value++;
+                }
+                else if (this.MA_4 != 0 && this.MA_5 != 0 && Plot_4.Last() < Plot_5.Last())
+                {
+                    _signal_value--;
+                }
+            }
+
+            if (this.If_5_over_6)
+            {
+                _enabled_ifs++;
+                if (this.MA_5 != 0 && this.MA_6 != 0 && Plot_5.Last() > Plot_6.Last())
+                {
+                    _signal_value++;
+                }
+                else if (this.MA_5 != 0 && this.MA_6 != 0 && Plot_5.Last() < Plot_6.Last())
+                {
+                    _signal_value--;
+                }
+            }
+
+
+            //if (Plot_5.Last() > Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0
+            //    && Plot_4.Last() > Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0
+            //    && Plot_3.Last() > Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0
+            //    && Plot_2.Last() > Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0
+            //    && Plot_1.Last() > Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
+            //{
+            //    _signal_value = 1;
+            //    if (this.ShowSignalOnChartBackground)
+            //    {
+            //        this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
+            //    }
+            //}
+            //else if (Plot_5.Last() < Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0
+            //    && Plot_4.Last() < Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0
+            //    && Plot_3.Last() < Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0
+            //    && Plot_2.Last() < Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0
+            //    && Plot_1.Last() < Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
+            //{
+            //    _signal_value = -1;
+            //    if (this.ShowSignalOnChartBackground)
+            //    {
+            //        this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
+            //    }
+
+            //}
+
+            if (_signal_value == _enabled_ifs)
+            {
+                _signals.Set(1);
+                //_days.Set(_days.GetByIndex(this.ProcessingBarIndex) + 1);
+                _days.Set(_days[1] + 1);
+            }
+            else if (_signal_value == _enabled_ifs * -1)
+            {
+                _signals.Set(-1);
+                _days.Set(_days[1] - 1);
+            }
+            else
+            {
+                _signals.Set(0);
+                _days.Set(0);
+            }
+           
+
+            if (ShowSignalOnChartBackground)
+            {
+                if (_signals[0] == 1)
+                {
+                    this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
+                }
+                else if (_signals[0] == -1)
+                {
+                    this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
+                }
+            }
+            
+
+            //if (ShowSignalStrengthText)
+            //{
+            //    AddChartText("showsignallongequalorlargerthan" + Time[0], _signal_value.ToString(), 0, High[0], Color.Black);
+            //}
 
             //Set the color
             PlotColors[0][0] = this.Color_1;
@@ -814,35 +924,123 @@ namespace AgenaTrader.UserCode
         [XmlIgnore()]
         public IntSeries Signals { get { return _signals; } }
 
+        [Browsable(false)]
+        [XmlIgnore()]
+        public IntSeries Days { get { return _days; } }
+
         /// <summary>
         /// </summary>
         [Description("Show signal strength on the chart (candle).")]
         [Category("Background")]
-        [DisplayName("Show signal strength")]
-        public bool ShowSignalStrengthText
+        [DisplayName("Show signal on chart")]
+        public bool ShowSignalOnChartBackground
         {
-            get { return _showsignalstrengthtext; }
+            get { return _ShowSignalOnChartBackground; }
             set
             {
-                _showsignalstrengthtext = value;
+                _ShowSignalOnChartBackground = value;
             }
         }
 
         /// <summary>
         /// </summary>
-        [Description("Select the signal strength for the background color signal.")]
-        [Category("Background")]
-        [DisplayName("Signal strength")]
-        public int SignalLongEqualOrLargerThan
+        [Description("If MA1 is larger than MA2.")]
+        [Category("Conditions")]
+        [DisplayName("MA1 > MA2")]
+        public bool If_1_over_2
         {
-            get { return _signallongequalorlargerthan; }
+            get { return _1_over_2; }
             set
             {
-                if (value < 1) value = 1;
-                if (value > 5) value = 5;
-                _signallongequalorlargerthan = value;
+                _1_over_2 = value;
             }
         }
+
+        /// <summary>
+        /// </summary>
+        [Description("If MA2 is larger than MA3.")]
+        [Category("Conditions")]
+        [DisplayName("MA2 > MA3")]
+        public bool If_2_over_3
+        {
+            get { return _2_over_3; }
+            set
+            {
+                _2_over_3 = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("If MA3 is larger than MA4.")]
+        [Category("Conditions")]
+        [DisplayName("MA3 > MA4")]
+        public bool If_3_over_4
+        {
+            get { return _3_over_4; }
+            set
+            {
+                _3_over_4 = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("If MA4 is larger than MA5.")]
+        [Category("Conditions")]
+        [DisplayName("MA4 > MA5")]
+        public bool If_4_over_5
+        {
+            get { return _4_over_5; }
+            set
+            {
+                _4_over_5 = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("If MA5 is larger than MA6.")]
+        [Category("Conditions")]
+        [DisplayName("MA5 > MA6")]
+        public bool If_5_over_6
+        {
+            get { return _5_over_6; }
+            set
+            {
+                _5_over_6 = value;
+            }
+        }
+
+        ///// <summary>
+        ///// </summary>
+        //[Description("Show signal strength on the chart (candle).")]
+        //[Category("Background")]
+        //[DisplayName("Show signal strength")]
+        //public bool ShowSignalStrengthText
+        //{
+        //    get { return _showsignalstrengthtext; }
+        //    set
+        //    {
+        //        _showsignalstrengthtext = value;
+        //    }
+        //}
+
+        ///// <summary>
+        ///// </summary>
+        //[Description("Select the signal strength for the background color signal.")]
+        //[Category("Background")]
+        //[DisplayName("Signal strength")]
+        //public int SignalLongEqualOrLargerThan
+        //{
+        //    get { return _signallongequalorlargerthan; }
+        //    set
+        //    {
+        //        if (value < 1) value = 1;
+        //        if (value > 5) value = 5;
+        //        _signallongequalorlargerthan = value;
+        //    }
+        //}
 
         /// <summary>
         /// </summary>
