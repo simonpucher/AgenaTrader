@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.2.1
+/// Version: 1.2.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -36,9 +36,9 @@ namespace AgenaTrader.UserCode
         #region Variables
 
         private bool _usemarkethours = true;
-        private string _instrumentlists = "DAX30;ATX20;DOW30;NASDAQ";
+        private string _instrumentlists = "DAX30;ATX20;DOW30;NASDAQ;S&P500";
         private static DateTime _lastupdate = DateTime.Now;
-        private int _seconds = 10;
+        private int _seconds = 60;
 
         private string _name_of_list = String.Empty;
         private IInstrumentsList _list = null;
@@ -53,6 +53,10 @@ namespace AgenaTrader.UserCode
         }
 
 
+        protected override void OnStart()
+        {
+            this.CheckForNewInstruments();
+        }
 
 
         protected override void OnCalculate()
@@ -84,10 +88,12 @@ namespace AgenaTrader.UserCode
 
                 if (_list != null)
                 {
-                    this.Root.Core.InstrumentManager.ClearInstrumentList(this.Name_of_list);
+                    //this.Root.Core.InstrumentManager.ClearInstrumentList(this.Name_of_list);
+                    Core.GuiManager.BeginInvoke((Action)(() => this.Root.Core.InstrumentManager.ClearInstrumentList(this.Name_of_list)));
+
                 }
 
-               
+
                 if (!String.IsNullOrWhiteSpace(this.Instrumentlists))
                 {
                     string[] arr_Instrumentlists = this.Instrumentlists.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
