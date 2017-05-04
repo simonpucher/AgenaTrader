@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: 1.2.5
+/// Version: 1.2.6
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -31,7 +31,8 @@ namespace AgenaTrader.UserCode
     public enum Enum_Moving_Averages_Indicator_MA
     {
         SMA = 0,
-        EMA = 1
+        EMA = 1,
+        WMA = 2
     }
 
     [Description("Use 6 different SMA or EMA at the same time in one indicator.")]
@@ -59,7 +60,7 @@ namespace AgenaTrader.UserCode
         private bool _4_over_5 = false;
         private bool _5_over_6 = false;
 
-        private bool _ShowSignalOnChartBackground = false;
+        private bool _ShowSignalOnChartBackground = true;
 
         private int _linewidth_1 = 1;
         private DashStyle _linestyle_1 = DashStyle.Solid;
@@ -90,8 +91,8 @@ namespace AgenaTrader.UserCode
 
         private Color _color_long_signal = Const.DefaultArrowLongColor;
         private Color _color_short_signal = Const.DefaultArrowShortColor;
-        private int _opacity_long_signal = 35;
-        private int _opacity_short_signal = 35;
+        private int _opacity_long_signal = 25;
+        private int _opacity_short_signal = 25;
 
 
         protected override void OnInit()
@@ -140,6 +141,9 @@ namespace AgenaTrader.UserCode
                     case Enum_Moving_Averages_Indicator_MA.EMA:
                         Plot_1.Set(EMA(this.MA_1)[0]);
                         break;
+                    case Enum_Moving_Averages_Indicator_MA.WMA:
+                        Plot_1.Set(WMA(this.MA_1)[0]);
+                        break;
                     default:
                         break;
                 }
@@ -155,6 +159,9 @@ namespace AgenaTrader.UserCode
                         break;
                     case Enum_Moving_Averages_Indicator_MA.EMA:
                         Plot_2.Set(EMA(this.MA_2)[0]);
+                        break;
+                    case Enum_Moving_Averages_Indicator_MA.WMA:
+                        Plot_2.Set(WMA(this.MA_2)[0]);
                         break;
                     default:
                         break;
@@ -172,6 +179,9 @@ namespace AgenaTrader.UserCode
                     case Enum_Moving_Averages_Indicator_MA.EMA:
                         Plot_3.Set(EMA(this.MA_3)[0]);
                         break;
+                    case Enum_Moving_Averages_Indicator_MA.WMA:
+                        Plot_3.Set(WMA(this.MA_3)[0]);
+                        break;
                     default:
                         break;
                 }
@@ -186,6 +196,9 @@ namespace AgenaTrader.UserCode
                         break;
                     case Enum_Moving_Averages_Indicator_MA.EMA:
                         Plot_4.Set(EMA(this.MA_4)[0]);
+                        break;
+                    case Enum_Moving_Averages_Indicator_MA.WMA:
+                        Plot_4.Set(WMA(this.MA_4)[0]);
                         break;
                     default:
                         break;
@@ -202,6 +215,9 @@ namespace AgenaTrader.UserCode
                     case Enum_Moving_Averages_Indicator_MA.EMA:
                         Plot_5.Set(EMA(this.MA_5)[0]);
                         break;
+                    case Enum_Moving_Averages_Indicator_MA.WMA:
+                        Plot_5.Set(WMA(this.MA_5)[0]);
+                        break;
                     default:
                         break;
                 }
@@ -216,6 +232,9 @@ namespace AgenaTrader.UserCode
                         break;
                     case Enum_Moving_Averages_Indicator_MA.EMA:
                         Plot_6.Set(EMA(this.MA_6)[0]);
+                        break;
+                    case Enum_Moving_Averages_Indicator_MA.WMA:
+                        Plot_6.Set(WMA(this.MA_6)[0]);
                         break;
                     default:
                         break;
