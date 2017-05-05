@@ -10,10 +10,12 @@ using AgenaTrader.API;
 using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
+using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 
 /// <summary>
-/// Version: 1.2.6
+/// Version: 1.2.7
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -397,12 +399,58 @@ namespace AgenaTrader.UserCode
                     this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
                 }
             }
-            
+
+            //percent
+            if (ShowSignalOnChartBackground && _signals[0] == 0 && _signals[1] != 0)
+            {
+
+                int offset = Math.Abs(_days[1])+1;
+                double percent = (Close[1] - Close[offset]) / (Close[offset] / 100);
+
+                Color _color = Color.Green;
+                if (percent < 0)
+                {
+                    _color = Color.Red;
+                }
+             
+                int _offsetdrawingtext = 7;
+                if (percent < 0)
+                {
+                    _offsetdrawingtext = _offsetdrawingtext * -3;
+                }
+                AddChartText("lastsegmentpercentline-" + Time[1], true, string.Format("{0:N2}%", percent), 1,Close[1], _offsetdrawingtext, _color, new Font("Arial", 9, FontStyle.Bold),StringAlignment.Center,HorizontalAlignment.Right,VerticalAlignment.Bottom,_color, Color.White,255);
+                
+                AddChartLine("drawaline" + Time[1], offset, Close[offset], 1, Close[1], _color, DashStyle.Dash, 2);
+            }
+
 
             //if (ShowSignalStrengthText)
             //{
             //    AddChartText("showsignallongequalorlargerthan" + Time[0], _signal_value.ToString(), 0, High[0], Color.Black);
             //}
+
+
+            //AddChartVerticalLine("lastsegmentpercentline" + Time[0], 1, Color.Black);
+
+            //            if (IsProcessingBarIndexLast)
+            //            {
+            //                for (int i = 0; i < ProcessingBarIndex; i++)
+            //                {
+            //                    //AddChartText("lastsegmentpercent" + Time[i], _days[i].ToString(), i, High[i], Color.Black);
+            //                    AddChartText("lastsegmentpercenttext-" + i, true, _days[i].ToString(), i,
+            //// barsAgo
+            //High[i], // y
+            //10, // yPixelOffset
+            //Color.Blue, // Text color
+            //new Font("Arial", 10, FontStyle.Bold),
+            //StringAlignment.Center,
+            //HorizontalAlignment.Center,
+            //VerticalAlignment.Bottom,
+            //Color.Red, // Outline color
+            //Color.Yellow, // Fill color
+            //100); // Opacity
+            //                }
+            //            }
 
             //Set the color
             PlotColors[0][0] = this.Color_1;
