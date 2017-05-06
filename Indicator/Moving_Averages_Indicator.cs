@@ -15,7 +15,7 @@ using System.Windows.Forms.VisualStyles;
 
 
 /// <summary>
-/// Version: 1.2.7
+/// Version: 1.2.8
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -27,27 +27,18 @@ using System.Windows.Forms.VisualStyles;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-    /// <summary>
-    /// Selectable MAs for this indicator.
-    /// </summary>
-    public enum Enum_Moving_Averages_Indicator_MA
-    {
-        SMA = 0,
-        EMA = 1,
-        WMA = 2
-    }
 
-    [Description("Use 6 different SMA or EMA at the same time in one indicator.")]
+    [Description("Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.")]
     public class Moving_Averages_Indicator : UserIndicator
     {
         
         //input 
-        private Enum_Moving_Averages_Indicator_MA _MA_1_Selected = Enum_Moving_Averages_Indicator_MA.SMA;
-        private Enum_Moving_Averages_Indicator_MA _MA_2_Selected = Enum_Moving_Averages_Indicator_MA.SMA;
-        private Enum_Moving_Averages_Indicator_MA _MA_3_Selected = Enum_Moving_Averages_Indicator_MA.SMA;
-        private Enum_Moving_Averages_Indicator_MA _MA_4_Selected = Enum_Moving_Averages_Indicator_MA.EMA;
-        private Enum_Moving_Averages_Indicator_MA _MA_5_Selected = Enum_Moving_Averages_Indicator_MA.EMA;
-        private Enum_Moving_Averages_Indicator_MA _MA_6_Selected = Enum_Moving_Averages_Indicator_MA.EMA;
+        private MAEnvelopesMAType _MA_1_Selected = MAEnvelopesMAType.SMA;
+        private MAEnvelopesMAType _MA_2_Selected = MAEnvelopesMAType.SMA;
+        private MAEnvelopesMAType _MA_3_Selected = MAEnvelopesMAType.SMA;
+        private MAEnvelopesMAType _MA_4_Selected = MAEnvelopesMAType.EMA;
+        private MAEnvelopesMAType _MA_5_Selected = MAEnvelopesMAType.EMA;
+        private MAEnvelopesMAType _MA_6_Selected = MAEnvelopesMAType.EMA;
 
         private int _ma_1 = 50;
         private int _ma_2 = 100;
@@ -96,6 +87,8 @@ namespace AgenaTrader.UserCode
         private int _opacity_long_signal = 25;
         private int _opacity_short_signal = 25;
 
+        private DashStyle _plotdashstyleline = DashStyle.Dash;
+        private int _plotwidthline = 2;
 
         protected override void OnInit()
         {
@@ -110,13 +103,32 @@ namespace AgenaTrader.UserCode
             CalculateOnClosedBar = false;
             IsOverlay = true;
 
-            this.RequiredBarsCount = 200; 
+            this.RequiredBarsCount = 200;
+             
             _signals = new IntSeries(this);
             _days = new IntSeries(this);
 
         }
 
-
+        private double GetValue(MAEnvelopesMAType matype, int period) {
+            switch (matype)
+            {
+                case MAEnvelopesMAType.SMA:
+                    return SMA(period)[0];
+                case MAEnvelopesMAType.EMA:
+                    return EMA(period)[0];
+                case MAEnvelopesMAType.WMA:
+                    return WMA(period)[0];
+                case MAEnvelopesMAType.HMA:
+                    return HMA(period)[0];
+                case MAEnvelopesMAType.TEMA:
+                    return TEMA(period)[0];
+                case MAEnvelopesMAType.TMA:
+                    return TMA(period)[0];
+                default:
+                    throw new NotImplementedException();
+            }
+        }
 
         protected override void OnCalculate()
         {
@@ -133,151 +145,14 @@ namespace AgenaTrader.UserCode
             int _signal_value = 0;
             int _enabled_ifs = 0;
 
-            if (this.MA_1 != 0)
-            {
-                switch (MA_1_Selected)
-                {
-                    case Enum_Moving_Averages_Indicator_MA.SMA:
-                        Plot_1.Set(SMA(this.MA_1)[0]);
-                        break;
-                    case Enum_Moving_Averages_Indicator_MA.EMA:
-                        Plot_1.Set(EMA(this.MA_1)[0]);
-                        break;
-                    case Enum_Moving_Averages_Indicator_MA.WMA:
-                        Plot_1.Set(WMA(this.MA_1)[0]);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-
-            if (this.MA_2 != 0)
-            {
-                switch (MA_2_Selected)
-                {
-                    case Enum_Moving_Averages_Indicator_MA.SMA:
-                        Plot_2.Set(SMA(this.MA_2)[0]);
-                        break;
-                    case Enum_Moving_Averages_Indicator_MA.EMA:
-                        Plot_2.Set(EMA(this.MA_2)[0]);
-                        break;
-                    case Enum_Moving_Averages_Indicator_MA.WMA:
-                        Plot_2.Set(WMA(this.MA_2)[0]);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-
-            if (this.MA_3 != 0)
-            {
-                switch (MA_3_Selected)
-                {
-                    case Enum_Moving_Averages_Indicator_MA.SMA:
-                        Plot_3.Set(SMA(this.MA_3)[0]);
-                        break;
-                    case Enum_Moving_Averages_Indicator_MA.EMA:
-                        Plot_3.Set(EMA(this.MA_3)[0]);
-                        break;
-                    case Enum_Moving_Averages_Indicator_MA.WMA:
-                        Plot_3.Set(WMA(this.MA_3)[0]);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (this.MA_4 != 0)
-            {
-                switch (MA_4_Selected)
-                {
-                    case Enum_Moving_Averages_Indicator_MA.SMA:
-                        Plot_4.Set(SMA(this.MA_4)[0]);
-                        break;
-                    case Enum_Moving_Averages_Indicator_MA.EMA:
-                        Plot_4.Set(EMA(this.MA_4)[0]);
-                        break;
-                    case Enum_Moving_Averages_Indicator_MA.WMA:
-                        Plot_4.Set(WMA(this.MA_4)[0]);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (this.MA_5 != 0)
-            {
-                switch (MA_5_Selected)
-                {
-                    case Enum_Moving_Averages_Indicator_MA.SMA:
-                        Plot_5.Set(SMA(this.MA_5)[0]);
-                        break;
-                    case Enum_Moving_Averages_Indicator_MA.EMA:
-                        Plot_5.Set(EMA(this.MA_5)[0]);
-                        break;
-                    case Enum_Moving_Averages_Indicator_MA.WMA:
-                        Plot_5.Set(WMA(this.MA_5)[0]);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            if (this.MA_6 != 0)
-            {
-                switch (MA_6_Selected)
-                {
-                    case Enum_Moving_Averages_Indicator_MA.SMA:
-                        Plot_6.Set(SMA(this.MA_6)[0]);
-                        break;
-                    case Enum_Moving_Averages_Indicator_MA.EMA:
-                        Plot_6.Set(EMA(this.MA_6)[0]);
-                        break;
-                    case Enum_Moving_Averages_Indicator_MA.WMA:
-                        Plot_6.Set(WMA(this.MA_6)[0]);
-                        break;
-                    default:
-                        break;
-                }
-            }
+            if (this.MA_1 != 0) Plot_1.Set(this.GetValue(this.MA_1_Selected, this.MA_1));
+            if (this.MA_2 != 0) Plot_2.Set(this.GetValue(this.MA_2_Selected, this.MA_2));
+            if (this.MA_3 != 0) Plot_3.Set(this.GetValue(this.MA_3_Selected, this.MA_3));
+            if (this.MA_4 != 0) Plot_4.Set(this.GetValue(this.MA_4_Selected, this.MA_4));
+            if (this.MA_5 != 0) Plot_5.Set(this.GetValue(this.MA_5_Selected, this.MA_5));
+            if (this.MA_6 != 0) Plot_6.Set(this.GetValue(this.MA_6_Selected, this.MA_6));
 
             //Signals 
-            //if (Plot_5.Last() > Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0)
-            //{
-            //    _signal_value = 1;
-            //}
-            //if (Plot_4.Last() > Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0)
-            //{
-            //    _signal_value = 2;
-            //}
-            //if (Plot_3.Last() > Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0)
-            //{
-            //    _signal_value = 3;
-            //}
-            //if (Plot_2.Last() > Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0)
-            //{
-            //    _signal_value = 4;
-            //}
-            //if (Plot_1.Last() > Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
-            //{
-            //    _signal_value = 5;
-            //}
-
-            //_signals.Set(_signal_value);
-
-
-            //if (_signals[0] >= this.SignalLongEqualOrLargerThan)
-            //{
-            //    this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
-            //}
-            //else
-            //{
-            //    this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
-            //}
-            
-
             if (this.If_1_over_2)
             {
                 _enabled_ifs++;
@@ -343,37 +218,11 @@ namespace AgenaTrader.UserCode
                 }
             }
 
-
-            //if (Plot_5.Last() > Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0
-            //    && Plot_4.Last() > Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0
-            //    && Plot_3.Last() > Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0
-            //    && Plot_2.Last() > Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0
-            //    && Plot_1.Last() > Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
-            //{
-            //    _signal_value = 1;
-            //    if (this.ShowSignalOnChartBackground)
-            //    {
-            //        this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
-            //    }
-            //}
-            //else if (Plot_5.Last() < Plot_6.Last() && this.MA_5 != 0 && this.MA_6 != 0
-            //    && Plot_4.Last() < Plot_5.Last() && this.MA_4 != 0 && this.MA_5 != 0
-            //    && Plot_3.Last() < Plot_4.Last() && this.MA_3 != 0 && this.MA_4 != 0
-            //    && Plot_2.Last() < Plot_3.Last() && this.MA_2 != 0 && this.MA_3 != 0
-            //    && Plot_1.Last() < Plot_2.Last() && this.MA_1 != 0 && this.MA_2 != 0)
-            //{
-            //    _signal_value = -1;
-            //    if (this.ShowSignalOnChartBackground)
-            //    {
-            //        this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
-            //    }
-
-            //}
+            
 
             if (_signal_value == _enabled_ifs)
             {
                 _signals.Set(1);
-                //_days.Set(_days.GetByIndex(this.ProcessingBarIndex) + 1);
                 _days.Set(_days[1] + 1);
             }
             else if (_signal_value == _enabled_ifs * -1)
@@ -390,68 +239,24 @@ namespace AgenaTrader.UserCode
 
             if (ShowSignalOnChartBackground)
             {
-                if (_signals[0] == 1)
-                {
-                    this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
-                }
-                else if (_signals[0] == -1)
-                {
-                    this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
-                }
+                if (_signals[0] == 1) this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
+                else if (_signals[0] == -1) this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
             }
 
             //percent
             if (ShowSignalOnChartBackground && _signals[0] == 0 && _signals[1] != 0)
             {
-
                 int offset = Math.Abs(_days[1])+1;
                 double percent = (Close[1] - Close[offset]) / (Close[offset] / 100);
-
                 Color _color = Color.Green;
-                if (percent < 0)
-                {
-                    _color = Color.Red;
-                }
-             
+                if (percent < 0) _color = Color.Red;
                 int _offsetdrawingtext = 7;
-                if (percent < 0)
-                {
-                    _offsetdrawingtext = _offsetdrawingtext * -3;
-                }
-                AddChartText("lastsegmentpercentline-" + Time[1], true, string.Format("{0:N2}%", percent), 1,Close[1], _offsetdrawingtext, _color, new Font("Arial", 9, FontStyle.Bold),StringAlignment.Center,HorizontalAlignment.Right,VerticalAlignment.Bottom,_color, Color.White,255);
-                
-                AddChartLine("drawaline" + Time[1], offset, Close[offset], 1, Close[1], _color, DashStyle.Dash, 2);
+                if (percent < 0) _offsetdrawingtext = _offsetdrawingtext * -3;
+                AddChartText("lastsegmentpercentline" + Time[1], true, string.Format("{0:N2}%", percent), 1,Close[1], _offsetdrawingtext, _color, new Font("Arial", 9, FontStyle.Bold),StringAlignment.Center,HorizontalAlignment.Right,VerticalAlignment.Bottom,_color, Color.White,255);
+                AddChartLine("drawaline" + Time[1], offset, Close[offset], 1, Close[1], _color, this.DashStyleLine, this.PlotWidthLine);
             }
 
-
-            //if (ShowSignalStrengthText)
-            //{
-            //    AddChartText("showsignallongequalorlargerthan" + Time[0], _signal_value.ToString(), 0, High[0], Color.Black);
-            //}
-
-
-            //AddChartVerticalLine("lastsegmentpercentline" + Time[0], 1, Color.Black);
-
-            //            if (IsProcessingBarIndexLast)
-            //            {
-            //                for (int i = 0; i < ProcessingBarIndex; i++)
-            //                {
-            //                    //AddChartText("lastsegmentpercent" + Time[i], _days[i].ToString(), i, High[i], Color.Black);
-            //                    AddChartText("lastsegmentpercenttext-" + i, true, _days[i].ToString(), i,
-            //// barsAgo
-            //High[i], // y
-            //10, // yPixelOffset
-            //Color.Blue, // Text color
-            //new Font("Arial", 10, FontStyle.Bold),
-            //StringAlignment.Center,
-            //HorizontalAlignment.Center,
-            //VerticalAlignment.Bottom,
-            //Color.Red, // Outline color
-            //Color.Yellow, // Fill color
-            //100); // Opacity
-            //                }
-            //            }
-
+            
             //Set the color
             PlotColors[0][0] = this.Color_1;
             Plots[0].PenStyle = this.DashStyle_1;
@@ -539,7 +344,7 @@ namespace AgenaTrader.UserCode
         [Description("Select the type of MA 1 you would like to use")]
         [Category("Parameters")]
         [DisplayName("1.1 Type of MA")]
-        public Enum_Moving_Averages_Indicator_MA MA_1_Selected
+        public MAEnvelopesMAType MA_1_Selected
         {
             get { return _MA_1_Selected; }
             set
@@ -610,7 +415,7 @@ namespace AgenaTrader.UserCode
         [Description("Select the type of MA you would like to use")]
         [Category("Parameters")]
         [DisplayName("2.1 Type of MA")]
-        public Enum_Moving_Averages_Indicator_MA MA_2_Selected
+        public MAEnvelopesMAType MA_2_Selected
         {
             get { return _MA_2_Selected; }
             set
@@ -681,7 +486,7 @@ namespace AgenaTrader.UserCode
         [Description("Select the type of MA you would like to use")]
         [Category("Parameters")]
         [DisplayName("3.1 Type of MA")]
-        public Enum_Moving_Averages_Indicator_MA MA_3_Selected
+        public MAEnvelopesMAType MA_3_Selected
         {
             get { return _MA_3_Selected; }
             set
@@ -752,7 +557,7 @@ namespace AgenaTrader.UserCode
         [Description("Select the type of MA you would like to use")]
         [Category("Parameters")]
         [DisplayName("4.1 Type of MA")]
-        public Enum_Moving_Averages_Indicator_MA MA_4_Selected
+        public MAEnvelopesMAType MA_4_Selected
         {
             get { return _MA_4_Selected; }
             set
@@ -824,7 +629,7 @@ namespace AgenaTrader.UserCode
         [Description("Select the type of MA you would like to use")]
         [Category("Parameters")]
         [DisplayName("5.1 Type of MA")]
-        public Enum_Moving_Averages_Indicator_MA MA_5_Selected
+        public MAEnvelopesMAType MA_5_Selected
         {
             get { return _MA_5_Selected; }
             set
@@ -896,7 +701,7 @@ namespace AgenaTrader.UserCode
         [Description("Select the type of MA 6 you would like to use")]
         [Category("Parameters")]
         [DisplayName("6.1 Type of MA")]
-        public Enum_Moving_Averages_Indicator_MA MA_6_Selected
+        public MAEnvelopesMAType MA_6_Selected
         {
             get { return _MA_6_Selected; }
             set
@@ -1180,6 +985,27 @@ namespace AgenaTrader.UserCode
             set { _color_short_signal = SerializableColor.FromString(value); }
         }
 
+        /// <summary>
+        /// </summary>
+        [Description("DashStyle for percent lines.")]
+        [Category("Plots")]
+        [DisplayName("Percent Dash Style")]
+        public DashStyle DashStyleLine
+        {
+            get { return _plotdashstyleline; }
+            set { _plotdashstyleline = value; }
+        }
+        
+        /// <summary>
+        /// </summary>
+        [Description("Width for percent lines.")]
+        [Category("Plots")]
+        [DisplayName("Percent Line Width")]
+        public int PlotWidthLine
+        {
+            get { return _plotwidthline; }
+            set { _plotwidthline = Math.Max(1, value); }
+        }
         #endregion
     }
 }
@@ -1194,17 +1020,17 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator
 	{
 		/// <summary>
-		/// Use 6 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
 		/// </summary>
-		public Moving_Averages_Indicator Moving_Averages_Indicator(Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
+		public Moving_Averages_Indicator Moving_Averages_Indicator(MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
         {
 			return Moving_Averages_Indicator(InSeries, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
 		}
 
 		/// <summary>
-		/// Use 6 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
 		/// </summary>
-		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
+		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
 			var indicator = CachedCalculationUnits.GetCachedIndicator<Moving_Averages_Indicator>(input, i => i.MA_1_Selected == mA_1_Selected && i.MA_1 == mA_1 && i.MA_2_Selected == mA_2_Selected && i.MA_2 == mA_2 && i.MA_3_Selected == mA_3_Selected && i.MA_3 == mA_3 && i.MA_4_Selected == mA_4_Selected && i.MA_4 == mA_4 && i.MA_5_Selected == mA_5_Selected && i.MA_5 == mA_5 && i.MA_6_Selected == mA_6_Selected && i.MA_6 == mA_6);
 
@@ -1244,17 +1070,17 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Use 6 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
 		/// </summary>
-		public Moving_Averages_Indicator Moving_Averages_Indicator(Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
+		public Moving_Averages_Indicator Moving_Averages_Indicator(MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
 			return LeadIndicator.Moving_Averages_Indicator(InSeries, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
 		}
 
 		/// <summary>
-		/// Use 6 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
 		/// </summary>
-		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
+		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
 			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
@@ -1270,17 +1096,17 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Use 6 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
 		/// </summary>
-		public Moving_Averages_Indicator Moving_Averages_Indicator(Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
+		public Moving_Averages_Indicator Moving_Averages_Indicator(MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
 			return LeadIndicator.Moving_Averages_Indicator(InSeries, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
 		}
 
 		/// <summary>
-		/// Use 6 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
 		/// </summary>
-		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
+		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
 			return LeadIndicator.Moving_Averages_Indicator(input, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
 		}
@@ -1293,17 +1119,17 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Use 6 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
 		/// </summary>
-		public Moving_Averages_Indicator Moving_Averages_Indicator(Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
+		public Moving_Averages_Indicator Moving_Averages_Indicator(MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
 			return LeadIndicator.Moving_Averages_Indicator(InSeries, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
 		}
 
 		/// <summary>
-		/// Use 6 different SMA or EMA at the same time in one indicator.
+		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
 		/// </summary>
-		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, Enum_Moving_Averages_Indicator_MA mA_1_Selected, System.Int32 mA_1, Enum_Moving_Averages_Indicator_MA mA_2_Selected, System.Int32 mA_2, Enum_Moving_Averages_Indicator_MA mA_3_Selected, System.Int32 mA_3, Enum_Moving_Averages_Indicator_MA mA_4_Selected, System.Int32 mA_4, Enum_Moving_Averages_Indicator_MA mA_5_Selected, System.Int32 mA_5, Enum_Moving_Averages_Indicator_MA mA_6_Selected, System.Int32 mA_6)
+		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
 			return LeadIndicator.Moving_Averages_Indicator(input, mA_1_Selected, mA_1, mA_2_Selected, mA_2, mA_3_Selected, mA_3, mA_4_Selected, mA_4, mA_5_Selected, mA_5, mA_6_Selected, mA_6);
 		}
