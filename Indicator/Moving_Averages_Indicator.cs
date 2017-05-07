@@ -15,7 +15,7 @@ using System.Windows.Forms.VisualStyles;
 
 
 /// <summary>
-/// Version: 1.2.8
+/// Version: 1.2.9
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -28,7 +28,7 @@ using System.Windows.Forms.VisualStyles;
 namespace AgenaTrader.UserCode
 {
 
-    [Description("Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.")]
+    [Description("Use 6 different MA like SMA, HMA, EMA, WMA, TEMA, TMA, WMA at the same time in one indicator.")]
     public class Moving_Averages_Indicator : UserIndicator
     {
         
@@ -88,7 +88,9 @@ namespace AgenaTrader.UserCode
         private int _opacity_short_signal = 25;
 
         private DashStyle _plotdashstyleline = DashStyle.Dash;
+        private DashStyle _plotdashstylelinelast = DashStyle.Dot;
         private int _plotwidthline = 2;
+        private int _plotwidthlinelast = 2;
 
         protected override void OnInit()
         {
@@ -128,6 +130,17 @@ namespace AgenaTrader.UserCode
                 default:
                     throw new NotImplementedException();
             }
+        }
+
+        private void drawpercentlines(int dayoffset, DashStyle styleofline, int widthofline) {
+            int offset = Math.Abs(_days[dayoffset]) + dayoffset;
+            double percent = (Close[dayoffset] - Close[offset]) / (Close[offset] / 100);
+            Color _color = Color.Green;
+            if (percent < 0) _color = Color.Red;
+            int _offsetdrawingtext = 7;
+            if (percent < 0) _offsetdrawingtext = _offsetdrawingtext * -3;
+            AddChartText("lastsegmentpercentline" + Time[dayoffset], true, string.Format("{0:N2}%", percent), dayoffset, Close[dayoffset], _offsetdrawingtext, _color, new Font("Arial", 9, FontStyle.Bold), StringAlignment.Center, HorizontalAlignment.Right, VerticalAlignment.Bottom, _color, Color.White, 255);
+            AddChartLine("drawaline" + Time[dayoffset], offset, Close[offset], dayoffset, Close[dayoffset], _color, styleofline, widthofline);
         }
 
         protected override void OnCalculate()
@@ -246,17 +259,34 @@ namespace AgenaTrader.UserCode
             //percent
             if (ShowSignalOnChartBackground && _signals[0] == 0 && _signals[1] != 0)
             {
-                int offset = Math.Abs(_days[1])+1;
-                double percent = (Close[1] - Close[offset]) / (Close[offset] / 100);
-                Color _color = Color.Green;
-                if (percent < 0) _color = Color.Red;
-                int _offsetdrawingtext = 7;
-                if (percent < 0) _offsetdrawingtext = _offsetdrawingtext * -3;
-                AddChartText("lastsegmentpercentline" + Time[1], true, string.Format("{0:N2}%", percent), 1,Close[1], _offsetdrawingtext, _color, new Font("Arial", 9, FontStyle.Bold),StringAlignment.Center,HorizontalAlignment.Right,VerticalAlignment.Bottom,_color, Color.White,255);
-                AddChartLine("drawaline" + Time[1], offset, Close[offset], 1, Close[1], _color, this.DashStyleLine, this.PlotWidthLine);
+                this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
+
+                //int offset = Math.Abs(_days[1])+1;
+                //double percent = (Close[1] - Close[offset]) / (Close[offset] / 100);
+                //Color _color = Color.Green;
+                //if (percent < 0) _color = Color.Red;
+                //int _offsetdrawingtext = 7;
+                //if (percent < 0) _offsetdrawingtext = _offsetdrawingtext * -3;
+                //AddChartText("lastsegmentpercentline" + Time[1], true, string.Format("{0:N2}%", percent), 1,Close[1], _offsetdrawingtext, _color, new Font("Arial", 9, FontStyle.Bold),StringAlignment.Center,HorizontalAlignment.Right,VerticalAlignment.Bottom,_color, Color.White,255);
+                //AddChartLine("drawaline" + Time[1], offset, Close[offset], 1, Close[1], _color, this.DashStyleLine, this.PlotWidthLine);
             }
 
-            
+            //percent on last candle
+            if (ShowSignalOnChartBackground && _signals[0] == 1 && IsProcessingBarIndexLast)
+            {
+                this.drawpercentlines(0, this.DashStyleLineLast, this.PlotWidthLineLast);
+
+                //int offset = Math.Abs(_days[0]);
+                //double percent = (Close[0] - Close[offset]) / (Close[offset] / 100);
+                //Color _color = Color.Green;
+                //if (percent < 0) _color = Color.Red;
+                //int _offsetdrawingtext = 7;
+                //if (percent < 0) _offsetdrawingtext = _offsetdrawingtext * -3;
+                //AddChartText("lastsegmentpercentline" + Time[0], true, string.Format("{0:N2}%", percent), 0, Close[0], _offsetdrawingtext, _color, new Font("Arial", 9, FontStyle.Bold), StringAlignment.Center, HorizontalAlignment.Right, VerticalAlignment.Bottom, _color, Color.White, 255);
+                //AddChartLine("drawaline" + Time[0], offset, Close[offset], 0, Close[0], _color, this.DashStyleLineLast, this.PlotWidthLineLast);
+            }
+
+
             //Set the color
             PlotColors[0][0] = this.Color_1;
             Plots[0].PenStyle = this.DashStyle_1;
@@ -884,35 +914,6 @@ namespace AgenaTrader.UserCode
             }
         }
 
-        ///// <summary>
-        ///// </summary>
-        //[Description("Show signal strength on the chart (candle).")]
-        //[Category("Background")]
-        //[DisplayName("Show signal strength")]
-        //public bool ShowSignalStrengthText
-        //{
-        //    get { return _showsignalstrengthtext; }
-        //    set
-        //    {
-        //        _showsignalstrengthtext = value;
-        //    }
-        //}
-
-        ///// <summary>
-        ///// </summary>
-        //[Description("Select the signal strength for the background color signal.")]
-        //[Category("Background")]
-        //[DisplayName("Signal strength")]
-        //public int SignalLongEqualOrLargerThan
-        //{
-        //    get { return _signallongequalorlargerthan; }
-        //    set
-        //    {
-        //        if (value < 1) value = 1;
-        //        if (value > 5) value = 5;
-        //        _signallongequalorlargerthan = value;
-        //    }
-        //}
 
         /// <summary>
         /// </summary>
@@ -985,6 +986,30 @@ namespace AgenaTrader.UserCode
             set { _color_short_signal = SerializableColor.FromString(value); }
         }
 
+        
+
+        /// <summary>
+        /// </summary>
+        [Description("DashStyle for last percent line.")]
+        [Category("Plots")]
+        [DisplayName("Percent Dash Style Last")]
+        public DashStyle DashStyleLineLast
+        {
+            get { return _plotdashstylelinelast; }
+            set { _plotdashstylelinelast = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Width for last percent line.")]
+        [Category("Plots")]
+        [DisplayName("Percent Line Width")]
+        public int PlotWidthLineLast
+        {
+            get { return _plotwidthlinelast; }
+            set { _plotwidthlinelast = Math.Max(1, value); }
+        }
+
         /// <summary>
         /// </summary>
         [Description("DashStyle for percent lines.")]
@@ -1020,7 +1045,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator
 	{
 		/// <summary>
-		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
+		/// Use 6 different MA like SMA, HMA, EMA, WMA, TEMA, TMA, WMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
         {
@@ -1028,7 +1053,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
+		/// Use 6 different MA like SMA, HMA, EMA, WMA, TEMA, TMA, WMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
@@ -1070,7 +1095,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
+		/// Use 6 different MA like SMA, HMA, EMA, WMA, TEMA, TMA, WMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
@@ -1078,7 +1103,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
+		/// Use 6 different MA like SMA, HMA, EMA, WMA, TEMA, TMA, WMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
@@ -1096,7 +1121,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
+		/// Use 6 different MA like SMA, HMA, EMA, WMA, TEMA, TMA, WMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
@@ -1104,7 +1129,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
+		/// Use 6 different MA like SMA, HMA, EMA, WMA, TEMA, TMA, WMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
@@ -1119,7 +1144,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
+		/// Use 6 different MA like SMA, HMA, EMA, WMA, TEMA, TMA, WMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
@@ -1127,7 +1152,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Use 6 different MA like (SMA, HMA, EMA, WMA, TEMA, TMA, WMA) at the same time in one indicator.
+		/// Use 6 different MA like SMA, HMA, EMA, WMA, TEMA, TMA, WMA at the same time in one indicator.
 		/// </summary>
 		public Moving_Averages_Indicator Moving_Averages_Indicator(IDataSeries input, MAEnvelopesMAType mA_1_Selected, System.Int32 mA_1, MAEnvelopesMAType mA_2_Selected, System.Int32 mA_2, MAEnvelopesMAType mA_3_Selected, System.Int32 mA_3, MAEnvelopesMAType mA_4_Selected, System.Int32 mA_4, MAEnvelopesMAType mA_5_Selected, System.Int32 mA_5, MAEnvelopesMAType mA_6_Selected, System.Int32 mA_6)
 		{
