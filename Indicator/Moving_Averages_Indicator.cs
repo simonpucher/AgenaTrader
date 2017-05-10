@@ -15,7 +15,7 @@ using System.Windows.Forms.VisualStyles;
 
 
 /// <summary>
-/// Version: 1.2.9
+/// Version: 1.2.10
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -232,60 +232,55 @@ namespace AgenaTrader.UserCode
             }
 
             
+            //signal
+            if (_signal_value == _enabled_ifs) _signals.Set(1);
+            else if (_signal_value == _enabled_ifs * -1) _signals.Set(-1);
+            else _signals.Set(0);
 
-            if (_signal_value == _enabled_ifs)
+            //days
+            if (_signals[0] == 0)
             {
-                _signals.Set(1);
-                _days.Set(_days[1] + 1);
-            }
-            else if (_signal_value == _enabled_ifs * -1)
-            {
-                _signals.Set(-1);
-                _days.Set(_days[1] - 1);
-            }
-            else
-            {
-                _signals.Set(0);
                 _days.Set(0);
             }
-           
+            else 
+            {
+                if (_signals[0] == 1 && _signals[1] == 1)
+                {
+                    _days.Set(_days[1] + 1);
+                }
+                else if (_signals[0] == -1 && _signals[1] == -1)
+                {
+                    _days.Set(_days[1] - 1);
+                }
+                else
+                {
+                    _days.Set(0);
+                }
+            }
 
+            
             if (ShowSignalOnChartBackground)
             {
+                //color an background
                 if (_signals[0] == 1) this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
                 else if (_signals[0] == -1) this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
+
+                //percent on all signals with more _enabled_ifs
+                if (_signals[0] == 0 && _signals[1] != 0 
+                    || _signals[0] == 1 && _signals[1] == -1 
+                    || _signals[0] == -1 && _signals[1] == 1)
+                {
+                    this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
+                }
+
+                //percent on last candle
+                if (_signals[0] != 1 && IsProcessingBarIndexLast)
+                {
+                    this.drawpercentlines(0, this.DashStyleLineLast, this.PlotWidthLineLast);
+                }
             }
 
-            //percent
-            if (ShowSignalOnChartBackground && _signals[0] == 0 && _signals[1] != 0)
-            {
-                this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
-
-                //int offset = Math.Abs(_days[1])+1;
-                //double percent = (Close[1] - Close[offset]) / (Close[offset] / 100);
-                //Color _color = Color.Green;
-                //if (percent < 0) _color = Color.Red;
-                //int _offsetdrawingtext = 7;
-                //if (percent < 0) _offsetdrawingtext = _offsetdrawingtext * -3;
-                //AddChartText("lastsegmentpercentline" + Time[1], true, string.Format("{0:N2}%", percent), 1,Close[1], _offsetdrawingtext, _color, new Font("Arial", 9, FontStyle.Bold),StringAlignment.Center,HorizontalAlignment.Right,VerticalAlignment.Bottom,_color, Color.White,255);
-                //AddChartLine("drawaline" + Time[1], offset, Close[offset], 1, Close[1], _color, this.DashStyleLine, this.PlotWidthLine);
-            }
-
-            //percent on last candle
-            if (ShowSignalOnChartBackground && _signals[0] == 1 && IsProcessingBarIndexLast)
-            {
-                this.drawpercentlines(0, this.DashStyleLineLast, this.PlotWidthLineLast);
-
-                //int offset = Math.Abs(_days[0]);
-                //double percent = (Close[0] - Close[offset]) / (Close[offset] / 100);
-                //Color _color = Color.Green;
-                //if (percent < 0) _color = Color.Red;
-                //int _offsetdrawingtext = 7;
-                //if (percent < 0) _offsetdrawingtext = _offsetdrawingtext * -3;
-                //AddChartText("lastsegmentpercentline" + Time[0], true, string.Format("{0:N2}%", percent), 0, Close[0], _offsetdrawingtext, _color, new Font("Arial", 9, FontStyle.Bold), StringAlignment.Center, HorizontalAlignment.Right, VerticalAlignment.Bottom, _color, Color.White, 255);
-                //AddChartLine("drawaline" + Time[0], offset, Close[offset], 0, Close[0], _color, this.DashStyleLineLast, this.PlotWidthLineLast);
-            }
-
+           
 
             //Set the color
             PlotColors[0][0] = this.Color_1;
