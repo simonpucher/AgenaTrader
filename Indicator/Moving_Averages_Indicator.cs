@@ -15,7 +15,7 @@ using System.Windows.Forms.VisualStyles;
 
 
 /// <summary>
-/// Version: 1.2.10
+/// Version: 1.2.11
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -54,6 +54,8 @@ namespace AgenaTrader.UserCode
         private bool _5_over_6 = false;
 
         private bool _ShowSignalOnChartBackground = true;
+        private bool _ShowSignalOnChartArrow = true;
+        private bool _ShowSignalOnChartPercent = true;
 
         private int _linewidth_1 = 1;
         private DashStyle _linestyle_1 = DashStyle.Solid;
@@ -82,8 +84,10 @@ namespace AgenaTrader.UserCode
         private IntSeries _signals;
         private IntSeries _days;
 
-        private Color _color_long_signal = Const.DefaultArrowLongColor;
-        private Color _color_short_signal = Const.DefaultArrowShortColor;
+        private Color _color_long_signal_background = Const.DefaultArrowLongColor;
+        private Color _color_short_signal_background = Const.DefaultArrowShortColor;
+        private Color _color_long_signal_arrow = Const.DefaultArrowLongColor;
+        private Color _color_short_signal_arrow = Const.DefaultArrowShortColor;
         private int _opacity_long_signal = 25;
         private int _opacity_short_signal = 25;
 
@@ -262,25 +266,33 @@ namespace AgenaTrader.UserCode
             if (ShowSignalOnChartBackground)
             {
                 //color an background
-                if (_signals[0] == 1) this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignal, this.OpacityLongSignal / 100.0);
-                else if (_signals[0] == -1) this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignal, this.OpacityShortSignal / 100.0);
+                if (_signals[0] == 1) this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorLongSignalBackground , this.OpacityLongSignal / 100.0);
+                else if (_signals[0] == -1) this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignalBackground, this.OpacityShortSignal / 100.0);
+            }
 
+            if (this.ShowSignalOnChartPercent)
+            {
                 //percent on all signals with more _enabled_ifs
-                if (_signals[0] == 0 && _signals[1] != 0 
-                    || _signals[0] == 1 && _signals[1] == -1 
+                if (_signals[0] == 0 && _signals[1] != 0
+                    || _signals[0] == 1 && _signals[1] == -1
                     || _signals[0] == -1 && _signals[1] == 1)
                 {
                     this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
                 }
 
                 //percent on last candle
-                if (_signals[0] != 1 && IsProcessingBarIndexLast)
+                if (_signals[0] != 0 && IsProcessingBarIndexLast)
                 {
                     this.drawpercentlines(0, this.DashStyleLineLast, this.PlotWidthLineLast);
                 }
             }
 
-           
+            if (this.ShowSignalOnChartArrow)
+            {
+                if (_signals[0] == 1 && _signals[1] != 1) AddChartArrowUp("ArrowLong_MA" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, this.ColorLongSignalArrow);
+                else if (_signals[0] == -1 && _signals[1] != -1) AddChartArrowDown("ArrowShort_MA" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].High, this.ColorShortSignalArrow);
+            }
+            
 
             //Set the color
             PlotColors[0][0] = this.Color_1;
@@ -827,9 +839,9 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("Show signal strength on the chart (candle).")]
+        [Description("Show signal strength on the chart (background).")]
         [Category("Background")]
-        [DisplayName("Show signal on chart")]
+        [DisplayName("Show background")]
         public bool ShowSignalOnChartBackground
         {
             get { return _ShowSignalOnChartBackground; }
@@ -838,6 +850,36 @@ namespace AgenaTrader.UserCode
                 _ShowSignalOnChartBackground = value;
             }
         }
+
+        /// <summary>
+        /// </summary>
+        [Description("Show signal strength on the chart (percent).")]
+        [Category("Background")]
+        [DisplayName("Show percent")]
+        public bool ShowSignalOnChartPercent
+        {
+            get { return _ShowSignalOnChartPercent; }
+            set
+            {
+                _ShowSignalOnChartPercent = value;
+            }
+        }
+        
+
+        /// <summary>
+        /// </summary>
+        [Description("Show signal strength on the chart (arrow).")]
+        [Category("Background")]
+        [DisplayName("Show arrow")]
+        public bool ShowSignalOnChartArrow
+        {
+            get { return _ShowSignalOnChartArrow; }
+            set
+            {
+                _ShowSignalOnChartArrow = value;
+            }
+        }
+        
 
         /// <summary>
         /// </summary>
@@ -914,7 +956,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         [Description("Select opacity for the background in long setup in percent.")]
         [Category("Background")]
-        [DisplayName("Opacity Long %")]
+        [DisplayName("Opacity Background Long %")]
         public int OpacityLongSignal
         {
             get { return _opacity_long_signal; }
@@ -930,7 +972,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         [Description("Select opacity for the background in short setup in percent.")]
         [Category("Background")]
-        [DisplayName("Opacity Short %")]
+        [DisplayName("Opacity Background Short %")]
         public int OpacityShortSignal
         {
             get { return _opacity_short_signal; }
@@ -947,41 +989,79 @@ namespace AgenaTrader.UserCode
         /// </summary>
         [Description("Select Color for the background in long setup.")]
         [Category("Background")]
-        [DisplayName("Color Long")]
-        public Color ColorLongSignal
+        [DisplayName("Color Background Long")]
+        public Color ColorLongSignalBackground
         {
-            get { return _color_long_signal; }
-            set { _color_long_signal = value; }
+            get { return _color_long_signal_background; }
+            set { _color_long_signal_background = value; }
         }
 
         
         // Serialize Color object
         [Browsable(false)]
-        public string ColorLongSignalSerialize
+        public string ColorLongSignalBackgroundSerialize
         {
-            get { return SerializableColor.ToString(_color_long_signal); }
-            set { _color_long_signal = SerializableColor.FromString(value); }
+            get { return SerializableColor.ToString(_color_long_signal_background); }
+            set { _color_long_signal_background = SerializableColor.FromString(value); }
         }
 
         /// <summary>
         /// </summary>
         [Description("Select Color for the background in short setup.")]
         [Category("Background")]
-        [DisplayName("Color Short")]
-        public Color ColorShortSignal
+        [DisplayName("Color Background Short")]
+        public Color ColorShortSignalBackground
         {
-            get { return _color_short_signal; }
-            set { _color_short_signal = value; }
+            get { return _color_short_signal_background; }
+            set { _color_short_signal_background = value; }
         }
         // Serialize Color object
         [Browsable(false)]
-        public string ColorShortSignalSerialize
+        public string ColorShortSignalBackgroundSerialize
         {
-            get { return SerializableColor.ToString(_color_short_signal); }
-            set { _color_short_signal = SerializableColor.FromString(value); }
+            get { return SerializableColor.ToString(_color_short_signal_background); }
+            set { _color_short_signal_background = SerializableColor.FromString(value); }
         }
 
-        
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the arrow in long setup.")]
+        [Category("Background")]
+        [DisplayName("Color Arrow Long")]
+        public Color ColorLongSignalArrow
+        {
+            get { return _color_long_signal_arrow; }
+            set { _color_long_signal_arrow = value; }
+        }
+
+
+        // Serialize Color object
+        [Browsable(false)]
+        public string ColorLongSignalArrowSerialize
+        {
+            get { return SerializableColor.ToString(_color_long_signal_background); }
+            set { _color_long_signal_background = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the arrow in short setup.")]
+        [Category("Background")]
+        [DisplayName("Color Arrow Short")]
+        public Color ColorShortSignalArrow
+        {
+            get { return _color_short_signal_arrow; }
+            set { _color_short_signal_arrow = value; }
+        }
+        // Serialize Color object
+        [Browsable(false)]
+        public string ColorShortSignalArrowSerialize
+        {
+            get { return SerializableColor.ToString(_color_short_signal_arrow); }
+            set { _color_short_signal_arrow = SerializableColor.FromString(value); }
+        }
+
+
 
         /// <summary>
         /// </summary>
