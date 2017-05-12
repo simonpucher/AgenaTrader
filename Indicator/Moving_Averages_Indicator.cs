@@ -15,7 +15,7 @@ using System.Windows.Forms.VisualStyles;
 
 
 /// <summary>
-/// Version: 1.2.11
+/// Version: 1.2.12
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -137,14 +137,23 @@ namespace AgenaTrader.UserCode
         }
 
         private void drawpercentlines(int dayoffset, DashStyle styleofline, int widthofline) {
-            int offset = Math.Abs(_days[dayoffset]) + dayoffset;
+            int offset = Math.Abs(_days[dayoffset]) +dayoffset;
             double percent = (Close[dayoffset] - Close[offset]) / (Close[offset] / 100);
             Color _color = Color.Green;
             if (percent < 0) _color = Color.Red;
             int _offsetdrawingtext = 7;
             if (percent < 0) _offsetdrawingtext = _offsetdrawingtext * -3;
             AddChartText("lastsegmentpercentline" + Time[dayoffset], true, string.Format("{0:N2}%", percent), dayoffset, Close[dayoffset], _offsetdrawingtext, _color, new Font("Arial", 9, FontStyle.Bold), StringAlignment.Center, HorizontalAlignment.Right, VerticalAlignment.Bottom, _color, Color.White, 255);
+
             AddChartLine("drawaline" + Time[dayoffset], offset, Close[offset], dayoffset, Close[dayoffset], _color, styleofline, widthofline);
+            //int offset = Math.Abs(_days[dayoffset]) + dayoffset;
+            //double percent = (Close[dayoffset] - Close[offset]) / (Close[offset] / 100);
+            //Color _color = Color.Green;
+            //if (percent < 0) _color = Color.Red;
+            //int _offsetdrawingtext = 7;
+            //if (percent < 0) _offsetdrawingtext = _offsetdrawingtext * -3;
+            //AddChartText("lastsegmentpercentline" + Time[dayoffset], true, string.Format("{0:N2}%", percent), dayoffset, Close[dayoffset], _offsetdrawingtext, _color, new Font("Arial", 9, FontStyle.Bold), StringAlignment.Center, HorizontalAlignment.Right, VerticalAlignment.Bottom, _color, Color.White, 255);
+            //AddChartLine("drawaline" + Time[dayoffset], offset, Close[offset], dayoffset, Close[dayoffset], _color, styleofline, widthofline);
         }
 
         protected override void OnCalculate()
@@ -258,7 +267,15 @@ namespace AgenaTrader.UserCode
                 }
                 else
                 {
-                    _days.Set(0);
+                    if (_signals[0] == 1 && _signals[1] == 0
+                        || _signals[0] == 1 && _signals[1] == -1)
+                    {
+                        _days.Set(1);
+                    }
+                    else
+                    {
+                        _days.Set(-1);
+                    }
                 }
             }
 
@@ -273,9 +290,15 @@ namespace AgenaTrader.UserCode
             if (this.ShowSignalOnChartPercent)
             {
                 //percent on all signals with more _enabled_ifs
-                if (_signals[0] == 0 && _signals[1] != 0
-                    || _signals[0] == 1 && _signals[1] == -1
-                    || _signals[0] == -1 && _signals[1] == 1)
+                if (_signals[0] == 0 && _signals[1] != 0)
+                {
+                    this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
+                }
+                else if (_signals[0] == 1 && _signals[1] == -1)
+                {
+                    this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
+                }
+                else if (_signals[0] == -1 && _signals[1] == 1)
                 {
                     this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
                 }
