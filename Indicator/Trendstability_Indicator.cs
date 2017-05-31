@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0
+/// Version: 1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2017
 /// -------------------------------------------------------------------------
@@ -91,9 +91,9 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("Select the type of MA 1 you would like to use")]
+        [Description("Select the type of MA you would like to use")]
         [Category("Parameters")]
-        [DisplayName("1.1 Type of MA")]
+        [DisplayName("Type of MA")]
         public MAEnvelopesMAType MA_1_Selected
         {
             get { return _MA_1_Selected; }
@@ -105,9 +105,9 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("Period for the MA 1")]
+        [Description("Period for the MA")]
         [Category("Parameters")]
-        [DisplayName("1.2 Period MA")]
+        [DisplayName("Period MA")]
         public int MA_1
         {
             get { return _ma_1; }
