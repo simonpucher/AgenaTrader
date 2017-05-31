@@ -15,7 +15,7 @@ using System.Windows.Forms.VisualStyles;
 
 
 /// <summary>
-/// Version: 1.2.12
+/// Version: 1.2.13
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -116,7 +116,8 @@ namespace AgenaTrader.UserCode
 
         }
 
-        private double GetValue(MAEnvelopesMAType matype, int period) {
+        private double GetValue(MAEnvelopesMAType matype, int period)
+        {
             switch (matype)
             {
                 case MAEnvelopesMAType.SMA:
@@ -165,7 +166,7 @@ namespace AgenaTrader.UserCode
                 this.MA_5 != 0 && this.MA_5 > this.RequiredBarsCount ||
                 this.MA_6 != 0 && this.MA_6 > this.RequiredBarsCount)
             {
-                AddChartTextFixed("AlertText", "Required bars must be at least as high as the largest mean average period.", TextPosition.Center, Color.Red, new Font("Arial", 30), Color.Red, Color.Red, 20);
+                AddChartTextFixed("AlertText", "Required bars must be at least as high as the largest moving average period.", TextPosition.Center, Color.Red, new Font("Arial", 30), Color.Red, Color.Red, 20);
             }
 
             int _signal_value = 0;
