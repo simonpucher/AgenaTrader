@@ -15,7 +15,7 @@ using System.Windows.Forms.VisualStyles;
 
 
 /// <summary>
-/// Version: 1.2.13
+/// Version: 1.2.14
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -83,6 +83,7 @@ namespace AgenaTrader.UserCode
 
         private IntSeries _signals;
         private IntSeries _days;
+        private DoubleSeries _percent;
 
         private Color _color_long_signal_background = Const.DefaultArrowLongColor;
         private Color _color_short_signal_background = Const.DefaultArrowShortColor;
@@ -113,6 +114,7 @@ namespace AgenaTrader.UserCode
              
             _signals = new IntSeries(this);
             _days = new IntSeries(this);
+            _percent = new DoubleSeries(this);
 
         }
 
@@ -137,9 +139,16 @@ namespace AgenaTrader.UserCode
             }
         }
 
-        private void drawpercentlines(int dayoffset, DashStyle styleofline, int widthofline) {
-            int offset = Math.Abs(_days[dayoffset]) +dayoffset;
+        private double getpercent(int dayoffset) {
+            int offset = Math.Abs(_days[dayoffset]) + dayoffset;
             double percent = (Close[dayoffset] - Close[offset]) / (Close[offset] / 100);
+            return percent;
+        }
+
+        private void drawpercentlines(int dayoffset, DashStyle styleofline, int widthofline) {
+            int offset = Math.Abs(_days[dayoffset]) + dayoffset;
+            double percent = this.getpercent(dayoffset);
+
             Color _color = Color.Green;
             if (percent < 0) _color = Color.Red;
             int _offsetdrawingtext = 7;
@@ -278,6 +287,8 @@ namespace AgenaTrader.UserCode
                         _days.Set(-1);
                     }
                 }
+
+               
             }
 
             
@@ -288,28 +299,66 @@ namespace AgenaTrader.UserCode
                 else if (_signals[0] == -1) this.BackColor = GlobalUtilities.AdjustOpacity(this.ColorShortSignalBackground, this.OpacityShortSignal / 100.0);
             }
 
-            if (this.ShowSignalOnChartPercent)
-            {
-                //percent on all signals with more _enabled_ifs
-                if (_signals[0] == 0 && _signals[1] != 0)
-                {
-                    this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
-                }
-                else if (_signals[0] == 1 && _signals[1] == -1)
-                {
-                    this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
-                }
-                else if (_signals[0] == -1 && _signals[1] == 1)
-                {
-                    this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
-                }
+            //if (this.ShowSignalOnChartPercent)
+            //{
+            //    //percent on all signals with more _enabled_ifs
+            //    if (_signals[0] == 0 && _signals[1] != 0)
+            //    {
+            //        this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
+            //    }
+            //    else if (_signals[0] == 1 && _signals[1] == -1)
+            //    {
+            //        this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
+            //    }
+            //    else if (_signals[0] == -1 && _signals[1] == 1)
+            //    {
+            //        this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
+            //    }
 
-                //percent on last candle
-                if (_signals[0] != 0 && IsProcessingBarIndexLast)
+            //    //percent on last candle
+            //    if (_signals[0] != 0 && IsProcessingBarIndexLast)
+            //    {
+            //        this.drawpercentlines(0, this.DashStyleLineLast, this.PlotWidthLineLast);
+            //    }
+            //}
+
+            //percent
+            //percent on all signals with more _enabled_ifs
+            if (_signals[0] == 0 && _signals[1] != 0)
+            {
+                _percent.Set(this.getpercent(1));
+                if (this.ShowSignalOnChartPercent)
+                {
+                    this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
+                }
+            }
+            else if (_signals[0] == 1 && _signals[1] == -1)
+            {
+                _percent.Set(this.getpercent(1));
+                if (this.ShowSignalOnChartPercent)
+                {
+                    this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
+                }
+            }
+            else if (_signals[0] == -1 && _signals[1] == 1)
+            {
+                _percent.Set(this.getpercent(1));
+                if (this.ShowSignalOnChartPercent)
+                {
+                    this.drawpercentlines(1, this.DashStyleLine, this.PlotWidthLine);
+                }
+            }
+
+            //percent on last candle
+            if (_signals[0] != 0 && IsProcessingBarIndexLast)
+            {
+                _percent.Set(this.getpercent(0));
+                if (this.ShowSignalOnChartPercent)
                 {
                     this.drawpercentlines(0, this.DashStyleLineLast, this.PlotWidthLineLast);
                 }
             }
+
 
             if (this.ShowSignalOnChartArrow)
             {
@@ -860,6 +909,10 @@ namespace AgenaTrader.UserCode
         [Browsable(false)]
         [XmlIgnore()]
         public IntSeries Days { get { return _days; } }
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public DoubleSeries Percent { get { return _percent; } }
 
         /// <summary>
         /// </summary>
