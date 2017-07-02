@@ -15,7 +15,7 @@ using System.Windows.Forms.VisualStyles;
 
 
 /// <summary>
-/// Version: 1.2.14
+/// Version: 1.2.15
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -153,7 +153,8 @@ namespace AgenaTrader.UserCode
             if (percent < 0) _color = Color.Red;
             int _offsetdrawingtext = 7;
             if (percent < 0) _offsetdrawingtext = _offsetdrawingtext * -3;
-            AddChartText("lastsegmentpercentline" + Time[dayoffset], true, string.Format("{0:N2}%", percent), dayoffset, Close[dayoffset], _offsetdrawingtext, _color, new Font("Arial", 9, FontStyle.Bold), StringAlignment.Center, HorizontalAlignment.Right, VerticalAlignment.Bottom, _color, Color.White, 255);
+            string percstring = string.Format("{0:N2}% ({1})", percent, Math.Abs(_days[dayoffset]));
+            AddChartText("lastsegmentpercentline" + Time[dayoffset], true, percstring, dayoffset, Close[dayoffset], _offsetdrawingtext, _color, new Font("Arial", 9, FontStyle.Bold), StringAlignment.Center, HorizontalAlignment.Right, VerticalAlignment.Bottom, _color, Color.White, 255);
 
             AddChartLine("drawaline" + Time[dayoffset], offset, Close[offset], dayoffset, Close[dayoffset], _color, styleofline, widthofline);
             //int offset = Math.Abs(_days[dayoffset]) + dayoffset;
@@ -941,7 +942,8 @@ namespace AgenaTrader.UserCode
                 _ShowSignalOnChartPercent = value;
             }
         }
-        
+
+  
 
         /// <summary>
         /// </summary>
@@ -1188,7 +1190,7 @@ namespace AgenaTrader.UserCode
 }
 
 
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
+#region AgenaTrader Automaticaly Generated Code. Do not change it manually
 
 namespace AgenaTrader.UserCode
 {
