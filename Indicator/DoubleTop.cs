@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -11,6 +11,25 @@ using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
+/// <summary>
+/// Version: stable
+/// -------------------------------------------------------------------------
+/// Christian Kovar 2017
+/// Simon Pucher 2017
+/// http://script-trading.com
+/// -------------------------------------------------------------------------
+/// inspired by the geomatrical figures of a double/tripple top, this indicator
+/// is showing and highlighting highs that occur on the same level.
+/// -use the _tolerancePercentage parameter to adjust your price tolerance in percentage
+/// -use the _barsAgo parameter to adjust the length of the arch that should be between your
+/// current and past high(s)
+/// -us the _candles parameter to implement an "echo" funcionality. this feature is not only
+/// checking the current/last bar but also the last 8 bars. This makes screening much easier, 
+/// especially in the scanner column
+/// -------------------------------------------------------------------------
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
 	[Description("DoubleTop")]
@@ -72,8 +91,10 @@ namespace AgenaTrader.UserCode
             double tolerance_max = HighestHighFromEchoBars + tolerance;
 
 
-            Print("  Bar {0}, Tol+{1}, Tol-{2}",
+            Print(Bars.Instrument + " Bar {0}, Tol+{1}, Tol-{2}",
             Bars[0].Time.ToString(), Math.Round(tolerance_max, 2), Math.Round(tolerance_min, 2));
+
+
 
 
             //Check, when the chart was the last time above our current high. That period becomes irrelevant for us and gets ignored
@@ -81,21 +102,31 @@ namespace AgenaTrader.UserCode
                                               .Where(x => x.Time <  HighestHighFromEchoBarsDate)
                                               .OrderByDescending(x => x.Time);
 
+            DateTime IgnoreFromHereOn = DateTime.MinValue.AddDays(1);
             //if there is no other High and the chart is coming all the way from a lower price, than just leave this indicator
-            if (!aboveHigh.Any())
+            //if (!aboveHigh.Any())
+            //{
+            //    return;
+            //}
+
+            if (aboveHigh.GetEnumerator().MoveNext())
             {
-                return;
+                IgnoreFromHereOn = aboveHigh.FirstOrDefault().Time;
             }
-
-
-            DateTime IgnoreFromHereOn = aboveHigh.FirstOrDefault().Time;
+            
 
             //Draw ToleranceArea for the respected timeperiod
             if (DrawTolerance)
             {
-                AddChartRectangle("ToleranceRectangle", true, Bars.GetBarsAgo(IgnoreFromHereOn), tolerance_max, 0, tolerance_min, Color.Yellow, Color.Yellow, 50);
+                //AddChartRectangle("ToleranceRectangle", true, Bars.GetBarsAgo(IgnoreFromHereOn), tolerance_max, 0, tolerance_min, Color.Yellow, Color.Yellow, 50);
+                AddChartRectangle("ToleranceRectangle", true, IgnoreFromHereOn.AddDays(-1), tolerance_max, Bars[0].Time.AddDays(1), tolerance_min, Color.Yellow, Color.Yellow, 50);
             }
 
+            //Check, if the time period between the highes Echo-Candle and the MinBarsAgo has any higher price. then we are not at a current high, we are just in strange time situations
+            if (HighestHighPrice(this.Candles + BarsAgo)[0] > HighestHighFromEchoBars)
+            {
+                return;
+            }
 
             //find previous highs
             //Select all data and find highs.
