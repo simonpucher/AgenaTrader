@@ -38,13 +38,20 @@ namespace AgenaTrader.UserCode
     {
 
         private Boolean SetSuccessFromEcho = false;
+        private Boolean VerboseMode = false;
 
         //input
         private double _tolerancePercentage = 0.6;
         private int _candles = 8;
         private bool _drawTolerance;
         private int _barsAgo = 20;
+        private bool _history = false;
+        private bool _filter_SMA200;
 
+        //output
+        private double _stop = double.MaxValue;
+        private double _target = double.MinValue;
+        
 
         protected override void OnInit()
         {
@@ -53,24 +60,31 @@ namespace AgenaTrader.UserCode
             CalculateOnClosedBar = false;
 
             //Inhalt des OutputWindow l�schen
-            ClearOutputWindow();
+            if (VerboseMode)
+            {
+                ClearOutputWindow();
+            }
+            
         }
 
         protected override void OnCalculate()
         {
 
                 DoubleBottom_DS.Set(0);
+            SetSuccessFromEcho = false;
 
 
 
             double LowestLowFromEchoBars;
             double LowestLowFromEchoBarsIndex;
+            DateTime LowestLowFromEchoBarsDate;
 
             //Get the lowest Price/Index from our Echo-Period
-            if (ProcessingBarIndex >= (Bars.Count- 1))
+            if (ProcessingBarIndex >= (Bars.Count- 1) || History == true)
             {
                 LowestLowFromEchoBars = LowestLowPrice(this.Candles)[0];
                 LowestLowFromEchoBarsIndex = LowestLowIndex(this.Candles)[0];
+                LowestLowFromEchoBarsDate = Bars[(int)LowestLowFromEchoBarsIndex].Time;
             }
             else
             {
@@ -92,13 +106,22 @@ namespace AgenaTrader.UserCode
             double tolerance_min = LowestLowFromEchoBars - tolerance;
             double tolerance_max = LowestLowFromEchoBars + tolerance;
 
+            double SMA_tol     = SMA(200)[0] * (TolerancePercentage / 100);
+            double SMA_tol_min = SMA(200)[0] - SMA_tol;
+            double SMA_tol_max = SMA(200)[0] + SMA_tol;
 
-            Print("  Bar {0}, Tol+{1}, Tol-{2}",
-            Bars[0].Time.ToString(), Math.Round(tolerance_max, 2), Math.Round(tolerance_min, 2));
+            if (VerboseMode)
+            {
+                Print("Instrument {3}  Bar {0}, Tol+{1}, Tol-{2}",
+            Bars[0].Time.ToString(), Math.Round(tolerance_max, 2), Math.Round(tolerance_min, 2), Bars.Instrument);
+            }
             
 
+
             //Check, when the chart was the last time below our current low. That period becomes irrelevant for us and gets ignored
-            IEnumerable<IBar> belowLow = Bars.Where(y => y.Low <= tolerance_min).OrderByDescending(x => x.Time);
+            IEnumerable<IBar> belowLow = Bars.Where(y => y.Low <= tolerance_min)
+                                             .Where(x => x.Time < LowestLowFromEchoBarsDate)
+                                             .OrderByDescending(x => x.Time);
 
             //if there is no other Low and the chart is coming all the way from a higher price, than just leave this indicator
             if (!belowLow.Any())
@@ -112,7 +135,15 @@ namespace AgenaTrader.UserCode
             //Draw ToleranceArea for the respected timeperiod
             if (DrawTolerance)
             {
-                AddChartRectangle("ToleranceRectangle", true, Bars.GetBarsAgo(IgnoreFromHereOn), tolerance_max, 0, tolerance_min, Color.Yellow, Color.Yellow, 50);
+                //AddChartRectangle("ToleranceRectangle", true, Bars.GetBarsAgo(IgnoreFromHereOn), tolerance_max, 0, tolerance_min, Color.Yellow, Color.Yellow, 50);
+                AddChartRectangle("ToleranceRectangle", true, IgnoreFromHereOn.AddDays(-1), tolerance_max, Bars[0].Time.AddDays(1), tolerance_min, Color.Yellow, Color.Yellow, 50);
+            }
+
+
+            //Check, if the time period between the highes Echo-Candle and the MinBarsAgo has any higher price. then we are not at a current high, we are just in strange time situations
+            if (LowestLowPrice(this.Candles + BarsAgo)[0] < LowestLowFromEchoBars)
+            {
+                return;
             }
 
 
@@ -142,8 +173,7 @@ namespace AgenaTrader.UserCode
                  ||   LowestLow == LowestLowFromEchoBars )
                     )
                 {
-                    Print("DoubleBottom  Low: {0}, Time: {1}, LowestLow: {2}, LowestLowBefore: {3}",
-                          bar.Low, bar.Time.ToString(), LowestLow, LowestLowBefore);
+
 
                     //Drawings
                     //Red Connection Line of the Bottoms
@@ -159,16 +189,35 @@ namespace AgenaTrader.UserCode
                     AddChartLine(strBreakThrough,     (int)BreakThroughAgo, BreakThrough, 0 , BreakThrough, Color.Aquamarine, DashStyle.Solid, 2);
                     AddChartLine(strBreakThroughVert, (int)BreakThroughAgo, bar.Low, (int)BreakThroughAgo, BreakThrough, Color.Aquamarine, DashStyle.Solid, 2);
 
+                    if (Filter_SMA200)
+                    {
+                        if (  bar.Low < SMA_tol_min
+                           || bar.Low > SMA_tol_max)
+                        {
+                            continue;  //check for SMA200 filter and check if the current low is within the SMA-tolerances
+                        }
+                    }
                     //Mark current low
                     DoubleBottom_DS.Set((int)LowestLowFromEchoBarsIndex,1);
                     //Mark previous low(s)
                     DoubleBottom_DS.Set(Bars.GetBarsAgo(bar.Time), 0.5);
                     SetSuccessFromEcho = true;
+
+                    if (VerboseMode)
+                    {
+                        Print("DoubleBottom  Low: {0}, Time: {1}, LowestLow: {2}, LowestLowBefore: {3}, BreakThrough:  {4}",
+                          bar.Low, bar.Time.ToString(), LowestLow, LowestLowBefore, BreakThrough);
+                    }
+
+                    //set Stop and Target for Strategy
+                    _stop = LowestLow * 0.99;
+                    _target = BreakThrough * 0.99;
                 }
             }
             if (SetSuccessFromEcho)
             {
                 DoubleBottom_DS.Set(1);
+                Print("Indikator Kaufsignal: " + LowestLowFromEchoBarsDate.ToString());
             }
             else
             {
@@ -244,6 +293,57 @@ namespace AgenaTrader.UserCode
             }
         }
 
+        [Description("Also calculate historic values (longer calculatio time!)")]
+        [Category("Parameters")]
+        [DisplayName("History")]
+        public bool History
+        {
+            get
+            {
+                return _history;
+            }
+
+            set
+            {
+                _history = value;
+            }
+        }
+
+        [Description("Filter: SMA200)")]
+        [Category("Parameters")]
+        [DisplayName("SMA200")]
+        public bool Filter_SMA200
+        {
+            get
+            {
+                return _filter_SMA200;
+            }
+
+            set
+            {
+                _filter_SMA200 = value;
+            }
+        }
+
+        public double Stop
+        {
+            get
+            {
+                return _stop;
+            }
+
+        }
+
+        public double Target
+        {
+            get
+            {
+                return _target;
+            }
+        }
+
+
+
 
         #endregion
     }
@@ -259,17 +359,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
+		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
         {
-			return DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo);
+			return DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
 		}
 
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
+		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<DoubleBottom>(input, i => Math.Abs(i.TolerancePercentage - tolerancePercentage) <= Double.Epsilon && i.Candles == candles && i.DrawTolerance == drawTolerance && i.BarsAgo == barsAgo);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<DoubleBottom>(input, i => Math.Abs(i.TolerancePercentage - tolerancePercentage) <= Double.Epsilon && i.Candles == candles && i.DrawTolerance == drawTolerance && i.BarsAgo == barsAgo && i.History == history && i.Filter_SMA200 == filter_SMA200);
 
 			if (indicator != null)
 				return indicator;
@@ -282,7 +382,9 @@ namespace AgenaTrader.UserCode
 							TolerancePercentage = tolerancePercentage,
 							Candles = candles,
 							DrawTolerance = drawTolerance,
-							BarsAgo = barsAgo
+							BarsAgo = barsAgo,
+							History = history,
+							Filter_SMA200 = filter_SMA200
 						};
 			indicator.SetUp();
 
@@ -301,20 +403,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
+		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
 		{
-			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo);
+			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
 		}
 
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
+		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
 		{
 			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
-			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance, barsAgo);
+			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
 		}
 	}
 
@@ -327,17 +429,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
+		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
 		{
-			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo);
+			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
 		}
 
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
+		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
 		{
-			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance, barsAgo);
+			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
 		}
 	}
 
@@ -350,17 +452,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
+		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
 		{
-			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo);
+			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
 		}
 
 		/// <summary>
 		/// DoubleBottom
 		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
+		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
 		{
-			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance, barsAgo);
+			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
 		}
 	}
 
