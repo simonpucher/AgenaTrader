@@ -13,7 +13,7 @@ using AgenaTrader.Helper;
 using System.Windows.Forms;
 
 /// <summary>
-/// Version: 1.2
+/// Version: 1.2.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -21,6 +21,10 @@ using System.Windows.Forms;
 /// + if markets are closed no OnCalculate() is called so we need an timer event. 
 /// -------------------------------------------------------------------------
 /// Adds instruments dynamical to a static list (e.g. portfolio) if the market is currently open.
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
+/// You will find this indicator on GitHub: https://raw.githubusercontent.com/simonpucher/AgenaTrader/master/Utilities/GlobalUtilities_Utility.cs
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -32,9 +36,9 @@ namespace AgenaTrader.UserCode
         #region Variables
 
         private bool _usemarkethours = true;
-        private string _instrumentlists = "DAX30;ATX20;DOW30;NASDAQ";
+        private string _instrumentlists = "DAX30;ATX20;DOW30;NASDAQ;S&P500";
         private static DateTime _lastupdate = DateTime.Now;
-        private int _seconds = 10;
+        private int _seconds = 60;
 
         private string _name_of_list = String.Empty;
         private IInstrumentsList _list = null;
@@ -49,6 +53,10 @@ namespace AgenaTrader.UserCode
         }
 
 
+        protected override void OnStart()
+        {
+            this.CheckForNewInstruments();
+        }
 
 
         protected override void OnCalculate()
@@ -80,10 +88,12 @@ namespace AgenaTrader.UserCode
 
                 if (_list != null)
                 {
-                    this.Root.Core.InstrumentManager.ClearInstrumentList(this.Name_of_list);
+                    //this.Root.Core.InstrumentManager.ClearInstrumentList(this.Name_of_list);
+                    Core.GuiManager.BeginInvoke((Action)(() => this.Root.Core.InstrumentManager.ClearInstrumentList(this.Name_of_list)));
+
                 }
 
-               
+
                 if (!String.IsNullOrWhiteSpace(this.Instrumentlists))
                 {
                     string[] arr_Instrumentlists = this.Instrumentlists.Split(new char[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
@@ -105,7 +115,8 @@ namespace AgenaTrader.UserCode
                                         {
                                             if (!_list.Contains(inst))
                                             {
-                                                this.Root.Core.InstrumentManager.AddInstrument2List(inst, this.Name_of_list);
+                                                //this.Root.Core.InstrumentManager.AddInstrument2List(inst, this.Name_of_list);
+                                                Core.GuiManager.BeginInvoke((Action)(() => Core.InstrumentManager.AddInstrument2List(inst, this.Name_of_list)));
                                             }
                                         }
                                     }
@@ -116,7 +127,8 @@ namespace AgenaTrader.UserCode
                                     {
                                         if (!_list.Contains(inst))
                                         {
-                                            this.Root.Core.InstrumentManager.AddInstrument2List(inst, this.Name_of_list);
+                                            //this.Root.Core.InstrumentManager.AddInstrument2List(inst, this.Name_of_list);
+                                            Core.GuiManager.BeginInvoke((Action)(() => Core.InstrumentManager.AddInstrument2List(inst, this.Name_of_list)));
                                         }
                                     }
                                 }
@@ -277,7 +289,7 @@ namespace AgenaTrader.UserCode
 		public DynamicListMarkets_Indicator_Tool DynamicListMarkets_Indicator_Tool(IDataSeries input, System.String name_of_list, System.Boolean useMarketHours, System.String instrumentlists, System.Int32 seconds)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.DynamicListMarkets_Indicator_Tool(input, name_of_list, useMarketHours, instrumentlists, seconds);
 		}

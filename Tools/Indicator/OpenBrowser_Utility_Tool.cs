@@ -12,11 +12,15 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1.4
+/// Version: 1.1.5
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
 /// Opens web browser by clicking on the chart.
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this indicator without any error you also need access to the utility indicator to use these global source code elements.
+/// You will find this indicator on GitHub: https://raw.githubusercontent.com/simonpucher/AgenaTrader/master/Utilities/GlobalUtilities_Utility.cs
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
@@ -39,6 +43,7 @@ namespace AgenaTrader.UserCode
         private bool _openyahoofinance = true;
         private bool _openearningswhispers = true;
         private bool _openzacks = true;
+        private bool _openzacks_direct = true;
 
 
         #endregion
@@ -175,7 +180,12 @@ namespace AgenaTrader.UserCode
 
                 if (this.OpenZacks)
                 {
-                    GUIHelper.OpenInBrowser("https://www.zacks.com/search.php?q=" + Name);
+                    GUIHelper.OpenInBrowser("https://www.zacks.com/search.php?q=" + symbol);
+                }
+
+                if (this.OpenZacks_Direct)
+                {
+                    GUIHelper.OpenInBrowser("https://www.zacks.com/stock/quote/" + symbol);
                 }
 
 
@@ -270,6 +280,15 @@ namespace AgenaTrader.UserCode
             set { _openzacks = value; }
         }
 
+        [Description("Opens Zacks Direct with the current symbol displayed in the chart")]
+        [Category("Parameters")]
+        [DisplayName("Zacks Direct")]
+        public bool OpenZacks_Direct
+        {
+            get { return _openzacks_direct; }
+            set { _openzacks_direct = value; }
+        }
+
         private Color _col_positive = Color.Green;
         /// <summary>
         /// </summary>
@@ -332,17 +351,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
         {
-			return OpenBrowser_Utility_Tool(InSeries, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks);
+			return OpenBrowser_Utility_Tool(InSeries, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks, openZacks_Direct);
 		}
 
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<OpenBrowser_Utility_Tool>(input, i => i.OpenYahooFinance == openYahooFinance && i.OpenGoogleFinance == openGoogleFinance && i.OpenMorningstar == openMorningstar && i.OpenMorningstar_Direct == openMorningstar_Direct && i.OpenEarningswhispers == openEarningswhispers && i.OpenZacks == openZacks);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<OpenBrowser_Utility_Tool>(input, i => i.OpenYahooFinance == openYahooFinance && i.OpenGoogleFinance == openGoogleFinance && i.OpenMorningstar == openMorningstar && i.OpenMorningstar_Direct == openMorningstar_Direct && i.OpenEarningswhispers == openEarningswhispers && i.OpenZacks == openZacks && i.OpenZacks_Direct == openZacks_Direct);
 
 			if (indicator != null)
 				return indicator;
@@ -357,7 +376,8 @@ namespace AgenaTrader.UserCode
 							OpenMorningstar = openMorningstar,
 							OpenMorningstar_Direct = openMorningstar_Direct,
 							OpenEarningswhispers = openEarningswhispers,
-							OpenZacks = openZacks
+							OpenZacks = openZacks,
+							OpenZacks_Direct = openZacks_Direct
 						};
 			indicator.SetUp();
 
@@ -376,20 +396,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(InSeries, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks);
+			return LeadIndicator.OpenBrowser_Utility_Tool(InSeries, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks, openZacks_Direct);
 		}
 
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
 			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
-			return LeadIndicator.OpenBrowser_Utility_Tool(input, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks);
+			return LeadIndicator.OpenBrowser_Utility_Tool(input, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks, openZacks_Direct);
 		}
 	}
 
@@ -402,17 +422,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(InSeries, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks);
+			return LeadIndicator.OpenBrowser_Utility_Tool(InSeries, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks, openZacks_Direct);
 		}
 
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(input, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks);
+			return LeadIndicator.OpenBrowser_Utility_Tool(input, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks, openZacks_Direct);
 		}
 	}
 
@@ -425,17 +445,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(InSeries, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks);
+			return LeadIndicator.OpenBrowser_Utility_Tool(InSeries, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks, openZacks_Direct);
 		}
 
 		/// <summary>
 		/// Opens web browser by clicking on the chart.
 		/// </summary>
-		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks)
+		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
-			return LeadIndicator.OpenBrowser_Utility_Tool(input, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks);
+			return LeadIndicator.OpenBrowser_Utility_Tool(input, openYahooFinance, openGoogleFinance, openMorningstar, openMorningstar_Direct, openEarningswhispers, openZacks, openZacks_Direct);
 		}
 	}
 

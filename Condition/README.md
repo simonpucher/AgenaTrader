@@ -1,10 +1,10 @@
-﻿#Conditions for Agena Trader
+﻿# Conditions for Agena Trader
 
-##Important
+## Important
 To compile indicators, conditions and other script resources without any error your Agena Trader also need access to the utility indicator to use these global source code elements. You will find this indicator on GitHub: [Global Utilities](https://github.com/ScriptTrading/Basic-Package/blob/master/Utilities/GlobalUtilities_Utility.cs)
 
-##Show Gap
+## Show Gap
 *** In Progress ***
 
-##Open Range
+## Open Range
 *** In Progress ***
