@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0.1
+/// Version: 1.0.3
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2017
 /// -------------------------------------------------------------------------
@@ -29,10 +29,17 @@ namespace AgenaTrader.UserCode
 	{
         private static readonly TimeFrame TF_Day = new TimeFrame(DatafeedHistoryPeriodicity.Day, 1);
         private static readonly TimeFrame TF_Week = new TimeFrame(DatafeedHistoryPeriodicity.Week, 1);
+        private static readonly TimeFrame TF_Month = new TimeFrame(DatafeedHistoryPeriodicity.Month, 1);
+
+        private Color _color_long_signal_background = Const.DefaultArrowLongColor;
+        private Color _color_short_signal_background = Const.DefaultArrowShortColor;
+        private int _opacity_signal = 25;
 
         protected override void OnBarsRequirements()
         {
             Add(TF_Day);
+            Add(TF_Week);
+            Add(TF_Month);
         }
 
         protected override void OnInit()
@@ -40,27 +47,43 @@ namespace AgenaTrader.UserCode
 			//Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
 			IsOverlay = true;
             CalculateOnClosedBar = true;
+            
         }
 
 		protected override void OnCalculate()
 		{
-  
+            //Always show the day candle
+            int _timeseriescount = 1;
+
             if (ProcessingBarSeriesIndex == 1)
             {
+                //Change time frame to higher candles
+                if (this.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Day)
+                {
+                    _timeseriescount = 2;
+                }
+                else if (this.TimeFrame.Periodicity == DatafeedHistoryPeriodicity.Week)
+                {
+                    _timeseriescount = 3;
+                }
+
+                //Drawing
                 Color _col = Color.Gray;
-                if (Opens[1][0] > Closes[1][0])
+                if (Opens[_timeseriescount][0] > Closes[_timeseriescount][0])
                 {
-                    _col = Color.Red;
+                    _col = this.ColorShortSignalBackground;
                 }
-                else if (Opens[1][0] < Closes[1][0])
+                else if (Opens[_timeseriescount][0] < Closes[_timeseriescount][0])
                 {
-                    _col = Color.Green;
+                    _col = this.ColorLongSignalBackground;
                 }
-                //MyPlot1.Set(InSeries[0]);
-                
-                AddChartRectangle("HTFCandle-" + ProcessingBarIndex, true, Times[1][0], Lows[1][0], Times[1][0].AddSeconds(TimeFrames[1].GetSeconds()), Highs[1][0], _col, _col, 50);
+
+                DateTime mystart = Times[_timeseriescount][1];
+                DateTime myend = Times[_timeseriescount][0].AddSeconds(-1);
+                AddChartRectangle("HTFCandle-" + Times[_timeseriescount][1], true, mystart, Lows[_timeseriescount][1], myend, Highs[_timeseriescount][1], _col, _col, this.OpacitySignal);
+
             }
-            
+
         }
 
         public override string ToString()
@@ -85,8 +108,66 @@ namespace AgenaTrader.UserCode
 			get { return Outputs[0]; }
 		}
 
-		#endregion
-	}
+        /// <summary>
+        /// </summary>
+        [Description("Select opacity for the background in percent.")]
+        [Category("Background")]
+        [DisplayName("Opacity Background %")]
+        public int OpacitySignal
+        {
+            get { return _opacity_signal; }
+            set
+            {
+                if (value < 0) value = 0;
+                if (value > 100) value = 100;
+                _opacity_signal = value;
+            }
+        }
+
+   
+
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the background in long setup.")]
+        [Category("Background")]
+        [DisplayName("Color Background Long")]
+        public Color ColorLongSignalBackground
+        {
+            get { return _color_long_signal_background; }
+            set { _color_long_signal_background = value; }
+        }
+
+
+        // Serialize Color object
+        [Browsable(false)]
+        public string ColorLongSignalBackgroundSerialize
+        {
+            get { return SerializableColor.ToString(_color_long_signal_background); }
+            set { _color_long_signal_background = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the background in short setup.")]
+        [Category("Background")]
+        [DisplayName("Color Background Short")]
+        public Color ColorShortSignalBackground
+        {
+            get { return _color_short_signal_background; }
+            set { _color_short_signal_background = value; }
+        }
+        // Serialize Color object
+        [Browsable(false)]
+        public string ColorShortSignalBackgroundSerialize
+        {
+            get { return SerializableColor.ToString(_color_short_signal_background); }
+            set { _color_short_signal_background = SerializableColor.FromString(value); }
+        }
+
+
+        #endregion
+    }
 }
 #region AgenaTrader Automaticaly Generated Code. Do not change it manually
 
