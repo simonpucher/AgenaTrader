@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0.0
+/// Version: 1.0.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2017
 /// -------------------------------------------------------------------------
@@ -33,23 +33,28 @@ namespace AgenaTrader.UserCode
         bool shortsignalbb = false;
         bool longsignalbb = false;
 
+        private int _bollinger_period = 20;
+        private double _bollinger_stddev = 2;
+
+        private int _macd_fast = 12;
+        private int _macd_slow = 26;
+        private int _macd_smooth = 9;
+
         protected override void OnInit()
 		{
-			AddPlot(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
+			AddPlot(new Plot(Color.FromKnownColor(KnownColor.Orange), "Plot_Signal_King_Pinball"));
 			CalculateOnClosedBar = true;
 		}
 
 		protected override void OnCalculate()
 		{
-
-            if (Close[0] < Bollinger(2, 100).Lower[0])
+            Bollinger bol = Bollinger(this.Bollinger_stddev, this.Bollinger_Period);
+            if (Close[0] < bol.Lower[0])
             {
-                //AddChartArrowUp(Time[0].ToString(), 0, Low[0], Color.Green);
                 longsignalbb = true;
             }
-            else if (Close[0] > Bollinger(2, 20).Upper[0])
+            else if (Close[0] > bol.Upper[0])
             {
-                //AddChartArrowDown(Time[0].ToString(), 0, High[0], Color.Red);
                 shortsignalbb = true;
             }
             else
@@ -57,8 +62,7 @@ namespace AgenaTrader.UserCode
                 //nothing
             }
 
-            MACD macd = MACD(5, 50, 25);
-
+            MACD macd = MACD(this.MACD_Fast, this.MACD_Slow, this.MACD_Smooth);
             if (longsignalbb && CrossAbove(macd.Default, macd.Avg, 0))
             {
                 AddChartArrowUp(Time[0].ToString()+"long", 0, Low[0], Color.Green);
@@ -88,8 +92,80 @@ namespace AgenaTrader.UserCode
 			get { return Outputs[0]; }
 		}
 
-		#endregion
-	}
+
+     
+        /// <summary>
+        /// </summary>
+        [Description("Bollinger Band period.")]
+        [Category("Parameters")]
+        [DisplayName("BB period")]
+        public int Bollinger_Period
+        {
+            get { return _bollinger_period; }
+            set
+            {
+                _bollinger_period = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Bollinger Band standard deviation")]
+        [Category("Parameters")]
+        [DisplayName("BB stddev")]
+        public double Bollinger_stddev
+        {
+            get { return _bollinger_stddev; }
+            set
+            {
+                _bollinger_stddev = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Bollinger Band fast")]
+        [Category("Parameters")]
+        [DisplayName("MACD fast")]
+        public int MACD_Fast
+        {
+            get { return _macd_fast; }
+            set
+            {
+                _macd_fast = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Bollinger Band slow")]
+        [Category("Parameters")]
+        [DisplayName("MACD slow")]
+        public int MACD_Slow
+        {
+            get { return _macd_slow; }
+            set
+            {
+                _macd_slow = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Bollinger Band smooth")]
+        [Category("Parameters")]
+        [DisplayName("MACD smooth")]
+        public int MACD_Smooth
+        {
+            get { return _macd_smooth; }
+            set
+            {
+                _macd_smooth = value;
+            }
+        }
+
+        #endregion
+    }
 }
 #region AgenaTrader Automaticaly Generated Code. Do not change it manually
 
@@ -102,17 +178,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// King Pinball
 		/// </summary>
-		public King_Pinball_Indicator King_Pinball_Indicator()
+		public King_Pinball_Indicator King_Pinball_Indicator(System.Int32 bollinger_Period, System.Double bollinger_stddev, System.Int32 mACD_Fast, System.Int32 mACD_Slow, System.Int32 mACD_Smooth)
         {
-			return King_Pinball_Indicator(InSeries);
+			return King_Pinball_Indicator(InSeries, bollinger_Period, bollinger_stddev, mACD_Fast, mACD_Slow, mACD_Smooth);
 		}
 
 		/// <summary>
 		/// King Pinball
 		/// </summary>
-		public King_Pinball_Indicator King_Pinball_Indicator(IDataSeries input)
+		public King_Pinball_Indicator King_Pinball_Indicator(IDataSeries input, System.Int32 bollinger_Period, System.Double bollinger_stddev, System.Int32 mACD_Fast, System.Int32 mACD_Slow, System.Int32 mACD_Smooth)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<King_Pinball_Indicator>(input);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<King_Pinball_Indicator>(input, i => i.Bollinger_Period == bollinger_Period && Math.Abs(i.Bollinger_stddev - bollinger_stddev) <= Double.Epsilon && i.MACD_Fast == mACD_Fast && i.MACD_Slow == mACD_Slow && i.MACD_Smooth == mACD_Smooth);
 
 			if (indicator != null)
 				return indicator;
@@ -121,7 +197,12 @@ namespace AgenaTrader.UserCode
 						{
 							RequiredBarsCount = RequiredBarsCount,
 							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input
+							InSeries = input,
+							Bollinger_Period = bollinger_Period,
+							Bollinger_stddev = bollinger_stddev,
+							MACD_Fast = mACD_Fast,
+							MACD_Slow = mACD_Slow,
+							MACD_Smooth = mACD_Smooth
 						};
 			indicator.SetUp();
 
@@ -140,20 +221,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// King Pinball
 		/// </summary>
-		public King_Pinball_Indicator King_Pinball_Indicator()
+		public King_Pinball_Indicator King_Pinball_Indicator(System.Int32 bollinger_Period, System.Double bollinger_stddev, System.Int32 mACD_Fast, System.Int32 mACD_Slow, System.Int32 mACD_Smooth)
 		{
-			return LeadIndicator.King_Pinball_Indicator(InSeries);
+			return LeadIndicator.King_Pinball_Indicator(InSeries, bollinger_Period, bollinger_stddev, mACD_Fast, mACD_Slow, mACD_Smooth);
 		}
 
 		/// <summary>
 		/// King Pinball
 		/// </summary>
-		public King_Pinball_Indicator King_Pinball_Indicator(IDataSeries input)
+		public King_Pinball_Indicator King_Pinball_Indicator(IDataSeries input, System.Int32 bollinger_Period, System.Double bollinger_stddev, System.Int32 mACD_Fast, System.Int32 mACD_Slow, System.Int32 mACD_Smooth)
 		{
 			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
-			return LeadIndicator.King_Pinball_Indicator(input);
+			return LeadIndicator.King_Pinball_Indicator(input, bollinger_Period, bollinger_stddev, mACD_Fast, mACD_Slow, mACD_Smooth);
 		}
 	}
 
@@ -166,17 +247,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// King Pinball
 		/// </summary>
-		public King_Pinball_Indicator King_Pinball_Indicator()
+		public King_Pinball_Indicator King_Pinball_Indicator(System.Int32 bollinger_Period, System.Double bollinger_stddev, System.Int32 mACD_Fast, System.Int32 mACD_Slow, System.Int32 mACD_Smooth)
 		{
-			return LeadIndicator.King_Pinball_Indicator(InSeries);
+			return LeadIndicator.King_Pinball_Indicator(InSeries, bollinger_Period, bollinger_stddev, mACD_Fast, mACD_Slow, mACD_Smooth);
 		}
 
 		/// <summary>
 		/// King Pinball
 		/// </summary>
-		public King_Pinball_Indicator King_Pinball_Indicator(IDataSeries input)
+		public King_Pinball_Indicator King_Pinball_Indicator(IDataSeries input, System.Int32 bollinger_Period, System.Double bollinger_stddev, System.Int32 mACD_Fast, System.Int32 mACD_Slow, System.Int32 mACD_Smooth)
 		{
-			return LeadIndicator.King_Pinball_Indicator(input);
+			return LeadIndicator.King_Pinball_Indicator(input, bollinger_Period, bollinger_stddev, mACD_Fast, mACD_Slow, mACD_Smooth);
 		}
 	}
 
@@ -189,17 +270,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// King Pinball
 		/// </summary>
-		public King_Pinball_Indicator King_Pinball_Indicator()
+		public King_Pinball_Indicator King_Pinball_Indicator(System.Int32 bollinger_Period, System.Double bollinger_stddev, System.Int32 mACD_Fast, System.Int32 mACD_Slow, System.Int32 mACD_Smooth)
 		{
-			return LeadIndicator.King_Pinball_Indicator(InSeries);
+			return LeadIndicator.King_Pinball_Indicator(InSeries, bollinger_Period, bollinger_stddev, mACD_Fast, mACD_Slow, mACD_Smooth);
 		}
 
 		/// <summary>
 		/// King Pinball
 		/// </summary>
-		public King_Pinball_Indicator King_Pinball_Indicator(IDataSeries input)
+		public King_Pinball_Indicator King_Pinball_Indicator(IDataSeries input, System.Int32 bollinger_Period, System.Double bollinger_stddev, System.Int32 mACD_Fast, System.Int32 mACD_Slow, System.Int32 mACD_Smooth)
 		{
-			return LeadIndicator.King_Pinball_Indicator(input);
+			return LeadIndicator.King_Pinball_Indicator(input, bollinger_Period, bollinger_stddev, mACD_Fast, mACD_Slow, mACD_Smooth);
 		}
 	}
 
