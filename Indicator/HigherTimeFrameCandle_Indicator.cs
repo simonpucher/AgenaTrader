@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0.3
+/// Version: 1.0.5
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2017
 /// -------------------------------------------------------------------------
@@ -46,7 +46,7 @@ namespace AgenaTrader.UserCode
 		{
 			//Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
 			IsOverlay = true;
-            CalculateOnClosedBar = true;
+            CalculateOnClosedBar = false;
             
         }
 
@@ -69,18 +69,21 @@ namespace AgenaTrader.UserCode
 
                 //Drawing
                 Color _col = Color.Gray;
-                if (Opens[_timeseriescount][0] > Closes[_timeseriescount][0])
+                if (Opens[_timeseriescount][1] > Closes[_timeseriescount][1])
                 {
                     _col = this.ColorShortSignalBackground;
                 }
-                else if (Opens[_timeseriescount][0] < Closes[_timeseriescount][0])
+                else if (Opens[_timeseriescount][1] < Closes[_timeseriescount][1])
                 {
                     _col = this.ColorLongSignalBackground;
                 }
 
+
                 DateTime mystart = Times[_timeseriescount][1];
                 DateTime myend = Times[_timeseriescount][0].AddSeconds(-1);
                 AddChartRectangle("HTFCandle-" + Times[_timeseriescount][1], true, mystart, Lows[_timeseriescount][1], myend, Highs[_timeseriescount][1], _col, _col, this.OpacitySignal);
+
+
 
             }
 
