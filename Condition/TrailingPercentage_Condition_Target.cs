@@ -11,12 +11,23 @@ using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
+/// <summary>
+/// Version: 1.2
+/// -------------------------------------------------------------------------
+/// Simon Pucher 2017
+/// -------------------------------------------------------------------------
+/// ****** Important ******
+/// To compile this script without any error you also need access to the utility indicator to use global source code elements.
+/// You will find this script on GitHub: https://raw.githubusercontent.com/simonpucher/AgenaTrader/master/Utilities/GlobalUtilities_Utility.cs
+/// -------------------------------------------------------------------------
+/// Namespace holds all indicators and is required. Do not change it.
+/// </summary>
 namespace AgenaTrader.UserCode
 {
 	[Description("Trailing Stop with percentage value.")]
 	[IsEntryAttribute(false)]
-	[IsStopAttribute(false)]
-	[IsTargetAttribute(true)]
+	[IsStopAttribute(true)]
+	[IsTargetAttribute(false)]
 	[OverrulePreviousStopPrice(false)]
 	public class TrailingPercentage_Condition_Target : UserScriptedCondition
 	{
@@ -29,19 +40,18 @@ namespace AgenaTrader.UserCode
 		protected override void OnInit()
 		{
 			IsEntry = false;
-			IsStop = false;
-			IsTarget = true;
+			IsStop = true;
+			IsTarget = false;
 			Add(new Plot(Color.FromKnownColor(KnownColor.Black), "Occurred"));
-			Add(new Plot(Color.Orange, "Target"));
+			Add(new Plot(Color.Orange, "Stop"));
 			IsOverlay = true;
             CalculateOnClosedBar = false;
 		}
 
 		protected override void OnCalculate()
 		{
-            //Print("TrailingPercentage_Condition_Target OnCalculate: " + Time[0].ToString());
             Occurred.Set(1);
-            Target.Set(Close[0] * (1 + this.Percentage/100.0));
+            Stop.Set(Close[0] * (1 - this.Percentage/100.0));
         }
 
 		#region Properties
@@ -55,14 +65,14 @@ namespace AgenaTrader.UserCode
 
 		[Browsable(false)]
 		[XmlIgnore()]
-		public DataSeries Target
+		public DataSeries Stop
 		{
 			get { return Outputs[1]; }
 		}
 
 		public override IList<DataSeries> GetTargets()
 		{
-			return new[]{Target};
+			return new[]{Stop};
 		}
 
 		[Description("")]
