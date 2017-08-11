@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2
+/// Version: 1.2.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -54,7 +54,7 @@ namespace AgenaTrader.UserCode
 		{
 			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
             //Add(new Plot(Color.FromKnownColor(KnownColor.Gray), "MyPlot2"));
-            IsOverlay = true;
+            IsOverlay = false;
 			CalculateOnClosedBar = true;
 		}
 
@@ -187,7 +187,7 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
+#region AgenaTrader Automaticaly Generated Code. Do not change it manually
 
 namespace AgenaTrader.UserCode
 {
