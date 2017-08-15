@@ -1767,7 +1767,7 @@ public class GlobalUtility : AgenaTrader.UserCode.UserIndicator
     //https://www.youtube.com/watch?v=5NNOrp_83RU
 }
 
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
+#region AgenaTrader Automaticaly Generated Code. Do not change it manually
 
 namespace AgenaTrader.UserCode
 {
