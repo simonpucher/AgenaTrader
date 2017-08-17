@@ -14,7 +14,7 @@ using AgenaTrader.Helper;
 namespace AgenaTrader.UserCode
 {
 	/// <summary>
-/// Version: 1.1.2
+/// Version: 1.1.3
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -24,14 +24,25 @@ namespace AgenaTrader.UserCode
 /// -------------------------------------------------------------------------
 /// Namespace holds all indicators and is required. Do not change it.
 /// </summary>
+/// 
     [Description("Take your money and run when smart money start the distribution.")]
 	public class DistributionDay_Indicator : UserIndicator
 	{
+        public enum Enum_Volume_Calucation
+        {
+            VolumeIsGreaterThanYesterday = 0,
+            VolumeisGreaterThantheEMAOfTheLastXCandles = 1
+        }
+
         private Queue<DateTime> _distributionlist = null;
         private int _period = 25;
         private double _percent = 0.2;
         private bool _showdistributiondayarrows = true;
         private int _distributiondaycount = 4;
+
+        private Enum_Volume_Calucation _volume_calculation = Enum_Volume_Calucation.VolumeisGreaterThantheEMAOfTheLastXCandles;
+
+        private int _ema_period = 30;
 
         private Color _color_long_signal_distribution = Color.DarkViolet;
         private Color _color_long_signal_distribution_strong = Color.LightPink;
@@ -59,8 +70,20 @@ namespace AgenaTrader.UserCode
                 this._distributionlist.Dequeue();
             }
 
-            //Draw Disrtibution Arrow.
-            if (Volume[0] > Volume[1] && ((Close[1] - Close[0]) / Close[1]) > (this.Percent / 100.0))
+            bool volumespike = false;
+            //Volume Calculation
+            switch (this.Volume_Calculation)
+            {
+                case Enum_Volume_Calucation.VolumeIsGreaterThanYesterday:
+                    if (Volume[0] > Volume[1]) volumespike = true;
+                    break;
+                case Enum_Volume_Calucation.VolumeisGreaterThantheEMAOfTheLastXCandles:
+                    if (Volume[0] > EMA(Volume, this.EMA_Period)[0]) volumespike = true;
+                    break;
+            }
+
+            //Draw Distribution Arrow.
+            if (volumespike && ((Close[1] - Close[0]) / Close[1]) > (this.Percent / 100.0))
             {
                
                 this._distributionlist.Enqueue(Time[0]);
@@ -171,6 +194,29 @@ namespace AgenaTrader.UserCode
             set { _color_long_signal_distribution_strong = SerializableColor.FromString(value); }
 
         }
+
+
+        
+ [Description("Select the type of volume calculation.")]
+        [Category("Volume")]
+        [DisplayName("Volume Calculation")]
+        public Enum_Volume_Calucation Volume_Calculation
+        {
+            get { return _volume_calculation; }
+            set { _volume_calculation = value; }
+        }
+
+        [Description("Select the period of the EMA volume calculation.")]
+        [Category("Volume")]
+        [DisplayName("Volume Calculation Period")]
+        public int EMA_Period
+        {
+            get { return _ema_period; }
+            set { _ema_period = value; }
+        }
+
+        
+
         #endregion
     }
 }
