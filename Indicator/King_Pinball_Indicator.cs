@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0.1
+/// Version: 1.0.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2017
 /// -------------------------------------------------------------------------
@@ -40,6 +40,9 @@ namespace AgenaTrader.UserCode
         private int _macd_slow = 26;
         private int _macd_smooth = 9;
 
+        private Color _color_long_signal = Const.DefaultArrowLongColor;
+        private Color _color_short_signal = Const.DefaultArrowShortColor;
+
         protected override void OnInit()
 		{
 			AddPlot(new Plot(Color.FromKnownColor(KnownColor.Orange), "Plot_Signal_King_Pinball"));
@@ -65,13 +68,13 @@ namespace AgenaTrader.UserCode
             MACD macd = MACD(this.MACD_Fast, this.MACD_Slow, this.MACD_Smooth);
             if (longsignalbb && CrossAbove(macd.Default, macd.Avg, 0))
             {
-                AddChartArrowUp(Time[0].ToString()+"long", 0, Low[0], Color.Green);
+                AddChartArrowUp(Time[0].ToString()+"long", 0, Low[0], this.ColorLongSignal);
                 MyPlot1.Set(1);
                 longsignalbb = false;
             }
             else if (shortsignalbb && CrossBelow(macd.Default, macd.Avg, 0))
             {
-                AddChartArrowDown(Time[0].ToString()+"short", 0, High[0], Color.Red);
+                AddChartArrowDown(Time[0].ToString()+"short", 0, High[0], this.ColorShortSignal);
                 MyPlot1.Set(-1);
                 shortsignalbb = false;
             }
@@ -162,6 +165,46 @@ namespace AgenaTrader.UserCode
             {
                 _macd_smooth = value;
             }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the long signal.")]
+        [Category("Color")]
+        [DisplayName("Signal Long")]
+        public Color ColorLongSignal
+        {
+            get { return _color_long_signal; }
+            set { _color_long_signal = value; }
+        }
+
+
+        // Serialize Color object
+        [Browsable(false)]
+        public string ColorLongSignalSerialize
+        {
+            get { return SerializableColor.ToString(_color_long_signal); }
+            set { _color_long_signal = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the long signal.")]
+        [Category("Color")]
+        [DisplayName("Signal Long")]
+        public Color ColorShortSignal
+        {
+            get { return _color_short_signal; }
+            set { _color_short_signal = value; }
+        }
+
+
+        // Serialize Color object
+        [Browsable(false)]
+        public string ColorShortSignalSerialize
+        {
+            get { return SerializableColor.ToString(_color_short_signal); }
+            set { _color_short_signal = SerializableColor.FromString(value); }
         }
 
         #endregion
