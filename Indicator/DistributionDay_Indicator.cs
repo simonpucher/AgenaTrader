@@ -14,7 +14,7 @@ using AgenaTrader.Helper;
 namespace AgenaTrader.UserCode
 {
 	/// <summary>
-/// Version: 1.1.4
+/// Version: 1.1.5
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -40,18 +40,17 @@ namespace AgenaTrader.UserCode
         private bool _showdistributiondayarrows = true;
         private int _distributiondaycount = 4;
 
-        private int _volumepercent = 100;
+        private double _volumepercent = 100.0;
 
         private Enum_Volume_Calucation _volume_calculation = Enum_Volume_Calucation.VolumeisGreaterThantheEMAOfTheLastXCandles;
 
         private int _ema_period = 30;
 
         private Color _color_long_signal_distribution = Color.DarkViolet;
-        private Color _color_long_signal_distribution_strong = Color.LightPink;
+        private Color _color_long_signal_distribution_strong = Color.Violet;
 
         protected override void OnInit()
 		{
-			//Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
 			CalculateOnClosedBar = false;
             this.IsOverlay = true;
 		}
@@ -77,7 +76,7 @@ namespace AgenaTrader.UserCode
             switch (this.Volume_Calculation)
             {
                 case Enum_Volume_Calucation.VolumeIsGreaterThanYesterday:
-                    if (Volume[0] > Volume[1]) volumespike = true;
+                    if (Volume[0] > (Volume[1] * (this.VolumePercent/100.0)) ) volumespike = true;
                     break;
                 case Enum_Volume_Calucation.VolumeisGreaterThantheEMAOfTheLastXCandles:
                     if (Volume[0] > EMA(Volume, this.EMA_Period)[0]) volumespike = true;
@@ -85,27 +84,25 @@ namespace AgenaTrader.UserCode
             }
 
             //Draw Distribution Arrow.
-            if (volumespike && ((Close[1] - Close[0]) / Close[1]) > (this.Percent / this.VolumePercent))
+            if (volumespike && ((Close[1] - Close[0]) / Close[1]) > (this.Percent / 100.0))
             {
-               
                 this._distributionlist.Enqueue(Time[0]);
 
+                //Draw the indicator
                 if (ShowDistributionDayArrows)
                 {
-                    AddChartArrowDown(ProcessingBarIndex.ToString(), true, 0, High[0], ColorLongSignalDistributionStrong);
-                }
-
-                //Draw the indicator
-                if (this._distributionlist.Count > this.DistributionDayCount)
-                {
-                    //MyPlot1.Set(1);
-                    AddChartArrowDown(ProcessingBarIndex.ToString(), true, 0, High[0], ColorLongSignalDistribution);
+                    if (this._distributionlist.Count > this.DistributionDayCount)
+                    {
+                        //MyPlot1.Set(1);
+                        AddChartArrowDown(ProcessingBarIndex.ToString(), true, 0, High[0], ColorLongSignalDistribution);
+                    }
+                    else
+                    {
+                        AddChartArrowDown(ProcessingBarIndex.ToString(), true, 0, High[0], ColorLongSignalDistributionStrong);
+                    }
                 }
                
-            }
-            else
-            {
-                //MyPlot1.Set(0);
+               
             }
 		}
 
@@ -201,7 +198,7 @@ namespace AgenaTrader.UserCode
         [Description("Percent of yesterday volume.")]
         [Category("Parameters")]
         [DisplayName("Volume Percent")]
-        public int VolumePercent
+        public double VolumePercent
         {
             get { return _volumepercent; }
             set { _volumepercent = value; }
@@ -242,7 +239,7 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Take your money and run when smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator(System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Int32 volumePercent)
+		public DistributionDay_Indicator DistributionDay_Indicator(System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Double volumePercent)
         {
 			return DistributionDay_Indicator(InSeries, period, distributionDayCount, percent, showDistributionDayArrows, volumePercent);
 		}
@@ -250,9 +247,9 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Take your money and run when smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input, System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Int32 volumePercent)
+		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input, System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Double volumePercent)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<DistributionDay_Indicator>(input, i => i.Period == period && i.DistributionDayCount == distributionDayCount && Math.Abs(i.Percent - percent) <= Double.Epsilon && i.ShowDistributionDayArrows == showDistributionDayArrows && i.VolumePercent == volumePercent);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<DistributionDay_Indicator>(input, i => i.Period == period && i.DistributionDayCount == distributionDayCount && Math.Abs(i.Percent - percent) <= Double.Epsilon && i.ShowDistributionDayArrows == showDistributionDayArrows && Math.Abs(i.VolumePercent - volumePercent) <= Double.Epsilon);
 
 			if (indicator != null)
 				return indicator;
@@ -285,7 +282,7 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Take your money and run when smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator(System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Int32 volumePercent)
+		public DistributionDay_Indicator DistributionDay_Indicator(System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Double volumePercent)
 		{
 			return LeadIndicator.DistributionDay_Indicator(InSeries, period, distributionDayCount, percent, showDistributionDayArrows, volumePercent);
 		}
@@ -293,7 +290,7 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Take your money and run when smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input, System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Int32 volumePercent)
+		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input, System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Double volumePercent)
 		{
 			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
@@ -311,7 +308,7 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Take your money and run when smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator(System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Int32 volumePercent)
+		public DistributionDay_Indicator DistributionDay_Indicator(System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Double volumePercent)
 		{
 			return LeadIndicator.DistributionDay_Indicator(InSeries, period, distributionDayCount, percent, showDistributionDayArrows, volumePercent);
 		}
@@ -319,7 +316,7 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Take your money and run when smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input, System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Int32 volumePercent)
+		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input, System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Double volumePercent)
 		{
 			return LeadIndicator.DistributionDay_Indicator(input, period, distributionDayCount, percent, showDistributionDayArrows, volumePercent);
 		}
@@ -334,7 +331,7 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Take your money and run when smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator(System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Int32 volumePercent)
+		public DistributionDay_Indicator DistributionDay_Indicator(System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Double volumePercent)
 		{
 			return LeadIndicator.DistributionDay_Indicator(InSeries, period, distributionDayCount, percent, showDistributionDayArrows, volumePercent);
 		}
@@ -342,7 +339,7 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Take your money and run when smart money start the distribution.
 		/// </summary>
-		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input, System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Int32 volumePercent)
+		public DistributionDay_Indicator DistributionDay_Indicator(IDataSeries input, System.Int32 period, System.Int32 distributionDayCount, System.Double percent, System.Boolean showDistributionDayArrows, System.Double volumePercent)
 		{
 			return LeadIndicator.DistributionDay_Indicator(input, period, distributionDayCount, percent, showDistributionDayArrows, volumePercent);
 		}
