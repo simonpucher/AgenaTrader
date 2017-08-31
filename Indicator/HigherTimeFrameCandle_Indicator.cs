@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0.6
+/// Version: 1.0.7
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2017
 /// -------------------------------------------------------------------------
@@ -34,6 +34,8 @@ namespace AgenaTrader.UserCode
 
         private DatafeedHistoryPeriodicity _datafeedhistoryperidocity = DatafeedHistoryPeriodicity.Day;
         private int _periodicityvalue = 1;
+        private int _maxcandles = 0;
+
 
         private Color _color_long_signal_background = Const.DefaultArrowLongColor;
         private Color _color_short_signal_background = Const.DefaultArrowShortColor;
@@ -56,8 +58,8 @@ namespace AgenaTrader.UserCode
             
         }
 
-		protected override void OnCalculate()
-		{
+        protected override void OnCalculate()
+        {
             //Always show the day candle
             int _timeseriescount = 1;
 
@@ -91,20 +93,24 @@ namespace AgenaTrader.UserCode
 
 
                 //Drawing
-                Color _col = Color.Gray;
-                if (Opens[_timeseriescount][1] > Closes[_timeseriescount][1])
+                if (MaxCandles == 0 || Closes[1].Count - ProcessingBarIndexes[1] <= this.MaxCandles)
                 {
-                    _col = this.ColorShortSignalBackground;
-                }
-                else if (Opens[_timeseriescount][1] < Closes[_timeseriescount][1])
-                {
-                    _col = this.ColorLongSignalBackground;
-                }
+                    Color _col = Color.Gray;
+                    if (Opens[_timeseriescount][1] > Closes[_timeseriescount][1])
+                    {
+                        _col = this.ColorShortSignalBackground;
+                    }
+                    else if (Opens[_timeseriescount][1] < Closes[_timeseriescount][1])
+                    {
+                        _col = this.ColorLongSignalBackground;
+                    }
 
 
-                DateTime mystart = Times[_timeseriescount][1];
-                DateTime myend = Times[_timeseriescount][0].AddSeconds(-1);
-                AddChartRectangle("HTFCandle-" + Times[_timeseriescount][1], true, mystart, Lows[_timeseriescount][1], myend, Highs[_timeseriescount][1], _col, _col, this.OpacitySignal);
+                    DateTime mystart = Times[_timeseriescount][1];
+                    DateTime myend = Times[_timeseriescount][0].AddSeconds(-1);
+                    AddChartRectangle("HTFCandle-" + Times[_timeseriescount][1], true, mystart, Lows[_timeseriescount][1], myend, Highs[_timeseriescount][1], _col, _col, this.OpacitySignal);
+
+                }
 
 
             }
@@ -174,7 +180,22 @@ namespace AgenaTrader.UserCode
                 _opacity_signal = value;
             }
         }
+
         
+        /// <summary>
+        /// </summary>
+        [Description("Select the number of max. candles (0 = show all candles in the higher timeframe, 3 = show the last 3 higher timeframe candles)")]
+        [Category("Parameters")]
+        [DisplayName("Max Candles")]
+        public int MaxCandles
+        {
+            get { return _maxcandles; }
+            set
+            {
+                _maxcandles = value;
+            }
+        }
+
 
         /// <summary>
         /// </summary>
@@ -229,17 +250,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Draw the candle of the higher timeframe on the chart.
 		/// </summary>
-		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues)
+		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues, System.Int32 maxCandles)
         {
-			return HigherTimeFrameCandle_Indicator(InSeries, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues);
+			return HigherTimeFrameCandle_Indicator(InSeries, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues, maxCandles);
 		}
 
 		/// <summary>
 		/// Draw the candle of the higher timeframe on the chart.
 		/// </summary>
-		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(IDataSeries input, DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues)
+		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(IDataSeries input, DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues, System.Int32 maxCandles)
 		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<HigherTimeFrameCandle_Indicator>(input, i => i.DF_DatafeedHistoryPeriodicity == dF_DatafeedHistoryPeriodicity && i.DF_periodicityvalues == dF_periodicityvalues);
+			var indicator = CachedCalculationUnits.GetCachedIndicator<HigherTimeFrameCandle_Indicator>(input, i => i.DF_DatafeedHistoryPeriodicity == dF_DatafeedHistoryPeriodicity && i.DF_periodicityvalues == dF_periodicityvalues && i.MaxCandles == maxCandles);
 
 			if (indicator != null)
 				return indicator;
@@ -250,7 +271,8 @@ namespace AgenaTrader.UserCode
 							CalculateOnClosedBar = CalculateOnClosedBar,
 							InSeries = input,
 							DF_DatafeedHistoryPeriodicity = dF_DatafeedHistoryPeriodicity,
-							DF_periodicityvalues = dF_periodicityvalues
+							DF_periodicityvalues = dF_periodicityvalues,
+							MaxCandles = maxCandles
 						};
 			indicator.SetUp();
 
@@ -269,20 +291,20 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Draw the candle of the higher timeframe on the chart.
 		/// </summary>
-		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues)
+		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues, System.Int32 maxCandles)
 		{
-			return LeadIndicator.HigherTimeFrameCandle_Indicator(InSeries, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues);
+			return LeadIndicator.HigherTimeFrameCandle_Indicator(InSeries, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues, maxCandles);
 		}
 
 		/// <summary>
 		/// Draw the candle of the higher timeframe on the chart.
 		/// </summary>
-		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(IDataSeries input, DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues)
+		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(IDataSeries input, DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues, System.Int32 maxCandles)
 		{
 			if (IsInInit && input == null)
 				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
-			return LeadIndicator.HigherTimeFrameCandle_Indicator(input, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues);
+			return LeadIndicator.HigherTimeFrameCandle_Indicator(input, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues, maxCandles);
 		}
 	}
 
@@ -295,17 +317,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Draw the candle of the higher timeframe on the chart.
 		/// </summary>
-		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues)
+		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues, System.Int32 maxCandles)
 		{
-			return LeadIndicator.HigherTimeFrameCandle_Indicator(InSeries, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues);
+			return LeadIndicator.HigherTimeFrameCandle_Indicator(InSeries, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues, maxCandles);
 		}
 
 		/// <summary>
 		/// Draw the candle of the higher timeframe on the chart.
 		/// </summary>
-		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(IDataSeries input, DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues)
+		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(IDataSeries input, DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues, System.Int32 maxCandles)
 		{
-			return LeadIndicator.HigherTimeFrameCandle_Indicator(input, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues);
+			return LeadIndicator.HigherTimeFrameCandle_Indicator(input, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues, maxCandles);
 		}
 	}
 
@@ -318,17 +340,17 @@ namespace AgenaTrader.UserCode
 		/// <summary>
 		/// Draw the candle of the higher timeframe on the chart.
 		/// </summary>
-		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues)
+		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues, System.Int32 maxCandles)
 		{
-			return LeadIndicator.HigherTimeFrameCandle_Indicator(InSeries, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues);
+			return LeadIndicator.HigherTimeFrameCandle_Indicator(InSeries, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues, maxCandles);
 		}
 
 		/// <summary>
 		/// Draw the candle of the higher timeframe on the chart.
 		/// </summary>
-		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(IDataSeries input, DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues)
+		public HigherTimeFrameCandle_Indicator HigherTimeFrameCandle_Indicator(IDataSeries input, DatafeedHistoryPeriodicity dF_DatafeedHistoryPeriodicity, System.Int32 dF_periodicityvalues, System.Int32 maxCandles)
 		{
-			return LeadIndicator.HigherTimeFrameCandle_Indicator(input, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues);
+			return LeadIndicator.HigherTimeFrameCandle_Indicator(input, dF_DatafeedHistoryPeriodicity, dF_periodicityvalues, maxCandles);
 		}
 	}
 
