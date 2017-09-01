@@ -11,9 +11,11 @@ using AgenaTrader.API;
 using AgenaTrader.Custom;
 using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
+using System.Windows.Forms;
+using System.Windows.Forms.VisualStyles;
 
 /// <summary>
-/// Version: in progress
+/// Version: 1.1.0
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -54,7 +56,9 @@ namespace AgenaTrader.UserCode
 			private DataSeries MaAtrRsi;
 			private DataSeries RsiAr;
 			private DataSeries RsiMa;
-		
+
+        private IBar lastcrossabove = null;
+
         // User defined variables (add any user defined variables below)
         #endregion
 
@@ -139,8 +143,28 @@ namespace AgenaTrader.UserCode
             //Change Colors
             PlotColors[0][0] = Line_01;
             PlotColors[1][0] = Line_02;
-           
-		}
+
+            //Drawing
+            if (CrossAbove(Value1, Value2, 0))
+            {
+                AddChartArrowUp(ProcessingBarIndex.ToString(), true, 0, Low[0], Color.Green);
+                lastcrossabove = Bars[0];
+                AddChartText("lastsegmentpercentline" + Time[0], true, "QQI", Time[0], Low[0], 0, Color.Green, new Font("Arial", 8, FontStyle.Bold), StringAlignment.Far, HorizontalAlignment.Center, VerticalAlignment.Bottom, Color.Green, Color.White, 255);
+
+            }
+            else if (CrossBelow(Value1, Value2, 0))
+            {
+                AddChartArrowDown(ProcessingBarIndex.ToString(), true, 0, High[0], Color.Red);
+                AddChartText("lastsegmentpercentline" + Time[0], true, "QQI", Time[0], High[0], 0, Color.Red, new Font("Arial", 8, FontStyle.Bold), StringAlignment.Far, HorizontalAlignment.Center, VerticalAlignment.Top, Color.Red, Color.White, 255);
+
+            }
+
+            if (lastcrossabove != null && CrossBelow(Value1, Value2, 0))
+            {
+                AddChartLine("drawaline" + Time[0], true, lastcrossabove.Time, lastcrossabove.Close, Time[0], Close[0], Color.Black, DashStyle.DashDotDot, 1);
+                
+            }
+        }
 
 
         public override string ToString()
@@ -251,13 +275,13 @@ namespace AgenaTrader.UserCode
     }
 }
 
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
+#region AgenaTrader Automaticaly Generated Code. Do not change it manually
 
 namespace AgenaTrader.UserCode
 {
 	#region Indicator
 
-	public partial class UserIndicator : Indicator
+	public partial class UserIndicator
 	{
 		/// <summary>
 		/// Qualitative Quantitative Estimation. QQE is a combination moving average RSI + ATR.
@@ -313,7 +337,7 @@ namespace AgenaTrader.UserCode
 		public QQE QQE(IDataSeries input, System.Int32 rSI_Period, System.Int32 sF)
 		{
 			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
+				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
 
 			return LeadIndicator.QQE(input, rSI_Period, sF);
 		}
