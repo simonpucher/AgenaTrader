@@ -15,7 +15,7 @@ using System.Windows.Forms.VisualStyles;
 
 
 /// <summary>
-/// Version: 1.2.15
+/// Version: 1.2.17
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -83,7 +83,7 @@ namespace AgenaTrader.UserCode
 
         private IntSeries _signals;
         private IntSeries _days;
-        private DoubleSeries _percent;
+        private DataSeries _percent;
 
         private Color _color_long_signal_background = Const.DefaultArrowLongColor;
         private Color _color_short_signal_background = Const.DefaultArrowShortColor;
@@ -114,7 +114,7 @@ namespace AgenaTrader.UserCode
              
             _signals = new IntSeries(this);
             _days = new IntSeries(this);
-            _percent = new DoubleSeries(this);
+            _percent = new DataSeries(this);
 
         }
 
@@ -913,7 +913,7 @@ namespace AgenaTrader.UserCode
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DoubleSeries Percent { get { return _percent; } }
+        public DataSeries Percent { get { return _percent; } }
 
         /// <summary>
         /// </summary>
