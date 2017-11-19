@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1.5
+/// Version: 1.1.6
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -26,7 +26,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-    [Description("Opens web browser by clicking on the chart.")]
+    [Description("Opens web browser by clicking on a button on the chart.")]
     public class OpenBrowser_Utility_Tool : UserIndicator
     {
         #region Variables
@@ -69,10 +69,10 @@ namespace AgenaTrader.UserCode
         protected override void OnCalculate()
         {
 
-            if (this.IsProcessingBarIndexLast)
-            {
-              _brush = Brushes.Green;
-            }
+            //if (this.IsProcessingBarIndexLast && this.Instrument.InstrumentType == InstrumentType.Stock)
+            //{
+            //  _brush = Brushes.Green;
+            //}
 
         }
 
@@ -111,26 +111,35 @@ namespace AgenaTrader.UserCode
             //Only draw button if parameters are available.
             if (this.Instrument != null)
             {
+                string strtext = "open browser";
                 //Only stocks are possible to lookup
                 if (this.Instrument.InstrumentType == InstrumentType.Stock)
                 {
-                    using (Font font1 = new Font("Arial", 8, FontStyle.Bold, GraphicsUnit.Point))
+                    _brush = Brushes.Green;
+                }
+                else
+                {
+                    _brush = Brushes.Gray;
+                    strtext = "not supported";
+                }
+                using (Font font1 = new Font("Arial", 8, FontStyle.Bold, GraphicsUnit.Point))
                     {
                         StringFormat stringFormat = new StringFormat();
                         stringFormat.Alignment = StringAlignment.Center;
                         stringFormat.LineAlignment = StringAlignment.Center;
 
                         this.Core.GetDataDirectory();
-
+                        
                         Brush tempbrush = new SolidBrush(GlobalUtilities.AdjustOpacity(((SolidBrush)_brush).Color, 0.5F));
 
                         _rect = new RectangleF(r.Width - 100, 10, 86, 27);
                         g.FillRectangle(tempbrush, _rect);
-                        g.DrawString("open browser", font1, Brushes.White, _rect, stringFormat);
+                        g.DrawString(strtext, font1, Brushes.White, _rect, stringFormat);
                         _rect2 = new RectangleF(r.Width - 100, 40, 86, 27);
 
-                    }
                 }
+               
+
                
             }
         }
@@ -140,7 +149,7 @@ namespace AgenaTrader.UserCode
         {
 
             Point cursorPos = new Point(e.X, e.Y);
-            if (_rect.Contains(cursorPos))
+            if (_rect.Contains(cursorPos) && this.Instrument.InstrumentType == InstrumentType.Stock)
             {
 
                 string symbol = this.Instrument.Symbol;
@@ -340,7 +349,7 @@ namespace AgenaTrader.UserCode
     }
 }
 
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
+#region AgenaTrader Automaticaly Generated Code. Do not change it manually
 
 namespace AgenaTrader.UserCode
 {
@@ -349,7 +358,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserIndicator
 	{
 		/// <summary>
-		/// Opens web browser by clicking on the chart.
+		/// Opens web browser by clicking on a button on the chart.
 		/// </summary>
 		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
         {
@@ -357,7 +366,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Opens web browser by clicking on the chart.
+		/// Opens web browser by clicking on a button on the chart.
 		/// </summary>
 		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
@@ -394,7 +403,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserStrategy
 	{
 		/// <summary>
-		/// Opens web browser by clicking on the chart.
+		/// Opens web browser by clicking on a button on the chart.
 		/// </summary>
 		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
@@ -402,7 +411,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Opens web browser by clicking on the chart.
+		/// Opens web browser by clicking on a button on the chart.
 		/// </summary>
 		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
@@ -420,7 +429,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserColumn
 	{
 		/// <summary>
-		/// Opens web browser by clicking on the chart.
+		/// Opens web browser by clicking on a button on the chart.
 		/// </summary>
 		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
@@ -428,7 +437,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Opens web browser by clicking on the chart.
+		/// Opens web browser by clicking on a button on the chart.
 		/// </summary>
 		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
@@ -443,7 +452,7 @@ namespace AgenaTrader.UserCode
 	public partial class UserScriptedCondition
 	{
 		/// <summary>
-		/// Opens web browser by clicking on the chart.
+		/// Opens web browser by clicking on a button on the chart.
 		/// </summary>
 		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
@@ -451,7 +460,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		/// <summary>
-		/// Opens web browser by clicking on the chart.
+		/// Opens web browser by clicking on a button on the chart.
 		/// </summary>
 		public OpenBrowser_Utility_Tool OpenBrowser_Utility_Tool(IDataSeries input, System.Boolean openYahooFinance, System.Boolean openGoogleFinance, System.Boolean openMorningstar, System.Boolean openMorningstar_Direct, System.Boolean openEarningswhispers, System.Boolean openZacks, System.Boolean openZacks_Direct)
 		{
