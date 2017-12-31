@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.3
+/// Version: 1.4
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2017
 /// -------------------------------------------------------------------------
@@ -32,7 +32,7 @@ namespace AgenaTrader.UserCode
 
         protected override void OnInit()
 		{
-			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
+			Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "Momentum_Levy_Portfolio_Rank_Indicator_Plot"));
             //Print("Barscount: " + Bars.Count);
         }
 
@@ -118,7 +118,7 @@ namespace AgenaTrader.UserCode
 		#endregion
 	}
 }
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
+#region AgenaTrader Automaticaly Generated Code. Do not change it manually
 
 namespace AgenaTrader.UserCode
 {
