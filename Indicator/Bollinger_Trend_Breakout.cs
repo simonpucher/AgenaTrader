@@ -85,7 +85,6 @@ namespace AgenaTrader.UserCode
             }
             else
             {
-                //this.BackColor = Color.Yellow;
                 _signals.Set(_signals[1]);
                 if (_signals[1] == 1)
                 {
