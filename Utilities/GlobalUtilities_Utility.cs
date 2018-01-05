@@ -22,10 +22,10 @@ using System.Net;
 using System.Globalization;
 
 /// <summary>
-/// Version: 1.5.22
+/// Version: 2.0.0
 /// -------------------------------------------------------------------------
-/// Simon Pucher 2016
-/// Christian Kovar 2016
+/// Simon Pucher 2018
+/// Christian Kovar 2018
 /// -------------------------------------------------------------------------
 /// Global utilities as a helper in Agena Trader Script.
 /// -------------------------------------------------------------------------
@@ -213,7 +213,7 @@ namespace AgenaTrader.UserCode
         ///// </summary>
         ///// <param name="execution"></param>
         ///// <returns></returns>
-        //public static string GetEmailSubjectEntrySignal(IInstrument instrument, OrderAction orderaction)
+        //public static string GetEmailSubjectEntrySignal(IInstrument instrument, OrderDirection orderaction)
         //{
         //    return "Entry Signal " + instrument.Symbol + " " + orderaction.ToString();
         //}
@@ -224,7 +224,7 @@ namespace AgenaTrader.UserCode
         ///// <param name="execution"></param>
         ///// <param name="strategyname"></param>
         ///// <returns></returns>
-        //public static string GetEmailBodyEntrySignal(IInstrument instrument, OrderAction orderaction, string strategyname, TimeFrame timeframe)
+        //public static string GetEmailBodyEntrySignal(IInstrument instrument, OrderDirection orderaction, string strategyname, TimeFrame timeframe)
         //{
         //    StringBuilder str = new StringBuilder();
 
@@ -966,16 +966,26 @@ namespace AgenaTrader.UserCode
 
     #region Global defined classes
 
+    /// <summary>
+    /// Different types of order directions.s
+    /// </summary>
+    public enum OrderDirection_Enum : byte
+    {
+        OpenLong = 1,
+        OpenShort = 2,
+        CloseLong = 3,
+        CloseShort = 4
+    }
 
     /// <summary>
-    /// Class which holds all important data like the OrderAction. 
+    /// Class which holds all important data like the OrderDirection. 
     /// We use this object as a global default return object for the calculate method in indicators.
     /// </summary>
     public class ResultValue
     {
         public bool ErrorOccured = false;
-        public OrderAction? Entry = null;
-        public OrderAction? Exit = null;
+        public OrderDirection? Entry = null;
+        public OrderDirection? Exit = null;
     }
 
     /// <summary>
@@ -1104,7 +1114,8 @@ namespace AgenaTrader.UserCode
                     this.ProfitLossPercent = trade.ProfitLossPercent; 
                     this.ExitReason = trade.ExitReason;
                     this.ExitPrice = trade.ExitPrice;
-                    this.ExitDateTime = execution.Time;
+                    //this.ExitDateTime = execution.Time;
+                    this.ExitDateTime = execution.Timestamp;
                     this.ExitQuantity = execution.Quantity;
                     this.ExitOrderType = execution.Order.OrderType;
                     this.EntryDateTime = trade.EntryOrder.CreationTime;
@@ -1766,17 +1777,3 @@ public class GlobalUtility : AgenaTrader.UserCode.UserIndicator
 {
     //https://www.youtube.com/watch?v=5NNOrp_83RU
 }
-
-#region AgenaTrader Automaticaly Generated Code. Do not change it manually
-
-namespace AgenaTrader.UserCode
-{
-}
-
-#endregion
-
-
-
-
-
-
