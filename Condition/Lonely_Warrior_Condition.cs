@@ -49,8 +49,8 @@ namespace AgenaTrader.UserCode
 			IsEntry = true;
 			IsStop = false;
 			IsTarget = false;
-            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Occurred"));
-            Add(new Plot(new Pen(this.Plot0Color, this.Plot1Width), PlotStyle.Line, "Entry"));
+            Add(new OutputDescriptor(new Pen(this.Plot0Color, this.Plot0Width), OutputSerieDrawStyle.Line, "Occurred"));
+            Add(new OutputDescriptor(new Pen(this.Plot0Color, this.Plot1Width), OutputSerieDrawStyle.Line, "Entry"));
 
             IsOverlay = false;
 			CalculateOnClosedBar = true;
@@ -63,12 +63,12 @@ namespace AgenaTrader.UserCode
             Occurred.Set(LeadIndicator.Lonely_Warrior_Indicator()[0]);
 
             PlotColors[0][0] = this.Plot0Color;
-            Plots[0].PenStyle = this.Dash0Style;
-            Plots[0].Pen.Width = this.Plot0Width;
+            OutputDescriptors[0].PenStyle = this.Dash0Style;
+            OutputDescriptors[0].Pen.Width = this.Plot0Width;
 
             PlotColors[1][0] = this.Plot1Color;
-            Plots[1].PenStyle = this.Dash1Style;
-            Plots[1].Pen.Width = this.Plot1Width;
+            OutputDescriptors[1].PenStyle = this.Dash1Style;
+            OutputDescriptors[1].Pen.Width = this.Plot1Width;
         }
 
 
@@ -189,120 +189,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition()
-        {
-			return Lonely_Warrior_Condition(InSeries);
-		}
-
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition(IDataSeries input)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Lonely_Warrior_Condition>(input);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new Lonely_Warrior_Condition
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition()
-		{
-			return LeadIndicator.Lonely_Warrior_Condition(InSeries);
-		}
-
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition(IDataSeries input)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
-
-			return LeadIndicator.Lonely_Warrior_Condition(input);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition()
-		{
-			return LeadIndicator.Lonely_Warrior_Condition(InSeries);
-		}
-
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition(IDataSeries input)
-		{
-			return LeadIndicator.Lonely_Warrior_Condition(input);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition()
-		{
-			return LeadIndicator.Lonely_Warrior_Condition(InSeries);
-		}
-
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Condition Lonely_Warrior_Condition(IDataSeries input)
-		{
-			return LeadIndicator.Lonely_Warrior_Condition(input);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

@@ -20,7 +20,7 @@ using System.Threading;
 /// Simon Pucher 2016
 /// Christian Kovar 2016
 /// -------------------------------------------------------------------------
-/// The initial version of this strategy was inspired by the work of Birger Sch�fermeier: https://www.whselfinvest.at/de/Store_Birger_Schaefermeier_Trading_Strategie_Open_Range_Break_Out.php
+/// The initial version of this strategy was inspired by the work of Birger Schäfermeier: https://www.whselfinvest.at/de/Store_Birger_Schaefermeier_Trading_Strategie_Open_Range_Break_Out.php
 /// Further developments are inspired by the work of Mehmet Emre Cekirdekci and Veselin Iliev from the Worcester Polytechnic Institute (2010)
 /// Trading System Development: Trading the Opening Range Breakouts https://www.wpi.edu/Pubs/E-project/Available/E-project-042910-142422/unrestricted/Veselin_Iliev_IQP.pdf
 /// -------------------------------------------------------------------------
@@ -84,7 +84,7 @@ namespace AgenaTrader.UserCode
         {
             base.OnStart();
 
-            //Print("OnStartUp" + Bars[0].Time);
+            //Print("OnStartUp" + Bars[0].Timestamp);
 
             //Init our indicator to get code access
             this._orb_indicator = new ORB_Indicator();
@@ -108,7 +108,7 @@ namespace AgenaTrader.UserCode
         {
             base.OnDispose();
 
-            //Print("OnTermination" + Bars[0].Time);
+            //Print("OnTermination" + Bars[0].Timestamp);
 
             //Close statistic data list if this feature is enabled
             if (this.StatisticBacktesting)
@@ -152,9 +152,9 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnCalculate()
 		{
-            //Print("OnBarUpdate" + Bars[0].Time.ToString());
+            //Print("OnBarUpdate" + Bars[0].Timestamp.ToString());
 
-            this.IsAutomated = this.Autopilot;
+            this.IsAutoConfirmOrder = this.Autopilot;
 
             //Reset Strategy for the next/first trading day
             //todo => Not perfect if we are using GMT+12 and other markets than local markets like DAX 
@@ -168,12 +168,12 @@ namespace AgenaTrader.UserCode
                 //if (this.Send_email)
                 //{
                 //    this.SendEmail(Core.Settings.MailDefaultFromAddress, Core.PreferenceManager.DefaultEmailAddress,
-                //        "Reset on Strategy: " + this.GetType().Name, "Strategy was restarted because a new trading day has arrived." + Environment.NewLine + "Instrument: " + this.Instrument.Name + " - Date: " + Bars[0].Time);
+                //        "Reset on Strategy: " + this.GetType().Name, "Strategy was restarted because a new trading day has arrived." + Environment.NewLine + "Instrument: " + this.Instrument.Name + " - Date: " + Bars[0].Timestamp);
                 //}
             }
 
             //close manually the trades in the end of the trading day
-            DateTime eod = this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay);
+            DateTime eod = this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].GetTimestamp(), this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay);
             if (this.CloseOrderBeforeEndOfTradingDay
                 && (this._orderenterlong != null || this._orderentershort != null)
                 && Bars[0].Time >= eod)
@@ -183,7 +183,7 @@ namespace AgenaTrader.UserCode
             }
 
             //if it to late or one order already set stop execution of calculate
-            // || Bars[0].Time.TimeOfDay >= this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay).TimeOfDay
+            // || Bars[0].Timestamp.TimeOfDay >= this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Timestamp, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay).TimeOfDay
             if (_orderenterlong != null || _orderentershort != null != Bars[0].Time >= eod)
             {
                 return;
@@ -193,16 +193,16 @@ namespace AgenaTrader.UserCode
             _orb_indicator.calculate(this.Bars, this.Bars[0]);
 
             //If there was a breakout and the current bar is the same bar as the long/short breakout, then trigger signal.
-            if (_orb_indicator.LongBreakout != null && _orb_indicator.LongBreakout.Time == Bars[0].Time)
+            if (_orb_indicator.LongBreakout != null && _orb_indicator.LongBreakout.GetTimestamp() == Bars[0].Time)
             {
                 //Long Signal
-                //Print("Enter Long" + Bars[0].Time.ToString());
+                //Print("Enter Long" + Bars[0].Timestamp.ToString());
                 DoEnterLong();
             }
-            else if (_orb_indicator.ShortBreakout != null && _orb_indicator.ShortBreakout.Time == Bars[0].Time)
+            else if (_orb_indicator.ShortBreakout != null && _orb_indicator.ShortBreakout.GetTimestamp() == Bars[0].Time)
             {
                 //Short Signal
-                //Print("Enter Short" + Bars[0].Time.ToString());
+                //Print("Enter Short" + Bars[0].Timestamp.ToString());
                 DoEnterShort();
             }
             else
@@ -230,7 +230,7 @@ namespace AgenaTrader.UserCode
                 //        if ((this._orderenterlong != null && item.EntryOrder.Name == this._orderenterlong.Name)
                 //         || (this._orderentershort != null && item.EntryOrder.Name == this._orderentershort.Name))
                 //        {
-                //            item.Expiration = this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Time, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay);
+                //            item.Expiration = this._orb_indicator.getDateTimeForClosingBeforeTradingDayEnds(this.Bars, this.Bars[0].Timestamp, this.TimeFrame, this.CloseXCandlesBeforeEndOfTradingDay);
                 //            //Print("Expiration: " + item.Expiration.ToString());
                 //        }
                 //    }
@@ -258,7 +258,7 @@ namespace AgenaTrader.UserCode
             if (this._orderenterlong == null)
             {
                 string entryreason = "ORB_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString();
-                _orderenterlong = OpenLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
+                _orderenterlong = SubmitOrder(new StrategyOrderParameters {Direction = OrderDirection.Buy, Type = OrderType.Market, Quantity = GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), SignalName =  entryreason, Instrument =  this.Instrument, TimeFrame =  this.TimeFrame});
                 if (this.UseStopLoss)
                 {
                     SetUpStopLoss(_orderenterlong.Name, CalculationMode.Price, this._orb_indicator.RangeLow, false);
@@ -283,7 +283,7 @@ namespace AgenaTrader.UserCode
             if (this._orderentershort == null)
             {
                 string entryreason = "ORB_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString();
-                _orderentershort = OpenShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), entryreason, this.Instrument, this.TimeFrame);
+                _orderentershort = SubmitOrder(new StrategyOrderParameters {Direction = OrderDirection.Sell, Type = OrderType.Market, Quantity = GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), SignalName =  entryreason, Instrument =  this.Instrument, TimeFrame =  this.TimeFrame});
                 if (this.UseStopLoss)
                 {
                     SetUpStopLoss(_orderentershort.Name, CalculationMode.Price, this._orb_indicator.RangeHigh, false);
@@ -310,7 +310,7 @@ namespace AgenaTrader.UserCode
             if (_orderenterlong != null)
             {
                 //todo exit reason on target?
-                CloseLong(this._orderenterlong.Quantity, Const.DefaultExitReasonEOD, this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
+                CloseLongTrade(new StrategyOrderParameters {Type = OrderType.Market, Quantity = this._orderenterlong.Quantity, SignalName =  Const.DefaultExitReasonEOD, FromEntrySignal =  this._orderenterlong.Name, Instrument =  this._orderenterlong.Instrument, TimeFrame =  this._orderenterlong.TimeFrame});
 
                 if (this.StatisticBacktesting)
                 {
@@ -332,7 +332,7 @@ namespace AgenaTrader.UserCode
             if (_orderentershort != null)
             {
                 //todo exit reason on target?
-                CloseShort(this._orderentershort.Quantity, Const.DefaultExitReasonEOD, this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
+                CloseShortTrade(new StrategyOrderParameters {Type = OrderType.Market, Quantity = this._orderentershort.Quantity, SignalName =  Const.DefaultExitReasonEOD, FromEntrySignal =  this._orderentershort.Name, Instrument =  this._orderentershort.Instrument, TimeFrame =  this._orderentershort.TimeFrame});
 
                 if (this.StatisticBacktesting)
                 {

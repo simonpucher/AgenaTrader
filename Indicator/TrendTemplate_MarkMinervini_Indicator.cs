@@ -36,9 +36,9 @@ namespace AgenaTrader.UserCode
 
         protected override void OnInit()
 		{
-			Add(new Plot(Color.FromKnownColor(KnownColor.Red), "MyPlot1"));
-            Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot2"));
-            Add(new Plot(Color.FromKnownColor(KnownColor.Blue), "MyPlot3"));
+			Add(new OutputDescriptor(Color.FromKnownColor(KnownColor.Red), "MyPlot1"));
+            Add(new OutputDescriptor(Color.FromKnownColor(KnownColor.Orange), "MyPlot2"));
+            Add(new OutputDescriptor(Color.FromKnownColor(KnownColor.Blue), "MyPlot3"));
             CalculateOnClosedBar = true;
             this.IsOverlay = true;
 		}
@@ -78,7 +78,7 @@ namespace AgenaTrader.UserCode
             {
                 switch (returnvalue.Entry)
                 {
-                    case OrderAction.Buy:
+                    case OrderDirection.Buy:
                         //AddChartDot("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
                         //this.MyPlot1.Set(1);
                         AddChartArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, Color.LightGreen);
@@ -129,7 +129,7 @@ namespace AgenaTrader.UserCode
                 if (input[0] > SMA(input, 50)[0] && SMA(input, 50)[0] > SMA(input, 150)[0] && SMA(input, 150)[0] > SMA(input, 200)[0] && IsSeriesRising(SMA(input, 200))
                     && input[0] / LowestLowPrice(input, 260)[0] > 1.3 && input[0] / HighestHighPrice(input, 260)[0] > 0.75)
                 {
-                    returnvalue.Entry = OrderAction.Buy;
+                    returnvalue.Entry = OrderDirection.Buy;
                 }
                 else
                 {
@@ -189,121 +189,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// Enter the description for the new custom indicator here
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Indicator TrendTemplate_MarkMinervini_Indicator()
-        {
-			return TrendTemplate_MarkMinervini_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Enter the description for the new custom indicator here
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Indicator TrendTemplate_MarkMinervini_Indicator(IDataSeries input)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<TrendTemplate_MarkMinervini_Indicator>(input);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new TrendTemplate_MarkMinervini_Indicator
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Enter the description for the new custom indicator here
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Indicator TrendTemplate_MarkMinervini_Indicator()
-		{
-			return LeadIndicator.TrendTemplate_MarkMinervini_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Enter the description for the new custom indicator here
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Indicator TrendTemplate_MarkMinervini_Indicator(IDataSeries input)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
-
-			return LeadIndicator.TrendTemplate_MarkMinervini_Indicator(input);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Enter the description for the new custom indicator here
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Indicator TrendTemplate_MarkMinervini_Indicator()
-		{
-			return LeadIndicator.TrendTemplate_MarkMinervini_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Enter the description for the new custom indicator here
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Indicator TrendTemplate_MarkMinervini_Indicator(IDataSeries input)
-		{
-			return LeadIndicator.TrendTemplate_MarkMinervini_Indicator(input);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Enter the description for the new custom indicator here
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Indicator TrendTemplate_MarkMinervini_Indicator()
-		{
-			return LeadIndicator.TrendTemplate_MarkMinervini_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Enter the description for the new custom indicator here
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Indicator TrendTemplate_MarkMinervini_Indicator(IDataSeries input)
-		{
-			return LeadIndicator.TrendTemplate_MarkMinervini_Indicator(input);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

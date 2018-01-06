@@ -55,8 +55,8 @@ namespace AgenaTrader.UserCode
 			IsEntry = true;
 			IsStop = false;
 			IsTarget = false;
-            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Occurred"));
-            Add(new Plot(new Pen(this.Plot0Color, this.Plot1Width), PlotStyle.Line, "Entry"));
+            Add(new OutputDescriptor(new Pen(this.Plot0Color, this.Plot0Width), OutputSerieDrawStyle.Line, "Occurred"));
+            Add(new OutputDescriptor(new Pen(this.Plot0Color, this.Plot1Width), OutputSerieDrawStyle.Line, "Entry"));
 
             ds_bull_power = new DoubleSeries(this);
             ds_bear_power = new DoubleSeries(this);
@@ -89,12 +89,12 @@ namespace AgenaTrader.UserCode
             Occurred.Set(resultsignal);
 
             PlotColors[0][0] = this.Plot0Color;
-            Plots[0].PenStyle = this.Dash0Style;
-            Plots[0].Pen.Width = this.Plot0Width;
+            OutputDescriptors[0].PenStyle = this.Dash0Style;
+            OutputDescriptors[0].Pen.Width = this.Plot0Width;
 
             PlotColors[1][0] = this.Plot1Color;
-            Plots[1].PenStyle = this.Dash1Style;
-            Plots[1].Pen.Width = this.Plot1Width;
+            OutputDescriptors[1].PenStyle = this.Dash1Style;
+            OutputDescriptors[1].Pen.Width = this.Plot1Width;
         }
 
 
@@ -236,122 +236,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// Elder Ray - Bull and Bear Power
-		/// </summary>
-		public Elder_Ray_Bull_and_Bear_Power_Condition Elder_Ray_Bull_and_Bear_Power_Condition(ElderRayTyp elderRayTyp, System.Int32 period)
-        {
-			return Elder_Ray_Bull_and_Bear_Power_Condition(InSeries, elderRayTyp, period);
-		}
-
-		/// <summary>
-		/// Elder Ray - Bull and Bear Power
-		/// </summary>
-		public Elder_Ray_Bull_and_Bear_Power_Condition Elder_Ray_Bull_and_Bear_Power_Condition(IDataSeries input, ElderRayTyp elderRayTyp, System.Int32 period)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Elder_Ray_Bull_and_Bear_Power_Condition>(input, i => i.ElderRayTyp == elderRayTyp && i.Period == period);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new Elder_Ray_Bull_and_Bear_Power_Condition
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input,
-							ElderRayTyp = elderRayTyp,
-							Period = period
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Elder Ray - Bull and Bear Power
-		/// </summary>
-		public Elder_Ray_Bull_and_Bear_Power_Condition Elder_Ray_Bull_and_Bear_Power_Condition(ElderRayTyp elderRayTyp, System.Int32 period)
-		{
-			return LeadIndicator.Elder_Ray_Bull_and_Bear_Power_Condition(InSeries, elderRayTyp, period);
-		}
-
-		/// <summary>
-		/// Elder Ray - Bull and Bear Power
-		/// </summary>
-		public Elder_Ray_Bull_and_Bear_Power_Condition Elder_Ray_Bull_and_Bear_Power_Condition(IDataSeries input, ElderRayTyp elderRayTyp, System.Int32 period)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
-
-			return LeadIndicator.Elder_Ray_Bull_and_Bear_Power_Condition(input, elderRayTyp, period);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Elder Ray - Bull and Bear Power
-		/// </summary>
-		public Elder_Ray_Bull_and_Bear_Power_Condition Elder_Ray_Bull_and_Bear_Power_Condition(ElderRayTyp elderRayTyp, System.Int32 period)
-		{
-			return LeadIndicator.Elder_Ray_Bull_and_Bear_Power_Condition(InSeries, elderRayTyp, period);
-		}
-
-		/// <summary>
-		/// Elder Ray - Bull and Bear Power
-		/// </summary>
-		public Elder_Ray_Bull_and_Bear_Power_Condition Elder_Ray_Bull_and_Bear_Power_Condition(IDataSeries input, ElderRayTyp elderRayTyp, System.Int32 period)
-		{
-			return LeadIndicator.Elder_Ray_Bull_and_Bear_Power_Condition(input, elderRayTyp, period);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Elder Ray - Bull and Bear Power
-		/// </summary>
-		public Elder_Ray_Bull_and_Bear_Power_Condition Elder_Ray_Bull_and_Bear_Power_Condition(ElderRayTyp elderRayTyp, System.Int32 period)
-		{
-			return LeadIndicator.Elder_Ray_Bull_and_Bear_Power_Condition(InSeries, elderRayTyp, period);
-		}
-
-		/// <summary>
-		/// Elder Ray - Bull and Bear Power
-		/// </summary>
-		public Elder_Ray_Bull_and_Bear_Power_Condition Elder_Ray_Bull_and_Bear_Power_Condition(IDataSeries input, ElderRayTyp elderRayTyp, System.Int32 period)
-		{
-			return LeadIndicator.Elder_Ray_Bull_and_Bear_Power_Condition(input, elderRayTyp, period);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

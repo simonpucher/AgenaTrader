@@ -6,7 +6,8 @@ This project contains scripts for the AgenaTrader like indicators, conditions an
 
 ## IMPORTANT
 ### AgenaTrader version number
-These scripts are compiled against AT 1.9.0.615.
+These scripts are compiled against AT 2.0.1.56.
+Because of the new AgenaTrader API you need at least AgenaTrader 2.0.1.56.
 
 ### Utility Indicator in our Script-Trading Basic-Package
 To compile indicators, conditions and other script resources without any error your **AgenaTrader also need access to the Utility Indicator** to use global source code elements! We use this indicator to share code snippets, so we do not need to copy and paste again and again. These reduces error sources, minimze the workload, gives us better testing opportunities and a better clarity. **You need to install the Utility Indicator into your AgenaTrader.**

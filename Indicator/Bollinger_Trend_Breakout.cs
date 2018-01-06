@@ -58,9 +58,9 @@ namespace AgenaTrader.UserCode
 
         protected override void OnInit()
 		{
-            Add(new Plot(new Pen(this.Color_1, this.LineWidth_1), PlotStyle.Line, "MA_1"));
-            Add(new Plot(new Pen(this.Color_2, this.LineWidth_2), PlotStyle.Line, "MA_2"));
-            Add(new Plot(new Pen(this.Color_3, this.LineWidth_3), PlotStyle.Line, "MA_3"));
+            Add(new OutputDescriptor(new Pen(this.Color_1, this.LineWidth_1), OutputSerieDrawStyle.Line, "MA_1"));
+            Add(new OutputDescriptor(new Pen(this.Color_2, this.LineWidth_2), OutputSerieDrawStyle.Line, "MA_2"));
+            Add(new OutputDescriptor(new Pen(this.Color_3, this.LineWidth_3), OutputSerieDrawStyle.Line, "MA_3"));
 
             IsOverlay = true;
 
@@ -110,14 +110,14 @@ namespace AgenaTrader.UserCode
 
             //Set the color
             PlotColors[0][0] = this.Color_1;
-            Plots[0].PenStyle = this.DashStyle_1;
-            Plots[0].Pen.Width = this.LineWidth_1;
+            OutputDescriptors[0].PenStyle = this.DashStyle_1;
+            OutputDescriptors[0].Pen.Width = this.LineWidth_1;
             PlotColors[1][0] = this.Color_2;
-            Plots[1].PenStyle = this.DashStyle_2;
-            Plots[1].Pen.Width = this.LineWidth_2;
+            OutputDescriptors[1].PenStyle = this.DashStyle_2;
+            OutputDescriptors[1].Pen.Width = this.LineWidth_2;
             PlotColors[2][0] = this.Color_3;
-            Plots[2].PenStyle = this.DashStyle_3;
-            Plots[2].Pen.Width = this.LineWidth_3;
+            OutputDescriptors[2].PenStyle = this.DashStyle_3;
+            OutputDescriptors[2].Pen.Width = this.LineWidth_3;
 
         }
 
@@ -459,98 +459,3 @@ namespace AgenaTrader.UserCode
 
     }
 }
-#region AgenaTrader Automaticaly Generated Code. Do not change it manually
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		public Bollinger_Trend_Breakout Bollinger_Trend_Breakout(System.Int32 period, System.Int32 standardDeviation)
-        {
-			return Bollinger_Trend_Breakout(InSeries, period, standardDeviation);
-		}
-
-		public Bollinger_Trend_Breakout Bollinger_Trend_Breakout(IDataSeries input, System.Int32 period, System.Int32 standardDeviation)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Bollinger_Trend_Breakout>(input, i => i.Period == period && i.StandardDeviation == standardDeviation);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new Bollinger_Trend_Breakout
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input,
-							Period = period,
-							StandardDeviation = standardDeviation
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		public Bollinger_Trend_Breakout Bollinger_Trend_Breakout(System.Int32 period, System.Int32 standardDeviation)
-		{
-			return LeadIndicator.Bollinger_Trend_Breakout(InSeries, period, standardDeviation);
-		}
-
-		public Bollinger_Trend_Breakout Bollinger_Trend_Breakout(IDataSeries input, System.Int32 period, System.Int32 standardDeviation)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
-
-			return LeadIndicator.Bollinger_Trend_Breakout(input, period, standardDeviation);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		public Bollinger_Trend_Breakout Bollinger_Trend_Breakout(System.Int32 period, System.Int32 standardDeviation)
-		{
-			return LeadIndicator.Bollinger_Trend_Breakout(InSeries, period, standardDeviation);
-		}
-
-		public Bollinger_Trend_Breakout Bollinger_Trend_Breakout(IDataSeries input, System.Int32 period, System.Int32 standardDeviation)
-		{
-			return LeadIndicator.Bollinger_Trend_Breakout(input, period, standardDeviation);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		public Bollinger_Trend_Breakout Bollinger_Trend_Breakout(System.Int32 period, System.Int32 standardDeviation)
-		{
-			return LeadIndicator.Bollinger_Trend_Breakout(InSeries, period, standardDeviation);
-		}
-
-		public Bollinger_Trend_Breakout Bollinger_Trend_Breakout(IDataSeries input, System.Int32 period, System.Int32 standardDeviation)
-		{
-			return LeadIndicator.Bollinger_Trend_Breakout(input, period, standardDeviation);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

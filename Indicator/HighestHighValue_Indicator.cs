@@ -49,11 +49,11 @@ namespace AgenaTrader.UserCode
         private DataSeries _DATA_List;
 
         /// <summary>
-        /// Initalizie the Plot.
+        /// Initalizie the OutputDescriptor.
         /// </summary>
 		protected override void OnInit()
 		{
-            Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "HighestHighValue_Indicator"));
+            Add(new OutputDescriptor(new Pen(this.Plot1Color, this.Plot0Width), OutputSerieDrawStyle.Line, "HighestHighValue_Indicator"));
 
             CalculateOnClosedBar = true;
             IsOverlay = false;
@@ -100,8 +100,8 @@ namespace AgenaTrader.UserCode
 
             //set the color
             PlotColors[0][0] = this.Plot1Color;
-            Plots[0].PenStyle = this.Dash0Style;
-            Plots[0].Pen.Width = this.Plot0Width;
+            OutputDescriptors[0].PenStyle = this.Dash0Style;
+            OutputDescriptors[0].Pen.Width = this.Plot0Width;
 
 		}
 
@@ -223,129 +223,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-
-
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator : Indicator
-	{
-		/// <summary>
-		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
-		/// </summary>
-		public HighestHighValue_Indicator HighestHighValue_Indicator(IndicatorEnum_HighestHighValue indicatorEnum, System.Int32 indicatorSMAPeriod, System.Int32 indicatorEMAPeriod, System.Int32 comparisonPeriod, Color plot1Color, System.Int32 plot0Width, DashStyle dash0Style)
-        {
-			return HighestHighValue_Indicator(InSeries, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
-		}
-
-		/// <summary>
-		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
-		/// </summary>
-		public HighestHighValue_Indicator HighestHighValue_Indicator(IDataSeries input, IndicatorEnum_HighestHighValue indicatorEnum, System.Int32 indicatorSMAPeriod, System.Int32 indicatorEMAPeriod, System.Int32 comparisonPeriod, Color plot1Color, System.Int32 plot0Width, DashStyle dash0Style)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<HighestHighValue_Indicator>(input, i => i.IndicatorEnum == indicatorEnum && i.IndicatorSMAPeriod == indicatorSMAPeriod && i.IndicatorEMAPeriod == indicatorEMAPeriod && i.ComparisonPeriod == comparisonPeriod && i.Plot1Color == plot1Color && i.Plot0Width == plot0Width && i.Dash0Style == dash0Style);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new HighestHighValue_Indicator
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input,
-							IndicatorEnum = indicatorEnum,
-							IndicatorSMAPeriod = indicatorSMAPeriod,
-							IndicatorEMAPeriod = indicatorEMAPeriod,
-							ComparisonPeriod = comparisonPeriod,
-							Plot1Color = plot1Color,
-							Plot0Width = plot0Width,
-							Dash0Style = dash0Style
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
-		/// </summary>
-		public HighestHighValue_Indicator HighestHighValue_Indicator(IndicatorEnum_HighestHighValue indicatorEnum, System.Int32 indicatorSMAPeriod, System.Int32 indicatorEMAPeriod, System.Int32 comparisonPeriod, Color plot1Color, System.Int32 plot0Width, DashStyle dash0Style)
-		{
-			return LeadIndicator.HighestHighValue_Indicator(InSeries, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
-		}
-
-		/// <summary>
-		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
-		/// </summary>
-		public HighestHighValue_Indicator HighestHighValue_Indicator(IDataSeries input, IndicatorEnum_HighestHighValue indicatorEnum, System.Int32 indicatorSMAPeriod, System.Int32 indicatorEMAPeriod, System.Int32 comparisonPeriod, Color plot1Color, System.Int32 plot0Width, DashStyle dash0Style)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
-
-			return LeadIndicator.HighestHighValue_Indicator(input, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
-		/// </summary>
-		public HighestHighValue_Indicator HighestHighValue_Indicator(IndicatorEnum_HighestHighValue indicatorEnum, System.Int32 indicatorSMAPeriod, System.Int32 indicatorEMAPeriod, System.Int32 comparisonPeriod, Color plot1Color, System.Int32 plot0Width, DashStyle dash0Style)
-		{
-			return LeadIndicator.HighestHighValue_Indicator(InSeries, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
-		}
-
-		/// <summary>
-		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
-		/// </summary>
-		public HighestHighValue_Indicator HighestHighValue_Indicator(IDataSeries input, IndicatorEnum_HighestHighValue indicatorEnum, System.Int32 indicatorSMAPeriod, System.Int32 indicatorEMAPeriod, System.Int32 comparisonPeriod, Color plot1Color, System.Int32 plot0Width, DashStyle dash0Style)
-		{
-			return LeadIndicator.HighestHighValue_Indicator(input, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
-		/// </summary>
-		public HighestHighValue_Indicator HighestHighValue_Indicator(IndicatorEnum_HighestHighValue indicatorEnum, System.Int32 indicatorSMAPeriod, System.Int32 indicatorEMAPeriod, System.Int32 comparisonPeriod, Color plot1Color, System.Int32 plot0Width, DashStyle dash0Style)
-		{
-			return LeadIndicator.HighestHighValue_Indicator(InSeries, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
-		}
-
-		/// <summary>
-		/// Compare the current value of an indicator to latest high value of the indicator in a defined period of time.
-		/// </summary>
-		public HighestHighValue_Indicator HighestHighValue_Indicator(IDataSeries input, IndicatorEnum_HighestHighValue indicatorEnum, System.Int32 indicatorSMAPeriod, System.Int32 indicatorEMAPeriod, System.Int32 comparisonPeriod, Color plot1Color, System.Int32 plot0Width, DashStyle dash0Style)
-		{
-			return LeadIndicator.HighestHighValue_Indicator(input, indicatorEnum, indicatorSMAPeriod, indicatorEMAPeriod, comparisonPeriod, plot1Color, plot0Width, dash0Style);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

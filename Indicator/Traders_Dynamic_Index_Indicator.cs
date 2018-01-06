@@ -74,12 +74,12 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		protected override void OnInit()
 		{
-            Add(new Plot(new Pen(this.Main, this.Plot0Width), PlotStyle.Line, "PriceLine"));
-            Add(new Plot(new Pen(this.Signal, this.Plot1Width), PlotStyle.Line, "Signalline"));
-            Add(new Plot(new Pen(this.BBAverage, this.Plot2Width), PlotStyle.Line, "Average"));
-            Add(new Plot(new Pen(this.BBUpper, this.Plot3Width), PlotStyle.Line, "Upper"));
-            Add(new Plot(new Pen(this.BBUpper, this.Plot3Width), PlotStyle.Line, "Lower"));
-            Add(new Plot(new Pen(Color.Gray, this.Plot3Width), PlotStyle.Line, "MidLine"));
+            Add(new OutputDescriptor(new Pen(this.Main, this.Plot0Width), OutputSerieDrawStyle.Line, "LinePrice"));
+            Add(new OutputDescriptor(new Pen(this.Signal, this.Plot1Width), OutputSerieDrawStyle.Line, "Signalline"));
+            Add(new OutputDescriptor(new Pen(this.BBAverage, this.Plot2Width), OutputSerieDrawStyle.Line, "Average"));
+            Add(new OutputDescriptor(new Pen(this.BBUpper, this.Plot3Width), OutputSerieDrawStyle.Line, "Upper"));
+            Add(new OutputDescriptor(new Pen(this.BBUpper, this.Plot3Width), OutputSerieDrawStyle.Line, "Lower"));
+            Add(new OutputDescriptor(new Pen(Color.Gray, this.Plot3Width), OutputSerieDrawStyle.Line, "MidLine"));
 
             CalculateOnClosedBar = true;
             IsOverlay = false;
@@ -100,7 +100,7 @@ namespace AgenaTrader.UserCode
             this._RSI_List.Set(RSI_value);
 
             double PRICE_value = SMA(this._RSI_List, this.PricePeriod)[0];
-            PriceLine.Set(PRICE_value);
+            LinePrice.Set(PRICE_value);
 
             double SIGNAL_value = SMA(this._RSI_List, this.SignalPeriod)[0];
             SignalLine.Set(SIGNAL_value);
@@ -125,19 +125,19 @@ namespace AgenaTrader.UserCode
             else
                 PlotColors[5][0] = this.MidNegative;
 
-            Plots[0].PenStyle = this.Dash0Style;
-            Plots[0].Pen.Width = this.Plot0Width;
-            Plots[1].PenStyle = this.Dash1Style;
-            Plots[1].Pen.Width = this.Plot1Width;
-            Plots[2].PenStyle = this.Dash2Style;
-            Plots[2].Pen.Width = this.Plot2Width;
+            OutputDescriptors[0].PenStyle = this.Dash0Style;
+            OutputDescriptors[0].Pen.Width = this.Plot0Width;
+            OutputDescriptors[1].PenStyle = this.Dash1Style;
+            OutputDescriptors[1].Pen.Width = this.Plot1Width;
+            OutputDescriptors[2].PenStyle = this.Dash2Style;
+            OutputDescriptors[2].Pen.Width = this.Plot2Width;
 
-            Plots[3].PenStyle = this.Dash3Style;
-            Plots[3].Pen.Width = this.Plot3Width;
-            Plots[4].PenStyle = this.Dash3Style;
-            Plots[4].Pen.Width = this.Plot3Width;
-            Plots[5].PenStyle = this.Dash3Style;
-            Plots[5].Pen.Width = this.Plot3Width;
+            OutputDescriptors[3].PenStyle = this.Dash3Style;
+            OutputDescriptors[3].Pen.Width = this.Plot3Width;
+            OutputDescriptors[4].PenStyle = this.Dash3Style;
+            OutputDescriptors[4].Pen.Width = this.Plot3Width;
+            OutputDescriptors[5].PenStyle = this.Dash3Style;
+            OutputDescriptors[5].Pen.Width = this.Plot3Width;
  
 		}
 
@@ -297,9 +297,9 @@ namespace AgenaTrader.UserCode
 
 
 
-        [Description("Period for Priceline")]
+        [Description("Period for LinePrice")]
         [Category("Parameters")]
-        [DisplayName("Period for Priceline")]
+        [DisplayName("Period for LinePrice")]
         public int PricePeriod
         {
             get { return _pricePeriod; }
@@ -342,9 +342,9 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("Width for Priceline.")]
+        [Description("Width for LinePrice.")]
         [Category("Parameters")]
-        [DisplayName("Line Width Priceline")]
+        [DisplayName("Line Width LinePrice")]
         public int Plot0Width
         {
             get { return _plot0Width; }
@@ -354,9 +354,9 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("DashStyle for Priceline.")]
+        [Description("DashStyle for LinePrice.")]
         [Category("Parameters")]
-        [DisplayName("Dash Style Priceline")]
+        [DisplayName("Dash Style LinePrice")]
         public DashStyle Dash0Style
         {
             get { return _dash0Style; }
@@ -439,7 +439,7 @@ namespace AgenaTrader.UserCode
 
         [Browsable(false)]
         [XmlIgnore()]
-        public DataSeries PriceLine
+        public DataSeries LinePrice
         {
             get { return Outputs[0]; }
         }
@@ -492,141 +492,3 @@ namespace AgenaTrader.UserCode
 	
 	}
 }
-
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public TDI_Indicator TDI_Indicator(Color main, Color signal, Color bBAverage, Color bBUpper, Color bBLower, Color midPositive, Color midNegative, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber, System.Int32 plot0Width, DashStyle dash0Style, System.Int32 plot1Width, DashStyle dash1Style, System.Int32 plot2Width, DashStyle dash2Style, System.Int32 plot3Width, DashStyle dash3Style)
-        {
-			return TDI_Indicator(InSeries, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
-		}
-
-		/// <summary>
-		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public TDI_Indicator TDI_Indicator(IDataSeries input, Color main, Color signal, Color bBAverage, Color bBUpper, Color bBLower, Color midPositive, Color midNegative, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber, System.Int32 plot0Width, DashStyle dash0Style, System.Int32 plot1Width, DashStyle dash1Style, System.Int32 plot2Width, DashStyle dash2Style, System.Int32 plot3Width, DashStyle dash3Style)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<TDI_Indicator>(input, i => i.Main == main && i.Signal == signal && i.BBAverage == bBAverage && i.BBUpper == bBUpper && i.BBLower == bBLower && i.MidPositive == midPositive && i.MidNegative == midNegative && i.RSIPeriod == rSIPeriod && i.PricePeriod == pricePeriod && i.SignalPeriod == signalPeriod && i.BandPeriod == bandPeriod && Math.Abs(i.StdDevNumber - stdDevNumber) <= Double.Epsilon && i.Plot0Width == plot0Width && i.Dash0Style == dash0Style && i.Plot1Width == plot1Width && i.Dash1Style == dash1Style && i.Plot2Width == plot2Width && i.Dash2Style == dash2Style && i.Plot3Width == plot3Width && i.Dash3Style == dash3Style);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new TDI_Indicator
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input,
-							Main = main,
-							Signal = signal,
-							BBAverage = bBAverage,
-							BBUpper = bBUpper,
-							BBLower = bBLower,
-							MidPositive = midPositive,
-							MidNegative = midNegative,
-							RSIPeriod = rSIPeriod,
-							PricePeriod = pricePeriod,
-							SignalPeriod = signalPeriod,
-							BandPeriod = bandPeriod,
-							StdDevNumber = stdDevNumber,
-							Plot0Width = plot0Width,
-							Dash0Style = dash0Style,
-							Plot1Width = plot1Width,
-							Dash1Style = dash1Style,
-							Plot2Width = plot2Width,
-							Dash2Style = dash2Style,
-							Plot3Width = plot3Width,
-							Dash3Style = dash3Style
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public TDI_Indicator TDI_Indicator(Color main, Color signal, Color bBAverage, Color bBUpper, Color bBLower, Color midPositive, Color midNegative, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber, System.Int32 plot0Width, DashStyle dash0Style, System.Int32 plot1Width, DashStyle dash1Style, System.Int32 plot2Width, DashStyle dash2Style, System.Int32 plot3Width, DashStyle dash3Style)
-		{
-			return LeadIndicator.TDI_Indicator(InSeries, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
-		}
-
-		/// <summary>
-		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public TDI_Indicator TDI_Indicator(IDataSeries input, Color main, Color signal, Color bBAverage, Color bBUpper, Color bBLower, Color midPositive, Color midNegative, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber, System.Int32 plot0Width, DashStyle dash0Style, System.Int32 plot1Width, DashStyle dash1Style, System.Int32 plot2Width, DashStyle dash2Style, System.Int32 plot3Width, DashStyle dash3Style)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
-
-			return LeadIndicator.TDI_Indicator(input, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public TDI_Indicator TDI_Indicator(Color main, Color signal, Color bBAverage, Color bBUpper, Color bBLower, Color midPositive, Color midNegative, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber, System.Int32 plot0Width, DashStyle dash0Style, System.Int32 plot1Width, DashStyle dash1Style, System.Int32 plot2Width, DashStyle dash2Style, System.Int32 plot3Width, DashStyle dash3Style)
-		{
-			return LeadIndicator.TDI_Indicator(InSeries, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
-		}
-
-		/// <summary>
-		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public TDI_Indicator TDI_Indicator(IDataSeries input, Color main, Color signal, Color bBAverage, Color bBUpper, Color bBLower, Color midPositive, Color midNegative, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber, System.Int32 plot0Width, DashStyle dash0Style, System.Int32 plot1Width, DashStyle dash1Style, System.Int32 plot2Width, DashStyle dash2Style, System.Int32 plot3Width, DashStyle dash3Style)
-		{
-			return LeadIndicator.TDI_Indicator(input, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public TDI_Indicator TDI_Indicator(Color main, Color signal, Color bBAverage, Color bBUpper, Color bBLower, Color midPositive, Color midNegative, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber, System.Int32 plot0Width, DashStyle dash0Style, System.Int32 plot1Width, DashStyle dash1Style, System.Int32 plot2Width, DashStyle dash2Style, System.Int32 plot3Width, DashStyle dash3Style)
-		{
-			return LeadIndicator.TDI_Indicator(InSeries, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
-		}
-
-		/// <summary>
-		/// The TDI (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public TDI_Indicator TDI_Indicator(IDataSeries input, Color main, Color signal, Color bBAverage, Color bBUpper, Color bBLower, Color midPositive, Color midNegative, System.Int32 rSIPeriod, System.Int32 pricePeriod, System.Int32 signalPeriod, System.Int32 bandPeriod, System.Double stdDevNumber, System.Int32 plot0Width, DashStyle dash0Style, System.Int32 plot1Width, DashStyle dash1Style, System.Int32 plot2Width, DashStyle dash2Style, System.Int32 plot3Width, DashStyle dash3Style)
-		{
-			return LeadIndicator.TDI_Indicator(input, main, signal, bBAverage, bBUpper, bBLower, midPositive, midNegative, rSIPeriod, pricePeriod, signalPeriod, bandPeriod, stdDevNumber, plot0Width, dash0Style, plot1Width, dash1Style, plot2Width, dash2Style, plot3Width, dash3Style);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

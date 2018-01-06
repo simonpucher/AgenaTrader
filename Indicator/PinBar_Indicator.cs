@@ -44,7 +44,7 @@ namespace AgenaTrader.UserCode
 
         protected override void OnInit()
         {
-            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "PinBar_Indicator"));
+            Add(new OutputDescriptor(new Pen(this.Plot0Color, this.Plot0Width), OutputSerieDrawStyle.Line, "PinBar_Indicator"));
             IsOverlay = false;
             CalculateOnClosedBar = true;
             IsAutoAdjustableScale = true;
@@ -83,8 +83,8 @@ namespace AgenaTrader.UserCode
 
 
             PlotColors[0][0] = this.Plot0Color;
-            Plots[0].PenStyle = this.Dash0Style;
-            Plots[0].Pen.Width = this.Plot0Width;
+            OutputDescriptors[0].PenStyle = this.Dash0Style;
+            OutputDescriptors[0].Pen.Width = this.Plot0Width;
         }
         
 
@@ -226,120 +226,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// Show the Pin Bar Signal.
-		/// </summary>
-		public PinBar_indicator PinBar_indicator()
-        {
-			return PinBar_indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Show the Pin Bar Signal.
-		/// </summary>
-		public PinBar_indicator PinBar_indicator(IDataSeries input)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<PinBar_indicator>(input);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new PinBar_indicator
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Show the Pin Bar Signal.
-		/// </summary>
-		public PinBar_indicator PinBar_indicator()
-		{
-			return LeadIndicator.PinBar_indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Show the Pin Bar Signal.
-		/// </summary>
-		public PinBar_indicator PinBar_indicator(IDataSeries input)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
-
-			return LeadIndicator.PinBar_indicator(input);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Show the Pin Bar Signal.
-		/// </summary>
-		public PinBar_indicator PinBar_indicator()
-		{
-			return LeadIndicator.PinBar_indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Show the Pin Bar Signal.
-		/// </summary>
-		public PinBar_indicator PinBar_indicator(IDataSeries input)
-		{
-			return LeadIndicator.PinBar_indicator(input);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Show the Pin Bar Signal.
-		/// </summary>
-		public PinBar_indicator PinBar_indicator()
-		{
-			return LeadIndicator.PinBar_indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Show the Pin Bar Signal.
-		/// </summary>
-		public PinBar_indicator PinBar_indicator(IDataSeries input)
-		{
-			return LeadIndicator.PinBar_indicator(input);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

@@ -64,11 +64,11 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnInit()
 		{
-            //Add(new Plot(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
+            //Add(new OutputDescriptor(Color.FromKnownColor(KnownColor.Orange), "MyPlot1"));
 
-            Add(new Plot(new Pen(Color.FromKnownColor(KnownColor.Red), 2), PlotStyle.Line, "MA_Fast")); 
-            Add(new Plot(new Pen(Color.FromKnownColor(KnownColor.Orange), 2), PlotStyle.Line, "MA_Medium")); 
-            Add(new Plot(new Pen(Color.FromKnownColor(KnownColor.Blue), 2), PlotStyle.Line, "MA_Slow"));
+            Add(new OutputDescriptor(new Pen(Color.FromKnownColor(KnownColor.Red), 2), OutputSerieDrawStyle.Line, "MA_Fast")); 
+            Add(new OutputDescriptor(new Pen(Color.FromKnownColor(KnownColor.Orange), 2), OutputSerieDrawStyle.Line, "MA_Medium")); 
+            Add(new OutputDescriptor(new Pen(Color.FromKnownColor(KnownColor.Blue), 2), OutputSerieDrawStyle.Line, "MA_Slow"));
 
 			CalculateOnClosedBar = true;
             IsOverlay = true;
@@ -88,9 +88,9 @@ namespace AgenaTrader.UserCode
             {
                  this.BarColor = Color.White;
             }
-    
+
             //calculate data
-            OrderAction? resultdata = this.calculate(InSeries, this.MA_Selected, this.MA_Fast, this.MA_Medium, this.MA_Slow);
+            OrderDirection_Enum? resultdata = this.calculate(InSeries, this.MA_Selected, this.MA_Fast, this.MA_Medium, this.MA_Slow);
 
             //draw indicator lines
             Plot_1.Set(this._mafast[0]);
@@ -105,16 +105,16 @@ namespace AgenaTrader.UserCode
             {
                 switch (resultdata)
                 {
-                    case OrderAction.Buy:
+                    case OrderDirection_Enum.OpenLong:
                         AddChartDot("ArrowLong_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
                         break;
-                    case OrderAction.SellShort:
+                    case OrderDirection_Enum.OpenShort:
                         AddChartDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
                         break;
-                    case OrderAction.BuyToCover:
+                    case OrderDirection_Enum.CloseShort:
                         AddChartDiamond("ArrowShort_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
                         break;
-                    case OrderAction.Sell:
+                    case OrderDirection_Enum.CloseLong:
                         AddChartDot("ArrowLong_Exit" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.Red);
                         break;
                     default:
@@ -128,11 +128,11 @@ namespace AgenaTrader.UserCode
 		}
 
         /// <summary>
-        /// In this function we do all the work and send back the OrderAction.
+        /// In this function we do all the work and send back the OrderDirection.
         /// </summary>
         /// <param name="data"></param>
         /// <returns></returns>
-        public OrderAction? calculate(IDataSeries data, Enum_RunningWithTheWolves_Indicator_MA ma, int fast, int medium, int slow)
+        public OrderDirection_Enum? calculate(IDataSeries data, Enum_RunningWithTheWolves_Indicator_MA ma, int fast, int medium, int slow)
         {
 
             //Calculate the SMA or EMA
@@ -191,40 +191,40 @@ namespace AgenaTrader.UserCode
             //2  && IsSeriesRising(_mafast) && IsSeriesFalling(_mafast)
             if (IsLongEnabled && CrossAbove(_mafast, _maslow, 0) )
             {
-                return OrderAction.Buy;
+                return OrderDirection_Enum.OpenLong;
             }
             else if (IsShortEnabled && CrossBelow(_mafast, _maslow, 0) )
             {
-                return OrderAction.SellShort;
+                return OrderDirection_Enum.OpenShort;
             }
             //else if (IsShortEnabled && data[0] < bb_low && rsi_value < 70)
             else if (IsShortEnabled && CrossAbove(_mafast, _mamedium, 0))
             {
-                return OrderAction.BuyToCover;
+                return OrderDirection_Enum.CloseShort;
             }
             //else if (IsLongEnabled && data[0] > bb_high && rsi_value > 70)
             else if (IsLongEnabled && CrossBelow(_mafast, _mamedium, 0))
             {
-                return OrderAction.Sell;
+                return OrderDirection_Enum.CloseLong;
             }
 
             ////1
             //double marketupordown =  MarketPhases(data, 0)[0];
             //if (IsLongEnabled && CrossAbove(_maslow, _mafast, 0) && marketupordown >= 0)
             // {
-            //     return OrderAction.Buy;
+            //     return OrderDirection.Buy;
             // }
             //else if (IsShortEnabled && CrossBelow(_maslow, _mafast, 0) && marketupordown <= 0)
             // {
-            //     return OrderAction.SellShort;
+            //     return OrderDirection.Sell;
             // }
             //else if (IsShortEnabled && CrossAbove(_maslow, _mamedium, 0))
             // {
-            //     return OrderAction.BuyToCover;
+            //     return OrderDirection.Buy;
             // }
             //else if (IsLongEnabled && CrossBelow(_maslow, _mamedium, 0))
             // {
-            //     return OrderAction.Sell;
+            //     return OrderDirection.Sell;
             // }
 
 
@@ -383,129 +383,3 @@ namespace AgenaTrader.UserCode
 		#endregion
 	}
 }
-
-
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// Use SMA or EMA crosses to find trends.
-		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
-        {
-			return RunningWithTheWolves_Indicator(InSeries, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
-		}
-
-		/// <summary>
-		/// Use SMA or EMA crosses to find trends.
-		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<RunningWithTheWolves_Indicator>(input, i => i.MA_Selected == mA_Selected && i.MA_Slow == mA_Slow && i.MA_Medium == mA_Medium && i.MA_Fast == mA_Fast && i.IsLongEnabled == isLongEnabled && i.IsShortEnabled == isShortEnabled && i.UseWhiteCandles == useWhiteCandles);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new RunningWithTheWolves_Indicator
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input,
-							MA_Selected = mA_Selected,
-							MA_Slow = mA_Slow,
-							MA_Medium = mA_Medium,
-							MA_Fast = mA_Fast,
-							IsLongEnabled = isLongEnabled,
-							IsShortEnabled = isShortEnabled,
-							UseWhiteCandles = useWhiteCandles
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Use SMA or EMA crosses to find trends.
-		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
-		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(InSeries, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
-		}
-
-		/// <summary>
-		/// Use SMA or EMA crosses to find trends.
-		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
-
-			return LeadIndicator.RunningWithTheWolves_Indicator(input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Use SMA or EMA crosses to find trends.
-		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
-		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(InSeries, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
-		}
-
-		/// <summary>
-		/// Use SMA or EMA crosses to find trends.
-		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
-		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Use SMA or EMA crosses to find trends.
-		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
-		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(InSeries, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
-		}
-
-		/// <summary>
-		/// Use SMA or EMA crosses to find trends.
-		/// </summary>
-		public RunningWithTheWolves_Indicator RunningWithTheWolves_Indicator(IDataSeries input, Enum_RunningWithTheWolves_Indicator_MA mA_Selected, System.Int32 mA_Slow, System.Int32 mA_Medium, System.Int32 mA_Fast, System.Boolean isLongEnabled, System.Boolean isShortEnabled, System.Boolean useWhiteCandles)
-		{
-			return LeadIndicator.RunningWithTheWolves_Indicator(input, mA_Selected, mA_Slow, mA_Medium, mA_Fast, isLongEnabled, isShortEnabled, useWhiteCandles);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

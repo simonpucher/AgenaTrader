@@ -45,9 +45,9 @@ namespace AgenaTrader.UserCode
         /// </summary>
         protected override void OnInit()
         {
-            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_Line1"));
-            Add(new Plot(new Pen(this.Plot1Color, this.Plot1Width), PlotStyle.Line, "Plot_Line2"));
-            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_Line3"));
+            Add(new OutputDescriptor(new Pen(this.Plot0Color, this.Plot0Width), OutputSerieDrawStyle.Line, "Plot_Line1"));
+            Add(new OutputDescriptor(new Pen(this.Plot1Color, this.Plot1Width), OutputSerieDrawStyle.Line, "Plot_Line2"));
+            Add(new OutputDescriptor(new Pen(this.Plot0Color, this.Plot0Width), OutputSerieDrawStyle.Line, "Plot_Line3"));
 
             CalculateOnClosedBar = true;
             IsOverlay = false;
@@ -104,16 +104,16 @@ namespace AgenaTrader.UserCode
 
 
             PlotColors[0][0] = this.Plot0Color;
-            Plots[0].PenStyle = this.Dash0Style;
-            Plots[0].Pen.Width = this.Plot0Width;
+            OutputDescriptors[0].PenStyle = this.Dash0Style;
+            OutputDescriptors[0].Pen.Width = this.Plot0Width;
 
             PlotColors[1][0] = this.Plot1Color;
-            Plots[1].PenStyle = this.Dash1Style;
-            Plots[1].Pen.Width = this.Plot1Width;
+            OutputDescriptors[1].PenStyle = this.Dash1Style;
+            OutputDescriptors[1].Pen.Width = this.Plot1Width;
 
             PlotColors[2][0] = this.Plot1Color;
-            Plots[2].PenStyle = this.Dash1Style;
-            Plots[2].Pen.Width = this.Plot1Width;
+            OutputDescriptors[2].PenStyle = this.Dash1Style;
+            OutputDescriptors[2].Pen.Width = this.Plot1Width;
 
         }
 
@@ -252,120 +252,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Holy_Grail_Indicator Holy_Grail_Indicator()
-        {
-			return Holy_Grail_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Holy_Grail_Indicator Holy_Grail_Indicator(IDataSeries input)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Holy_Grail_Indicator>(input);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new Holy_Grail_Indicator
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Holy_Grail_Indicator Holy_Grail_Indicator()
-		{
-			return LeadIndicator.Holy_Grail_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Holy_Grail_Indicator Holy_Grail_Indicator(IDataSeries input)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
-
-			return LeadIndicator.Holy_Grail_Indicator(input);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Holy_Grail_Indicator Holy_Grail_Indicator()
-		{
-			return LeadIndicator.Holy_Grail_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Holy_Grail_Indicator Holy_Grail_Indicator(IDataSeries input)
-		{
-			return LeadIndicator.Holy_Grail_Indicator(input);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Holy_Grail_Indicator Holy_Grail_Indicator()
-		{
-			return LeadIndicator.Holy_Grail_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Holy_Grail_Indicator Holy_Grail_Indicator(IDataSeries input)
-		{
-			return LeadIndicator.Holy_Grail_Indicator(input);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

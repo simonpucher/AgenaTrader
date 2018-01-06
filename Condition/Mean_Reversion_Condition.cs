@@ -70,8 +70,8 @@ namespace AgenaTrader.UserCode
 			IsEntry = true;
 			IsStop = false;
 			IsTarget = false;
-			Add(new Plot(Const.DefaultIndicatorColor, "Occurred"));
-            Add(new Plot(Const.DefaultIndicatorColor, "Entry"));
+			Add(new OutputDescriptor(Const.DefaultIndicatorColor, "Occurred"));
+            Add(new OutputDescriptor(Const.DefaultIndicatorColor, "Entry"));
 
 			IsOverlay = false;
 			CalculateOnClosedBar = true;
@@ -123,10 +123,10 @@ namespace AgenaTrader.UserCode
             {
                 switch (returnvalue.Entry)
                 {
-                    case OrderAction.Buy:
+                    case OrderDirection.Buy:
                         Occurred.Set(1);
                         break;
-                    case OrderAction.SellShort:
+                    case OrderDirection.Sell:
                         Occurred.Set(-1);
                         break;
                 }
@@ -137,10 +137,10 @@ namespace AgenaTrader.UserCode
             //{
             //    switch (returnvalue.Exit)
             //    {
-            //        case OrderAction.BuyToCover:
+            //        case OrderDirection.Buy:
             //            this.DoExitShort();
             //            break;
-            //        case OrderAction.Sell:
+            //        case OrderDirection.Sell:
             //            this.DoExitLong();
             //            break;
             //    }

@@ -119,7 +119,7 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnInit()
 		{
-            Add(new Plot(new Pen(this.Plot1Color, this.Plot0Width), PlotStyle.Line, "ORB_IndicatorPlot"));
+            Add(new OutputDescriptor(new Pen(this.Plot1Color, this.Plot0Width), OutputSerieDrawStyle.Line, "ORB_IndicatorPlot"));
             IsOverlay = false;
             CalculateOnClosedBar = true;
 
@@ -213,8 +213,8 @@ namespace AgenaTrader.UserCode
 
                 //Set the color
                 PlotColors[0][0] = this.Plot1Color;
-                Plots[0].PenStyle = this.Dash0Style;
-                Plots[0].Pen.Width = this.Plot0Width;
+                OutputDescriptors[0].PenStyle = this.Dash0Style;
+                OutputDescriptors[0].Pen.Width = this.Plot0Width;
 
 
                 //When finished set the last day variable
@@ -815,121 +815,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// Open Range Breakout Indicator
-		/// </summary>
-		public ORB_Indicator ORB_Indicator()
-        {
-			return ORB_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Open Range Breakout Indicator
-		/// </summary>
-		public ORB_Indicator ORB_Indicator(IDataSeries input)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<ORB_Indicator>(input);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new ORB_Indicator
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Open Range Breakout Indicator
-		/// </summary>
-		public ORB_Indicator ORB_Indicator()
-		{
-			return LeadIndicator.ORB_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Open Range Breakout Indicator
-		/// </summary>
-		public ORB_Indicator ORB_Indicator(IDataSeries input)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
-
-			return LeadIndicator.ORB_Indicator(input);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Open Range Breakout Indicator
-		/// </summary>
-		public ORB_Indicator ORB_Indicator()
-		{
-			return LeadIndicator.ORB_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Open Range Breakout Indicator
-		/// </summary>
-		public ORB_Indicator ORB_Indicator(IDataSeries input)
-		{
-			return LeadIndicator.ORB_Indicator(input);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Open Range Breakout Indicator
-		/// </summary>
-		public ORB_Indicator ORB_Indicator()
-		{
-			return LeadIndicator.ORB_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Open Range Breakout Indicator
-		/// </summary>
-		public ORB_Indicator ORB_Indicator(IDataSeries input)
-		{
-			return LeadIndicator.ORB_Indicator(input);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

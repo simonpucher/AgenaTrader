@@ -55,14 +55,14 @@ namespace AgenaTrader.UserCode
 
         protected override void OnInit()
         {
-            Add(new Plot(Color.LawnGreen, "DoubleBottom_DS"));
+            Add(new OutputDescriptor(Color.LawnGreen, "DoubleBottom_DS"));
             IsOverlay = false;
             CalculateOnClosedBar = false;
 
             //Inhalt des OutputWindow l�schen
             if (VerboseMode)
             {
-                ClearOutputWindow();
+                ClearTraceWindow();
             }
             
         }
@@ -348,129 +348,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// DoubleBottom
-		/// </summary>
-		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
-        {
-			return DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
-		}
-
-		/// <summary>
-		/// DoubleBottom
-		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<DoubleBottom>(input, i => Math.Abs(i.TolerancePercentage - tolerancePercentage) <= Double.Epsilon && i.Candles == candles && i.DrawTolerance == drawTolerance && i.BarsAgo == barsAgo && i.History == history && i.Filter_SMA200 == filter_SMA200);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new DoubleBottom
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input,
-							TolerancePercentage = tolerancePercentage,
-							Candles = candles,
-							DrawTolerance = drawTolerance,
-							BarsAgo = barsAgo,
-							History = history,
-							Filter_SMA200 = filter_SMA200
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// DoubleBottom
-		/// </summary>
-		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
-		{
-			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
-		}
-
-		/// <summary>
-		/// DoubleBottom
-		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
-
-			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// DoubleBottom
-		/// </summary>
-		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
-		{
-			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
-		}
-
-		/// <summary>
-		/// DoubleBottom
-		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
-		{
-			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// DoubleBottom
-		/// </summary>
-		public DoubleBottom DoubleBottom(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
-		{
-			return LeadIndicator.DoubleBottom(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
-		}
-
-		/// <summary>
-		/// DoubleBottom
-		/// </summary>
-		public DoubleBottom DoubleBottom(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo, System.Boolean history, System.Boolean filter_SMA200)
-		{
-			return LeadIndicator.DoubleBottom(input, tolerancePercentage, candles, drawTolerance, barsAgo, history, filter_SMA200);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion
-
-
-

@@ -85,11 +85,11 @@ namespace AgenaTrader.UserCode
             {
                 if (this._orderenterlong != null)
                 {
-                    CloseLong(this._orderenterlong.Quantity, "PopGunTarget", this._orderenterlong.Name, this._orderenterlong.Instrument, this._orderenterlong.TimeFrame);
+                    CloseLongTrade(new StrategyOrderParameters {Type = OrderType.Market, Quantity = this._orderenterlong.Quantity, SignalName =  "PopGunTarget", FromEntrySignal =  this._orderenterlong.Name, Instrument =  this._orderenterlong.Instrument, TimeFrame =  this._orderenterlong.TimeFrame});
                 }
                 if (this._orderentershort != null)
                 {
-                    CloseShort(this._orderentershort.Quantity, "PopGunTarget", this._orderentershort.Name, this._orderentershort.Instrument, this._orderentershort.TimeFrame);
+                    CloseShortTrade(new StrategyOrderParameters {Type = OrderType.Market, Quantity = this._orderentershort.Quantity, SignalName =  "PopGunTarget", FromEntrySignal =  this._orderentershort.Name, Instrument =  this._orderentershort.Instrument, TimeFrame =  this._orderentershort.TimeFrame});
                 }
             }
 
@@ -163,11 +163,11 @@ namespace AgenaTrader.UserCode
 
         private void DoEnterLong()
         {
-            _orderenterlong = OpenLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager,
+            _orderenterlong = SubmitOrder(new StrategyOrderParameters {Direction = OrderDirection.Buy, Type = OrderType.Market, Quantity = GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager,
                                                                                        this.Root.Core.PreferenceManager,
-                                                                                       this.Instrument, Bars[0].Close),
-                                                                                       "PopGun_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(),
-                                                                                       this.Instrument, this.TimeFrame);
+                                                                                       this.Instrument, Bars[0].Close), SignalName = 
+                                                                                       "PopGun_Long_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), Instrument = 
+                                                                                       this.Instrument, TimeFrame =  this.TimeFrame});
             if (UseStopLoss)
             {
                 SetUpStopLoss(_orderenterlong.Name, CalculationMode.Price, this._popgun_indicator.PopGunTriggerShort, false);
@@ -183,11 +183,11 @@ namespace AgenaTrader.UserCode
 
         private void DoEnterShort()
         {
-            _orderentershort = OpenShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager,
+            _orderentershort = SubmitOrder(new StrategyOrderParameters {Direction = OrderDirection.Sell, Type = OrderType.Market, Quantity = GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager,
                                                                                          this.Root.Core.PreferenceManager,
-                                                                                         this.Instrument, Bars[0].Close),
-                                                                                         "PopGun_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(),
-                                                                                         this.Instrument, this.TimeFrame);
+                                                                                         this.Instrument, Bars[0].Close), SignalName = 
+                                                                                         "PopGun_Short_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), Instrument = 
+                                                                                         this.Instrument, TimeFrame =  this.TimeFrame});
             if (UseStopLoss)
             {
                 SetUpStopLoss(_orderentershort.Name, CalculationMode.Price, this._popgun_indicator.PopGunTriggerLong, false);

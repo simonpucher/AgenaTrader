@@ -1654,6 +1654,22 @@ namespace AgenaTrader.UserCode
 
 }
 
+
+
+#region ITradingOrderExtensions
+
+public static class IBarExtensions
+{
+
+    public static DateTime GetTimestamp(this IBar item)
+    {
+        return item.Time;
+    }
+
+}
+
+#endregion
+
 #region ITradingOrderExtensions
 
 public static class ITradingOrderExtensions

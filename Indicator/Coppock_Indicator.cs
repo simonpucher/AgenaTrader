@@ -60,8 +60,8 @@ namespace AgenaTrader.UserCode
 		/// </summary>
 		protected override void OnInit()
 		{
-            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Coppock_Curve"));
-            Add(new Plot(new Pen(Const.DefaultIndicatorColor_GreyedOut, this.Plot0Width), PlotStyle.Line, "Coppock_Curve_GreyedOut"));
+            Add(new OutputDescriptor(new Pen(this.Plot0Color, this.Plot0Width), OutputSerieDrawStyle.Line, "Coppock_Curve"));
+            Add(new OutputDescriptor(new Pen(Const.DefaultIndicatorColor_GreyedOut, this.Plot0Width), OutputSerieDrawStyle.Line, "Coppock_Curve_GreyedOut"));
 
             CalculateOnClosedBar = true;
             IsOverlay = false;
@@ -105,12 +105,12 @@ namespace AgenaTrader.UserCode
                 this.Coppock_GreyedOut.Set(0.0);
 
                 PlotColors[0][0] = Plot0Color;
-                Plots[0].PenStyle = this.Dash0Style;
-                Plots[0].Pen.Width = this.Plot0Width;
+                OutputDescriptors[0].PenStyle = this.Dash0Style;
+                OutputDescriptors[0].Pen.Width = this.Plot0Width;
 
                 PlotColors[1][0] = Const.DefaultIndicatorColor_GreyedOut;
-                Plots[1].PenStyle = this.Dash0Style;
-                Plots[1].Pen.Width = this.Plot0Width;
+                OutputDescriptors[1].PenStyle = this.Dash0Style;
+                OutputDescriptors[1].Pen.Width = this.Plot0Width;
 
             }
             else
@@ -273,121 +273,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public Coppock_Indicator Coppock_Indicator()
-        {
-			return Coppock_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public Coppock_Indicator Coppock_Indicator(IDataSeries input)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Coppock_Indicator>(input);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new Coppock_Indicator
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public Coppock_Indicator Coppock_Indicator()
-		{
-			return LeadIndicator.Coppock_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public Coppock_Indicator Coppock_Indicator(IDataSeries input)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
-
-			return LeadIndicator.Coppock_Indicator(input);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public Coppock_Indicator Coppock_Indicator()
-		{
-			return LeadIndicator.Coppock_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public Coppock_Indicator Coppock_Indicator(IDataSeries input)
-		{
-			return LeadIndicator.Coppock_Indicator(input);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public Coppock_Indicator Coppock_Indicator()
-		{
-			return LeadIndicator.Coppock_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// The Coppock (Moving Average Convergence/Divergence) is a trend following momentum indicator that shows the relationship between two moving averages of prices.
-		/// </summary>
-		public Coppock_Indicator Coppock_Indicator(IDataSeries input)
-		{
-			return LeadIndicator.Coppock_Indicator(input);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

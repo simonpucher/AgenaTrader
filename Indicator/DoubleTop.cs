@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -46,12 +46,12 @@ namespace AgenaTrader.UserCode
 
         protected override void OnInit()
         {
-            Add(new Plot(Color.Red, "DoubleTop_DS"));
+            Add(new OutputDescriptor(Color.Red, "DoubleTop_DS"));
             IsOverlay = false;
             CalculateOnClosedBar = false;
 
             //Inhalt des OutputWindow l�schen
-            ClearOutputWindow();
+            ClearTraceWindow();
         }
 
         protected override void OnCalculate()
@@ -259,124 +259,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// DoubleTop
-		/// </summary>
-		public DoubleTop DoubleTop(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
-        {
-			return DoubleTop(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo);
-		}
-
-		/// <summary>
-		/// DoubleTop
-		/// </summary>
-		public DoubleTop DoubleTop(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<DoubleTop>(input, i => Math.Abs(i.TolerancePercentage - tolerancePercentage) <= Double.Epsilon && i.Candles == candles && i.DrawTolerance == drawTolerance && i.BarsAgo == barsAgo);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new DoubleTop
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input,
-							TolerancePercentage = tolerancePercentage,
-							Candles = candles,
-							DrawTolerance = drawTolerance,
-							BarsAgo = barsAgo
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// DoubleTop
-		/// </summary>
-		public DoubleTop DoubleTop(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
-		{
-			return LeadIndicator.DoubleTop(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo);
-		}
-
-		/// <summary>
-		/// DoubleTop
-		/// </summary>
-		public DoubleTop DoubleTop(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
-
-			return LeadIndicator.DoubleTop(input, tolerancePercentage, candles, drawTolerance, barsAgo);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// DoubleTop
-		/// </summary>
-		public DoubleTop DoubleTop(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
-		{
-			return LeadIndicator.DoubleTop(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo);
-		}
-
-		/// <summary>
-		/// DoubleTop
-		/// </summary>
-		public DoubleTop DoubleTop(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
-		{
-			return LeadIndicator.DoubleTop(input, tolerancePercentage, candles, drawTolerance, barsAgo);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// DoubleTop
-		/// </summary>
-		public DoubleTop DoubleTop(System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
-		{
-			return LeadIndicator.DoubleTop(InSeries, tolerancePercentage, candles, drawTolerance, barsAgo);
-		}
-
-		/// <summary>
-		/// DoubleTop
-		/// </summary>
-		public DoubleTop DoubleTop(IDataSeries input, System.Double tolerancePercentage, System.Int32 candles, System.Boolean drawTolerance, System.Int32 barsAgo)
-		{
-			return LeadIndicator.DoubleTop(input, tolerancePercentage, candles, drawTolerance, barsAgo);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

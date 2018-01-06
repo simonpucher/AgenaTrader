@@ -31,7 +31,7 @@ using AgenaTrader.Helper;
 namespace AgenaTrader.UserCode
 {
     /// <summary>
-    /// Plots horizontal rays at swing highs and lows and removes them once broken. 
+    /// OutputDescriptors horizontal rays at swing highs and lows and removes them once broken. 
     /// </summary>
     [Description("Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.")]
     public class SwingRays : UserIndicator
@@ -97,7 +97,7 @@ namespace AgenaTrader.UserCode
             swingHighRays = new Stack<RayObject>(); // LIFO buffer; last entry contains the nearest swing high
             swingLowRays = new Stack<RayObject>();
 
-            Add(new Plot(new Pen(this.Signal, this.Plot0Width), PlotStyle.Line, "Signalline"));
+            Add(new OutputDescriptor(new Pen(this.Signal, this.Plot0Width), OutputSerieDrawStyle.Line, "Signalline"));
         }
 
         /// <summary>
@@ -411,132 +411,3 @@ namespace AgenaTrader.UserCode
 
     }
 }
-
-
-
-
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
-		/// </summary>
-		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
-        {
-			return SwingRays(InSeries, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
-		}
-
-		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
-		/// </summary>
-		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<SwingRays>(input, i => i.Strength == strength && i.EnableAlerts == enableAlerts && i.KeepBrokenLines == keepBrokenLines && i.SwingHighColor == swingHighColor && i.SwingLowColor == swingLowColor && i.Soundfile == soundfile);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new SwingRays
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input,
-							Strength = strength,
-							EnableAlerts = enableAlerts,
-							KeepBrokenLines = keepBrokenLines,
-							SwingHighColor = swingHighColor,
-							SwingLowColor = swingLowColor,
-							Soundfile = soundfile
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
-		/// </summary>
-		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
-		{
-			return LeadIndicator.SwingRays(InSeries, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
-		}
-
-		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
-		/// </summary>
-		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
-
-			return LeadIndicator.SwingRays(input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
-		/// </summary>
-		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
-		{
-			return LeadIndicator.SwingRays(InSeries, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
-		}
-
-		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
-		/// </summary>
-		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
-		{
-			return LeadIndicator.SwingRays(input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
-		/// </summary>
-		public SwingRays SwingRays(System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
-		{
-			return LeadIndicator.SwingRays(InSeries, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
-		}
-
-		/// <summary>
-		/// Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.
-		/// </summary>
-		public SwingRays SwingRays(IDataSeries input, System.Int32 strength, System.Boolean enableAlerts, System.Boolean keepBrokenLines, Color swingHighColor, Color swingLowColor, Soundfile soundfile)
-		{
-			return LeadIndicator.SwingRays(input, strength, enableAlerts, keepBrokenLines, swingHighColor, swingLowColor, soundfile);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion
-
-

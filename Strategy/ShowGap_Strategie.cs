@@ -47,7 +47,7 @@ namespace AgenaTrader.UserCode
         protected override void OnInit()
         {
             CalculateOnClosedBar = false;
-            IsAutomated = false;
+            IsAutoConfirmOrder = false;
         }
 
         protected override void OnCalculate()
@@ -80,15 +80,15 @@ namespace AgenaTrader.UserCode
             //        ts_Ausstieg = DateTime.Now.AddMinutes(1);
             //    }
 
-            //    if (Bars[0].Time >= ts_Ausstieg)
+            //    if (Bars[0].Timestamp >= ts_Ausstieg)
             //    {
-            //        if (this.oEnter.Action == OrderAction.Buy)
+            //        if (this.oEnter.Direction == OrderDirection.Buy)
             //        {
-            //            CloseLong(this.oEnter.Quantity, "EOD", this.oEnter.Name, this.oEnter.Instrument, this.oEnter.TimeFrame);
+            //            CloseLongTrade(new StrategyOrderParameters {Type = OrderType.Market, Quantity = this.oEnter.Quantity, SignalName =  "EOD", FromEntrySignal =  this.oEnter.Name, Instrument =  this.oEnter.Instrument, TimeFrame =  this.oEnter.TimeFrame});
             //        }
-            //        else if (this.oEnter.Action == OrderAction.SellShort)
+            //        else if (this.oEnter.Direction == OrderDirection.Sell)
             //        {
-            //            CloseShort(this.oEnter.Quantity, "EOD", this.oEnter.Name, this.oEnter.Instrument, this.oEnter.TimeFrame);
+            //            CloseShortTrade(new StrategyOrderParameters {Type = OrderType.Market, Quantity = this.oEnter.Quantity, SignalName =  "EOD", FromEntrySignal =  this.oEnter.Name, Instrument =  this.oEnter.Instrument, TimeFrame =  this.oEnter.TimeFrame});
             //        }
             //    }
             //}
@@ -118,8 +118,8 @@ namespace AgenaTrader.UserCode
                     SignalNameEnter = "ShowGapLong" + Bars[0].Time;
                     SignalNameStop = "ShowGapStop" + Bars[0].Time;
                     ocoId = "ShowGapLong_ocoID" + Bars[0].Time;
-                    oEnter = SubmitOrder(0, OrderAction.Buy, OrderType.Market, 3, 0, 0, ocoId, SignalNameEnter);
-                    oStop = SubmitOrder(0, OrderAction.Sell, OrderType.Stop, 3, 0, StopForShowGapTrade, ocoId, SignalNameStop);
+                    oEnter = SubmitOrder(0, OrderDirection.Buy, OrderType.Market, 3, 0, 0, ocoId, SignalNameEnter);
+                    oStop = SubmitOrder(0, OrderDirection.Sell, OrderType.Stop, 3, 0, StopForShowGapTrade, ocoId, SignalNameStop);
                 }
                 else if (ShowGap_Indicator_Value == -100)
                 {
@@ -127,8 +127,8 @@ namespace AgenaTrader.UserCode
                     SignalNameEnter = "ShowGapShort" + Bars[0].Time;
                     SignalNameStop = "ShowGapStop" + Bars[0].Time;
                     ocoId = "ShowGapShort_ocoID" + Bars[0].Time;
-                    oEnter = SubmitOrder(0, OrderAction.SellShort, OrderType.Market, 3, 0, 0, ocoId, SignalNameEnter);
-                    oStop = SubmitOrder(0, OrderAction.BuyToCover, OrderType.Stop, 3, 0, StopForShowGapTrade, ocoId, SignalNameStop);
+                    oEnter = SubmitOrder(0, OrderDirection.Sell, OrderType.Market, 3, 0, 0, ocoId, SignalNameEnter);
+                    oStop = SubmitOrder(0, OrderDirection.Buy, OrderType.Stop, 3, 0, StopForShowGapTrade, ocoId, SignalNameStop);
                 }
                 else
                 {

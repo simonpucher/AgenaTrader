@@ -86,10 +86,10 @@ namespace AgenaTrader.UserCode
             {
                 switch (ResultValue.Entry)
                 {
-                    case OrderAction.Buy:
+                    case OrderDirection.Buy:
                         this.DoEnterLong(ResultValue.StopLoss, ResultValue.Target);
                         break;
-                    case OrderAction.SellShort:
+                    case OrderDirection.Sell:
                         //            this.DoEnterShort(ResultValue.StopLoss, ResultValue.Target);
                         break;
                 }
@@ -104,11 +104,10 @@ namespace AgenaTrader.UserCode
             if (_orderenterlong == null)
             {
                 Print("Strategie" + Bars[0].Time + " Long " + "Close: " + Bars[0].Close + " StopLoss: " + StopLoss + " Target: " + Target);
-                _orderenterlong = OpenLong(//GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), 
-                                           10,
-                                           this.GetType().Name + " " + PositionType.Long + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(),
-                                           this.Instrument,
-                                           this.TimeFrame);
+                _orderenterlong = SubmitOrder(new StrategyOrderParameters {Direction = OrderDirection.Buy, Type = OrderType.Market, Quantity = 10,
+                                            Mode = OrderMode.Direct,
+                                            //Mode = this.GetType().Name + " " + PositionType.Long + "_" + this.Instrument.Symbol + "_" + Bars[0].Timestamp.Ticks.ToString(),
+                                            Instrument =  this.Instrument, TimeFrame =  this.TimeFrame});
                 SetUpStopLoss(_orderenterlong.Name, CalculationMode.Price, StopLoss, false);
                 SetUpProfitTarget(_orderenterlong.Name, CalculationMode.Price, Target);
             }
@@ -122,7 +121,7 @@ namespace AgenaTrader.UserCode
             if (_orderentershort == null)
             {
                 Print("Short" + "Close: " + Bars[0].Close + "StopLoss: " + StopLoss + " Target: " + Target);
-                _orderentershort = OpenShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+                _orderentershort = SubmitOrder(new StrategyOrderParameters {Direction = OrderDirection.Sell, Type = OrderType.Market, Quantity = GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), SignalName =  this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), Instrument =  this.Instrument, TimeFrame =  this.TimeFrame});
                 ////SetUpStopLoss(_orderentershort.Name, CalculationMode.Price, StopLoss, false);
                 ////SetUpProfitTarget(_orderentershort.Name, CalculationMode.Price, Target);
                 SetUpStopLoss(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 1.05, false);

@@ -49,8 +49,8 @@ namespace AgenaTrader.UserCode
             IsEntry = true;
             IsStop = false;
             IsTarget = false;
-            Add(new Plot(Const.DefaultIndicatorColor, "Occurred"));
-            Add(new Plot(Const.DefaultIndicatorColor, "Entry"));
+            Add(new OutputDescriptor(Const.DefaultIndicatorColor, "Occurred"));
+            Add(new OutputDescriptor(Const.DefaultIndicatorColor, "Entry"));
 
             IsOverlay = false;
             CalculateOnClosedBar = true;
@@ -97,7 +97,7 @@ namespace AgenaTrader.UserCode
             {
                 switch (returnvalue.Entry)
                 {
-                    case OrderAction.Buy:
+                    case OrderDirection.Buy:
                         Occurred.Set(1);
                         break;
                 }
@@ -152,121 +152,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Condition TrendTemplate_MarkMinervini_Condition()
-        {
-			return TrendTemplate_MarkMinervini_Condition(InSeries);
-		}
-
-		/// <summary>
-		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Condition TrendTemplate_MarkMinervini_Condition(IDataSeries input)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<TrendTemplate_MarkMinervini_Condition>(input);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new TrendTemplate_MarkMinervini_Condition
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Condition TrendTemplate_MarkMinervini_Condition()
-		{
-			return LeadIndicator.TrendTemplate_MarkMinervini_Condition(InSeries);
-		}
-
-		/// <summary>
-		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Condition TrendTemplate_MarkMinervini_Condition(IDataSeries input)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
-
-			return LeadIndicator.TrendTemplate_MarkMinervini_Condition(input);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Condition TrendTemplate_MarkMinervini_Condition()
-		{
-			return LeadIndicator.TrendTemplate_MarkMinervini_Condition(InSeries);
-		}
-
-		/// <summary>
-		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Condition TrendTemplate_MarkMinervini_Condition(IDataSeries input)
-		{
-			return LeadIndicator.TrendTemplate_MarkMinervini_Condition(input);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Condition TrendTemplate_MarkMinervini_Condition()
-		{
-			return LeadIndicator.TrendTemplate_MarkMinervini_Condition(InSeries);
-		}
-
-		/// <summary>
-		/// Geben Sie bitte hier die Beschreibung für die neue Condition ein
-		/// </summary>
-		public TrendTemplate_MarkMinervini_Condition TrendTemplate_MarkMinervini_Condition(IDataSeries input)
-		{
-			return LeadIndicator.TrendTemplate_MarkMinervini_Condition(input);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

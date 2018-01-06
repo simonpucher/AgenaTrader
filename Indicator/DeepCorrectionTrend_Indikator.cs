@@ -41,8 +41,8 @@ namespace AgenaTrader.UserCode
 
         protected override void OnInit()
         {
-            Add(new Plot(Color.Brown, PlotStyle.Block, "DeepCorrection"));
-            Add(new Plot(Color.Green, "Entry"));
+            Add(new OutputDescriptor(Color.Brown, OutputSerieDrawStyle.Block, "DeepCorrection"));
+            Add(new OutputDescriptor(Color.Green, "Entry"));
             IsOverlay = false;
             CalculateOnClosedBar = true;
            // RequiredBarsCount = 20;
@@ -76,10 +76,10 @@ namespace AgenaTrader.UserCode
             {
                 switch (ResultValue.Entry)
                 {
-                    case OrderAction.Buy:
+                    case OrderDirection.Buy:
                         Outputs[1].Set(1);
                         break;
-                    case OrderAction.SellShort:
+                    case OrderDirection.Sell:
                         //AddChartDiamond("ArrowShort_Entry" + Bars[0].Time.Ticks, true, Bars[0].Time, Bars[0].Open, Color.LightGreen);
                         Outputs[1].Set(-1);
                         break;
@@ -117,14 +117,14 @@ namespace AgenaTrader.UserCode
                 if (P123(InSeries, _trendSize).TempP3Price[0] != 0)
                 {
                     ResultValue.DeepCorrection = true;
-                    ResultValue.Entry = OrderAction.Buy;
+                    ResultValue.Entry = OrderDirection.Buy;
                     ResultValue.StopLoss = P123(InSeries, _trendSize).TempP3Price[0];
                     
                 }
                 else if (P123(InSeries, _trendSize).ValidP3Price[0] != 0)
                 {
                     ResultValue.DeepCorrection = true;
-                    ResultValue.Entry = OrderAction.Buy;
+                    ResultValue.Entry = OrderDirection.Buy;
                     ResultValue.StopLoss = P123(InSeries, _trendSize).ValidP3Price[0];
                 }
 
@@ -148,14 +148,14 @@ namespace AgenaTrader.UserCode
                 if (P123(InSeries, _trendSize).TempP3Price[0] != 0)
                 {
                     ResultValue.DeepCorrection = true;
-                    ResultValue.Entry = OrderAction.SellShort;
+                    ResultValue.Entry = OrderDirection.Sell;
                     ResultValue.StopLoss = P123(InSeries, _trendSize).TempP3Price[0];
                     ResultValue.Target = P123(InSeries, _trendSize).P2Price[0];
                 }
                 else if (P123(InSeries, _trendSize).ValidP3Price[0] != 0)
                 {
                     ResultValue.DeepCorrection = true;
-                    ResultValue.Entry = OrderAction.SellShort;
+                    ResultValue.Entry = OrderDirection.Sell;
                     ResultValue.StopLoss = P123(InSeries, _trendSize).ValidP3Price[0];
                 }
                 //Check, if current Price is higher than P2 (because we want to go short towards P2)
@@ -235,121 +235,3 @@ namespace AgenaTrader.UserCode
 
 
 }
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator : Indicator
-	{
-		/// <summary>
-		/// Indicator which shows deep correction of ongoing trend
-		/// </summary>
-		public DeepCorrectionTrend_Indikator DeepCorrectionTrend_Indikator(System.Int32 trendSize)
-        {
-			return DeepCorrectionTrend_Indikator(InSeries, trendSize);
-		}
-
-		/// <summary>
-		/// Indicator which shows deep correction of ongoing trend
-		/// </summary>
-		public DeepCorrectionTrend_Indikator DeepCorrectionTrend_Indikator(IDataSeries input, System.Int32 trendSize)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<DeepCorrectionTrend_Indikator>(input, i => i.TrendSize == trendSize);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new DeepCorrectionTrend_Indikator
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input,
-							TrendSize = trendSize
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Indicator which shows deep correction of ongoing trend
-		/// </summary>
-		public DeepCorrectionTrend_Indikator DeepCorrectionTrend_Indikator(System.Int32 trendSize)
-		{
-			return LeadIndicator.DeepCorrectionTrend_Indikator(InSeries, trendSize);
-		}
-
-		/// <summary>
-		/// Indicator which shows deep correction of ongoing trend
-		/// </summary>
-		public DeepCorrectionTrend_Indikator DeepCorrectionTrend_Indikator(IDataSeries input, System.Int32 trendSize)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'Initialize()' method");
-
-			return LeadIndicator.DeepCorrectionTrend_Indikator(input, trendSize);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Indicator which shows deep correction of ongoing trend
-		/// </summary>
-		public DeepCorrectionTrend_Indikator DeepCorrectionTrend_Indikator(System.Int32 trendSize)
-		{
-			return LeadIndicator.DeepCorrectionTrend_Indikator(InSeries, trendSize);
-		}
-
-		/// <summary>
-		/// Indicator which shows deep correction of ongoing trend
-		/// </summary>
-		public DeepCorrectionTrend_Indikator DeepCorrectionTrend_Indikator(IDataSeries input, System.Int32 trendSize)
-		{
-			return LeadIndicator.DeepCorrectionTrend_Indikator(input, trendSize);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Indicator which shows deep correction of ongoing trend
-		/// </summary>
-		public DeepCorrectionTrend_Indikator DeepCorrectionTrend_Indikator(System.Int32 trendSize)
-		{
-			return LeadIndicator.DeepCorrectionTrend_Indikator(InSeries, trendSize);
-		}
-
-		/// <summary>
-		/// Indicator which shows deep correction of ongoing trend
-		/// </summary>
-		public DeepCorrectionTrend_Indikator DeepCorrectionTrend_Indikator(IDataSeries input, System.Int32 trendSize)
-		{
-			return LeadIndicator.DeepCorrectionTrend_Indikator(input, trendSize);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

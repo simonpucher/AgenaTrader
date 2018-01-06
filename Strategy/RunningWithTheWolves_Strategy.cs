@@ -89,7 +89,7 @@ namespace AgenaTrader.UserCode
         {
             base.OnStart();
 
-            //Print("OnStartUp" + Bars[0].Time);
+            //Print("OnStartUp" + Bars[0].Timestamp);
 
             //Init our indicator to get code access
             this._RunningWithTheWolves_Indicator = new RunningWithTheWolves_Indicator();
@@ -106,7 +106,7 @@ namespace AgenaTrader.UserCode
         {
             base.OnDispose();
 
-            ////Print("OnTermination" + Bars[0].Time);
+            ////Print("OnTermination" + Bars[0].Timestamp);
             //IAccount account = this.Core.AccountManager.GetAccount(this.Instrument, true);
 
             //double counti = this.Core.TradingManager.GetExecutions(account, this.Backtesting.Settings.DateTimeRange.Lower, this.Backtesting.Settings.DateTimeRange.Upper).Count();
@@ -129,33 +129,33 @@ namespace AgenaTrader.UserCode
 		protected override void OnCalculate()
 		{
             //Set automated during configuration in input dialog at strategy escort in chart
-            this.IsAutomated = this.Autopilot;
+            this.IsAutoConfirmOrder = this.Autopilot;
 
             //calculate data
-            OrderAction? resultdata = this._RunningWithTheWolves_Indicator.calculate(Closes[0], this.MA_Selected, this.MA_Fast, this.MA_Medium, this.MA_Slow);
+            OrderDirection_Enum? resultdata = this._RunningWithTheWolves_Indicator.calculate(Closes[0], this.MA_Selected, this.MA_Fast, this.MA_Medium, this.MA_Slow);
             if (resultdata.HasValue)
             {
                 switch (resultdata)
                 {
-                    case OrderAction.Buy:
+                    case OrderDirection_Enum.OpenLong:
                         this.DoEnterLong();
                         break;
-                    case OrderAction.SellShort:
+                    case OrderDirection_Enum.OpenShort:
                         //this.DoEnterShort();
                         break;
-                    case OrderAction.BuyToCover:
+                    case OrderDirection_Enum.CloseShort:
                         // && this._orderentershort.IsOpened && !this._orderentershort.IsManuallyConfirmable
-                        if (this._orderentershort != null && this.IsAutomated)
+                        if (this._orderentershort != null && this.IsAutoConfirmOrder)
                         {
-                            CloseShort();
+                            CloseShortTrade(new StrategyOrderParameters {Type = OrderType.Market});
                             this._orderentershort = null;
                         }
                         break;
-                    case OrderAction.Sell:
+                    case OrderDirection_Enum.CloseLong:
                         // && this._orderenterlong.IsOpened && !this._orderenterlong.IsManuallyConfirmable
-                        if (this._orderenterlong != null && this.IsAutomated)
+                        if (this._orderenterlong != null && this.IsAutoConfirmOrder)
                         {
-                            CloseLong();
+                            CloseLongTrade(new StrategyOrderParameters {Type = OrderType.Market});
                             this._orderenterlong = null;
                         }
                         break;
@@ -231,7 +231,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         private void DoEnterLong()
         {
-            _orderenterlong = OpenLong(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Long + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+            _orderenterlong = SubmitOrder(new StrategyOrderParameters {Direction = OrderDirection.Buy, Type = OrderType.Market, Quantity = GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), SignalName =  this.GetType().Name + " " + PositionType.Long + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), Instrument =  this.Instrument, TimeFrame =  this.TimeFrame});
             SetUpStopLoss(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close / 1.05, false);
             SetUpProfitTarget(_orderenterlong.Name, CalculationMode.Price, Bars[0].Close * 1.11);
         }
@@ -241,7 +241,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         private void DoEnterShort()
         {
-            _orderentershort = OpenShort(GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), this.Instrument, this.TimeFrame);
+            _orderentershort = SubmitOrder(new StrategyOrderParameters {Direction = OrderDirection.Sell, Type = OrderType.Market, Quantity = GlobalUtilities.AdjustPositionToRiskManagement(this.Root.Core.AccountManager, this.Root.Core.PreferenceManager, this.Instrument, Bars[0].Close), SignalName =  this.GetType().Name + " " + PositionType.Short + "_" + this.Instrument.Symbol + "_" + Bars[0].Time.Ticks.ToString(), Instrument =  this.Instrument, TimeFrame =  this.TimeFrame});
             SetUpStopLoss(_orderentershort.Name, CalculationMode.Price, Bars[0].Close * 1.05, false);
             SetUpProfitTarget(_orderentershort.Name, CalculationMode.Price, Bars[0].Close / 1.11);
         }

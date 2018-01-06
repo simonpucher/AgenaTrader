@@ -45,7 +45,7 @@ namespace AgenaTrader.UserCode
         /// </summary>
         protected override void OnInit()
         {
-            Add(new Plot(new Pen(this.Plot0Color, this.Plot0Width), PlotStyle.Line, "Plot_Line"));
+            Add(new OutputDescriptor(new Pen(this.Plot0Color, this.Plot0Width), OutputSerieDrawStyle.Line, "Plot_Line"));
 
             CalculateOnClosedBar = true;
             IsOverlay = false;
@@ -104,8 +104,8 @@ namespace AgenaTrader.UserCode
 
 
             PlotColors[0][0] = this.Plot0Color;
-            Plots[0].PenStyle = this.Dash0Style;
-            Plots[0].Pen.Width = this.Plot0Width;
+            OutputDescriptors[0].PenStyle = this.Dash0Style;
+            OutputDescriptors[0].Pen.Width = this.Plot0Width;
 
         }
 
@@ -230,120 +230,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-#region AgenaTrader Automaticaly Generated Code. Do not change it manualy
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator()
-        {
-			return Lonely_Warrior_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<Lonely_Warrior_Indicator>(input);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new Lonely_Warrior_Indicator
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator()
-		{
-			return LeadIndicator.Lonely_Warrior_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
-
-			return LeadIndicator.Lonely_Warrior_Indicator(input);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator()
-		{
-			return LeadIndicator.Lonely_Warrior_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input)
-		{
-			return LeadIndicator.Lonely_Warrior_Indicator(input);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator()
-		{
-			return LeadIndicator.Lonely_Warrior_Indicator(InSeries);
-		}
-
-		/// <summary>
-		/// Watch out for the lonely warrior behind enemy lines.
-		/// </summary>
-		public Lonely_Warrior_Indicator Lonely_Warrior_Indicator(IDataSeries input)
-		{
-			return LeadIndicator.Lonely_Warrior_Indicator(input);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

@@ -60,8 +60,8 @@ namespace AgenaTrader.UserCode
 			IsEntry = true;
 			IsStop = false;
 			IsTarget = false;
-			Add(new Plot(Const.DefaultIndicatorColor, "Occurred"));
-            Add(new Plot(Const.DefaultIndicatorColor, "Entry"));
+			Add(new OutputDescriptor(Const.DefaultIndicatorColor, "Occurred"));
+            Add(new OutputDescriptor(Const.DefaultIndicatorColor, "Entry"));
 
 			IsOverlay = false;
 			CalculateOnClosedBar = true;
@@ -91,22 +91,22 @@ namespace AgenaTrader.UserCode
 		{
 
             //calculate data
-            OrderAction? resultdata = this._RunningWithTheWolves_Indicator.calculate(InSeries, this.MA_Selected, this.MA_Fast, this.MA_Medium, this.MA_Slow);
+            OrderDirection_Enum? resultdata = this._RunningWithTheWolves_Indicator.calculate(InSeries, this.MA_Selected, this.MA_Fast, this.MA_Medium, this.MA_Slow);
             if (resultdata.HasValue)
             {
                 switch (resultdata)
                 {
-                    case OrderAction.Buy:
+                    case OrderDirection_Enum.OpenLong:
                         Occurred.Set(1);
                         //Entry.Set(InSeries[0]);
                         break;
-                    case OrderAction.SellShort:
+                    case OrderDirection_Enum.OpenShort:
                         Occurred.Set(-1);
                         //Entry.Set(InSeries[0]);
                         break;
-                    //case OrderAction.BuyToCover:
+                    //case OrderDirection.Buy:
                     //    break;
-                    //case OrderAction.Sell:
+                    //case OrderDirection.Sell:
                     //    break;
                     default:
                         //nothing to do

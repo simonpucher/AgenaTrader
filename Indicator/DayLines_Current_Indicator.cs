@@ -66,10 +66,10 @@ namespace AgenaTrader.UserCode
         protected override void OnInit()
 		{
             //Output Listen
-            //Add(new Plot(new Pen(this.Color_O, this.LineWidth_O), PlotStyle.Line, "Plot_Open"));
-            //Add(new Plot(new Pen(this.Color_H, this.LineWidth_H), PlotStyle.Line, "Plot_High"));
-            //Add(new Plot(new Pen(this.Color_L, this.LineWidth_L), PlotStyle.Line, "Plot_Low"));
-            //Add(new Plot(new Pen(this.Color_C, this.LineWidth_C), PlotStyle.Line, "Plot_Close"));
+            //Add(new OutputDescriptor(new Pen(this.Color_O, this.LineWidth_O), OutputSerieDrawStyle.Line, "Plot_Open"));
+            //Add(new OutputDescriptor(new Pen(this.Color_H, this.LineWidth_H), OutputSerieDrawStyle.Line, "Plot_High"));
+            //Add(new OutputDescriptor(new Pen(this.Color_L, this.LineWidth_L), OutputSerieDrawStyle.Line, "Plot_Low"));
+            //Add(new OutputDescriptor(new Pen(this.Color_C, this.LineWidth_C), OutputSerieDrawStyle.Line, "Plot_Close"));
 
             IsOverlay = true;
 			CalculateOnClosedBar = false; //do not change this
@@ -435,125 +435,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-#region AgenaTrader Automaticaly Generated Code. Do not change it manually
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// Draws days lines from the current day.
-		/// </summary>
-		public DayLines_Current_Indicator DayLines_Current_Indicator(System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
-        {
-			return DayLines_Current_Indicator(InSeries, showLines, showOpen, showHigh, showLow, showClose);
-		}
-
-		/// <summary>
-		/// Draws days lines from the current day.
-		/// </summary>
-		public DayLines_Current_Indicator DayLines_Current_Indicator(IDataSeries input, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<DayLines_Current_Indicator>(input, i => i.ShowLines == showLines && i.ShowOpen == showOpen && i.ShowHigh == showHigh && i.ShowLow == showLow && i.ShowClose == showClose);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new DayLines_Current_Indicator
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input,
-							ShowLines = showLines,
-							ShowOpen = showOpen,
-							ShowHigh = showHigh,
-							ShowLow = showLow,
-							ShowClose = showClose
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Draws days lines from the current day.
-		/// </summary>
-		public DayLines_Current_Indicator DayLines_Current_Indicator(System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
-		{
-			return LeadIndicator.DayLines_Current_Indicator(InSeries, showLines, showOpen, showHigh, showLow, showClose);
-		}
-
-		/// <summary>
-		/// Draws days lines from the current day.
-		/// </summary>
-		public DayLines_Current_Indicator DayLines_Current_Indicator(IDataSeries input, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
-
-			return LeadIndicator.DayLines_Current_Indicator(input, showLines, showOpen, showHigh, showLow, showClose);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Draws days lines from the current day.
-		/// </summary>
-		public DayLines_Current_Indicator DayLines_Current_Indicator(System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
-		{
-			return LeadIndicator.DayLines_Current_Indicator(InSeries, showLines, showOpen, showHigh, showLow, showClose);
-		}
-
-		/// <summary>
-		/// Draws days lines from the current day.
-		/// </summary>
-		public DayLines_Current_Indicator DayLines_Current_Indicator(IDataSeries input, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
-		{
-			return LeadIndicator.DayLines_Current_Indicator(input, showLines, showOpen, showHigh, showLow, showClose);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Draws days lines from the current day.
-		/// </summary>
-		public DayLines_Current_Indicator DayLines_Current_Indicator(System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
-		{
-			return LeadIndicator.DayLines_Current_Indicator(InSeries, showLines, showOpen, showHigh, showLow, showClose);
-		}
-
-		/// <summary>
-		/// Draws days lines from the current day.
-		/// </summary>
-		public DayLines_Current_Indicator DayLines_Current_Indicator(IDataSeries input, System.Boolean showLines, System.Boolean showOpen, System.Boolean showHigh, System.Boolean showLow, System.Boolean showClose)
-		{
-			return LeadIndicator.DayLines_Current_Indicator(input, showLines, showOpen, showHigh, showLow, showClose);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion

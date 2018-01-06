@@ -46,7 +46,7 @@ namespace AgenaTrader.UserCode
         protected override void OnInit()
         {
             CalculateOnClosedBar = true;
-            IsAutomated = false;
+            IsAutoConfirmOrder = false;
         }
 
         protected override void OnCalculate()
@@ -81,8 +81,8 @@ namespace AgenaTrader.UserCode
                 SignalNameEnter = "ReversalLong" + Bars[0].Time;
                 SignalNameStop = "ReversalStop" + Bars[0].Time;
                 ocoId = "ReversalLong_ocoID" + Bars[0].Time;
-                oEnter = SubmitOrder(0, OrderAction.Buy, OrderType.Market, 3, 0, 0, ocoId, SignalNameEnter);
-                oStop = SubmitOrder(0, OrderAction.Sell, OrderType.Stop, 3, 0, StopForReversalTrade, ocoId, SignalNameStop);
+                oEnter = SubmitOrder(0, OrderDirection.Buy, OrderType.Market, 3, 0, 0, ocoId, SignalNameEnter);
+                oStop = SubmitOrder(0, OrderDirection.Sell, OrderType.Stop, 3, 0, StopForReversalTrade, ocoId, SignalNameStop);
             }
             else if (Reversal_Indicator_Value == -100)
             {
@@ -90,8 +90,8 @@ namespace AgenaTrader.UserCode
                 SignalNameEnter = "ReversalShort" + Bars[0].Time;
                 SignalNameStop = "ReversalStop" + Bars[0].Time;
                 ocoId = "ReversalShort_ocoID" + Bars[0].Time;
-                oEnter = SubmitOrder(0, OrderAction.SellShort, OrderType.Market, 3, 0, 0, ocoId, SignalNameEnter);
-                oStop = SubmitOrder(0, OrderAction.BuyToCover, OrderType.Stop, 3, 0, StopForReversalTrade, ocoId, SignalNameStop);
+                oEnter = SubmitOrder(0, OrderDirection.Sell, OrderType.Market, 3, 0, 0, ocoId, SignalNameEnter);
+                oStop = SubmitOrder(0, OrderDirection.Buy, OrderType.Stop, 3, 0, StopForReversalTrade, ocoId, SignalNameStop);
             }
             else
             {
@@ -108,7 +108,7 @@ namespace AgenaTrader.UserCode
         {
             DateTime ts_Ausstieg;
 
-           // ts_Ausstieg = Reversal2NextBar_Indicator().GetTargetBar(Bars[-1].Time);
+           // ts_Ausstieg = Reversal2NextBar_Indicator().GetTargetBar(Bars[-1].Timestamp);
             ts_Ausstieg = GlobalUtilities.GetTargetBar(Bars, Bars[0].Time, TimeFrame, 1);
             Print("Ausstieg: " + ts_Ausstieg + "Bars[-1].Time: " + Bars[-1].Time);
 

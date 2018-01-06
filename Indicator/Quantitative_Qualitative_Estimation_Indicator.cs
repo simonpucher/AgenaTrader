@@ -68,9 +68,9 @@ namespace AgenaTrader.UserCode
             protected override void OnInit()
         {
 
-            Add(new Plot(new Pen(this.Line_01, 2), PlotStyle.Line, "Value1"));
-            Add(new Plot(new Pen(this.Line_02, 2), PlotStyle.Line, "Value2"));
-            Plots[1].Pen.DashStyle = DashStyle.Dash;
+            Add(new OutputDescriptor(new Pen(this.Line_01, 2), OutputSerieDrawStyle.Line, "Value1"));
+            Add(new OutputDescriptor(new Pen(this.Line_02, 2), OutputSerieDrawStyle.Line, "Value2"));
+            OutputDescriptors[1].Pen.DashStyle = DashStyle.Dash;
 
             Add(new LevelLine(_line_lower, 70, "Upper Line"));
             Add(new LevelLine(_line_mid, 50, "Mid Line"));
@@ -274,123 +274,3 @@ namespace AgenaTrader.UserCode
         #endregion
     }
 }
-
-#region AgenaTrader Automaticaly Generated Code. Do not change it manually
-
-namespace AgenaTrader.UserCode
-{
-	#region Indicator
-
-	public partial class UserIndicator
-	{
-		/// <summary>
-		/// Qualitative Quantitative Estimation. QQE is a combination moving average RSI + ATR.
-		/// </summary>
-		public QQE QQE(System.Int32 rSI_Period, System.Int32 sF)
-        {
-			return QQE(InSeries, rSI_Period, sF);
-		}
-
-		/// <summary>
-		/// Qualitative Quantitative Estimation. QQE is a combination moving average RSI + ATR.
-		/// </summary>
-		public QQE QQE(IDataSeries input, System.Int32 rSI_Period, System.Int32 sF)
-		{
-			var indicator = CachedCalculationUnits.GetCachedIndicator<QQE>(input, i => i.RSI_Period == rSI_Period && i.SF == sF);
-
-			if (indicator != null)
-				return indicator;
-
-			indicator = new QQE
-						{
-							RequiredBarsCount = RequiredBarsCount,
-							CalculateOnClosedBar = CalculateOnClosedBar,
-							InSeries = input,
-							RSI_Period = rSI_Period,
-							SF = sF
-						};
-			indicator.SetUp();
-
-			CachedCalculationUnits.AddIndicator2Cache(indicator);
-
-			return indicator;
-		}
-	}
-
-	#endregion
-
-	#region Strategy
-
-	public partial class UserStrategy
-	{
-		/// <summary>
-		/// Qualitative Quantitative Estimation. QQE is a combination moving average RSI + ATR.
-		/// </summary>
-		public QQE QQE(System.Int32 rSI_Period, System.Int32 sF)
-		{
-			return LeadIndicator.QQE(InSeries, rSI_Period, sF);
-		}
-
-		/// <summary>
-		/// Qualitative Quantitative Estimation. QQE is a combination moving average RSI + ATR.
-		/// </summary>
-		public QQE QQE(IDataSeries input, System.Int32 rSI_Period, System.Int32 sF)
-		{
-			if (IsInInit && input == null)
-				throw new ArgumentException("You only can access an indicator with the default input/bar series from within the 'OnInit()' method");
-
-			return LeadIndicator.QQE(input, rSI_Period, sF);
-		}
-	}
-
-	#endregion
-
-	#region Column
-
-	public partial class UserColumn
-	{
-		/// <summary>
-		/// Qualitative Quantitative Estimation. QQE is a combination moving average RSI + ATR.
-		/// </summary>
-		public QQE QQE(System.Int32 rSI_Period, System.Int32 sF)
-		{
-			return LeadIndicator.QQE(InSeries, rSI_Period, sF);
-		}
-
-		/// <summary>
-		/// Qualitative Quantitative Estimation. QQE is a combination moving average RSI + ATR.
-		/// </summary>
-		public QQE QQE(IDataSeries input, System.Int32 rSI_Period, System.Int32 sF)
-		{
-			return LeadIndicator.QQE(input, rSI_Period, sF);
-		}
-	}
-
-	#endregion
-
-	#region Scripted Condition
-
-	public partial class UserScriptedCondition
-	{
-		/// <summary>
-		/// Qualitative Quantitative Estimation. QQE is a combination moving average RSI + ATR.
-		/// </summary>
-		public QQE QQE(System.Int32 rSI_Period, System.Int32 sF)
-		{
-			return LeadIndicator.QQE(InSeries, rSI_Period, sF);
-		}
-
-		/// <summary>
-		/// Qualitative Quantitative Estimation. QQE is a combination moving average RSI + ATR.
-		/// </summary>
-		public QQE QQE(IDataSeries input, System.Int32 rSI_Period, System.Int32 sF)
-		{
-			return LeadIndicator.QQE(input, rSI_Period, sF);
-		}
-	}
-
-	#endregion
-
-}
-
-#endregion
