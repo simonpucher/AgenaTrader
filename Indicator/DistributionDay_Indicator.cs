@@ -16,7 +16,7 @@ using System.Windows.Forms.VisualStyles;
 namespace AgenaTrader.UserCode
 {
     /// <summary>
-    /// Version: 1.1.6
+    /// Version: 1.2.0
     /// -------------------------------------------------------------------------
     /// Simon Pucher 2016
     /// -------------------------------------------------------------------------

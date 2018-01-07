@@ -22,7 +22,7 @@ using System.Net;
 using System.Globalization;
 
 /// <summary>
-/// Version: 2.0.0
+/// Version: 2.0.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2018
 /// Christian Kovar 2018
