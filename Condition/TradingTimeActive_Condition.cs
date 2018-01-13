@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1
+/// Version: 1.1.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -34,9 +34,6 @@ namespace AgenaTrader.UserCode
 	public class TradingTimeActive_Condition : UserScriptedCondition
 	{
         #region Variables
-
-        //private TimeSpan _start = new TimeSpan(12, 00, 00);
-        //private TimeSpan _end = new TimeSpan(13, 00, 00);
 
         private string _start ="12:00:00";
         private string _end = "13:00:00";
@@ -101,21 +98,6 @@ namespace AgenaTrader.UserCode
             set { _start = value; }
         }
 
-        //[Description("Start of the trading break. (e.g. 12:00:00)")]
-        //[Category("Parameters")]
-        //[DisplayName("Start")]
-        //public TimeSpan Start
-        //{
-        //    get { return _start; }
-        //    set { _start = value; }
-        //}
-
-        //[Browsable(false)]
-        //public string StartSerialize
-        //{
-        //    get { return _start.ToString(); }
-        //    set { _start = TimeSpan.Parse(value); }
-        //}
 
         [Description("End of the trading break. (e.g. 13:00:00)")]
         [Category("Parameters")]
@@ -126,21 +108,6 @@ namespace AgenaTrader.UserCode
             set { _end = value; }
         }
 
-        //[Description("End of the trading break. (e.g. 13:00:00)")]
-        //[Category("Parameters")]
-        //[DisplayName("End")]
-        //public TimeSpan End
-        //{
-        //    get { return _end; }
-        //    set { _end = value; }
-        //}
-
-        //[Browsable(false)]
-        //public string EndSerialize
-        //{
-        //    get { return _end.ToString(); }
-        //    set { _end = TimeSpan.Parse(value); }
-        //}
 
         #endregion
     }
