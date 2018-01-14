@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.3
+/// Version: 1.3.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2017
 /// -------------------------------------------------------------------------
@@ -24,7 +24,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-    [Description("Watch out for the lonely warrior behind enemy lines.")]
+    [Description("Moving Averages Condition.")]
     [IsEntryAttribute(true)]
 	[IsStopAttribute(false)]
 	[IsTargetAttribute(false)]
@@ -41,6 +41,10 @@ namespace AgenaTrader.UserCode
         private Color _plot1color = Const.DefaultIndicatorColor_GreyedOut;
         private int _plot1width = Const.DefaultLineWidth;
         private DashStyle _plot1dashstyle = Const.DefaultIndicatorDashStyle;
+
+        private int _ma_long = 200;
+        private int _ma_medium = 100;
+        private int _ma_short = 50;
 
         #endregion
 
@@ -70,7 +74,8 @@ namespace AgenaTrader.UserCode
             //if (Low[0] < SMA(200)[0] && SMA(50)[0] >= SMA(100)[0] && SMA(100)[0] >= SMA(200)[0]  && Close[0] > SuperTrend(SuperTrendMAType.HMA, SuperTrendMode.ATR, 14, 2.618, 14).UpTrend[0])
             //if (Low[0] < SMA(200)[0] && SMA(50)[0] >= SMA(100)[0] && Close[0] > SuperTrend(SuperTrendMAType.HMA, SuperTrendMode.ATR, 14, 2.618, 14).UpTrend[0])
             //if (Low[0] < SMA(200)[0] && SMA(50)[0] >= SMA(100)[0] && Close[0] > SuperTrend(SuperTrendMAType.SMA, SuperTrendMode.ATR, 50, 2.618, 50).UpTrend[0])
-            if (Low[0] < SMA(200)[0] && SMA(50)[0] >= SMA(100)[0] && Close[0] > SuperTrend(SuperTrendMAType.SMA, SuperTrendMode.ATR, 200, 2.618, 200).UpTrend[0])
+            if (Low[0] < SMA(this.MA_Long)[0] && SMA(this.MA_Short)[0] >= SMA(this.MA_Medium)[0] 
+                && Close[0] > SuperTrend(SuperTrendMAType.SMA, SuperTrendMode.ATR, 200, 2.618, 200).UpTrend[0])
             {
                 therewasasignal = true;
             }
@@ -137,6 +142,41 @@ namespace AgenaTrader.UserCode
 		{
 			return new[]{Entry};
 		}
+
+        
+
+        /// <summary>
+        /// </summary>
+        [Description("The period of the long Moving Average.")]
+        [Category("Parameters")]
+        [DisplayName("Period MA Long")]
+        public int MA_Long
+        {
+            get { return _ma_long; }
+            set { _ma_long = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("The period of the medium Moving Average.")]
+        [Category("Parameters")]
+        [DisplayName("Period MA Medium")]
+        public int MA_Medium
+        {
+            get { return _ma_medium; }
+            set { _ma_medium = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("The period of the short Moving Average.")]
+        [Category("Parameters")]
+        [DisplayName("Period MA Short")]
+        public int MA_Short
+        {
+            get { return _ma_short; }
+            set { _ma_short = value; }
+        }
 
         /// <summary>
         /// </summary>
