@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2.0
+/// Version: 1.2.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2017
 /// -------------------------------------------------------------------------
@@ -47,7 +47,6 @@ namespace AgenaTrader.UserCode
         protected override void OnCalculate()
 		{
            
-            //MyPlot1.Set(Closes[1][0]);
             MyPlot1.Set(Normalize(Closes[1].ToList(), Closes[1][0]));
             MyPlot2.Set(Normalize(Closes[2].ToList(), Closes[2][0]));
         }
@@ -78,17 +77,7 @@ namespace AgenaTrader.UserCode
             get { return Outputs[1]; }
         }
 
-
-        //private string _instrument = "AAPL";
-
-        //[Description("First Symbol to compare")]
-        //[Category("Parameters")]
-        //[DisplayNameAttribute("1st Symbol")]
-        //public string Symbol
-        //{
-        //    get { return _instrument; }
-        //    set { _instrument = value; }
-        //}
+       
 
         private string _instrument_2 = "AAPL";
 
