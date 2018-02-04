@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2.1
+/// Version: 1.2.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2017
 /// -------------------------------------------------------------------------
@@ -31,6 +31,9 @@ namespace AgenaTrader.UserCode
         private const int endOfScale = 1;
         private const int topOfScale = 100;
 
+        int i1 = 1;
+        int i2 = 2;
+
         protected override void OnInit()
 		{
 			Add(new OutputDescriptor(Color.FromKnownColor(KnownColor.Gray), "MyComparePlot_1"));
@@ -41,14 +44,19 @@ namespace AgenaTrader.UserCode
         {
             Add(Core.InstrumentManager.GetInstrument(this.Instrument.Symbol));
             Add(Core.InstrumentManager.GetInstrument(_instrument_2));
+
+            if (this.Instrument.Symbol == _instrument_2)
+            {
+                i1 = 0;
+                i2 = 1;
+            }
         }
 
 
         protected override void OnCalculate()
 		{
-           
-            MyPlot1.Set(Normalize(Closes[1].ToList(), Closes[1][0]));
-            MyPlot2.Set(Normalize(Closes[2].ToList(), Closes[2][0]));
+            MyPlot1.Set(Normalize(Closes[i1].ToList(), Closes[i1][0]));
+            MyPlot2.Set(Normalize(Closes[i2].ToList(), Closes[i2][0]));
         }
 
         private static double Normalize(List<double> list, double currentValue)
