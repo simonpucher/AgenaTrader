@@ -31,56 +31,45 @@ namespace AgenaTrader.UserCode
         bool shortsignalbb = false;
         bool longsignalbb = false;
 
-        private int _bollinger_period = 20;
-        private double _bollinger_stddev = 2;
-
-        private int _macd_fast = 12;
-        private int _macd_slow = 26;
-        private int _macd_smooth = 9;
+        private int _period = 20;
 
         private Color _color_long_signal = Const.DefaultArrowLongColor;
         private Color _color_short_signal = Const.DefaultArrowShortColor;
 
         protected override void OnInit()
 		{
-			AddOutput(new OutputDescriptor(Color.FromKnownColor(KnownColor.Orange), "Plot_Signal_King_Pinball"));
+			AddOutput(new OutputDescriptor(Color.FromKnownColor(KnownColor.Orange), "Plot_Market_Meanness_Index_Indicator"));
 			CalculateOnClosedBar = true;
 		}
 
 		protected override void OnCalculate()
 		{
-            Bollinger bol = Bollinger(this.Bollinger_stddev, this.Bollinger_Period);
-            if (Close[0] < bol.Lower[0])
-            {
-                longsignalbb = true;
-            }
-            else if (Close[0] > bol.Upper[0])
-            {
-                shortsignalbb = true;
-            }
-            else
-            {
-                //nothing
-            }
 
-            MACD macd = MACD(this.MACD_Fast, this.MACD_Slow, this.MACD_Smooth);
-            if (longsignalbb && CrossAbove(macd.Default, macd.Avg, 0))
-            {
-                AddChartArrowUp(Time[0].ToString()+"long", 0, Low[0], this.ColorLongSignal);
-                MyPlot1.Set(1);
-                longsignalbb = false;
-            }
-            else if (shortsignalbb && CrossBelow(macd.Default, macd.Avg, 0))
-            {
-                AddChartArrowDown(Time[0].ToString()+"short", 0, High[0], this.ColorShortSignal);
-                MyPlot1.Set(-1);
-                shortsignalbb = false;
-            }
-            else
-            {
-                MyPlot1.Set(0);
-            }
 
+            //double m = Median(Data, TimePeriod);
+            //int i, nh = 0, nl = 0;
+            //for (i = 1; i < TimePeriod; i++)
+            //{
+            //    if (Data[i] > m && Data[i] > Data[i - 1])
+            //        nl++;
+            //    else if (Data[i] < m && Data[i] < Data[i - 1])
+            //        nh++;
+            //}
+            //return 100.* (nl + nh) / (TimePeriod - 1);
+
+            double m = Median[this.MMI_Period];
+            int i, nh = 0, nl = 0;
+            for (i = 1; i < this.MMI_Period; i++)
+            {
+                if (this.InSeries[i] > m && this.InSeries[i] > this.InSeries[i - 1])
+                    nl++;
+                else if (this.InSeries[i] < m && this.InSeries[i] < this.InSeries[i - 1])
+                    nh++;
+            }
+            double resulti = 100.0 * (nl + nh) / (this.MMI_Period - 1);
+
+            MyPlot1.Set(resulti);
+            
 
         }
 
@@ -97,73 +86,20 @@ namespace AgenaTrader.UserCode
      
         /// <summary>
         /// </summary>
-        [Description("Bollinger Band period.")]
+        [Description("Period.")]
         [Category("Parameters")]
-        [DisplayName("BB period")]
-        public int Bollinger_Period
+        [DisplayName("Period")]
+        public int MMI_Period
         {
-            get { return _bollinger_period; }
+            get { return _period; }
             set
             {
-                _bollinger_period = value;
+                _period = value;
             }
         }
 
-        /// <summary>
-        /// </summary>
-        [Description("Bollinger Band standard deviation")]
-        [Category("Parameters")]
-        [DisplayName("BB stddev")]
-        public double Bollinger_stddev
-        {
-            get { return _bollinger_stddev; }
-            set
-            {
-                _bollinger_stddev = value;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        [Description("Bollinger Band fast")]
-        [Category("Parameters")]
-        [DisplayName("MACD fast")]
-        public int MACD_Fast
-        {
-            get { return _macd_fast; }
-            set
-            {
-                _macd_fast = value;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        [Description("Bollinger Band slow")]
-        [Category("Parameters")]
-        [DisplayName("MACD slow")]
-        public int MACD_Slow
-        {
-            get { return _macd_slow; }
-            set
-            {
-                _macd_slow = value;
-            }
-        }
-
-        /// <summary>
-        /// </summary>
-        [Description("Bollinger Band smooth")]
-        [Category("Parameters")]
-        [DisplayName("MACD smooth")]
-        public int MACD_Smooth
-        {
-            get { return _macd_smooth; }
-            set
-            {
-                _macd_smooth = value;
-            }
-        }
+       
+       
 
         /// <summary>
         /// </summary>
