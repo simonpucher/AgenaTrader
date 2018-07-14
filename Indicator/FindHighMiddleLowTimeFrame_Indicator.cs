@@ -214,7 +214,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Candle will do measurement on candles. Session will to measurement on f.e. the last day.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("0.0 Type")]
         public FindHighLowTimeFrame_Type FindHighLowTimeFrame_Type
         {
@@ -226,7 +226,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("0 is for the current session. 1 is the session yesterday. And so on.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("1.0 Sessions ago")]
         public int Sessionsago
         {
@@ -237,7 +237,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("If true the you are able to specify a dedicated time span.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("1.1 Use dedicated time span")]
         public bool UseDedicatedTimeSpan
         {
@@ -248,7 +248,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("The start time of the time frame.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("1.2 Start")]
         public TimeSpan Time_Start
         {
@@ -265,7 +265,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("The end time of the time frame.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("1.3 End")]
         public TimeSpan Time_End
         {
@@ -283,7 +283,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("0 is for the current candle. 1 is the candle yesterday. And so on.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("2.0 Candles ago")]
         public int CandlesAgo
         {

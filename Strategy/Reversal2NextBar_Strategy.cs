@@ -110,7 +110,7 @@ namespace AgenaTrader.UserCode
 
            // ts_Ausstieg = Reversal2NextBar_Indicator().GetTargetBar(Bars[-1].Timestamp);
             ts_Ausstieg = GlobalUtilities.GetTargetBar(Bars, Bars[0].Time, TimeFrame, 1);
-            Print("Ausstieg: " + ts_Ausstieg + "Bars[-1].Time: " + Bars[-1].Time);
+            Print("Ausstieg: " + ts_Ausstieg + "Bars[-1].Time: " + Bars[-1].Timestamp);
 
             ////todo this is not working in 1.9
             //foreach (Trade item in this.Root.Core.TradingManager.ActiveOpenedTrades)
@@ -132,7 +132,7 @@ namespace AgenaTrader.UserCode
 
         #region Properties
         [Description("Testlauf")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Testlauf")]
         public bool Testlauf
         {

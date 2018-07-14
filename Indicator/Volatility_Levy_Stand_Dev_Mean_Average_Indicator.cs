@@ -67,7 +67,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Number of historical bars.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period")]
         public int Period
         {

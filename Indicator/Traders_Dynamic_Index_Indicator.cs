@@ -163,7 +163,7 @@ namespace AgenaTrader.UserCode
 
         [XmlIgnore()]
         [Description("Select Color")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Pricline")]
         public Color Main
         {
@@ -181,7 +181,7 @@ namespace AgenaTrader.UserCode
 
         [XmlIgnore()]
         [Description("Select Color")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Signalline")]
         public Color Signal
         {
@@ -199,7 +199,7 @@ namespace AgenaTrader.UserCode
 
         [XmlIgnore()]
         [Description("Select Color")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Bollinger Average")]
         public Color BBAverage
         {
@@ -217,7 +217,7 @@ namespace AgenaTrader.UserCode
 
         [XmlIgnore()]
         [Description("Select Color")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Bollinger Upper Band")]
         public Color BBUpper
         {
@@ -235,7 +235,7 @@ namespace AgenaTrader.UserCode
 
         [XmlIgnore()]
         [Description("Select Color")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Bollinger Lower Band")]
         public Color BBLower
         {
@@ -253,7 +253,7 @@ namespace AgenaTrader.UserCode
 
         [XmlIgnore()]
         [Description("Select Color")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Midline Positive")]
         public Color MidPositive
         {
@@ -271,7 +271,7 @@ namespace AgenaTrader.UserCode
 
         [XmlIgnore()]
         [Description("Select Color")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Midline Negative")]
         public Color MidNegative
         {
@@ -287,7 +287,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Period for RSI")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period for RSI")]
         public int RSIPeriod
         {
@@ -298,7 +298,7 @@ namespace AgenaTrader.UserCode
 
 
         [Description("Period for LinePrice")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period for LinePrice")]
         public int PricePeriod
         {
@@ -309,7 +309,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Period for Signalline")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period for Signalline")]
         public int SignalPeriod
         {
@@ -320,7 +320,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Band Period for Bollinger Band")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period for VolaBands")]
         public int BandPeriod
         {
@@ -331,7 +331,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Number of standard deviations")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("# of Std. Dev.")]
         public double StdDevNumber
         {
@@ -343,7 +343,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Width for LinePrice.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Line Width LinePrice")]
         public int Plot0Width
         {
@@ -355,7 +355,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("DashStyle for LinePrice.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Dash Style LinePrice")]
         public DashStyle Dash0Style
         {
@@ -366,7 +366,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Width for Signalline.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Line Width Signal")]
         public int Plot1Width
         {
@@ -377,7 +377,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("DashStyle for Signalline.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Dash Style Signal")]
         public DashStyle Dash1Style
         {
@@ -388,7 +388,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Width for Midband.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Line Width Midband")]
         public int Plot2Width
         {
@@ -400,7 +400,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("DashStyle for Bollinger Bands.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Dash Style BBands")]
         public DashStyle Dash2Style
         {
@@ -411,7 +411,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Width for Bollinger Bands.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Line Width BBAnds")]
         public int Plot3Width
         {
@@ -423,7 +423,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("DashStyle for Trigger Average Line.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Dash Style Average")]
         public DashStyle Dash3Style
         {

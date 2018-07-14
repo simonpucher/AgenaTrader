@@ -216,7 +216,7 @@ namespace AgenaTrader.UserCode
         #region Properties
 
         [Description("Type of PopGun Pattern you would like to use.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Pop Gun Type")]
         public PopGunType PopGunType
         {
@@ -225,7 +225,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Wieviel Bars ist PopGunTrigger g�ltig?")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("PopGunExpires")]
         public int PopGunExpires
         {
@@ -233,7 +233,7 @@ namespace AgenaTrader.UserCode
             set { _PopGunExpires = value; }
         }
         [Description("Creates snapshots on signals")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Snapshot is active")]
         public bool IsSnapshotActive
         {
@@ -242,7 +242,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Creates evalation (P/L) on signals")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Evalation is active")]
         public bool IsEvaluationActive
         {
@@ -251,7 +251,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Set StopLoss on opposite Trigger Range")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Set StopLoss")]
         public bool UseStopLoss
         {
@@ -259,7 +259,7 @@ namespace AgenaTrader.UserCode
             set { _setStopLoss = value; }
         }
         [Description("Set TrailingStop")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Set TrailingStop")]
         public bool UseTrailingStop
         {

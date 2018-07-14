@@ -85,7 +85,7 @@ namespace AgenaTrader.UserCode
         ///// <summary>
         ///// </summary>
         //[Description("Select the period for the bullbreath count.")]
-        //[Category("Parameters")]
+        //[InputParameter]
         //[DisplayName("Period")]
         //public int Period
         //{

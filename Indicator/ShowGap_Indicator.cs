@@ -392,7 +392,7 @@ namespace AgenaTrader.UserCode
 
 
         [Description("Mind. Punkte für Gap Prozent")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("MinPunkteProz")]
         public decimal PunkteGapMinProz
         {
@@ -401,7 +401,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Max. Punkte für Gap Prozent")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("MaxPunkteProz")]
         public decimal PunkteGapMaxProz
         {

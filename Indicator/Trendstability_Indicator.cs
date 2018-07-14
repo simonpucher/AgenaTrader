@@ -92,7 +92,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Select the type of MA you would like to use")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Type of MA")]
         public MAEnvelopesMAType MA_1_Selected
         {
@@ -106,7 +106,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Period for the MA")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period MA")]
         public int MA_1
         {

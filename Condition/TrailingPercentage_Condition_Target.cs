@@ -76,7 +76,7 @@ namespace AgenaTrader.UserCode
 		}
 
 		[Description("")]
-		[Category("Parameters")]
+		[InputParameter]
 		public double Percentage
 		{
 			get { return _percentage; }

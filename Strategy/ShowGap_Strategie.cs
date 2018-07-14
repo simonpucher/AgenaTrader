@@ -173,7 +173,7 @@ namespace AgenaTrader.UserCode
 
         #region Properties
         [Description("Mind. Punkte für Gap")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("MinPunkte")]
         public decimal PunkteGapMin
         {
@@ -182,7 +182,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Max. Punkte für Gap")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("MaxPunkte")]
         public decimal PunkteGapMax
         {
@@ -191,7 +191,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Testlauf")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Testlauf")]
         public bool Testlauf
         {

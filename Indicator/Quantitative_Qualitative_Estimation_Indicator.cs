@@ -196,14 +196,14 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Period for the RSI")]
-        [Category("Parameters")]
+        [InputParameter]
         public int RSI_Period
         {
             get { return rSI_Period; }
             set { rSI_Period = Math.Max(1, value); }
         }
 		[Description("Smoothing Factor")]
-        [Category("Parameters")]
+        [InputParameter]
         public int SF
         {
             get { return sF; }

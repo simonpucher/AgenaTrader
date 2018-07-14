@@ -198,7 +198,7 @@ namespace AgenaTrader.UserCode
 		}
 
         [Description("Tolerance level in percent.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Tolerance")]
         public double TolerancePercentage
         {
@@ -215,7 +215,7 @@ namespace AgenaTrader.UserCode
 
 
         [Description("The script shows a signal if the double bottom was reached within the last x candles.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Candles")]
         public int Candles
         {
@@ -224,7 +224,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Draw the ToleranceLevel")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Draw Tolerance")]
         public bool DrawTolerance
         {
@@ -241,7 +241,7 @@ namespace AgenaTrader.UserCode
 
 
         [Description("Determines, how many bars the other bottom(s) should be at least away from the current low")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Min Bars ago for last bottom")]
         public int BarsAgo
         {

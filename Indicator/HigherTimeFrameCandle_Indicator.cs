@@ -141,7 +141,7 @@ namespace AgenaTrader.UserCode
 
 
         [Description("Select the timeframe of the periodicity.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("HTF TimeFrame")]
         public DatafeedHistoryPeriodicity DF_DatafeedHistoryPeriodicity
         {
@@ -153,7 +153,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Select the value of the periodicity.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("HTF Value")]
         public int DF_periodicityvalues
         {
@@ -185,7 +185,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Select the number of max. candles (0 = show all candles in the higher timeframe, 3 = show the last 3 higher timeframe candles)")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Max Candles")]
         public int MaxCandles
         {

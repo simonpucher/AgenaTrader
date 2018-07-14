@@ -226,7 +226,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Period for the Bollinger Band")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("BB Period")]
         public int Period
         {
@@ -240,7 +240,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Standard Deviation for the Bollinger Band")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("BB Std. Dev.")]
         public int StandardDeviation
         {

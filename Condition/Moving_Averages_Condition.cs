@@ -148,7 +148,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("The period of the long Moving Average.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period MA Long")]
         public int MA_Long
         {
@@ -159,7 +159,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("The period of the medium Moving Average.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period MA Medium")]
         public int MA_Medium
         {
@@ -170,7 +170,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("The period of the short Moving Average.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period MA Short")]
         public int MA_Short
         {
@@ -181,7 +181,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("The script show a signal if the gap was during the last x candles.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Candles")]
         public int Candles
         {

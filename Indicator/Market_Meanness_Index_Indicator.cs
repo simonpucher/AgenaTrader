@@ -87,7 +87,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Period.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period")]
         public int MMI_Period
         {

@@ -143,7 +143,7 @@ namespace AgenaTrader.UserCode
 
 
         [Description("Period of the mean average.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period")]
         public int Period
         {
@@ -154,7 +154,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Select the type of MA you would like to use")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Type of MA")]
         public Enum_Distance_Indicator_MA MA_1_Selected
         {
@@ -167,7 +167,7 @@ namespace AgenaTrader.UserCode
 
 
         [Description("Period of the mean average.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period")]
         public Enum_Type_of_Signal TypeOfSignal
         {
@@ -176,7 +176,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Threshold in percent to show a discreet signal.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Percent Threshold")]
         public double PercentThreshold
         {

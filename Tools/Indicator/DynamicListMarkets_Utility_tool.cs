@@ -175,7 +175,7 @@ namespace AgenaTrader.UserCode
 
 
         [Description("The name of the static list to which you would like to add the instruments.")]
-            [Category("Parameters")]
+            [InputParameter]
             [DisplayName("Static list")]
             public string Name_of_list
             {
@@ -185,7 +185,7 @@ namespace AgenaTrader.UserCode
         
 
         [Description("If true then all markets with active trading session will be added to the static list.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Use market hours")]
         public bool UseMarketHours
         {
@@ -194,7 +194,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("All of these markets will be added automatically to your list if if the market is currently open.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Markets")]
         public string Instrumentlists
         {
@@ -204,7 +204,7 @@ namespace AgenaTrader.UserCode
 
 
         [Description("Update interval in seconds.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Update interval (sec.)")]
         public int Seconds
         {

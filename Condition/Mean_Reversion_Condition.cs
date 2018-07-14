@@ -176,7 +176,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("If true it is allowed to create long positions.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Allow Long")]
         public bool IsLongEnabled
         {
@@ -188,7 +188,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("If true it is allowed to create short positions.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Allow Short")]
         public bool IsShortEnabled
         {
@@ -216,7 +216,7 @@ namespace AgenaTrader.UserCode
 
 
         [Description("Period of the Bollinger Band.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("BB Period")]
         public int Bollinger_Period
         {
@@ -225,7 +225,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Standard Deviation of the Bollinger Band.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("BB StdDev")]
         public double Bollinger_Standard_Deviation
         {
@@ -234,7 +234,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Period of the Momentum.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("MOM Period")]
         public int Momentum_Period
         {
@@ -243,7 +243,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Period of the RSI.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("RSI Period")]
         public int RSI_Period
         {
@@ -252,7 +252,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Smooth Period of the RSI.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("RSI Smooth Period")]
         public int RSI_Smooth
         {
@@ -261,7 +261,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("We trade long below this RSI level.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("RSI Level Low")]
         public int RSI_Level_Low
         {
@@ -270,7 +270,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("We trade short above this RSI level.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("RSI Level High")]
         public int RSI_Level_High
         {
@@ -279,7 +279,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("We trade long if momentum is above this level.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("MOM Level Low")]
         public int Momentum_Level_Low
         {
@@ -288,7 +288,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("We trade short if momentum is below this level.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("MOM Level High")]
         public int Momentum_Level_High
         {

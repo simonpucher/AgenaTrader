@@ -233,7 +233,7 @@ namespace AgenaTrader.UserCode
         
 
     [Description("Opens Yahoo Finance with the current symbol displayed in the chart")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Yahoo Finance")]
         public bool OpenYahooFinance
         {
@@ -242,7 +242,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Opens Google Finance with the current symbol displayed in the chart")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Google Finance")]
         public bool OpenGoogleFinance
         {
@@ -251,7 +251,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Opens Morningstar with the current symbol displayed in the chart")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Morningstar")]
         public bool OpenMorningstar
         {
@@ -260,7 +260,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Opens Morningstar Direct with the current symbol displayed in the chart")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Morningstar Direct")]
         public bool OpenMorningstar_Direct
         {
@@ -271,7 +271,7 @@ namespace AgenaTrader.UserCode
         
 
         [Description("Opens Earnings whispers with the current symbol displayed in the chart")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Earnings whispers")]
         public bool OpenEarningswhispers
         {
@@ -281,7 +281,7 @@ namespace AgenaTrader.UserCode
 
         
   [Description("Opens Zacks with the current symbol displayed in the chart")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Zacks")]
         public bool OpenZacks
         {
@@ -290,7 +290,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Opens Zacks Direct with the current symbol displayed in the chart")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Zacks Direct")]
         public bool OpenZacks_Direct
         {

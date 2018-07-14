@@ -12,11 +12,11 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.1.0
+/// Version: 1.0.0
 /// -------------------------------------------------------------------------
-/// Simon Pucher 2017
+/// Simon Pucher 2018
 /// -------------------------------------------------------------------------
-/// King Pinball by Traderfox: https://youtu.be/bwFGeUVmF5o
+/// https://github.com/simonpucher/AgenaTrader/issues/52
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use global source code elements.
@@ -26,8 +26,8 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-	[Description("King Pinball")]
-	public class King_Pinball_Indicator : UserIndicator
+	[Description("Choppy Market Index")]
+	public class Choppy_Market_Index_Indicator : UserIndicator
 	{
 
         bool shortsignalbb = false;

@@ -148,7 +148,7 @@ namespace AgenaTrader.UserCode
         #region Properties
 
         [Description("Trendsize (0-3)")]
-        [Category("Parameters")]
+        [InputParameter]
         public int TrendSize
         {
             get { return _trendSize; }

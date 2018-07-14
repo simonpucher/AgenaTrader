@@ -123,7 +123,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Period which will be used to count distribution days.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period")]
         public int Period
         {
@@ -132,7 +132,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Period which will be used to count distribution days.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Distribution Day Count")]
         public int DistributionDayCount
         {
@@ -141,7 +141,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Percent down to count as a distribution day.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Percent")]
         public double Percent
         {
@@ -151,7 +151,7 @@ namespace AgenaTrader.UserCode
 
         
         [Description("Show all distribution day arrows.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Show all arrows")]
         public bool ShowDistributionDayArrows
         {
@@ -160,7 +160,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Show all distribution day labels.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Show all labels")]
         public bool ShowDistributionDayLabel
         {
@@ -209,7 +209,7 @@ namespace AgenaTrader.UserCode
 
 
         [Description("Percent of yesterday volume.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Volume Percent")]
         public double VolumePercent
         {

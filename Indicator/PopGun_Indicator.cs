@@ -130,8 +130,8 @@ namespace AgenaTrader.UserCode
             double OneBarAgo_High = bars[1].High;
             double OneBarAgo_Low = bars[1].Low;
 
-            double CurrentBar_High = bars[0].High;
-            double CurrentBar_Low = bars[0].Low;
+            double CurrentHigh = bars[0].High;
+            double CurrentLow = bars[0].Low;
 
             if (this.PopGunType == UserCode.PopGunType.Classic)
             {
@@ -140,8 +140,8 @@ namespace AgenaTrader.UserCode
                 && TwoBarsAgo_Low < OneBarAgo_Low)
                 {
                     //One Bar ago was an inside bar, so lets check if current bar is outside bar
-                    if (TwoBarsAgo_High < CurrentBar_High
-                    && TwoBarsAgo_Low > CurrentBar_Low)
+                    if (TwoBarsAgo_High < CurrentHigh
+                    && TwoBarsAgo_Low > CurrentLow)
                     {
 
                         // current bar is outside bar -> lets pop the gun
@@ -160,8 +160,8 @@ namespace AgenaTrader.UserCode
                         {
                             this.PopGunTarget = curbar + this.PopGunExpires;
                             PopGunTriggerBar = ProcessingBarIndex;
-                            this.PopGunTriggerLong = CurrentBar_High;
-                            this.PopGunTriggerShort = CurrentBar_Low;
+                            this.PopGunTriggerLong = CurrentHigh;
+                            this.PopGunTriggerShort = CurrentLow;
                         }
                     }
                 }
@@ -378,7 +378,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Type of PopGun Pattern you would like to use.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Pop Gun Type")]
         public PopGunType PopGunType
         {
@@ -387,7 +387,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Wieviel Bars ist PopGunTrigger g�ltig?")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("PopGunExpires")]
         public int PopGunExpires
         {
@@ -396,7 +396,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Creates snapshots on signals")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Snapshot is active")]
         public bool IsSnapshotActive
         {
@@ -405,7 +405,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Creates evalation (P/L) on signals")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Evalation is active")]
         public bool IsEvaluationActive
         {

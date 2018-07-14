@@ -125,7 +125,7 @@ namespace AgenaTrader.UserCode
         #region InSeries
 
         [Description("Type of the indicator")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Type of the indicator")]
         public IndicatorEnum_HighestHighValue IndicatorEnum
         {
@@ -135,7 +135,7 @@ namespace AgenaTrader.UserCode
 
 
             [Description("Period for the SMA")]
-            [Category("Parameters")]
+            [InputParameter]
             [DisplayName("Period SMA")]
             public int IndicatorSMAPeriod
             {
@@ -144,7 +144,7 @@ namespace AgenaTrader.UserCode
             }
 
             [Description("Period for the EMA")]
-            [Category("Parameters")]
+            [InputParameter]
             [DisplayName("Period EMA")]
             public int IndicatorEMAPeriod
             {
@@ -155,7 +155,7 @@ namespace AgenaTrader.UserCode
 
 
             [Description("Period for comparison")]
-            [Category("Parameters")]
+            [InputParameter]
             [DisplayName("Period for comparison")]
             public int ComparisonPeriod
             {
@@ -167,7 +167,7 @@ namespace AgenaTrader.UserCode
 
                 [XmlIgnore()]
                 [Description("Select Color")]
-                [Category("Parameters")]
+                [InputParameter]
                 [DisplayName("Pricline")]
                 public Color Plot1Color
                 {
@@ -184,7 +184,7 @@ namespace AgenaTrader.UserCode
                 /// <summary>
                 /// </summary>
                 [Description("Width for Indicator.")]
-                [Category("Parameters")]
+                [InputParameter]
                 [DisplayName("Line Width Indicator")]
                 public int Plot0Width
                 {
@@ -196,7 +196,7 @@ namespace AgenaTrader.UserCode
                 /// <summary>
                 /// </summary>
                 [Description("DashStyle for Indicator.")]
-                [Category("Parameters")]
+                [InputParameter]
                 [DisplayName("Dash Style Indicator")]
                 public DashStyle Dash0Style
                 {

@@ -112,7 +112,7 @@ namespace AgenaTrader.UserCode
 		}
 
         [Description("The name of the static list to which you would like to use.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Static list")]
         public string Instrumentlist
 		{

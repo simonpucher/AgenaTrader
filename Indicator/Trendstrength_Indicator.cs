@@ -97,7 +97,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Select the type of MA1 you would like to use")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Type of MA1")]
         public MAEnvelopesMAType MA_1_Selected
         {
@@ -111,7 +111,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Period for the MA1")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period MA1")]
         public int MA_1
         {
@@ -125,7 +125,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Select the type of MA2 you would like to use")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Type of MA2")]
         public MAEnvelopesMAType MA_2_Selected
         {
@@ -139,7 +139,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Period for the MA2")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period MA2")]
         public int MA_2
         {
@@ -153,7 +153,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Multiplier")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Multiplier")]
         public int Multiplier
         {

@@ -182,7 +182,7 @@ namespace AgenaTrader.UserCode
      
 
         [Description("Names of the lines will be shown next to the line.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Shows Names")]
         public bool ShowLines
         {
@@ -191,7 +191,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("If true the open lines are shown.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Show Open lines")]
         public bool ShowOpen
         {
@@ -200,7 +200,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("If true the high lines are shown.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Show High lines")]
         public bool ShowHigh
         {
@@ -209,7 +209,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("If true the low lines are shown.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Show Low lines")]
         public bool ShowLow
         {
@@ -218,7 +218,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("If true the close lines are shown.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Show Close lines")]
         public bool ShowClose
         {

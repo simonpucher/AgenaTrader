@@ -116,7 +116,7 @@ namespace AgenaTrader.UserCode
         #region Properties
 
         [Description("Performance will be calculated x bars backwards. Insert 365 for the performance of the last year. Insert 1 for the perfomance since yesterday.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Bars backwards")]
         public int BarsCount
         {
@@ -126,7 +126,7 @@ namespace AgenaTrader.UserCode
 
 
         [Description("Performance will be calculated from today to a dedicated date. The close of this day is used.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Selected date")]
         public DateTime SelectedDate
         {
@@ -135,7 +135,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Choose the type of calculation. BarCount = The calculation will use the bars for the calculation. ThisYear = Calculation will be done for today minus the close of the last bar of last year.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Type")]
         public PerformanceCalculationType PerformanceCalculationType
         {

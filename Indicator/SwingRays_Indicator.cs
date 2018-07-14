@@ -252,7 +252,7 @@ namespace AgenaTrader.UserCode
         #region InSeries Parameters
 
         [Description("Number of bars before/after each pivot bar")]
-            [Category("Parameters")]
+            [InputParameter]
             [DisplayName("Strength")]
             public int Strength
             {
@@ -261,7 +261,7 @@ namespace AgenaTrader.UserCode
             }
 
             [Description("Alert when swings are broken")]
-            [Category("Parameters")]
+            [InputParameter]
             [DisplayName("Enable alerts")]
             public bool EnableAlerts
             {
@@ -270,7 +270,7 @@ namespace AgenaTrader.UserCode
             }
 
             [Description("Show broken swing points")]
-            [Category("Parameters")]
+            [InputParameter]
             [DisplayName("Keep broken lines")]
             public bool KeepBrokenLines
             {
@@ -280,7 +280,7 @@ namespace AgenaTrader.UserCode
 
             [XmlIgnore()]
             [Description("Color for swing highs")]
-            [Category("Parameters")]
+            [InputParameter]
             [DisplayName("Swing high color")]
             public Color SwingHighColor
             {
@@ -298,7 +298,7 @@ namespace AgenaTrader.UserCode
 
             [XmlIgnore()]
             [Description("Color for swing lows")]
-            [Category("Parameters")]
+            [InputParameter]
             [DisplayName("Swing low color")]
             public Color SwingLowColor
             {
@@ -316,7 +316,7 @@ namespace AgenaTrader.UserCode
 
             [XmlIgnore()]
             [Description("Select the soundfile for the alert.")]
-            [Category("Parameters")]
+            [InputParameter]
             [DisplayName("Soundfile name")]
             public Soundfile Soundfile
             {

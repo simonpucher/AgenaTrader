@@ -289,7 +289,7 @@ namespace AgenaTrader.UserCode
 		}
 
         //[Description("")]
-        //[Category("Parameters")]
+        //[InputParameter]
         //public int MyCondition1
         //{
         //    get { return _myCondition1; }
@@ -297,7 +297,7 @@ namespace AgenaTrader.UserCode
         //}
 
         [Description("Mind. Punkte für Gap")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("MinPunkte")]
         public int PunkteGapMin
         {
@@ -306,7 +306,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Max. Punkte für Gap")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("MaxPunkte")]
         public int PunkteGapMax
         {

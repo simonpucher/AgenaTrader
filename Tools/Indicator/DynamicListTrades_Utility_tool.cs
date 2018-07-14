@@ -182,7 +182,7 @@ namespace AgenaTrader.UserCode
 
 
         [Description("The name of the static list to which you would like to add the instruments.")]
-            [Category("Parameters")]
+            [InputParameter]
             [DisplayName("Static list")]
             public string Name_of_list
             {
@@ -191,7 +191,7 @@ namespace AgenaTrader.UserCode
             }
 
         [Description("If true then all open trades will be added dynamical to the static list.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Show trades")]
         public bool ShowTrades
         {
@@ -201,7 +201,7 @@ namespace AgenaTrader.UserCode
 
         
         [Description("If true then all active proposals will be added dynamical to the static list.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Show proposals")]
         public bool ShowProposals
         {
@@ -210,7 +210,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("If true then all instruments with price alerts will be added dynamical to the static list.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Show price alerts")]
         public bool ShowPriceAlert
         {
@@ -219,7 +219,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("Update interval in seconds.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Update interval (sec.)")]
         public int Seconds
         {

@@ -197,7 +197,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Trendsize (0-3)")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Trendsize (0-3)")]
         public int TrendSize
         {

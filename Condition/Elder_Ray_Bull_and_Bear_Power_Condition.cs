@@ -135,7 +135,7 @@ namespace AgenaTrader.UserCode
 		}
 
         [Description("Type of ElderRayTyp.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("ElderRayTyp")]
         public ElderRayTyp ElderRayTyp
         {
@@ -144,7 +144,7 @@ namespace AgenaTrader.UserCode
 
         }
         [Description("Period of the EMA.")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Period")]
         public int Period
         {

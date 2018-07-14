@@ -256,7 +256,7 @@ namespace AgenaTrader.UserCode
               /// <summary>
         /// </summary>
         [Description("Select the type of MA you would like to use")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Type of MA")]
         public Enum_RunningWithTheWolves_Indicator_MA MA_Selected
         {
@@ -271,7 +271,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Period for the slow mean average")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("MA Slow")]
         public int MA_Slow
         {
@@ -285,7 +285,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Period for the medium mean average")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("MA Medium")]
         public int MA_Medium
         {
@@ -299,7 +299,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("Period for the fast mean average")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("MA Fast")]
         public int MA_Fast
         {
@@ -314,7 +314,7 @@ namespace AgenaTrader.UserCode
               /// <summary>
         /// </summary>
         [Description("If true it is allowed to go long")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Allow Long")]
         public bool IsLongEnabled
         {
@@ -326,7 +326,7 @@ namespace AgenaTrader.UserCode
           /// <summary>
         /// </summary>
         [Description("If true it is allowed to go short")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Allow Short")]
         public bool IsShortEnabled
         {
@@ -337,7 +337,7 @@ namespace AgenaTrader.UserCode
         /// <summary>
         /// </summary>
         [Description("If true candles will be display in white/gray to provide a better contrast")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("White candle colors")]
         public bool UseWhiteCandles
         {

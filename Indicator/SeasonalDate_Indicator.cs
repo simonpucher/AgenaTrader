@@ -331,7 +331,7 @@ namespace AgenaTrader.UserCode
             /// <summary>
             /// </summary>
             [Description("Seasonal Type")]
-            [Category("Parameters")]
+            [InputParameter]
             [DisplayName("Seasonal Type")]
             public SeasonalDateType SeasonalDateType
             {
@@ -344,7 +344,7 @@ namespace AgenaTrader.UserCode
   
 
         [Description("Start month of the manual seasonal type")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("Start month (manual)")]
         public int Start_Month
         {
@@ -353,7 +353,7 @@ namespace AgenaTrader.UserCode
         }
 
         [Description("End month of the manual seasonal type")]
-        [Category("Parameters")]
+        [InputParameter]
         [DisplayName("End month (manual)")]
         public int End_Month
         {
