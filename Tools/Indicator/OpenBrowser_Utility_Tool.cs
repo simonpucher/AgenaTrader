@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2.0
+/// Version: 1.2.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -44,6 +44,7 @@ namespace AgenaTrader.UserCode
         private bool _openearningswhispers = true;
         private bool _openzacks = true;
         private bool _openzacks_direct = true;
+        private bool _openbarchart_options_direct = true;
 
 
         #endregion
@@ -197,6 +198,11 @@ namespace AgenaTrader.UserCode
                     GUIHelper.OpenInBrowser("https://www.zacks.com/stock/quote/" + symbol);
                 }
 
+                if (this.Openbarchart_Options_Direct)
+                {
+                    GUIHelper.OpenInBrowser("https://www.barchart.com/stocks/quotes/" + symbol + "/options?view=sbs");
+                }
+
 
             }
             else
@@ -297,6 +303,17 @@ namespace AgenaTrader.UserCode
             get { return _openzacks_direct; }
             set { _openzacks_direct = value; }
         }
+
+        [Description("Opens Barchart Options Direct with the current symbol displayed in the chart")]
+        [InputParameter]
+        [DisplayName("Barchart Options Direct")]
+        public bool Openbarchart_Options_Direct
+        {
+            get { return _openbarchart_options_direct; }
+            set { _openbarchart_options_direct = value; }
+        }
+
+        
 
         private Color _col_positive = Color.Green;
         /// <summary>
