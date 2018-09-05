@@ -14,7 +14,7 @@ using System.Runtime.CompilerServices;
 
 
 /// <summary>
-/// Version: 1.1.0
+/// Version: 1.1.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2018
 /// -------------------------------------------------------------------------
@@ -27,17 +27,21 @@ using System.Runtime.CompilerServices;
 namespace AgenaTrader.UserCode
 {
   
-
-
+    
     [Description("Show seasonal trends")]
 	public class FiscalYear_Indicator : UserIndicator
 	{
 
         #region Variables
 
+        private int _vertical_line_width = 1;
+        private Color _color_vertical_line_FiscalEnd = Color.DarkViolet;
+        private int _horizontal_line_width = 2;
+        private Color _color_horizontal_line_FiscalEnd = Color.DarkViolet;
+        private DashStyle _horizontal_dashstyle = DashStyle.Dash;
+        private DashStyle _vertical_dashstyle = DashStyle.Dash;
+
         private int _year = 0;
-
-
 
         #endregion
 
@@ -56,39 +60,6 @@ namespace AgenaTrader.UserCode
 
         protected override void OnStart()
         {
-            //Print("OnStartUp");
-
-            /*   switch (FiscalYearType)
-              {
-                  case FiscalYearType.SellInMay:
-                      _list_sellinmayandgoaway_buy = Bars.Where(x => x.Time.Month <= 4 || x.Time.Month >= 10);
-                      _list_sellinmayandgoaway_sell = Bars.Except(_list_sellinmayandgoaway_buy);
-                      hashset = new HashSet<DateTime>(_list_sellinmayandgoaway_buy.Select(x => x.Time));
-                      break;
-                  case FiscalYearType.SantaClausRally:
-                      _list_santaclausrally_buy = from b in Bars
-                                                 where (b.Time.Month == 12 && b.Time.Day >= 15) || (b.Time.Month == 1 && b.Time.Day <= 9)
-                                                 select b;
-                      hashset = new HashSet<DateTime>(_list_santaclausrally_buy.Select(x => x.Time));
-                      break;
-                  case FiscalYearType.fourthofjuly:
-                      _list_fourthofjuly_buy = from b in Bars
-                                                  where (b.Time.Month == 7 && b.Time.Day >= 1) || (b.Time.Month == 7 && b.Time.Day <= 8)
-                                                  select b;
-                      hashset = new HashSet<DateTime>(_list_fourthofjuly_buy.Select(x => x.Time));
-                      break;
-                  case FiscalYearType.manual:
-                      _list_manual_buy = from b in Bars
-                                               where (b.Time.Month >= this.Start_Month  && b.Time.Month <= this.End_Month)
-                                               select b;
-                      hashset = new HashSet<DateTime>(_list_manual_buy.Select(x => x.Time));
-                      break;
-                  default:
-                      break;
-              } */
-
-            
-
             CalculateOnClosedBar = true;
             IsOverlay = true;
         }
@@ -104,50 +75,28 @@ namespace AgenaTrader.UserCode
 
             if (_year < Time[0].Year)
             {
-                AddChartVerticalLine(Time[0].Date.ToString(), 0, Color.Magenta, DashStyle.Dash, 2);
-                //AddChartTextFixed("txt" + Time[0].Date.ToString(), Time[0].Year.ToString(), TextPosition.BottomCenter);
-                AddChartText("txt" + Time[0].Date.ToString(), Time[0].Year.ToString(), 0, Low[0], Color.Magenta);
+                AddChartVerticalLine("vline" + Time[0].Date.ToString(), 0, this.Color_Vertical_Line_FiscalEnd, this.Vertical_DashStyle, this.Vertical_Line_Width);
+                //AddChartText("txt" + Time[0].Date.ToString(), Time[0].Year.ToString(), ProcessingBarIndexes[0] - Bars.Count() + 1, Low[0], this.Color_Horizontal_Line_FiscalEnd);
+                AddChartText("txt" + Time[0].Date.ToString(), Time[0].Year.ToString(), ProcessingBarIndexes[0] - Chart.LastBarVisible + 1, Close[0], this.Color_Horizontal_Line_FiscalEnd);
+                AddChartLine("hline" + Time[0].ToString(), 0, Close[0], ProcessingBarIndexes[0]-Bars.Count()+1, Close[0], this.Color_Horizontal_Line_FiscalEnd);
                 _year = Time[0].Year;
+                
             }
-
             
-
         }
 
-        /// <summary>
-        /// Draws a rectangle in the chart to visualize the seasonality.
-        /// </summary>
-        /// <param name="list"></param>
-        /// <param name="col"></param>
-        private void DrawAreaRectangle(IEnumerable<IBar> list, Color color, string name)
-        {
-            double low = list.Min(x => x.Low);
-            double high = list.Max(x => x.High);
-
-            double difference = list.Last().Close - list.First().Open;
-
-            //We need to get ensure that each name is unique.
-            name = name + list.First().Time.Ticks;
-
-            AddChartRectangle("Seasonal_rect" + name, true, list.First().Time, high, list.Last().Time, low, color, color, 70);
-            AddChartText("Seasonal_text" + name, true, Math.Round((difference), 2).ToString(), list.First().Time, high, 7, Color.Black, new Font("Arial", 9), StringAlignment.Center, Color.Gray, color, 100);
-        }
-
-
-       
-
-
+      
 
         public override string ToString()
         {
-            return "Fiscal Year End";
+            return "Fiscal Year End (I)";
         }
 
         public override string DisplayName
         {
             get
             {
-                  return "Fiscal Year End";
+                  return "Fiscal Year End (I)";
             }
         }
 
@@ -172,44 +121,93 @@ namespace AgenaTrader.UserCode
 
 
 
-		#region Properties
+        #region Properties
 
-        #region InSeries 
+        /// <summary>
+        /// </summary>
+        [Description("Select the Dash Style for the vertical line.")]
+        [Category("Color")]
+        [DisplayName("Dash Style Vertical")]
+        public DashStyle Vertical_DashStyle
+        {
+            get { return _vertical_dashstyle; }
+            set { _vertical_dashstyle = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select the Dash Style for the horizontal line.")]
+        [Category("Color")]
+        [DisplayName("Dash Style Horizontal")]
+        public DashStyle Horizontal_DashStyle
+        {
+            get { return _horizontal_dashstyle; }
+            set { _horizontal_dashstyle = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select the width for the vertical line.")]
+        [Category("Color")]
+        [DisplayName("Width Vertical")]
+        public int Vertical_Line_Width
+        {
+            get { return _vertical_line_width; }
+            set { _vertical_line_width = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select the width for the horizontal line.")]
+        [Category("Color")]
+        [DisplayName("Width Horizontal")]
+        public int Horizontal_Line_Width
+        {
+            get { return _horizontal_line_width; }
+            set { _horizontal_line_width = value; }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the vertical line.")]
+        [Category("Color")]
+        [DisplayName("Color Vertical")]
+        public Color Color_Vertical_Line_FiscalEnd
+        {
+            get { return _color_vertical_line_FiscalEnd; }
+            set { _color_vertical_line_FiscalEnd = value; }
+        }
+
+
+        // Serialize Color object
+        [Browsable(false)]
+        public string Color_Vertical_Line_FiscalEndSerialize
+        {
+            get { return SerializableColor.ToString(_color_vertical_line_FiscalEnd); }
+            set { _color_vertical_line_FiscalEnd = SerializableColor.FromString(value); }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Select Color for the horizontal line.")]
+        [Category("Color")]
+        [DisplayName("Color horizontal")]
+        public Color Color_Horizontal_Line_FiscalEnd
+        {
+            get { return _color_horizontal_line_FiscalEnd; }
+            set { _color_horizontal_line_FiscalEnd = value; }
+        }
+
+
+        // Serialize Color object
+        [Browsable(false)]
+        public string Color_Horizontal_Line_FiscalEndSerialize
+        {
+            get { return SerializableColor.ToString(_color_horizontal_line_FiscalEnd); }
+            set { _color_horizontal_line_FiscalEnd = SerializableColor.FromString(value); }
+        }
+
         
-       
-
-
-      
-  
-
-        //[Description("Start month of the manual seasonal type")]
-        //[InputParameter]
-        //[DisplayName("Start month (manual)")]
-        //public int Start_Month
-        //{
-        //    get { return _start_month; }
-        //    set { _start_month = value; }
-        //}
-
-        //[Description("End month of the manual seasonal type")]
-        //[InputParameter]
-        //[DisplayName("End month (manual)")]
-        //public int End_Month
-        //{
-        //    get { return _end_month; }
-        //    set { _end_month = value; }
-        //}
-
-        #endregion
-
-        //[Browsable(false)]
-        //[XmlIgnore()]
-        //public DataSeries MyPlot1
-        //{
-        //    get { return Outputs[0]; }
-        //}
-
-
 
 
         #endregion
