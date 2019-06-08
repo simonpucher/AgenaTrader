@@ -15,7 +15,7 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: in progress
+/// Version: 1.0.0
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -36,6 +36,13 @@ namespace AgenaTrader.UserCode
     [Description("Plots horizontal rays at swing highs and lows and removes them once broken. Returns 1 if a high has broken. Returns -1 if a low has broken. Returns 0 in all other cases.")]
     public class SwingRays : UserIndicator
     {
+
+        public enum enum_swingray_type
+        {
+            highlow = 0,
+            open = 1,
+            close = 2
+        }
         /// <summary>
         /// Object is storing ray data
         /// </summary>
@@ -81,6 +88,7 @@ namespace AgenaTrader.UserCode
 
         private Soundfile _soundfile = Soundfile.Blip;
 
+        private enum_swingray_type _type = enum_swingray_type.highlow;
 
         /// <summary>
         /// This method is used to configure the indicator and is called once before any bar data is loaded.
@@ -107,12 +115,27 @@ namespace AgenaTrader.UserCode
         {
             int temp_signal_value = 0;
 
+            double actualhigh = High[0];
+            double actuallow = Low[0];
+
+            if (this.Type == enum_swingray_type.open)
+            {
+                 actualhigh = Open[0];
+                 actuallow = Open[0];
+            }
+            else if (this.Type == enum_swingray_type.close)
+                {
+                 actualhigh = Close[0];
+                 actuallow = Close[0];
+            }
+           
+
             // build up cache of recent High and Low values
             // code devised from default Swing Indicator by marqui@BMT, 10-NOV-2010 
-            lastHighCache.Add(High[0]);
+            lastHighCache.Add(actualhigh);
             if (lastHighCache.Count > (2 * strength) + 1)
                 lastHighCache.RemoveAt(0); // if cache is filled, drop the oldest value
-            lastLowCache.Add(Low[0]);
+            lastLowCache.Add(actuallow);
             if (lastLowCache.Count > (2 * strength) + 1)
                 lastLowCache.RemoveAt(0);
             //
@@ -138,7 +161,7 @@ namespace AgenaTrader.UserCode
                     RayObject newRayObject = new RayObject("highRay" + (ProcessingBarIndex - strength), strength, lastSwingHighValue, 0, lastSwingHighValue);
                     swingHighRays.Push(newRayObject); // store a reference so we can remove it from the chart later
                 }
-                else if (High[0] > lastSwingHighValue) // otherwise, we test to see if price has broken through prior swing high
+                else if (actualhigh > lastSwingHighValue) // otherwise, we test to see if price has broken through prior swing high
                 {
                     if (swingHighRays.Count > 0) // just to be safe 
                     {
@@ -195,7 +218,7 @@ namespace AgenaTrader.UserCode
                     RayObject newRayObject = new RayObject("lowRay" + (ProcessingBarIndex - strength), strength, lastSwingLowValue, 0, lastSwingLowValue);
                     swingLowRays.Push(newRayObject);
                 }
-                else if (Low[0] < lastSwingLowValue) // otherwise test to see if price has broken through prior swing low
+                else if (actuallow < lastSwingLowValue) // otherwise test to see if price has broken through prior swing low
                 {
                     if (swingLowRays.Count > 0)
                     {
@@ -259,6 +282,14 @@ namespace AgenaTrader.UserCode
                 get { return strength; }
                 set { strength = Math.Max(2, value); }
             }
+
+        [Description("Choose the type of swingray")]
+        [InputParameter]
+        [DisplayName("SwingRay Type")]
+        public enum_swingray_type Type {
+            get { return _type; }
+            set { _type = value; }
+        }
 
             [Description("Alert when swings are broken")]
             [InputParameter]
