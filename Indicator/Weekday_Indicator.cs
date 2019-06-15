@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0.0
+/// Version: 1.0.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2019
 /// /// -------------------------------------------------------------------------
@@ -26,23 +26,23 @@ namespace AgenaTrader.UserCode
 {
 	public class Weekday_Indicator : UserIndicator
 	{
-        private bool _ShowSignalOnChartBackground = true;
-        private bool _ShowSignalOnChartArrow = true;
+        //private bool _ShowSignalOnChartBackground = true;
+        //private bool _ShowSignalOnChartArrow = true;
 
-        private int _period = 200;
-        private int _stddev = 1;
+        //private int _period = 200;
+        //private int _stddev = 1;
 
-        private int _linewidth_1 = 1;
-        private DashStyle _linestyle_1 = DashStyle.Solid;
-        private Color _col_1 = Color.Violet;
+        //private int _linewidth_1 = 1;
+        //private DashStyle _linestyle_1 = DashStyle.Solid;
+        //private Color _col_1 = Color.Violet;
 
-        private int _linewidth_2 = 1;
-        private DashStyle _linestyle_2 = DashStyle.Solid;
-        private Color _col_2 = Color.Gray;
+        //private int _linewidth_2 = 1;
+        //private DashStyle _linestyle_2 = DashStyle.Solid;
+        //private Color _col_2 = Color.Gray;
 
-        private int _linewidth_3 = 1;
-        private DashStyle _linestyle_3 = DashStyle.Solid;
-        private Color _col_3 = Color.Gray;
+        //private int _linewidth_3 = 1;
+        //private DashStyle _linestyle_3 = DashStyle.Solid;
+        //private Color _col_3 = Color.Gray;
 
         private Color _color_long_signal_background = Const.DefaultArrowLongColor;
         private Color _color_short_signal_background = Const.DefaultArrowShortColor;
@@ -54,27 +54,30 @@ namespace AgenaTrader.UserCode
 
         private DataSeries _signals;
 
+        private DayOfWeek _start = DayOfWeek.Tuesday;
+        private DayOfWeek _end = DayOfWeek.Thursday;
+
         protected override void OnInit()
 		{
-            Add(new OutputDescriptor(new Pen(this.Color_1, this.LineWidth_1), OutputSerieDrawStyle.Line, "MA_1"));
-            Add(new OutputDescriptor(new Pen(this.Color_2, this.LineWidth_2), OutputSerieDrawStyle.Line, "MA_2"));
-            Add(new OutputDescriptor(new Pen(this.Color_3, this.LineWidth_3), OutputSerieDrawStyle.Line, "MA_3"));
+            //Add(new OutputDescriptor(new Pen(this.Color_1, this.LineWidth_1), OutputSerieDrawStyle.Line, "MA_1"));
+            //Add(new OutputDescriptor(new Pen(this.Color_2, this.LineWidth_2), OutputSerieDrawStyle.Line, "MA_2"));
+            //Add(new OutputDescriptor(new Pen(this.Color_3, this.LineWidth_3), OutputSerieDrawStyle.Line, "MA_3"));
 
             IsOverlay = true;
 
             _signals = new DataSeries(this);
 
-            this.RequiredBarsCount = 200;
+            this.RequiredBarsCount = 10;
         }
 
 		protected override void OnCalculate()
 		{
-            if (Time[0].DayOfWeek == DayOfWeek.Monday)
+            if (Time[0].DayOfWeek == this.Day_Buy)
             {
                 AddChartArrowUp("ArrowLong_MA" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Open, this.ColorLongSignalArrow);
             }
 
-            if (Time[0].DayOfWeek == DayOfWeek.Wednesday)
+            if (Time[0].DayOfWeek == this.Day_Sell)
             {
                 AddChartArrowDown("ArrowShort_MA" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Close, this.ColorShortSignalArrow);
             }
@@ -204,60 +207,60 @@ namespace AgenaTrader.UserCode
 
         /// <summary>
         /// </summary>
-        [Description("Show signal strength on the chart (arrow).")]
-        [Category("Background")]
-        [DisplayName("Show arrow")]
-        public bool ShowSignalOnChartArrow
+        [Description("Show buy arrow on the chart.")]
+        [Category("Signals")]
+        [DisplayName("Arrow Buy")]
+        public DayOfWeek Day_Buy
         {
-            get { return _ShowSignalOnChartArrow; }
+            get { return _start; }
             set
             {
-                _ShowSignalOnChartArrow = value;
+                _start = value;
             }
         }
 
         /// <summary>
         /// </summary>
-        [Description("Show signal strength on the chart (background).")]
-        [Category("Background")]
-        [DisplayName("Show background")]
-        public bool ShowSignalOnChartBackground
+        [Description("Show sell arrow on the chart.")]
+        [Category("Signals")]
+        [DisplayName("Arrow Sell")]
+        public DayOfWeek Day_Sell
         {
-            get { return _ShowSignalOnChartBackground; }
+            get { return _end; }
             set
             {
-                _ShowSignalOnChartBackground = value;
+                _end = value;
             }
         }
 
 
-        /// <summary>
-        /// </summary>
-        [Description("Period for the Bollinger Band")]
-        [InputParameter]
-        [DisplayName("BB Period")]
-        public int Period
-        {
-            get { return _period; }
-            set
-            {
-                _period = value;
-            }
-        }
+        ///// <summary>
+        ///// </summary>
+        //[Description("Period for the Bollinger Band")]
+        //[InputParameter]
+        //[DisplayName("BB Period")]
+        //public int Period
+        //{
+        //    get { return _period; }
+        //    set
+        //    {
+        //        _period = value;
+        //    }
+        //}
 
-        /// <summary>
-        /// </summary>
-        [Description("Standard Deviation for the Bollinger Band")]
-        [InputParameter]
-        [DisplayName("BB Std. Dev.")]
-        public int StandardDeviation
-        {
-            get { return _stddev; }
-            set
-            {
-                _stddev = value;
-            }
-        }
+        ///// <summary>
+        ///// </summary>
+        //[Description("Standard Deviation for the Bollinger Band")]
+        //[InputParameter]
+        //[DisplayName("BB Std. Dev.")]
+        //public int StandardDeviation
+        //{
+        //    get { return _stddev; }
+        //    set
+        //    {
+        //        _stddev = value;
+        //    }
+        //}
 
         /// <summary>
         /// </summary>
@@ -332,138 +335,138 @@ namespace AgenaTrader.UserCode
 
 
 
-        /// <summary>
-        /// </summary>
-        [Description("Line Width of MA 1.")]
-        [Category("Plots")]
-        [DisplayName("LW MA 1")]
-        public int LineWidth_1
-        {
-            get { return _linewidth_1; }
-            set { _linewidth_1 = Math.Max(1, value); }
-        }
+        ///// <summary>
+        ///// </summary>
+        //[Description("Line Width of MA 1.")]
+        //[Category("Plots")]
+        //[DisplayName("LW MA 1")]
+        //public int LineWidth_1
+        //{
+        //    get { return _linewidth_1; }
+        //    set { _linewidth_1 = Math.Max(1, value); }
+        //}
 
 
-        /// <summary>
-        /// </summary>
-        [Description("DashStyle for MA 1.")]
-        [Category("Plots")]
-        [DisplayName("DS MA 1")]
-        public DashStyle DashStyle_1
-        {
-            get { return _linestyle_1; }
-            set { _linestyle_1 = value; }
-        }
+        ///// <summary>
+        ///// </summary>
+        //[Description("DashStyle for MA 1.")]
+        //[Category("Plots")]
+        //[DisplayName("DS MA 1")]
+        //public DashStyle DashStyle_1
+        //{
+        //    get { return _linestyle_1; }
+        //    set { _linestyle_1 = value; }
+        //}
 
 
-        /// <summary>
-        /// </summary>
-        [Description("Color for MA 1")]
-        [Category("Plots")]
-        [DisplayName("Color MA 1")]
-        public Color Color_1
-        {
-            get { return _col_1; }
-            set { _col_1 = value; }
-        }
+        ///// <summary>
+        ///// </summary>
+        //[Description("Color for MA 1")]
+        //[Category("Plots")]
+        //[DisplayName("Color MA 1")]
+        //public Color Color_1
+        //{
+        //    get { return _col_1; }
+        //    set { _col_1 = value; }
+        //}
 
-        [Browsable(false)]
-        public string Color_1_Serialize
-        {
-            get { return SerializableColor.ToString(_col_1); }
-            set { _col_1 = SerializableColor.FromString(value); }
-        }
+        //[Browsable(false)]
+        //public string Color_1_Serialize
+        //{
+        //    get { return SerializableColor.ToString(_col_1); }
+        //    set { _col_1 = SerializableColor.FromString(value); }
+        //}
 
 
       
 
-        /// <summary>
-        /// </summary>
-        [Description("Line Width of MA 2.")]
-        [Category("Plots")]
-        [DisplayName("LW MA 2")]
-        public int LineWidth_2
-        {
-            get { return _linewidth_2; }
-            set { _linewidth_2 = Math.Max(1, value); }
-        }
+        ///// <summary>
+        ///// </summary>
+        //[Description("Line Width of MA 2.")]
+        //[Category("Plots")]
+        //[DisplayName("LW MA 2")]
+        //public int LineWidth_2
+        //{
+        //    get { return _linewidth_2; }
+        //    set { _linewidth_2 = Math.Max(1, value); }
+        //}
 
 
-        /// <summary>
-        /// </summary>
-        [Description("DashStyle for MA 2.")]
-        [Category("Plots")]
-        [DisplayName("DS MA 2")]
-        public DashStyle DashStyle_2
-        {
-            get { return _linestyle_2; }
-            set { _linestyle_2 = value; }
-        }
+        ///// <summary>
+        ///// </summary>
+        //[Description("DashStyle for MA 2.")]
+        //[Category("Plots")]
+        //[DisplayName("DS MA 2")]
+        //public DashStyle DashStyle_2
+        //{
+        //    get { return _linestyle_2; }
+        //    set { _linestyle_2 = value; }
+        //}
 
 
-        /// <summary>
-        /// </summary>
-        [Description("Color for MA 2")]
-        [Category("Plots")]
-        [DisplayName("Color MA 2")]
-        public Color Color_2
-        {
-            get { return _col_2; }
-            set { _col_2 = value; }
-        }
+        ///// <summary>
+        ///// </summary>
+        //[Description("Color for MA 2")]
+        //[Category("Plots")]
+        //[DisplayName("Color MA 2")]
+        //public Color Color_2
+        //{
+        //    get { return _col_2; }
+        //    set { _col_2 = value; }
+        //}
 
-        [Browsable(false)]
-        public string Color_2_Serialize
-        {
-            get { return SerializableColor.ToString(_col_2); }
-            set { _col_2 = SerializableColor.FromString(value); }
-        }
+        //[Browsable(false)]
+        //public string Color_2_Serialize
+        //{
+        //    get { return SerializableColor.ToString(_col_2); }
+        //    set { _col_2 = SerializableColor.FromString(value); }
+        //}
 
 
   
        
 
-        /// <summary>
-        /// </summary>
-        [Description("Line Width of MA 3.")]
-        [Category("Plots")]
-        [DisplayName("LW MA 3")]
-        public int LineWidth_3
-        {
-            get { return _linewidth_3; }
-            set { _linewidth_3 = Math.Max(1, value); }
-        }
+        ///// <summary>
+        ///// </summary>
+        //[Description("Line Width of MA 3.")]
+        //[Category("Plots")]
+        //[DisplayName("LW MA 3")]
+        //public int LineWidth_3
+        //{
+        //    get { return _linewidth_3; }
+        //    set { _linewidth_3 = Math.Max(1, value); }
+        //}
 
 
-        /// <summary>
-        /// </summary>
-        [Description("DashStyle for MA 3.")]
-        [Category("Plots")]
-        [DisplayName("DS MA 3")]
-        public DashStyle DashStyle_3
-        {
-            get { return _linestyle_3; }
-            set { _linestyle_3 = value; }
-        }
+        ///// <summary>
+        ///// </summary>
+        //[Description("DashStyle for MA 3.")]
+        //[Category("Plots")]
+        //[DisplayName("DS MA 3")]
+        //public DashStyle DashStyle_3
+        //{
+        //    get { return _linestyle_3; }
+        //    set { _linestyle_3 = value; }
+        //}
 
 
-        /// <summary>
-        /// </summary>
-        [Description("Color for MA 3")]
-        [Category("Plots")]
-        [DisplayName("Color MA 3")]
-        public Color Color_3
-        {
-            get { return _col_3; }
-            set { _col_3 = value; }
-        }
+        ///// <summary>
+        ///// </summary>
+        //[Description("Color for MA 3")]
+        //[Category("Plots")]
+        //[DisplayName("Color MA 3")]
+        //public Color Color_3
+        //{
+        //    get { return _col_3; }
+        //    set { _col_3 = value; }
+        //}
 
-        [Browsable(false)]
-        public string Color_3_Serialize
-        {
-            get { return SerializableColor.ToString(_col_3); }
-            set { _col_3 = SerializableColor.FromString(value); }
-        }
+        //[Browsable(false)]
+        //public string Color_3_Serialize
+        //{
+        //    get { return SerializableColor.ToString(_col_3); }
+        //    set { _col_3 = SerializableColor.FromString(value); }
+        //}
 
     }
 }
