@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.0.1
+/// Version: 1.0.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2019
 /// /// -------------------------------------------------------------------------
@@ -24,7 +24,15 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
-	public class Weekday_Indicator : UserIndicator
+    public enum Enum_TypeOfEntryExit {
+        open = 0,
+        close = 1
+    }   
+
+
+
+
+    public class Weekday_Indicator : UserIndicator
 	{
         //private bool _ShowSignalOnChartBackground = true;
         //private bool _ShowSignalOnChartArrow = true;
@@ -57,6 +65,15 @@ namespace AgenaTrader.UserCode
         private DayOfWeek _start = DayOfWeek.Tuesday;
         private DayOfWeek _end = DayOfWeek.Thursday;
 
+        private double _start_candle = 0.0;
+        //private double _end_candle = 0.0;
+        private double _summe = 0.0;
+        private double _anzahl = 0.0;
+
+        private Enum_TypeOfEntryExit _startentry = Enum_TypeOfEntryExit.close;
+        private Enum_TypeOfEntryExit _endentry = Enum_TypeOfEntryExit.close;
+
+
         protected override void OnInit()
 		{
             //Add(new OutputDescriptor(new Pen(this.Color_1, this.LineWidth_1), OutputSerieDrawStyle.Line, "MA_1"));
@@ -72,15 +89,47 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnCalculate()
 		{
+            double price_buy = Bars[0].Open;
+            if (this.Day_Buy_Time == Enum_TypeOfEntryExit.close)
+            {
+                price_buy = Bars[0].Close;
+            }
+
             if (Time[0].DayOfWeek == this.Day_Buy)
             {
-                AddChartArrowUp("ArrowLong_MA" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Open, this.ColorLongSignalArrow);
+                _start_candle = price_buy;
+                AddChartArrowUp("ArrowLong_MA" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, price_buy, this.ColorLongSignalArrow);
             }
+
+            double pricesell = Bars[0].Open;
+            if (this.Day_Sell_Time == Enum_TypeOfEntryExit.close)
+            {
+                pricesell = Bars[0].Close;
+
+            }
+
+
 
             if (Time[0].DayOfWeek == this.Day_Sell)
             {
-                AddChartArrowDown("ArrowShort_MA" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Close, this.ColorShortSignalArrow);
+                if (_start_candle > 0.0)
+                {
+                    _summe += pricesell - _start_candle;
+                    _anzahl += 1;
+                    _start_candle = 0.0;
+                }
+                AddChartArrowDown("ArrowShort_MA" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, pricesell, this.ColorShortSignalArrow);
             }
+
+
+            if (IsProcessingBarIndexLast)
+            {
+                AddChartTextFixed("RRR_string01", "Gesamt: " + _summe.ToString("F"), TextPosition.TopRight, Color.Black, new Font(FontFamily.GenericSansSerif, 10, FontStyle.Regular), Color.Transparent, Color.Transparent);
+                AddChartTextFixed("RRR_string02", "Trades: " + _anzahl.ToString(), TextPosition.TopRight, Color.Black, new Font(FontFamily.GenericSansSerif, 10, FontStyle.Regular), Color.Transparent, Color.Transparent);
+                AddChartTextFixed("RRR_string03", "Durchschnitt: " + (_summe/_anzahl).ToString("F"), TextPosition.TopRight, Color.Black, new Font(FontFamily.GenericSansSerif, 10, FontStyle.Regular), Color.Transparent, Color.Transparent);
+
+            }
+
 
             //Bollinger bb = Bollinger(this.StandardDeviation, this.Period);
 
@@ -233,6 +282,35 @@ namespace AgenaTrader.UserCode
             }
         }
 
+
+        
+        /// <summary>
+        /// </summary>
+        [Description("Time to Buy.")]
+        [Category("Signals")]
+        [DisplayName("Time Buy")]
+        public Enum_TypeOfEntryExit Day_Buy_Time
+        {
+            get { return _startentry; }
+            set
+            {
+                _startentry = value;
+            }
+        }
+
+        /// <summary>
+        /// </summary>
+        [Description("Time to Sell.")]
+        [Category("Signals")]
+        [DisplayName("Time Sell")]
+        public Enum_TypeOfEntryExit Day_Sell_Time
+        {
+            get { return _endentry; }
+            set
+            {
+                _endentry = value;
+            }
+        }
 
         ///// <summary>
         ///// </summary>
