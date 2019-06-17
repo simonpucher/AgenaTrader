@@ -15,7 +15,7 @@ using AgenaTrader.Helper;
 
 
 /// <summary>
-/// Version: 1.0.0
+/// Version: 1.0.1
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -43,8 +43,9 @@ namespace AgenaTrader.UserCode
             open = 1,
             close = 2
         }
+
         /// <summary>
-        /// Object is storing ray data
+        /// Object is storing swing ray data
         /// </summary>
         private class RayObject
         {
@@ -80,6 +81,7 @@ namespace AgenaTrader.UserCode
         private Stack<RayObject> swingLowRays; // track swing lows in the same manner
         private bool enableAlerts = false;
         private bool keepBrokenLines = true;
+        private bool enablesignalline = false;
 
         //input
         private Color _signal = Color.Orange;
@@ -106,6 +108,9 @@ namespace AgenaTrader.UserCode
             swingLowRays = new Stack<RayObject>();
 
             Add(new OutputDescriptor(new Pen(this.Signal, this.Plot0Width), OutputSerieDrawStyle.Line, "Signalline"));
+            Add(new OutputDescriptor(new Pen(swingHighColor, this.Plot0Width), OutputSerieDrawStyle.Line, "SwingHighs"));
+            Add(new OutputDescriptor(new Pen(swingLowColor, this.Plot0Width), OutputSerieDrawStyle.Line, "SwingLows"));
+            Add(new OutputDescriptor(new Pen(this.Signal, this.Plot0Width), OutputSerieDrawStyle.Line, "Priceline"));
         }
 
         /// <summary>
@@ -160,24 +165,29 @@ namespace AgenaTrader.UserCode
                     AddChartRay("highRay" + (ProcessingBarIndex - strength), false, strength, lastSwingHighValue, 0, lastSwingHighValue, swingHighColor, DashStyle.Solid, 1);
                     RayObject newRayObject = new RayObject("highRay" + (ProcessingBarIndex - strength), strength, lastSwingHighValue, 0, lastSwingHighValue);
                     swingHighRays.Push(newRayObject); // store a reference so we can remove it from the chart later
+                   
                 }
                 else if (actualhigh > lastSwingHighValue) // otherwise, we test to see if price has broken through prior swing high
                 {
                     if (swingHighRays.Count > 0) // just to be safe 
                     {
+                        
                         //IRay currentRay = (IRay)swingHighRays.Pop(); // pull current ray from stack 
                         RayObject currentRay = (RayObject)swingHighRays.Pop(); // pull current ray from stack 
                         if (currentRay != null)
                         {
+                           
                             if (enableAlerts)
                             {
                                 ShowAlert("Swing High at " + currentRay.Y1 + " broken", GlobalUtilities.GetSoundfile(this.Soundfile));
                             }
                             temp_signal_value = 1;
+
                             if (keepBrokenLines) // draw a line between swing point and break bar 
                             {
                                 int barsAgo = currentRay.BarsAgo1;
                                 ITrendLine newLine = AddChartLine("highLine" + (ProcessingBarIndex - barsAgo), false, barsAgo, currentRay.Y1, 0, currentRay.Y1, swingHighColor, DashStyle.Dot, 2);
+                               
                             }
                             RemoveChartDrawing(currentRay.Tag);
                             if (swingHighRays.Count > 0)
@@ -231,10 +241,12 @@ namespace AgenaTrader.UserCode
                                 ShowAlert("Swing Low at " + currentRay.Y1 + " broken", GlobalUtilities.GetSoundfile(this.Soundfile));
                             }
                             temp_signal_value = -1;
+
                             if (keepBrokenLines) // draw a line between swing point and break bar 
                             {
                                 int barsAgo = currentRay.BarsAgo1;
                                 ITrendLine newLine = AddChartLine("highLine" + (ProcessingBarIndex - barsAgo), false, barsAgo, currentRay.Y1, 0, currentRay.Y1, swingLowColor, DashStyle.Dot, 2);
+                                
                             }
                             RemoveChartDrawing(currentRay.Tag);
 
@@ -253,8 +265,33 @@ namespace AgenaTrader.UserCode
                 }
             }
 
+            if (enablesignalline)
+            {
+                SignalLine.Set(temp_signal_value);
+            }
+            else
+            {
+                this.SwingHighs.Set(lastSwingHighValue);
+                this.SwingLows.Set(lastSwingLowValue);
 
-            SignalLine.Set(temp_signal_value);
+                this.PriceLines.Set(InSeries[0]);
+            }
+
+
+            //Set the color
+            PlotColors[0][0] = this.Signal;
+            OutputDescriptors[0].PenStyle = DashStyle.Solid;
+            OutputDescriptors[0].Pen.Width = this.Plot0Width;
+            PlotColors[1][0] = this.swingHighColor;
+            OutputDescriptors[1].PenStyle = DashStyle.Solid;
+            OutputDescriptors[1].Pen.Width = this.Plot0Width;
+            PlotColors[2][0] = this.swingLowColor;
+            OutputDescriptors[2].PenStyle = DashStyle.Solid;
+            OutputDescriptors[2].Pen.Width = this.Plot0Width;
+            PlotColors[3][0] = this.Signal;
+            OutputDescriptors[3].PenStyle = DashStyle.Solid;
+            OutputDescriptors[3].Pen.Width = this.Plot0Width;
+
         }
 
 
@@ -291,7 +328,16 @@ namespace AgenaTrader.UserCode
             set { _type = value; }
         }
 
-            [Description("Alert when swings are broken")]
+        [Description("Show Signals if true, when false then show the priceline.")]
+        [InputParameter]
+        [DisplayName("Enable signalline")]
+        public bool EnableSignalline
+        {
+            get { return enablesignalline; }
+            set { enablesignalline = value; }
+        }
+
+        [Description("Alert when swings are broken")]
             [InputParameter]
             [DisplayName("Enable alerts")]
             public bool EnableAlerts
@@ -408,6 +454,29 @@ namespace AgenaTrader.UserCode
         public DataSeries SignalLine
         {
             get { return Outputs[0]; }
+        }
+
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public DataSeries SwingHighs
+        {
+            get { return Outputs[1]; }
+        }
+
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public DataSeries SwingLows
+        {
+            get { return Outputs[2]; }
+        }
+
+        [Browsable(false)]
+        [XmlIgnore()]
+        public DataSeries PriceLines
+        {
+            get { return Outputs[3]; }
         }
 
         //[Browsable(false)]  // this line prevents the data series from being displayed in the indicator properties dialog, do not remove
