@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -288,12 +289,13 @@ namespace WindowsFormsApplication1
                 var csv = new StringBuilder();
                 foreach (string[] item in _exportdata)
                 {
-                    csv.AppendLine(string.Format("{0};{1};{2}", item[0], item[1], item[2]));
+                    csv.AppendLine(string.Format("{0};{1};{2};{3};{4};{5};{6}", item[0], item[1], item[2], item[3], item[4], item[5], item[6]));
                 }
                 string filename = this.lstvw_instruments.SelectedItems[0].Text + "_" + this.lstvw_instruments.SelectedItems[0].SubItems[2].Text + "_" + this.dtp_to.Value.ToString("yyyyMMdd") + "_" + this.dtp_to.Value.ToString("yyyyMMdd") + ".csv";
                 var invalids = System.IO.Path.GetInvalidFileNameChars();
                 filename = String.Join("_", filename.Split(invalids, StringSplitOptions.RemoveEmptyEntries)).TrimEnd('.');
                 File.WriteAllText(System.IO.Directory.GetCurrentDirectory() + "\\" + filename, csv.ToString());
+                this.lbl_data_loaded.Text = _exportdata.Count + " rows of data exported.";
             }
             else
             {
@@ -308,7 +310,8 @@ namespace WindowsFormsApplication1
             {
                  TaiPanRealtime tpr = new TaiPanRealtime();
                 DataBase tprdata = (DataBase)tpr.DataBase;
-                this.GetData(tprdata, this.dtp_to.Value, this.lstvw_instruments.SelectedItems);
+                //this.GetData(tprdata, this.dtp_to.Value, this.lstvw_instruments.SelectedItems);
+                this.GetDailyEODDate(tprdata, this.dtp_to.Value, this.lstvw_instruments.SelectedItems);
             }
             else
             {
@@ -326,7 +329,63 @@ namespace WindowsFormsApplication1
         }
 
 
+        private void GetDailyEODDate(DataBase tprdata, DateTime datumVon, ListView.SelectedListViewItemCollection selecteditem)
+        {
 
+            ArrayLoader loader = new ArrayLoader();
+
+            //securities are identified with a unique symbol number
+            int bubu = Int32.Parse(selecteditem[0].SubItems[2].Text);
+            int[] symbolNr = new int[1]
+            {
+                bubu
+ //   78303,          //555750.ETR        Dt.Telekom
+	//169286,         //710000.ETR        Daimler AG
+	//78275,          //519000.ETR        BWM ST
+	//78340,          //766403.ETR        VW ST
+	//78267           //823212.ETR        Lufthansa
+            };
+            //DateTime datumVon = new DateTime(2013, 8, 1);    //start date is 08/01/2013
+            DateTime datumBis = DateTime.Now;               //end date is today
+
+            JahreschartCollection jahresCol = loader.Jahrescharts(symbolNr, datumVon, datumBis) as JahreschartCollection;
+            if (jahresCol != null)
+            {
+                //the JahresChartCollection contains all end-of-day charts...
+                Jahreschart c = new Jahreschart();
+                IChartTimeRange it = (IChartTimeRange)c;
+                it.TimeRange(datumVon, datumBis);
+
+                foreach (Jahreschart chart in jahresCol)
+                {
+                    ////...that can be read now...
+                    //Debug.WriteLine(Environment.NewLine);
+                    //foreach (IJahreschartEintrag entry in chart)
+                    //{
+                    //    Debug.WriteLine("{0}  {1}  {2}  {3}  {4}", entry.Zeit.ToShortDateString(), entry.Open, entry.High, entry.Low, entry.Close);
+                    //}
+                    _exportdata = new List<string[]>();
+                    foreach (IJahreschartEintrag entry in chart)
+                    {
+                        //TPRTIntradayChartEintrag = (IIntradayChartEintrag)TPRTIntradayChart[i];
+                        string[] tempdata = new string[7];
+                        tempdata[0] = entry.Zeit.ToString("dd.MM.yyyy");// + " " + entry.Zeit.ToString("hhmmss");
+                        tempdata[1] = entry.Open.ToString();
+                        tempdata[2] = entry.High.ToString();
+                        tempdata[3] = entry.Low.ToString();
+                        tempdata[4] = entry.Close.ToString();
+                        tempdata[5] = entry.Volume.ToString();
+                        tempdata[6] = entry.OpenInterest.ToString();
+
+                        _exportdata.Add(tempdata);
+                        //Console.WriteLine("Time: " + TPRTIntradayChartEintrag.Zeit.ToString() + " Value: " + TPRTIntradayChartEintrag.Kurs.ToString());
+                        //Console.WriteLine(TPRTIntradayChartEintrag.Volume.ToString());
+
+                    }
+                    this.lbl_data_loaded.Text = _exportdata.Count + " rows of data loaded.";
+                }
+            }
+        }
 
      
 
