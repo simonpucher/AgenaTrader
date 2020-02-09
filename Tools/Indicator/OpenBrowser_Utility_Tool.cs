@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.2.1
+/// Version: 1.2.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2016
 /// -------------------------------------------------------------------------
@@ -168,7 +168,7 @@ namespace AgenaTrader.UserCode
 
                 if (this.OpenMorningstar)
                 {
-                    GUIHelper.OpenInBrowser("http://beta.morningstar.com/search.html?q=" + isin);
+                    GUIHelper.OpenInBrowser("https://www.morningstar.com/search?query=" + symbol);
                 }
 
                 if (this.OpenMorningstar_Direct)
