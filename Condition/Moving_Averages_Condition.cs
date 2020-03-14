@@ -12,7 +12,7 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.3.1
+/// Version: 1.3.2
 /// -------------------------------------------------------------------------
 /// Simon Pucher 2017
 /// -------------------------------------------------------------------------
@@ -46,6 +46,8 @@ namespace AgenaTrader.UserCode
         private int _ma_medium = 100;
         private int _ma_short = 50;
 
+        private Color _signalcolor = Color.Transparent;
+
         #endregion
 
         protected override void OnInit()
@@ -64,6 +66,8 @@ namespace AgenaTrader.UserCode
 
 		protected override void OnCalculate()
 		{
+            //Reset color
+            _signalcolor = Color.Transparent;
 
             if (ProcessingBarIndex == 0)
             {
@@ -83,6 +87,7 @@ namespace AgenaTrader.UserCode
             if (therewasasignal)
             {
                 thevalue = 1;
+                _signalcolor = Color.LightGreen;
                 AddChartArrowUp("ArrowLong_Entry" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, Color.Green);
                 lastsignals.Push(Time[0]);
             }
@@ -92,6 +97,7 @@ namespace AgenaTrader.UserCode
                 {
                     AddChartArrowUp("ArrowLong_Echo_Entry" + +Bars[0].Time.Ticks, this.IsAutoAdjustableScale, 0, Bars[0].Low, Color.LightGreen);
                     thevalue = 0.5;
+                    _signalcolor = Color.Green;
                 }
             }
 
@@ -120,6 +126,11 @@ namespace AgenaTrader.UserCode
             {
                 return "Moving Averages (C)";
             }
+        }
+
+        public override Color? GetSignalColor()
+        {
+            return _signalcolor;
         }
 
         #region Properties
