@@ -12,9 +12,9 @@ using AgenaTrader.Plugins;
 using AgenaTrader.Helper;
 
 /// <summary>
-/// Version: 1.3
+/// Version: 1.4
 /// -------------------------------------------------------------------------
-/// Simon Pucher 2017
+/// Simon Pucher 2021
 /// -------------------------------------------------------------------------
 /// ****** Important ******
 /// To compile this script without any error you also need access to the utility indicator to use global source code elements.
@@ -33,7 +33,7 @@ namespace AgenaTrader.UserCode
 	{
 		#region Variables
 
-		private double _percentage = 1.5;
+		private double _percentagetrailing = 3.0;
 
 		#endregion
 
@@ -45,13 +45,14 @@ namespace AgenaTrader.UserCode
 			Add(new OutputDescriptor(Color.FromKnownColor(KnownColor.Black), "Occurred"));
 			Add(new OutputDescriptor(Color.Orange, "Stop"));
 			IsOverlay = true;
-            CalculateOnClosedBar = false;
+            CalculateOnClosedBar = true;
+			OverridePreviousStop = false;
 		}
 
 		protected override void OnCalculate()
 		{
             Occurred.Set(1);
-            Stop.Set(Close[0] * (1 - this.Percentage/100.0));
+            Stop.Set(Close[0] * (1 - this.PercentageTrailing / 100.0));
         }
 
 		#region Properties
@@ -75,12 +76,12 @@ namespace AgenaTrader.UserCode
 			return new[]{Stop};
 		}
 
-		[Description("")]
+		[Description("Enter the amount of percentage you want to use in your trailing.")]
 		[InputParameter]
-		public double Percentage
+		public double PercentageTrailing
 		{
-			get { return _percentage; }
-			set { _percentage = value; }
+			get { return _percentagetrailing; }
+			set { _percentagetrailing = value; }
 		}
 
 		#endregion
