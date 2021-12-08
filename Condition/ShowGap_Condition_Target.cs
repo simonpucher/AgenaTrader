@@ -27,6 +27,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+	[Category("Script-Trading")]
 	[Description("Geben Sie bitte hier die Beschreibung für die neue Condition ein")]
 	[IsEntryAttribute(false)]
 	[IsStopAttribute(false)]

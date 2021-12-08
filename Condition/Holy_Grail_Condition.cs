@@ -26,6 +26,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+	[Category("Script-Trading")]
     [Description("Watch out for the lonely warrior behind enemy lines.")]
     [IsEntryAttribute(true)]
 	[IsStopAttribute(false)]

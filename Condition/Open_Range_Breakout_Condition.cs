@@ -30,6 +30,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+	[Category("Script-Trading")]
 	[Description("Open Range Breakout Condition")]
 	[IsEntryAttribute(true)]
 	[IsStopAttribute(false)]

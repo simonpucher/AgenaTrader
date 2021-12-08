@@ -27,6 +27,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+	[Category("Script-Trading")]
 	[Description("Condition für Pop Gun Bar Pattern")]
 	[IsEntryAttribute(true)]
 	[IsStopAttribute(false)]

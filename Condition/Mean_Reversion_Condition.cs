@@ -31,6 +31,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+	[Category("Script-Trading")]
     [Description("Mean Reversion")]
 	[IsEntryAttribute(true)]
 	[IsStopAttribute(false)]

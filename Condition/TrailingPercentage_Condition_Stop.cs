@@ -24,12 +24,13 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+	[Category("Script-Trading")]
 	[Description("Trailing Stop with percentage value.")]
 	[IsEntryAttribute(false)]
 	[IsStopAttribute(true)]
 	[IsTargetAttribute(false)]
 	[OverrulePreviousStopPrice(false)]
-	public class TrailingPercentage_Condition_Target : UserScriptedCondition
+	public class TrailingPercentage_Condition_Stop : UserScriptedCondition
 	{
 		#region Variables
 
@@ -71,9 +72,9 @@ namespace AgenaTrader.UserCode
 			get { return Outputs[1]; }
 		}
 
-		public override IList<DataSeries> GetTargets()
+		public override IList<DataSeries> GetStops()
 		{
-			return new[]{Stop};
+			return new[] { Stop };
 		}
 
 		[Description("Enter the amount of percentage you want to use in your trailing.")]
@@ -82,6 +83,19 @@ namespace AgenaTrader.UserCode
 		{
 			get { return _percentagetrailing; }
 			set { _percentagetrailing = value; }
+		}
+
+		public override string ToString()
+		{
+			return "Trailing Percentage Stop (C)";
+		}
+
+		public override string DisplayName
+		{
+			get
+			{
+				return "Trailing Percentage Stop (C)";
+			}
 		}
 
 		#endregion

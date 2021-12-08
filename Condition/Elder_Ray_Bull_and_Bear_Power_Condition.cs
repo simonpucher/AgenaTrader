@@ -26,6 +26,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+	[Category("Script-Trading")]
     [Description("Elder Ray - Bull and Bear Power")]
     [IsEntryAttribute(true)]
 	[IsStopAttribute(false)]

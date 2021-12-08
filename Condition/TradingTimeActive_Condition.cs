@@ -26,6 +26,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+	[Category("Script-Trading")]
 	[Description("Condition returns false if trading break is active.")]
 	[IsEntryAttribute(true)]
 	[IsStopAttribute(false)]

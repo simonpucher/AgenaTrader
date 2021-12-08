@@ -24,6 +24,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+	[Category("Script-Trading")]
     [Description("Moving Averages Condition.")]
     [IsEntryAttribute(true)]
 	[IsStopAttribute(false)]

@@ -28,6 +28,7 @@ using AgenaTrader.Helper;
 /// </summary>
 namespace AgenaTrader.UserCode
 {
+	[Category("Script-Trading")]
     [Description("Use SMA or EMA crosses to find trends.")]
 	[IsEntryAttribute(true)]
 	[IsStopAttribute(false)]
