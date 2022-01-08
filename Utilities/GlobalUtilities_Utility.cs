@@ -290,7 +290,7 @@ namespace AgenaTrader.UserCode
         public static int AdjustPositionToRiskManagement(IAccountManager accountmanager, IPreferenceManager preferencemanager, IInstrument instrument, double lastprice)
         {
             //Get Risk Management from Account
-            IAccount account = accountmanager.GetAccount(instrument, true);
+            IAccount account = accountmanager.GetAccount(instrument, true, true);
             if (account == null)
             {
                 return instrument.GetDefaultQuantity();
